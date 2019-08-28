@@ -17,22 +17,33 @@ endif()
 
 
 if (MSVC)
-	if (CMAKE_GENERATOR_PLATFORM MATCHES x64)
-		FetchContent_Declare(
-			curllib
-			URL 		https://curl.haxx.se/windows/dl-7.65.3_1/curl-7.65.3_1-win64-mingw.zip
-			URL_HASH 	SHA256=19384567361d89261b92373ef4950e257c2fb4c72a7c4fbc4bbdaf463f83ff39
-			)
-	else()
-		FetchContent_Declare(
-			curllib
-			URL 		https://curl.haxx.se/windows/dl-7.65.3_1/curl-7.65.3_1-win32-mingw.zip
-			URL_HASH 	SHA256=031f66560ab8eb324cba331dd381cfa5ba73edb92da6047bedad20cb3736d0e8
-			)
+	message(STATUS "Looking to see if we have curl installed...")
+	find_package(CURL)
+
+	if (NOT CURL_FOUND)
+		message(STATUS "Couldn't find an installed cURL library. Downloading a binary release.")
+		if (CMAKE_GENERATOR_PLATFORM MATCHES x64)
+			FetchContent_Declare(
+				curllib
+				URL 		https://curl.haxx.se/windows/dl-7.65.3_1/curl-7.65.3_1-win64-mingw.zip
+				URL_HASH 	SHA256=19384567361d89261b92373ef4950e257c2fb4c72a7c4fbc4bbdaf463f83ff39
+				)
+		else()
+			FetchContent_Declare(
+				curllib
+				URL 		https://curl.haxx.se/windows/dl-7.65.3_1/curl-7.65.3_1-win32-mingw.zip
+				URL_HASH 	SHA256=031f66560ab8eb324cba331dd381cfa5ba73edb92da6047bedad20cb3736d0e8
+				)
+		endif()
+		FetchContent_Populate(curllib)
+		SET (CURL_LIBRARY ${curllib_SOURCE_DIR}/lib/libcurl.dll.a)
+		SET (CURL_INCLUDE_DIR ${curllib_SOURCE_DIR}/include)
 	endif()
-	FetchContent_Populate(curllib)
-	SET (CURL_LIBRARY ${curllib_SOURCE_DIR}/lib/libcurl.dll.a)
-	SET (CURL_INCLUDE_DIR ${curllib_SOURCE_DIR}/include)
+	#unset these because the cpr build will run find_package(curl) again to find the binaries we just got
+	unset(CURL_FOUND)
+	unset(CURL_INCLUDE_DIRS)
+	unset(CURL_LIBRARIES)
+	unset(CURL_VERSION_STRING)
 endif()
 
 FetchContent_Declare(
