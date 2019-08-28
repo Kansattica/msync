@@ -1,11 +1,17 @@
 language: cpp
-os: 
-  - linux
-  - windows
-dist: xenial
-compiler:
-  - clang
-  - gcc
+matrix:
+  include:
+    - os: linux
+    - dist: xenial
+    - compiler: clang
+  include:
+    - os: linux
+    - dist: xenial
+    - compiler: gcc
+  include:
+    - os: windows
+    - compiler: gcc
+
 script:
   - mkdir build
   - cd build
