@@ -22,13 +22,15 @@ if (MSVC)
 
 	if (NOT CURL_FOUND)
 		message(STATUS "Couldn't find an installed cURL library. Downloading a binary release.")
-		if (CMAKE_GENERATOR_PLATFORM MATCHES x64)
+		if("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
+			message(STATUS "Using 64 bit curl")
 			FetchContent_Declare(
 				curllib
 				URL 		https://curl.haxx.se/windows/dl-7.65.3_1/curl-7.65.3_1-win64-mingw.zip
 				URL_HASH 	SHA256=19384567361d89261b92373ef4950e257c2fb4c72a7c4fbc4bbdaf463f83ff39
 				)
 		else()
+			message(STATUS "Using 32 bit curl")
 			FetchContent_Declare(
 				curllib
 				URL 		https://curl.haxx.se/windows/dl-7.65.3_1/curl-7.65.3_1-win32-mingw.zip
@@ -36,9 +38,10 @@ if (MSVC)
 				)
 		endif()
 		FetchContent_Populate(curllib)
-		SET (CURL_LIBRARY ${curllib_SOURCE_DIR}/lib/libcurl.dll.a)
+		SET (CURL_LIBRARY ${curllib_SOURCE_DIR}/lib/libcurl.a)
 		SET (CURL_INCLUDE_DIR ${curllib_SOURCE_DIR}/include)
 	endif()
+	add_definitions(-DCURL_STATICLIB)
 	#unset these because the cpr build will run find_package(curl) again to find the binaries we just got
 	unset(CURL_FOUND)
 	unset(CURL_INCLUDE_DIRS)
@@ -58,5 +61,8 @@ FetchContent_GetProperties(libcpr)
 if(NOT libcpr_POPULATED)
 	FetchContent_Populate(libcpr)
 	add_subdirectory(${libcpr_SOURCE_DIR})
-	include_directories(${CPR_INCLUDE_DIRS})
+	#message(STATUS "Descending into ${CPR_INCLUDE_DIRS}")
+	#include_directories(${CPR_INCLUDE_DIRS})
+	message(STATUS "Prepared CPR libraries ${CPR_LIBRARIES}")
+	#target_compile_definitions(${CPR_LIBRARIES} PUBLIC "CURL_STATICLIB")
 endif()

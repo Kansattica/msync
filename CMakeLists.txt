@@ -27,5 +27,6 @@ target_link_libraries(common PRIVATE ${CPR_LIBRARIES})
 
 add_executable(msync console/msync.cpp)
 
+target_link_libraries(msync PRIVATE common)
 target_link_libraries(msync PRIVATE parse)
 target_link_libraries(msync PRIVATE sync)
