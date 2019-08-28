@@ -3,6 +3,8 @@ project (msync VERSION 0.1
 	DESCRIPTION "Store and forward messages with a Mastodon-compatible API server."
 	LANGUAGES CXX)
 
+include(cmake/linktimeoptimization.cmake)
+
 include(cmake/packages.cmake)
 
 
@@ -14,6 +16,7 @@ if (MSVC)
 else()
 	add_compile_options(-W -Wall)
 endif()
+
 add_library(parse "")
 add_library(sync "")
 
