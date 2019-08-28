@@ -11,6 +11,7 @@ option(JSON_BuildTests "" OFF)
 FetchContent_GetProperties(njson)
 if(NOT njson_POPULATED)
 	FetchContent_Populate(njson)
+	message(STATUS "Building nlohmann json...")
 	add_subdirectory(${njson_SOURCE_DIR} ${njson_BINARY_DIR})
 endif()
 
