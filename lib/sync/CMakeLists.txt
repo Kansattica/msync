@@ -1,8 +1,7 @@
 target_sources_local(sync
 	PRIVATE
-	version.h
-	send.h
+	send.hpp
 	send.cpp
-	recv.h
+	recv.hpp
 	recv.cpp
 	)
