@@ -9,16 +9,9 @@ matrix:
     compiler: gcc
   - os: windows
     compiler: msvc
-    # use Chocolatey's version of curl
-    env: 
-    - CMAKE_PREFIX=C:\ProgramData\chocolatey\lib\curl\tools
-    - MATRIX_EVAL="CC=CL.exe && CXX=CL.exe"
     
-before_install:
-    - eval "${MATRIX_EVAL}"  #force travis to not set gcc stuff
-
 script:
   - mkdir build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX} ..
+  - cmake -DCMAKE_BUILD_TYPE=Release ..
   - cmake --build . --config Release
