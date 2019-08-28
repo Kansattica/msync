@@ -16,7 +16,6 @@ endif()
 
 
 if (MSVC)
-	option(USE_SYSTEM_CURL "" ON)
 	if (CMAKE_GENERATOR_PLATFORM MATCHES x64)
 		FetchContent_Declare(
 			curllib
@@ -41,6 +40,7 @@ FetchContent_Declare(
 	GIT_TAG			master
 	GIT_SHALLOW		TRUE 	
 )
+option(USE_SYSTEM_CURL "" ON)
 option(BUILD_CPR_TESTS "" OFF)
 FetchContent_GetProperties(libcpr)
 if(NOT libcpr_POPULATED)
