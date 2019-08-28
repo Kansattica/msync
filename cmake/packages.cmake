@@ -21,25 +21,26 @@ if (MSVC)
 	find_package(CURL)
 
 	if (NOT CURL_FOUND)
-		message(STATUS "Couldn't find an installed cURL library. Downloading a binary release.")
-		if("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
-			message(STATUS "Using 64 bit curl")
-			FetchContent_Declare(
-				curllib
-				URL 		https://curl.haxx.se/windows/dl-7.65.3_1/curl-7.65.3_1-win64-mingw.zip
-				URL_HASH 	SHA256=19384567361d89261b92373ef4950e257c2fb4c72a7c4fbc4bbdaf463f83ff39
+		message(STATUS "Couldn't find an installed cURL library. Downloading a source build.")
+		FetchContent_Declare(
+			curllib
+			GIT_REPOSITORY 	https://github.com/curl/curl.git
+			GIT_TAG 		curl-7_65_3
+			GIT_SHALLOW 	TRUE
+			GIT_PROGRESS 	TRUE
+			)
+		if (NOT curllib_POPULATED)
+			FetchContent_Populate(curllib)
+			execute_process(
+				COMMAND "cmake . -DCMAKE_USE_WINSSL=ON -DHTTP_ONLY=ON -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DENABLE_DEBUG=OFF -DCMAKE_BUILD_TYPE=Release"
+				COMMAND "cmake --build . --config Release --clean-first"
+				WORKING_DIRECTORY "${curllib_SOURCE_DIR}"
+				COMMAND_ECHO 	STDOUT
 				)
-		else()
-			message(STATUS "Using 32 bit curl")
-			FetchContent_Declare(
-				curllib
-				URL 		https://curl.haxx.se/windows/dl-7.65.3_1/curl-7.65.3_1-win32-mingw.zip
-				URL_HASH 	SHA256=031f66560ab8eb324cba331dd381cfa5ba73edb92da6047bedad20cb3736d0e8
-				)
+			#add_subdirectory(${curllib_SOURCE_DIR})
+			SET (CURL_LIBRARY ${curllib_SOURCE_DIR}/lib/Release/libcurl.lib)
+			SET (CURL_INCLUDE_DIR ${curllib_SOURCE_DIR}/include)
 		endif()
-		FetchContent_Populate(curllib)
-		SET (CURL_LIBRARY ${curllib_SOURCE_DIR}/lib/libcurl.a)
-		SET (CURL_INCLUDE_DIR ${curllib_SOURCE_DIR}/include)
 	endif()
 	add_definitions(-DCURL_STATICLIB)
 	#unset these because the cpr build will run find_package(curl) again to find the binaries we just got
