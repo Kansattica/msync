@@ -11,22 +11,19 @@ include(cmake/packages.cmake)
 set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_CXX_EXTENSIONS off)
 
-if (MSVC)
-	add_compile_options(/W3)
-else()
-	add_compile_options(-W -Wall)
-endif()
-
 add_library(parse "")
 add_library(sync "")
+add_library(common "")
 
 # see https://crascit.com/2016/01/31/enhanced-source-file-handling-with-target_sources/
 include(cmake/compatibility.cmake)
 
 add_subdirectory(lib/parse)
 add_subdirectory(lib/sync)
+add_subdirectory(lib/common)
 
 target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(common PRIVATE ${CPR_LIBRARIES})
 
 add_executable(msync console/msync.cpp)
 
