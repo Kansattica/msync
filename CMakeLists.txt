@@ -3,7 +3,6 @@ project (msync VERSION 0.1
 	DESCRIPTION "Store and forward messages with a Mastodon-compatible API server."
 	LANGUAGES CXX)
 
-include(cmake/linktimeoptimization.cmake)
 
 include(cmake/packages.cmake)
 
@@ -30,3 +29,5 @@ add_executable(msync console/msync.cpp)
 target_link_libraries(msync PRIVATE common)
 target_link_libraries(msync PRIVATE parse)
 target_link_libraries(msync PRIVATE sync)
+
+include(cmake/linktimeoptimization.cmake)
