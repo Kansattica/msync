@@ -8,9 +8,12 @@ matrix:
     dist: xenial
     compiler: gcc
   - os: windows
+    compiler: none
+    # use Chocolatey's version of curl
+    env: CMAKE_PREFIX=C:\ProgramData\chocolatey\lib\curl\tools
 
 script:
   - mkdir build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE=Release ..
+  - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$CMAKE_PREFIX ..
   - cmake --build . --config Release
