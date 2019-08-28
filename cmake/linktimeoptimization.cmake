@@ -1,7 +1,6 @@
-include(CheckIPOSupported)
-
 if((CMAKE_BUILD_TYPE MATCHES Release) OR (CMAKE_BUILD_TYPE MATCHES MinSizeRel))
 	message("Testing for IPO support...")
+	include(CheckIPOSupported)
 	check_ipo_supported(RESULT ipo_is_supported OUTPUT error)
 	if (ipo_is_supported)
 		message(STATUS "IPO / LTO enabled!")
