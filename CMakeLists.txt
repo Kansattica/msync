@@ -1,9 +1,12 @@
-cmake_minimum_required(VERSION 3.13..3.15)
+cmake_minimum_required(VERSION 3.12..3.15)
 project (msync VERSION 0.1
 	DESCRIPTION "Store and forward messages with a Mastodon-compatible API server."
 	LANGUAGES CXX)
 
-set (CMAKE_CXX_STANDARD 17)
+include(cmake/packages.cmake)
+
+
+set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_CXX_EXTENSIONS off)
 
 if (MSVC)
@@ -11,13 +14,16 @@ if (MSVC)
 else()
 	add_compile_options(-W -Wall)
 endif()
-
 add_library(parse "")
 add_library(sync "")
 
 # see https://crascit.com/2016/01/31/enhanced-source-file-handling-with-target_sources/
+include(cmake/compatibility.cmake)
+
 add_subdirectory(lib/parse)
 add_subdirectory(lib/sync)
+
+target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json)
 
 add_executable(msync console/msync.cpp)
 

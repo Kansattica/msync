@@ -1,4 +1,4 @@
-target_sources(parse
+target_sources_local(parse
 	PRIVATE
 		version.h
 		inoutbox.cpp

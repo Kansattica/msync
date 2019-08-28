@@ -1,4 +1,4 @@
-target_sources(sync
+target_sources_local(sync
 	PRIVATE
 	version.h
 	send.h
