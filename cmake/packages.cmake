@@ -31,6 +31,22 @@ if(NOT frozenlib_POPULATED)
 	add_subdirectory(${frozenlib_SOURCE_DIR} ${frozenlib_BINARY_DIR})
 endif()
 
+message(STATUS "Downloading TCLAP...")
+FetchContent_Declare(
+	tclaplib
+	GIT_REPOSITORY https://git.code.sf.net/p/tclap/code
+	GIT_TAG		   v1.2.2
+	GIT_SHALLOW    TRUE
+	GIT_PROGRESS   TRUE
+	)
+
+FetchContent_GetProperties(tclaplib)
+if(NOT tclaplib_POPULATED)
+	FetchContent_Populate(tclaplib)
+	set (TCLAP_LIBRARIES "${tclaplib_SOURCE_DIR}/include")
+endif()
+
+message(STATUS "Downloading CPR...")
 FetchContent_Declare(
 	libcpr
 	GIT_REPOSITORY 	https://github.com/kansattica/cpr.git
@@ -48,6 +64,7 @@ if (MSVC)
 endif()
 FetchContent_GetProperties(libcpr)
 if(NOT libcpr_POPULATED)
+	message(STATUS "Configuring CPR...")
 	FetchContent_Populate(libcpr)
 	message(STATUS "BUILD_SHARED_LIBS IS ${BUILD_SHARED_LIBS}")
 	add_subdirectory(${libcpr_SOURCE_DIR})
