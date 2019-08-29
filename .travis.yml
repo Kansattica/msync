@@ -27,3 +27,4 @@ script:
 after_success:
   - echo "Binary size:"
   - du -h $EXELOCATION
+  - $EXELOCATION
