@@ -10,9 +10,9 @@ include(cmake/packages.cmake)
 set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_CXX_EXTENSIONS off)
 
-add_library(parse "")
-add_library(sync "")
-add_library(common "")
+add_library(parse STATIC "")
+add_library(sync STATIC "")
+add_library(common STATIC "")
 
 # see https://crascit.com/2016/01/31/enhanced-source-file-handling-with-target_sources/
 include(cmake/compatibility.cmake)
