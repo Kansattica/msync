@@ -16,61 +16,6 @@ if(NOT njson_POPULATED)
 	add_subdirectory(${njson_SOURCE_DIR} ${njson_BINARY_DIR})
 endif()
 
-
-if (MSVC)
-	message(STATUS "Looking to see if we have curl installed...")
-	find_package(CURL)
-
-	if (NOT CURL_FOUND)
-		message(STATUS "Couldn't find an installed cURL library. Downloading a source build.")
-		FetchContent_Declare(
-			curllib
-			GIT_REPOSITORY 	https://github.com/curl/curl.git
-			GIT_TAG 		curl-7_65_3
-			GIT_SHALLOW 	TRUE
-			GIT_PROGRESS 	TRUE
-			)
-		if (NOT curllib_POPULATED)
-			FetchContent_Populate(curllib)
-			message (STATUS "Building curl in ${curllib_BINARY_DIR}...")
-
-			if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "Debug")
-				set (LIBCURL_BUILD_TYPE ${CMAKE_BUILD_TYPE})
-			elseif (CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
-				set (LIBCURL_BUILD_TYPE "Release")
-			else()
-				set(LIBCURL_BUILD_TYPE "Debug")
-			endif()
-
-			message (STATUS "Building libcurl in ${LIBCURL_BUILD_TYPE} mode.")
-
-			execute_process(
-				COMMAND "cmake" "${curllib_SOURCE_DIR}" "-DCMAKE_USE_WINSSL=ON" "-DHTTP_ONLY=ON" "-DBUILD_SHARED_LIBS=OFF" "-DBUILD_TESTING=OFF" "-DENABLE_DEBUG=OFF" "-DCMAKE_BUILD_TYPE=${LIBCURL_BUILD_TYPE}" "-DBUILD_CURL_EXE=OFF"
-				WORKING_DIRECTORY ${curllib_BINARY_DIR}
-				)
-			execute_process(
-				COMMAND "cmake" "--build" "." "--config" "${LIBCURL_BUILD_TYPE}" "--clean-first"
-				WORKING_DIRECTORY ${curllib_BINARY_DIR}
-				)
-
-			#add_subdirectory(${curllib_SOURCE_DIR})
-			message (STATUS "Looking for libcurl at ${curllib_BINARY_DIR}/lib/${LIBCURL_BUILD_TYPE}/")
-			
-			# it's libcurl.lib on release builds and libcurl-d.lib on debug
-			file(GLOB CURL_LIBRARY "${curllib_BINARY_DIR}/lib/${LIBCURL_BUILD_TYPE}/*.lib")
-			message (STATUS "Using cURL library at ${CURL_LIBRARY}")
-			#SET (CURL_LIBRARY "${curllib_BINARY_DIR}/lib/${CMAKE_BUILD_TYPE}/libcurl*.lib")
-			SET (CURL_INCLUDE_DIR ${curllib_SOURCE_DIR}/include)
-		endif()
-	endif()
-	add_definitions(-DCURL_STATICLIB)
-	#unset these because the cpr build will run find_package(curl) again to find the binaries we just got
-	unset(CURL_FOUND)
-	unset(CURL_INCLUDE_DIRS)
-	unset(CURL_LIBRARIES)
-	unset(CURL_VERSION_STRING)
-endif()
-
 FetchContent_Declare(
 	libcpr
 	GIT_REPOSITORY 	https://github.com/kansattica/cpr.git
@@ -79,9 +24,16 @@ FetchContent_Declare(
 )
 option(USE_SYSTEM_CURL "" ON)
 option(BUILD_CPR_TESTS "" OFF)
+if (MSVC)
+	set (CMAKE_USE_WINSSL ON CACHE BOOL "Use winssl" FORCE)
+	set (CMAKE_USE_OPENSSL OFF CACHE BOOL "Don't use openssl" FORCE)
+	set (BUILD_SHARED_LIBS OFF CACHE BOOL "Build static libcurl and cpr." FORCE)
+	add_definitions(-DCURL_STATICLIB)
+endif()
 FetchContent_GetProperties(libcpr)
 if(NOT libcpr_POPULATED)
 	FetchContent_Populate(libcpr)
+	message(STATUS "BUILD_SHARED_LIBS IS ${BUILD_SHARED_LIBS}")
 	add_subdirectory(${libcpr_SOURCE_DIR})
 	#message(STATUS "Descending into ${CPR_INCLUDE_DIRS}")
 	#include_directories(${CPR_INCLUDE_DIRS})
