@@ -9,9 +9,17 @@ matrix:
     compiler: gcc
   - os: windows
     compiler: msvc
-    
+env:
+  - BUILDTYPE=Release
+  - BUILDTYPE=MinSizeRel
+
 script:
   - mkdir build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE=Release ..
-  - cmake --build . --config Release
+  - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE ..
+  - cmake --build . --config $BUILDTYPE
+
+after_success:
+  - echo "Binary size:"
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then du ./Release/msync.exe; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then du ./msync; fi
