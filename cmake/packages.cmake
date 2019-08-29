@@ -33,18 +33,34 @@ if (MSVC)
 		if (NOT curllib_POPULATED)
 			FetchContent_Populate(curllib)
 			message (STATUS "Building curl in ${curllib_BINARY_DIR}...")
+
+			if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "Debug")
+				set (LIBCURL_BUILD_TYPE ${CMAKE_BUILD_TYPE})
+			elseif (CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
+				set (LIBCURL_BUILD_TYPE "Release")
+			else()
+				set(LIBCURL_BUILD_TYPE "Debug")
+			endif()
+
+			message (STATUS "Building libcurl in ${LIBCURL_BUILD_TYPE} mode.")
+
 			execute_process(
-				COMMAND "cmake" "${curllib_SOURCE_DIR}" "-DCMAKE_USE_WINSSL=ON" "-DHTTP_ONLY=ON" "-DBUILD_SHARED_LIBS=OFF" "-DBUILD_TESTING=OFF" "-DENABLE_DEBUG=OFF" "-DCMAKE_BUILD_TYPE=Release"
+				COMMAND "cmake" "${curllib_SOURCE_DIR}" "-DCMAKE_USE_WINSSL=ON" "-DHTTP_ONLY=ON" "-DBUILD_SHARED_LIBS=OFF" "-DBUILD_TESTING=OFF" "-DENABLE_DEBUG=OFF" "-DCMAKE_BUILD_TYPE=${LIBCURL_BUILD_TYPE}" "-DBUILD_CURL_EXE=OFF"
 				WORKING_DIRECTORY ${curllib_BINARY_DIR}
 				)
 			execute_process(
-				COMMAND "cmake" "--build" "." "--config" "Release" "--clean-first"
+				COMMAND "cmake" "--build" "." "--config" "${LIBCURL_BUILD_TYPE}" "--clean-first"
 				WORKING_DIRECTORY ${curllib_BINARY_DIR}
 				)
 
 			#add_subdirectory(${curllib_SOURCE_DIR})
-			SET (CURL_LIBRARY ${curllib_BINARY_DIR}/lib/Release/libcurl.lib)
-			SET (CURL_INCLUDE_DIR ${curllib_BINARY_DIR}/include)
+			message (STATUS "Looking for libcurl at ${curllib_BINARY_DIR}/lib/${LIBCURL_BUILD_TYPE}/")
+			
+			# it's libcurl.lib on release builds and libcurl-d.lib on debug
+			file(GLOB CURL_LIBRARY "${curllib_BINARY_DIR}/lib/${LIBCURL_BUILD_TYPE}/*.lib")
+			message (STATUS "Using cURL library at ${CURL_LIBRARY}")
+			#SET (CURL_LIBRARY "${curllib_BINARY_DIR}/lib/${CMAKE_BUILD_TYPE}/libcurl*.lib")
+			SET (CURL_INCLUDE_DIR ${curllib_SOURCE_DIR}/include)
 		endif()
 	endif()
 	add_definitions(-DCURL_STATICLIB)
