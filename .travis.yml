@@ -1,4 +1,7 @@
 language: cpp
+env:
+  - BUILDTYPE=Release
+  - BUILDTYPE=MinSizeRel
 matrix:
   include:
   - os: linux
@@ -9,14 +12,11 @@ matrix:
     compiler: gcc
   - os: windows
     compiler: msvc
-env:
-  - BUILDTYPE=Release
-  - BUILDTYPE=MinSizeRel
 
 script:
   - mkdir build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE ..
+  - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE -DUSE_SYSTEM_CURL=OFF ..
   - cmake --build . --config $BUILDTYPE
 
 after_success:
