@@ -1,10 +1,10 @@
 #include <tclap/CmdLine.h>
 #include <iostream>
-#include <optional>
+#include <tuple>
 
 #include "parseoptions.hpp"
 
-std::optional<int> parse(int argc, char **argv)
+std::tuple<int, bool> parse(int argc, char **argv)
 {
     try
     {
@@ -14,11 +14,11 @@ std::optional<int> parse(int argc, char **argv)
         cmd.parse(argc, argv);
 
         if (numArg.isSet())
-            return numArg.getValue();
+            return std::make_tuple(numArg.getValue(), true);
     }
     catch (const TCLAP::ArgException &e)
     {
         std::cerr << "error: " << e.error() << " for arg " << e.argId() << std::endl;
     }
-    return {};
+    return std::make_tuple(0, false);
 }
