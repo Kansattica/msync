@@ -1,3 +1,3 @@
-#include <optional>
+#include <tuple>
 
-std::optional<int> parse(int argc, char **argv);
+std::tuple<int, bool> parse(int argc, char **argv);

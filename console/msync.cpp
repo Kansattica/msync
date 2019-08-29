@@ -17,8 +17,11 @@ int main(int argc, char *argv[])
 		std::cout << "The number " << v << " is " << (is_good(v) ? "good" : "bad") << ".\n";
 	}
 
-	if (auto usernum = parse(argc, argv))
+	bool found;
+	int num;
+	std::tie(num, found) = parse(argc, argv);
+	if (found)
 	{
-		std::cout << "You gave me the number " << *usernum << ", which is " << (is_good(*usernum) ? "good" : "bad") << ".\n";
+		std::cout << "You gave me the number " << num << ", which is " << (is_good(num) ? "good" : "bad") << ".\n";
 	}
 }

@@ -7,7 +7,7 @@ include(cmake/linktimeoptimization.cmake)
 
 include(cmake/packages.cmake)
 
-set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_CXX_EXTENSIONS off)
 
 add_library(parse STATIC "")
