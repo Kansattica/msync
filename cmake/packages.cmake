@@ -35,7 +35,6 @@ if (MSVC)
 				COMMAND "cmake . -DCMAKE_USE_WINSSL=ON -DHTTP_ONLY=ON -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DENABLE_DEBUG=OFF -DCMAKE_BUILD_TYPE=Release"
 				COMMAND "cmake --build . --config Release --clean-first"
 				WORKING_DIRECTORY "${curllib_SOURCE_DIR}"
-				COMMAND_ECHO 	STDOUT
 				)
 			#add_subdirectory(${curllib_SOURCE_DIR})
 			SET (CURL_LIBRARY ${curllib_SOURCE_DIR}/lib/Release/libcurl.lib)
