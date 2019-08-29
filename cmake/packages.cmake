@@ -32,18 +32,19 @@ if (MSVC)
 			)
 		if (NOT curllib_POPULATED)
 			FetchContent_Populate(curllib)
-			message (STATUS "Building curl...")
+			message (STATUS "Building curl in ${curllib_BINARY_DIR}...")
 			execute_process(
-				COMMAND "cmake" "." "-DCMAKE_USE_WINSSL=ON" "-DHTTP_ONLY=ON" "-DBUILD_SHARED_LIBS=OFF" "-DBUILD_TESTING=OFF" "-DENABLE_DEBUG=OFF" "-DCMAKE_BUILD_TYPE=Release"
+				COMMAND "cmake" "${curllib_SOURCE_DIR}" "-DCMAKE_USE_WINSSL=ON" "-DHTTP_ONLY=ON" "-DBUILD_SHARED_LIBS=OFF" "-DBUILD_TESTING=OFF" "-DENABLE_DEBUG=OFF" "-DCMAKE_BUILD_TYPE=Release"
+				WORKING_DIRECTORY ${curllib_BINARY_DIR}
+				)
+			execute_process(
 				COMMAND "cmake" "--build" "." "--config" "Release" "--clean-first"
-				WORKING_DIRECTORY ${curllib_SOURCE_DIR}
-				RESULT_VARIABLE CURL_BUILD_RESULT
+				WORKING_DIRECTORY ${curllib_BINARY_DIR}
 				)
 
-			message (STATUS "${CURL_BUILD_RESULT}")
 			#add_subdirectory(${curllib_SOURCE_DIR})
-			SET (CURL_LIBRARY ${curllib_SOURCE_DIR}/lib/Release/libcurl.lib)
-			SET (CURL_INCLUDE_DIR ${curllib_SOURCE_DIR}/include)
+			SET (CURL_LIBRARY ${curllib_BINARY_DIR}/lib/Release/libcurl.lib)
+			SET (CURL_INCLUDE_DIR ${curllib_BINARY_DIR}/include)
 		endif()
 	endif()
 	add_definitions(-DCURL_STATICLIB)
