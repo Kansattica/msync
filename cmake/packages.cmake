@@ -1,5 +1,6 @@
 include(FetchContent)
 
+message(STATUS "Downloading nlohmann json...")
 FetchContent_Declare(
 	njson
 	URL 		https://github.com/nlohmann/json/archive/v3.7.0.zip
@@ -31,11 +32,15 @@ if (MSVC)
 			)
 		if (NOT curllib_POPULATED)
 			FetchContent_Populate(curllib)
+			message (STATUS "Building curl...")
 			execute_process(
-				COMMAND "cmake . -DCMAKE_USE_WINSSL=ON -DHTTP_ONLY=ON -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DENABLE_DEBUG=OFF -DCMAKE_BUILD_TYPE=Release"
-				COMMAND "cmake --build . --config Release --clean-first"
-				WORKING_DIRECTORY "${curllib_SOURCE_DIR}"
+				COMMAND "cmake" "." "-DCMAKE_USE_WINSSL=ON" "-DHTTP_ONLY=ON" "-DBUILD_SHARED_LIBS=OFF" "-DBUILD_TESTING=OFF" "-DENABLE_DEBUG=OFF" "-DCMAKE_BUILD_TYPE=Release"
+				COMMAND "cmake" "--build" "." "--config" "Release" "--clean-first"
+				WORKING_DIRECTORY ${curllib_SOURCE_DIR}
+				RESULT_VARIABLE CURL_BUILD_RESULT
 				)
+
+			message (STATUS "${CURL_BUILD_RESULT}")
 			#add_subdirectory(${curllib_SOURCE_DIR})
 			SET (CURL_LIBRARY ${curllib_SOURCE_DIR}/lib/Release/libcurl.lib)
 			SET (CURL_INCLUDE_DIR ${curllib_SOURCE_DIR}/include)
