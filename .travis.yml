@@ -11,10 +11,10 @@ matrix:
   include:
   - os: windows
     compiler: msvc
-    env: BUILDTYPE=Release
+    env: BUILDTYPE=Release 
   - os: windows
     compiler: msvc
-    env: BUILDTYPE=MinSizeRel
+    env: BUILDTYPE=MinSizeRel 
 
 
 script:
@@ -22,8 +22,8 @@ script:
   - cd build
   - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE -DUSE_SYSTEM_CURL=OFF ..
   - cmake --build . --config $BUILDTYPE --parallel 2
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then EXELOCATION="./Release/msync.exe"; else EXELOCATION="./msync"; fi
 
 after_success:
   - echo "Binary size:"
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then du ./Release/msync.exe; fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then du ./msync; fi
+  - du -h $EXELOCATION
