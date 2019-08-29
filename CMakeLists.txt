@@ -22,6 +22,7 @@ add_subdirectory(lib/sync)
 add_subdirectory(lib/common)
 
 target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(parse PRIVATE frozen::frozen)
 target_link_libraries(common PRIVATE ${CPR_LIBRARIES})
 
 add_executable(msync console/msync.cpp)
