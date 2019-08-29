@@ -5,12 +5,9 @@
 
 using json = nlohmann::json;
 
-void getgoodstuff()
+void getgoodstuff(std::string jsonish)
 {
-	json jerry = {
-		{"cool", "beans"},
-		{"counting", 69},
-		{"hey there", {"friend", true}}};
+	json jerry = json::parse(jsonish);
 
 	std::cout << std::setw(4) << jerry << std::endl;
 }
