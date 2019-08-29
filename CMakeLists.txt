@@ -7,7 +7,7 @@ include(cmake/linktimeoptimization.cmake)
 
 include(cmake/packages.cmake)
 
-set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_EXTENSIONS off)
 
 add_library(parse STATIC "")
@@ -25,7 +25,10 @@ target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(parse PRIVATE frozen::frozen)
 target_link_libraries(common PRIVATE ${CPR_LIBRARIES})
 
-add_executable(msync console/msync.cpp)
+
+add_executable(msync console/msync.cpp console/parseoptions.cpp console/parseoptions.hpp)
+
+target_include_directories(msync PRIVATE ${TCLAP_LIBRARIES})
 
 target_link_libraries(msync PRIVATE common)
 target_link_libraries(msync PRIVATE parse)

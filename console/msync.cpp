@@ -3,6 +3,8 @@
 #include "../lib/common/net.hpp"
 #include "../lib/parse/inoutbox.hpp"
 
+#include "parseoptions.hpp"
+
 int main(int argc, char *argv[])
 {
 	std::cout << "Sup, nerds. Welcome to Mastosync.\n";
@@ -13,5 +15,10 @@ int main(int argc, char *argv[])
 	for (auto v : nums)
 	{
 		std::cout << "The number " << v << " is " << (is_good(v) ? "good" : "bad") << ".\n";
+	}
+
+	if (auto usernum = parse(argc, argv))
+	{
+		std::cout << "You gave me the number " << *usernum << ", which is " << (is_good(*usernum) ? "good" : "bad") << ".\n";
 	}
 }
