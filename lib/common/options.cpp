@@ -1,12 +1,5 @@
 #include <string>
 #include <vector>
-#include <map>
-
-struct global_options {
-    bool verbose;
-
-    std::vector<user_options> accounts_to_sync;
-};
 
 struct user_options {
     // including instance name, like name@instance.social
@@ -20,4 +13,10 @@ struct user_options {
     bool sync_home;
     bool sync_dms;
     bool sync_notifications;
+};
+
+struct global_options {
+    bool verbose;
+
+    std::vector<user_options> accounts_to_sync;
 };
