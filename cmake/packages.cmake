@@ -1,6 +1,7 @@
 include(FetchContent)
 
 add_library (filesystem INTERFACE)
+target_compile_features(filesystem INTERFACE cxx_std_17)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   message (STATUS "Detected clang, using -lc++fs flag for std::filesystem support." )
   target_link_libraries(filesystem INTERFACE -lc++fs )
