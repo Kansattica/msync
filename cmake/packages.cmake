@@ -1,5 +1,29 @@
 include(FetchContent)
 
+if (!MSVC)
+	message(STATUS "Downloading FindFilesystem...")
+	FetchContent_Declare(
+		findfs
+		GIT_REPOSITORY https://github.com/vector-of-bool/CMakeCM.git
+		GIT_TAG 	   c1fe037c197a536d49bcee3d38fb861ef50ae948
+		)
+
+	FetchContent_GetProperties(findfs)
+	if(NOT findfs_POPULATED)
+		FetchContent_Populate(findfs)
+		include(${findfs_SOURCE_DIR}/CMakeCM.cmake)
+		include(FindFilesystem)
+		find_package(Filesystem REQUIRED Final)
+		message (STATUS "Filesystem support is experimental: ${CXX_FILESYSTEM_IS_EXPERIMENTAL}")
+		message (STATUS "Filesystem support was found: ${CXX_FILESYSTEM_HAVE_FS}")
+		message (STATUS "Filesystem header is: ${CXX_FILESYSTEM_HEADER}")
+		message (STATUS "Filesystem namespace is: ${CXX_FILESYSTEM_NAMESPACE}")
+	endif()
+elseif(MSVC_VERSION GREATER_EQUAL 1910) # vs 2017 or greater
+	message (STATUS "MSVC version is at least 1910 (detected ${MSVC_VERSION}), so we should have std::filesystem support." )
+	add_library (std::filesystem INTERFACE IMPORTED)
+endif()
+
 message(STATUS "Downloading nlohmann json...")
 FetchContent_Declare(
 	njson
