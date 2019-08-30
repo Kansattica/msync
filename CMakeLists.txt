@@ -30,6 +30,7 @@ target_link_libraries(net PRIVATE ${CPR_LIBRARIES})
 add_executable(msync console/msync.cpp console/parseoptions.cpp console/parseoptions.hpp)
 
 target_include_directories(msync PRIVATE ${TCLAP_LIBRARIES})
+target_include_directories(msync PRIVATE options)
 
 target_link_libraries(msync PRIVATE net)
 target_link_libraries(msync PRIVATE parse)
