@@ -28,7 +28,7 @@ target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(parse PRIVATE frozen::frozen)
 target_link_libraries(net PRIVATE ${CPR_LIBRARIES})
 
-target_link_libraries(options PRIVATE constants whereami)
+target_link_libraries(options PRIVATE constants whereami std::filesystem)
 
 add_executable(msync console/msync.cpp console/parseoptions.cpp console/parseoptions.hpp)
 
