@@ -7,12 +7,6 @@ dist: bionic
 compiler:
   - clang
   - gcc
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-8
 matrix:
   include:
   - os: windows
@@ -23,7 +17,7 @@ matrix:
     #env: BUILDTYPE=MinSizeRel 
   
 before_install:
-  - if ["$TRAVIS_COMPILER" = "gcc"]; then CC=gcc-8 && CXX=g++-8; fi
+  - if [ "$TRAVIS_COMPILER" = "gcc" ]; then sudo -E apt-get -yq --no-install-suggests --no-install-recommends $(travis_apt_get_options) install g++-8 && CC=gcc-8 && CXX=g++-8; fi
 
 script:
   - mkdir build
