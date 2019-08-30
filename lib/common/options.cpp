@@ -1,7 +1,10 @@
 #include "options.hpp"
 
+#include <constants.hpp>
+
 #include <vector>
 #include <filesystem>
+
 #include <whereami.h>
 
 global_options options;
@@ -23,5 +26,5 @@ void set_locations()
 
 std::optional<std::string> account_exists(std::string name)
 {
-    return {};
+    return Account_Directory;
 }
