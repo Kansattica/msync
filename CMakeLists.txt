@@ -12,7 +12,8 @@ set (CMAKE_CXX_EXTENSIONS off)
 
 add_library(parse STATIC "")
 add_library(sync STATIC "")
-add_library(common STATIC "")
+add_library(net STATIC "")
+add_library(options STATIC "")
 
 # see https://crascit.com/2016/01/31/enhanced-source-file-handling-with-target_sources/
 include(cmake/compatibility.cmake)
@@ -23,13 +24,13 @@ add_subdirectory(lib/common)
 
 target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(parse PRIVATE frozen::frozen)
-target_link_libraries(common PRIVATE ${CPR_LIBRARIES})
+target_link_libraries(net PRIVATE ${CPR_LIBRARIES})
 
 
 add_executable(msync console/msync.cpp console/parseoptions.cpp console/parseoptions.hpp)
 
 target_include_directories(msync PRIVATE ${TCLAP_LIBRARIES})
 
-target_link_libraries(msync PRIVATE common)
+target_link_libraries(msync PRIVATE net)
 target_link_libraries(msync PRIVATE parse)
 target_link_libraries(msync PRIVATE sync)
