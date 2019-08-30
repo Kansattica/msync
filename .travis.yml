@@ -3,7 +3,7 @@ env:
   - BUILDTYPE=Release
   - BUILDTYPE=MinSizeRel
 os: linux
-dist: xenial
+dist: bionic
 compiler:
   - clang
   - gcc
@@ -28,4 +28,4 @@ after_success:
   - echo "Binary size:"
   - du -h $EXELOCATION
   - $EXELOCATION
-  - $EXELOCATION -n 420 -n 22 -n 69
+  - $EXELOCATION -n 420 -n 22 -n 69 -v

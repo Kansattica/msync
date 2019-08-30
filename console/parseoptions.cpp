@@ -9,6 +9,7 @@ std::vector<int> parse(int argc, char **argv)
 {
     try
     {
+        set_locations(argv[0]);
         TCLAP::CmdLine cmd("This is msync", ' ', "0.1");
         TCLAP::MultiArg<int> numArg("n", "num", "Number to check", false, "integer");
         TCLAP::SwitchArg verboseArg("v", "verbose", "Produce more output", false);
@@ -17,6 +18,7 @@ std::vector<int> parse(int argc, char **argv)
         cmd.parse(argc, argv);
 
         options.verbose = verboseArg.getValue();
+
         return numArg.getValue();
     }
     catch (const TCLAP::ArgException &e)
