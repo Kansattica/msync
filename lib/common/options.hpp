@@ -5,7 +5,7 @@
 #include <optional>
 #include <string>
 
-void set_locations(const char *executable_location);
+void set_locations();
 
 extern global_options options;
 
