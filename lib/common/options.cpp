@@ -1,5 +1,6 @@
 #include "options.hpp"
 
+#include <vector>
 #include <filesystem>
 #include <whereami.h>
 
@@ -11,12 +12,13 @@ void set_locations()
 
     // see https://github.com/gpakosz/whereami
     const int length = wai_getModulePath(nullptr, 0, nullptr);
-    auto path = new char[length + 1];
+
+    auto path = std::make_unique<char[]>(length + 1);
+
     int dirname_length;
-    wai_getExecutablePath(path, length, &dirname_length);
+    wai_getExecutablePath(path.get(), length, &dirname_length);
     path[dirname_length + 1] = '\0';
-    options.executable_location = std::filesystem::path(path);
-    delete path;
+    options.executable_location = std::filesystem::path(path.get());
 }
 
 std::optional<std::string> account_exists(std::string name)
