@@ -22,6 +22,7 @@ include(cmake/compatibility.cmake)
 add_subdirectory(lib/parse)
 add_subdirectory(lib/sync)
 add_subdirectory(lib/common)
+add_subdirectory(lib/constants)
 
 target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(parse PRIVATE frozen::frozen)
