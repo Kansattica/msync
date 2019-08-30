@@ -1,6 +1,6 @@
 include(FetchContent)
 
-if (!MSVC)
+if (NOT MSVC)
 	message(STATUS "Downloading FindFilesystem...")
 	FetchContent_Declare(
 		findfs
