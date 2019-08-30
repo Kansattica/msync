@@ -1,7 +1,7 @@
 language: cpp
 env:
   - BUILDTYPE=Release
-  - BUILDTYPE=MinSizeRel
+  #- BUILDTYPE=MinSizeRel
 os: linux
 dist: bionic
 compiler:
@@ -12,9 +12,9 @@ matrix:
   - os: windows
     compiler: msvc
     env: BUILDTYPE=Release 
-  - os: windows
-    compiler: msvc
-    env: BUILDTYPE=MinSizeRel 
+  #- os: windows
+    #compiler: msvc
+    #env: BUILDTYPE=MinSizeRel 
 
 
 script:
