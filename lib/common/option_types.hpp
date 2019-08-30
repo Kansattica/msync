@@ -1,11 +1,7 @@
 #include <string>
 #include <vector>
 
-#ifndef __clang__
-#include <filesystem>
-#else
-#include <experimental/filesystem>
-#endif
+#include "filesystem.hpp"
 
 struct user_options
 {
@@ -30,8 +26,8 @@ struct user_options
 struct global_options
 {
     bool verbose;
-    std::filesystem::path executable_location;
-    std::filesystem::path current_working_directory;
+    fs::path executable_location;
+    fs::path current_working_directory;
 
     std::vector<user_options> accounts_to_sync;
 };
