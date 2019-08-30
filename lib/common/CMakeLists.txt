@@ -10,10 +10,3 @@ target_sources_local(options
         options.hpp
         option_types.hpp
 )
-
-target_sources_local(constants
-        INTERFACE
-        constants.hpp
-)
-
-#set_target_properties (constants PROPERTIES LINKER_LANGUAGE CXX)
