@@ -3,4 +3,4 @@
 
 #include "options.hpp"
 
-global_options options = global_options();
+options = global_options();
