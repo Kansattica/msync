@@ -19,7 +19,7 @@ message(STATUS "Downloading serge-sans-paille/frozen...")
 FetchContent_Declare(
 	frozenlib
 	GIT_REPOSITORY https://github.com/serge-sans-paille/frozen.git
-	GIT_TAG		   master
+	GIT_TAG		   origin/master
 	GIT_SHALLOW    TRUE
 	GIT_PROGRESS   TRUE
 	)
@@ -46,11 +46,26 @@ if(NOT tclaplib_POPULATED)
 	set (TCLAP_LIBRARIES "${tclaplib_SOURCE_DIR}/include")
 endif()
 
+message(STATUS "Downloading whereami...")
+FetchContent_Declare(
+	whereamilib
+	GIT_REPOSITORY https://github.com/gpakosz/whereami.git
+	GIT_TAG		   f3a86fdf17b49c434a16bb4d9e45a135d4cc25f9
+	GIT_PROGRESS   FALSE
+	)
+
+FetchContent_GetProperties(whereamilib)
+if(NOT whereamilib_POPULATED)
+	FetchContent_Populate(whereamilib)
+	add_library (whereami STATIC ${whereamilib_SOURCE_DIR}/src/whereami.c  ${whereamilib_SOURCE_DIR}/src/whereami.h)
+	target_include_directories(whereami PUBLIC ${whereamilib_SOURCE_DIR}/src)
+endif()
+
 message(STATUS "Downloading CPR...")
 FetchContent_Declare(
 	libcpr
 	GIT_REPOSITORY 	https://github.com/kansattica/cpr.git
-	GIT_TAG			master
+	GIT_TAG			origin/master
 	GIT_SHALLOW		TRUE 	
 )
 option(USE_SYSTEM_CURL "" ON)

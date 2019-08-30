@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12..3.15)
 project (msync VERSION 0.1
 	DESCRIPTION "Store and forward messages with a Mastodon-compatible API server."
-	LANGUAGES CXX)
+	LANGUAGES CXX C)
 
 include(cmake/linktimeoptimization.cmake)
 
@@ -27,7 +27,7 @@ target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(parse PRIVATE frozen::frozen)
 target_link_libraries(net PRIVATE ${CPR_LIBRARIES})
 
-target_link_libraries(options PRIVATE constants)
+target_link_libraries(options PRIVATE constants whereami)
 
 add_executable(msync console/msync.cpp console/parseoptions.cpp console/parseoptions.hpp)
 
