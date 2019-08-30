@@ -3,6 +3,7 @@
 
 #include <string>
 
-const std::string Account_Directory { "accounts" }
+// inline should make sure there's only one between all the files
+inline const std::string Account_Directory{"accounts"};
 
 #endif
