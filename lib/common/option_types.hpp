@@ -1,6 +1,11 @@
 #include <string>
 #include <vector>
+
+#ifndef __clang__
 #include <filesystem>
+#else
+#include <experimental/filesystem>
+#endif
 
 struct user_options
 {
