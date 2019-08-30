@@ -7,6 +7,12 @@ dist: bionic
 compiler:
   - clang
   - gcc
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-8
 matrix:
   include:
   - os: windows
@@ -15,7 +21,9 @@ matrix:
   #- os: windows
     #compiler: msvc
     #env: BUILDTYPE=MinSizeRel 
-
+  
+before_install:
+  - if ["$TRAVIS_COMPILER" = "gcc"]; then CC=gcc-8 && CXX=g++-8; fi
 
 script:
   - mkdir build
