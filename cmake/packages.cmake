@@ -1,10 +1,10 @@
 include(FetchContent)
 
-add_library (std::filesystem INTERFACE)
+add_library (filesystem INTERFACE)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  target_link_libraries(std::filesystem INTERFACE -lc++fs)
+  target_compile_options(filesystem INTERFACE -lc++fs)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  target_link_libraries(std::filesystem INTERFACE -lstdc++fs)
+  target_compile_options(filesystem INTERFACE -lstdc++fs)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" AND MSVC_VERSION GREATER_EQUAL 1910)
   # using Visual Studio C++
 	message (STATUS "MSVC version is at least 1910 (detected ${MSVC_VERSION}), so we should have std::filesystem support." )
