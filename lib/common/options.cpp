@@ -1,11 +1,11 @@
 #include <string>
 #include <vector>
+#include <map>
 
 struct global_options {
     bool verbose;
 
-    std::vector<std::string> accounts_to_sync;
-    std::vector<std::string> lists_to_sync;
+    std::vector<user_options> accounts_to_sync;
 };
 
 struct user_options {
