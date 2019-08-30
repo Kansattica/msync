@@ -1,3 +1,3 @@
-#include <tuple>
+#include <vector>
 
-std::tuple<int, bool> parse(int argc, char **argv);
+std::vector<int> parse(int argc, char **argv);

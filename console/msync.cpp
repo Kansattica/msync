@@ -1,5 +1,6 @@
 #include <iostream>
 #include <array>
+#include <vector>
 #include "../lib/common/net.hpp"
 #include "../lib/parse/inoutbox.hpp"
 
@@ -17,11 +18,9 @@ int main(int argc, char *argv[])
 		std::cout << "The number " << v << " is " << (is_good(v) ? "good" : "bad") << ".\n";
 	}
 
-	bool found;
-	int num;
-	std::tie(num, found) = parse(argc, argv);
-	if (found)
+	std::vector<int> args = parse(argc, argv);
+	for (auto v : args)
 	{
-		std::cout << "You gave me the number " << num << ", which is " << (is_good(num) ? "good" : "bad") << ".\n";
+		std::cout << "You gave me the number " << v << ", which is " << (is_good(v) ? "good" : "bad") << ".\n";
 	}
 }
