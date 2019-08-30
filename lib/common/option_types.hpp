@@ -1,7 +1,9 @@
 #include <string>
 #include <vector>
+#include <filesystem>
 
-struct user_options {
+struct user_options
+{
     // including instance name, like name@instance.social
     std::string account_name;
     std::string access_token;
@@ -20,8 +22,11 @@ struct user_options {
     bool pull_notifications;
 };
 
-struct global_options {
+struct global_options
+{
     bool verbose;
+    std::filesystem::path executable_location;
+    std::filesystem::path current_working_directory;
 
     std::vector<user_options> accounts_to_sync;
 };
