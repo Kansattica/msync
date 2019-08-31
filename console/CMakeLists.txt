@@ -4,4 +4,5 @@ target_sources_local(msync
         parseoptions.cpp
         parseoptions.hpp
         wideroutput.hpp
+        termwidth.hpp
 )
