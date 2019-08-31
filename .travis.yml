@@ -30,4 +30,4 @@ after_success:
   - echo "Binary size:"
   - du -h $EXELOCATION
   - $EXELOCATION
-  - $EXELOCATION -n 420 -n 22 -n 69 -v
+  - $EXELOCATION -v
