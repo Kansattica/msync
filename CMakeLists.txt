@@ -15,10 +15,12 @@ add_library(sync STATIC "")
 add_library(net STATIC "")
 add_library(options STATIC "")
 add_library(constants INTERFACE)
+add_executable(msync "")
 
 # see https://crascit.com/2016/01/31/enhanced-source-file-handling-with-target_sources/
 include(cmake/compatibility.cmake)
 
+add_subdirectory(console)
 add_subdirectory(lib/parse)
 add_subdirectory(lib/sync)
 add_subdirectory(lib/common)
@@ -31,7 +33,6 @@ target_link_libraries(net PRIVATE ${CPR_LIBRARIES})
 target_link_libraries(options PRIVATE constants whereami )
 target_link_libraries(options PUBLIC filesystem )
 
-add_executable(msync console/msync.cpp console/parseoptions.cpp console/parseoptions.hpp)
 
 target_include_directories(msync PRIVATE ${TCLAP_LIBRARIES})
 
