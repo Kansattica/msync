@@ -31,3 +31,5 @@ after_success:
   - du -h $EXELOCATION
   - $EXELOCATION
   - $EXELOCATION -v
+  - $EXELOCATION -h
+  
