@@ -4,6 +4,7 @@
 
 #include "../lib/common/options.hpp"
 #include "wideroutput.hpp"
+#include "termwidth.hpp"
 #include "parseoptions.hpp"
 
 const std::string helpmessage = R"(msync is a command line utility for synchronizing with a Mastodon API-compatible server.
@@ -12,7 +13,8 @@ Account names for accounts that you have logged into msync with can be shortened
 (for example, if you have GoddessGrace@goodchristian.website and GoodGraces@another.website, you could select them with -a God or -a Goo, respectively)
 )";
 
-TCLAP::WiderOutput fixedOutput {100};
+const int columns = term_width();
+TCLAP::WiderOutput fixedOutput {columns};
 
 void parse(int argc, char **argv)
 {
@@ -33,6 +35,10 @@ void parse(int argc, char **argv)
         options.verbose = verboseArg.getValue();
         options.retries = retryArg.getValue();
 
+        if (options.verbose)
+        {
+            std::cout << "I detected your terminal width to be " << columns << " columns wide.\n";
+        }
     }
     catch (const TCLAP::ArgException &e)
     {
