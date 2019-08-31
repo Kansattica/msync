@@ -9,7 +9,7 @@
 const std::string helpmessage = R"(msync is a command line utility for synchronizing with a Mastodon API-compatible server.
 New account names must be fully specified, like: GoddessGrace@goodchristian.website.
 Account names for accounts that you have logged into msync with can be shortened as long as it's unambiguous.
-(for example, if you have GoddessGrace@goodchristian.website and GoodGrace@another.website, you could select them with -a God or -a Goo, respectively)
+(for example, if you have GoddessGrace@goodchristian.website and GoodGraces@another.website, you could select them with -a God or -a Goo, respectively)
 )";
 
 TCLAP::WiderOutput fixedOutput {100};
