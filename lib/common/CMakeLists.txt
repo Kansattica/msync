@@ -9,4 +9,5 @@ target_sources_local(options
         options.cpp
         options.hpp
         option_types.hpp
+        filesystem.hpp
 )
