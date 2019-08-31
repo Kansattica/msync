@@ -1,3 +1,2 @@
-#include <vector>
 
-std::vector<int> parse(int argc, char **argv);
+void parse(int argc, char **argv);
