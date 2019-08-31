@@ -1,7 +1,7 @@
 #include <string>
 #include <vector>
 
-#include "filesystem.hpp"
+#include <filesystem>
 
 struct user_options
 {
@@ -26,8 +26,9 @@ struct user_options
 struct global_options
 {
     bool verbose;
-    fs::path executable_location;
-    fs::path current_working_directory;
+    int retries;
+    std::filesystem::path executable_location;
+    std::filesystem::path current_working_directory;
 
     std::vector<user_options> accounts_to_sync;
 };
