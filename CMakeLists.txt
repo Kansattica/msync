@@ -14,6 +14,7 @@ add_library(parse STATIC "")
 add_library(sync STATIC "")
 add_library(net STATIC "")
 add_library(options STATIC "")
+add_library(optionparsing STATIC "")
 add_library(constants INTERFACE)
 add_executable(msync "")
 
@@ -21,6 +22,7 @@ add_executable(msync "")
 include(cmake/compatibility.cmake)
 
 add_subdirectory(console)
+add_subdirectory(console/optionparsing)
 add_subdirectory(lib/parse)
 add_subdirectory(lib/sync)
 add_subdirectory(lib/common)
@@ -32,9 +34,8 @@ target_link_libraries(net PRIVATE ${CPR_LIBRARIES})
 
 target_link_libraries(options PRIVATE constants whereami )
 target_link_libraries(options PUBLIC filesystem )
+target_link_libraries(optionparsing PRIVATE frozen::frozen)
 
+target_include_directories(optionparsing PRIVATE ${TCLAP_LIBRARIES})
 
-target_include_directories(msync PRIVATE ${TCLAP_LIBRARIES})
-
-target_link_libraries(msync PRIVATE net parse sync options)
-target_link_libraries(msync PRIVATE frozen::frozen)
+target_link_libraries(msync PRIVATE net parse sync options optionparsing)
