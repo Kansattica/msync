@@ -6,7 +6,7 @@
 
 #include "../lib/options/options.hpp"
 
-#include "parseoptions.hpp"
+#include "optionparsing/parseoptions.hpp"
 
 int main(int argc, char *argv[])
 {
