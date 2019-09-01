@@ -1,0 +1,9 @@
+target_sources_local(options
+        PRIVATE
+        options.cpp
+        options.hpp
+        global_options.hpp
+        global_options.cpp
+        user_options.hpp
+        filesystem.hpp
+)

@@ -1,8 +1,6 @@
 #include <string>
 #include <vector>
 
-#include "filesystem.hpp"
-
 struct user_options
 {
     // including instance name, like name@instance.social
@@ -21,14 +19,4 @@ struct user_options
     bool pull_home;
     bool pull_dms;
     bool pull_notifications;
-};
-
-struct global_options
-{
-    bool verbose;
-    int retries;
-    fs::path executable_location;
-    fs::path current_working_directory;
-
-    std::vector<user_options> accounts_to_sync;
 };
