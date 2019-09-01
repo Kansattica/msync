@@ -4,7 +4,7 @@
 #include "../lib/common/net.hpp"
 #include "../lib/parse/inoutbox.hpp"
 
-#include "../lib/common/options.hpp"
+#include "../lib/options/options.hpp"
 
 #include "parseoptions.hpp"
 
