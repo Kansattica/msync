@@ -222,7 +222,7 @@ inline void WiderOutput::spacePrint(std::ostream &os,
 									int indentSpaces,
 									int secondLineOffset) const
 {
-	int len = static_cast<int>(s.length());
+	const int len = static_cast<int>(s.length());
 
 	if ((len + indentSpaces > maxWidth) && maxWidth > 0)
 	{
@@ -267,7 +267,7 @@ inline void WiderOutput::spacePrint(std::ostream &os,
 				allowedLen -= secondLineOffset;
 			}
 
-			os << s.substr(start, stringLen) << std::endl;
+			os << s.substr(start, stringLen); //add a new line after this to make the post-help prose have extra newlines.
 
 			// so we don't start a line with a space
 			while (s[stringLen + start] == ' ' && start < len)

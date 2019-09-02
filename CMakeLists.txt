@@ -24,10 +24,10 @@ add_subdirectory(console)
 add_subdirectory(lib/parse)
 add_subdirectory(lib/sync)
 add_subdirectory(lib/common)
+add_subdirectory(lib/options)
 add_subdirectory(lib/constants)
 
 target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(parse PRIVATE frozen::frozen)
 target_link_libraries(net PRIVATE ${CPR_LIBRARIES})
 
 target_link_libraries(options PRIVATE constants whereami )
@@ -36,7 +36,5 @@ target_link_libraries(options PUBLIC filesystem )
 
 target_include_directories(msync PRIVATE ${TCLAP_LIBRARIES})
 
-target_link_libraries(msync PRIVATE net)
-target_link_libraries(msync PRIVATE parse)
-target_link_libraries(msync PRIVATE sync)
-target_link_libraries(msync PRIVATE options)
+target_link_libraries(msync PRIVATE net parse sync options)
+target_link_libraries(msync PRIVATE frozen::frozen)
