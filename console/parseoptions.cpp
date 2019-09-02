@@ -1,8 +1,9 @@
 #include <tclap/CmdLine.h>
+#include <frozen/set.h>
 #include <iostream>
 #include <string>
 
-#include "../lib/common/options.hpp"
+#include "../lib/options/options.hpp"
 #include "wideroutput.hpp"
 #include "termwidth.hpp"
 #include "parseoptions.hpp"
@@ -20,20 +21,17 @@ void parse(int argc, char **argv)
 {
     try
     {
-        set_locations();
         TCLAP::CmdLine cmd(helpmessage, ' ', "0.1");
-        TCLAP::ValueArg<int> retryArg("r", "retries", "How many times to retry a failed operation", false, 3, "integer");
-        TCLAP::MultiArg<std::string> accountsArg("a", "account", "The account or accounts to operate on.", false, "account name");
-        TCLAP::SwitchArg verboseArg("v", "verbose", "Produce more output", false);
-        cmd.add(retryArg);
-        cmd.add(verboseArg);
-        cmd.add(accountsArg);
+        TCLAP::ValueArg<int> retry("r", "retries", "How many times to retry a failed operation.", false, 3, "integer", cmd);
+        TCLAP::ValueArg<std::string> set("", "set", "The name of the option to set for the given account. Acceptable values are 'accesstoken', 'clientsecret', 'authcode', 'username', 'password'", false, "", "option name", cmd);
+        TCLAP::MultiArg<std::string> accounts("a", "account", "The account or accounts to operate on.", false, "account name", cmd);
+        TCLAP::SwitchArg verbose("v", "verbose", "Produce more output.", cmd, false);
 
         cmd.setOutput(&fixedOutput);
         cmd.parse(argc, argv);
 
-        options.verbose = verboseArg.getValue();
-        options.retries = retryArg.getValue();
+        options.verbose = verbose.getValue();
+        options.retries = retry.getValue();
 
         if (options.verbose)
         {
