@@ -21,6 +21,12 @@ msync config new -a [account name]
 New account names must be fully specified, like: GoddessGrace@goodchristian.website
 )";
 
+const std::string configMessage = R"(optionname	Sets the named option to the named value. If no value is given, print the value of that option.
+showall	Print options for the specified account. If no account is specified, print options for all accounts.
+list	Add and remove lists from being synchronized for an account.
+sync	Whether to synchronize an account's home timeline, direct messages, and notifications.
+)";
+
 enum class mode
 {
     config,
@@ -41,28 +47,26 @@ void parse(int argc, char **argv)
     string account;
 
     auto settableoptions = (one_of(
-        command("showall").set(toset, user_option::show),
-        command("show").set(toset, user_option::show),
         command("new").set(toset, user_option::newaccount),
         command("accesstoken").set(toset, user_option::accesstoken),
         command("username").set(toset, user_option::username),
         command("password").set(toset, user_option::password),
         command("clientsecret").set(toset, user_option::clientsecret)));
 
-    auto configMode = (command("config").set(selected, mode::config).doc("Set or retrieve configuration options for accounts."),
+    auto configMode = (command("config").set(selected, mode::config).doc("Set and show account-specific options."),
                        one_of(
-                           in_sequence(command("list"), one_of(command("add").set(toset, user_option::addlist), command("remove").set(toset, user_option::removelist)), value("list name", optionval))
-                               .doc("Sync or stop syncing a list."),
+                           command("showall").set(toset, user_option::show).doc("Print options for the specified account. If no account is specified, print options for all accounts."),
                            in_sequence(command("sync"),
                                        one_of(command("home").set(toset, user_option::home),
                                               command("dms").set(toset, user_option::dms),
                                               command("notifications").set(toset, user_option::notifications)),
-                                       one_of(command("on").set(optionval, "T"s), command("off").set(optionval, "F"s)))
-                               .doc("Sync or stop syncing the home timeline, direct messages, or notifications for the specified account."),
+                                       one_of(command("on").set(optionval, "T"s), command("off").set(optionval, "F"s))).doc("Whether to synchronize an account's home timeline, direct messages, and notifications."),
+                           in_sequence(command("list"), one_of(command("add").set(toset, user_option::addlist), command("remove").set(toset, user_option::removelist)), value("list name", optionval)).doc("Add and remove lists from being synchronized for an account"),
                            settableoptions & opt_value("value", optionval)));
 
     auto syncMode = ((command("sync").set(selected, mode::sync))
-                         .doc("Synchronize your account[s] with their server[s]. Synchronizes all accounts unless one is specified with -a."));
+                         .doc("Synchronize your account[s] with their server[s]. Synchronizes all accounts unless one is specified with -a."),
+                     (option("-r", "--retries") & value("times", options.retries)) % "Retry failed requests n times. (default: 3)");
 
     auto genMode = ((command("gen").set(selected, mode::gen) | command("generate").set(selected, mode::gen)).doc("Generate a post template in the current folder."));
 
@@ -72,8 +76,6 @@ void parse(int argc, char **argv)
                              option("-v", "--verbose").set(options.verbose).doc("Verbose mode. Program will be more chatty."));
 
     auto cli = (configMode | syncMode | genMode | queueMode | (command("help").set(selected, mode::help)), universalOptions);
-    // (option("-r", "--retries") & value("times", options.retries)) % "Retry failed requests n times. (default: 3)");
-
 
     auto result = parse(argc, argv, cli);
 
@@ -82,5 +84,6 @@ void parse(int argc, char **argv)
         cout << make_man_page(cli, "msync").append_section("NOTES", helpmessage);
     }
 
+    cout << static_cast<int>(selected) << '\n';
     cout << static_cast<int>(toset) << '\n';
 }
