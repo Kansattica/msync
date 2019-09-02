@@ -59,7 +59,7 @@ void parse(int argc, char **argv)
                                               command("notifications").set(toset, user_option::notifications)),
                                        one_of(command("on").set(optionval, "T"s), command("off").set(optionval, "F"s)))
                                .doc("Sync or stop syncing the home timeline, direct messages, or notifications for the specified account."),
-                           settableoptions & opt_value("set option to this", optionval)));
+                           settableoptions & opt_value("value", optionval)));
 
     auto syncMode = ((command("sync").set(selected, mode::sync))
                          .doc("Synchronize your account[s] with their server[s]. Synchronizes all accounts unless one is specified with -a."));
