@@ -26,8 +26,10 @@ enum class mode
     config,
     sync,
     gen,
+    queue,
     help
 };
+
 void parse(int argc, char **argv)
 {
     using namespace std::string_literals;
@@ -49,7 +51,7 @@ void parse(int argc, char **argv)
 
     auto configMode = (command("config").set(selected, mode::config).doc("Set or retrieve configuration options for accounts."),
                        one_of(
-                           in_sequence(command("list"), one_of(command("add").set(toset, user_option::addlist), command("remove").set(toset, user_option::removelist)))
+                           in_sequence(command("list"), one_of(command("add").set(toset, user_option::addlist), command("remove").set(toset, user_option::removelist)), value("list name", optionval))
                                .doc("Sync or stop syncing a list."),
                            in_sequence(command("sync"),
                                        one_of(command("home").set(toset, user_option::home),
@@ -57,16 +59,19 @@ void parse(int argc, char **argv)
                                               command("notifications").set(toset, user_option::notifications)),
                                        one_of(command("on").set(optionval, "T"s), command("off").set(optionval, "F"s)))
                                .doc("Sync or stop syncing the home timeline, direct messages, or notifications for the specified account."),
-                           settableoptions),
-                       option("-t", "--value", "--to").doc("What to set that option to. If omitted, print the value of the option.") & value("value", optionval));
+                           settableoptions & opt_value("set option to this", optionval)));
 
     auto syncMode = ((command("sync").set(selected, mode::sync))
-                         .doc("Synchronize your account[s] with the server[s]."));
+                         .doc("Synchronize your account[s] with their server[s]. Synchronizes all accounts unless one is specified with -a."));
+
+    auto genMode = ((command("gen").set(selected, mode::gen) | command("generate").set(selected, mode::gen)).doc("Generate a post template in the current folder."));
+
+    auto queueMode = ((command("queue").set(selected, mode::gen) | command("q").set(selected, mode::gen)).doc("Manage the queue of things to send."));
 
     auto universalOptions = (option("-a", "--account") & value("account", account).doc("The account name to operate on."),
                              option("-v", "--verbose").set(options.verbose).doc("Verbose mode. Program will be more chatty."));
 
-    auto cli = (configMode | syncMode | (command("help").set(selected, mode::help)), universalOptions);
+    auto cli = (configMode | syncMode | genMode | queueMode | (command("help").set(selected, mode::help)), universalOptions);
     // (option("-r", "--retries") & value("times", options.retries)) % "Retry failed requests n times. (default: 3)");
 
 
@@ -74,7 +79,7 @@ void parse(int argc, char **argv)
 
     if (!result)
     {
-        cout << make_man_page(cli, "msync").append_section("Notes", helpmessage);
+        cout << make_man_page(cli, "msync").append_section("NOTES", helpmessage);
     }
 
     cout << static_cast<int>(toset) << '\n';
