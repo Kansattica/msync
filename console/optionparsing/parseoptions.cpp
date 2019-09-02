@@ -1,56 +1,81 @@
-#include <tclap/CmdLine.h>
-#include <frozen/set.h>
+#include <clipp.h>
+
 #include <iostream>
 #include <string>
-#include <vector>
 
 #include "../../lib/options/options.hpp"
-#include "wideroutput.hpp"
-#include "termwidth.hpp"
 #include "parseoptions.hpp"
 
+using namespace clipp;
+using std::cout;
+using std::string;
+
 const std::string helpmessage = R"(msync is a command line utility for synchronizing with a Mastodon API-compatible server.
-New account names must be fully specified, like: GoddessGrace@goodchristian.website.
 Account names for accounts that you have logged into msync with can be shortened as long as it's unambiguous.
 (for example, if you have GoddessGrace@goodchristian.website and GoodGraces@another.website, you could select them with -a God or -a Goo, respectively)
+The account name can be left out of most commands entirely if you only have one account registered with msync.
+If this is your first time, try running:
+
+msync config new -a [account name]
+
+New account names must be fully specified, like: GoddessGrace@goodchristian.website
 )";
 
-const int columns = term_width();
-
-// tclap isn't very const correct, huh
-std::vector<std::string> validOptions {"accesstoken", "clientsecret", "authcode", "username", "password"};
-
+enum class mode
+{
+    config,
+    sync,
+    gen,
+    help
+};
 void parse(int argc, char **argv)
 {
-    TCLAP::ValuesConstraint<std::string> allowedOptions(validOptions);
-    try
+    using namespace std::string_literals;
+
+    mode selected = mode::help;
+
+    user_option toset;
+    string optionval;
+    string account;
+
+    auto settableoptions = (one_of(
+        command("showall").set(toset, user_option::show),
+        command("show").set(toset, user_option::show),
+        command("new").set(toset, user_option::newaccount),
+        command("accesstoken").set(toset, user_option::accesstoken),
+        command("username").set(toset, user_option::username),
+        command("password").set(toset, user_option::password),
+        command("clientsecret").set(toset, user_option::clientsecret)));
+
+    auto configMode = (command("config").set(selected, mode::config).doc("Set or retrieve configuration options for accounts."),
+                       one_of(
+                           in_sequence(command("list"), one_of(command("add").set(toset, user_option::addlist), command("remove").set(toset, user_option::removelist)))
+                               .doc("Sync or stop syncing a list."),
+                           in_sequence(command("sync"),
+                                       one_of(command("home").set(toset, user_option::home),
+                                              command("dms").set(toset, user_option::dms),
+                                              command("notifications").set(toset, user_option::notifications)),
+                                       one_of(command("on").set(optionval, "T"s), command("off").set(optionval, "F"s)))
+                               .doc("Sync or stop syncing the home timeline, direct messages, or notifications for the specified account."),
+                           settableoptions),
+                       option("-t", "--value", "--to").doc("What to set that option to. If omitted, print the value of the option.") & value("value", optionval));
+
+    auto syncMode = ((command("sync").set(selected, mode::sync))
+                         .doc("Synchronize your account[s] with the server[s]."));
+
+    auto universalOptions = (option("-a", "--account") & value("account", account).doc("The account name to operate on."),
+                             option("-v", "--verbose").set(options.verbose).doc("Verbose mode. Program will be more chatty."));
+
+    auto cli = (configMode | syncMode | (command("help").set(selected, mode::help)), universalOptions);
+    // (option("-r", "--retries") & value("times", options.retries)) % "Retry failed requests n times. (default: 3)");
+
+
+    auto result = parse(argc, argv, cli);
+
+    if (!result)
     {
-        TCLAP::CmdLine cmd(helpmessage, ' ', "0.1");
-        TCLAP::ValueArg<int> retry("r", "retries", "How many times to retry a failed operation.", false, 3, "integer", cmd);
-        TCLAP::ValueArg<std::string> option("", "option", "The name of the option to read or set for the given account.", false, "", &allowedOptions, cmd);
-        TCLAP::ValueArg<std::string> setOption("", "set", "What to set the named option to.", false, "", "option value", cmd);
-        TCLAP::MultiArg<std::string> accounts("a", "account", "The account or accounts to operate on.", false, "account name", cmd);
-        TCLAP::SwitchArg verbose("v", "verbose", "Produce more output.", cmd, false);
-
-        TCLAP::WiderOutput wideOut{columns};
-        cmd.setOutput(&wideOut);
-
-        cmd.parse(argc, argv);
-
-        options.verbose = verbose.getValue();
-        options.retries = retry.getValue();
-
-        if (options.verbose)
-            std::cout << "I detected your terminal width to be " << columns << " columns wide.\n";
-
-        if (setOption.isSet() && !option.isSet())
-            std::cerr << "If you're going to use --set, you have to provide an option to set.";
-
+        cout << make_man_page(cli, "msync").append_section("Notes", helpmessage);
     }
-    catch (const TCLAP::ArgException &e)
-    {
-        std::cerr << "error: " << e.error() << " for arg " << e.argId() << std::endl;
-    }
+
+    cout << static_cast<int>(toset) << '\n';
 }
-
-

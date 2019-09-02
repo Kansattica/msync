@@ -20,3 +20,5 @@ struct user_options
     bool pull_dms;
     bool pull_notifications;
 };
+
+enum class user_option {show, accesstoken, username, password, clientsecret, addlist, removelist, home, dms, notifications, newaccount};

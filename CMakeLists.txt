@@ -32,10 +32,8 @@ add_subdirectory(lib/constants)
 target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(net PRIVATE ${CPR_LIBRARIES})
 
-target_link_libraries(options PRIVATE constants whereami )
-target_link_libraries(options PUBLIC filesystem )
-target_link_libraries(optionparsing PRIVATE frozen::frozen)
-
-target_include_directories(optionparsing PRIVATE ${TCLAP_LIBRARIES})
+target_link_libraries(options PRIVATE constants whereami)
+target_link_libraries(options PUBLIC filesystem)
+target_link_libraries(optionparsing PRIVATE frozen::frozen clipp::clipp)
 
 target_link_libraries(msync PRIVATE net parse sync options optionparsing)

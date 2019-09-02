@@ -53,19 +53,28 @@ if(NOT frozenlib_POPULATED)
 	add_subdirectory(${frozenlib_SOURCE_DIR} ${frozenlib_BINARY_DIR})
 endif()
 
-message(STATUS "Downloading TCLAP...")
+message(STATUS "Downloading clipp...")
 FetchContent_Declare(
-	tclaplib
-	GIT_REPOSITORY https://git.code.sf.net/p/tclap/code
-	GIT_TAG		   v1.2.2
+	clipplib
+	GIT_REPOSITORY https://github.com/muellan/clipp.git
+	GIT_TAG		   2c32b2f1f7cc530b1ec1f62c92f698643bb368db
 	GIT_SHALLOW    TRUE
 	GIT_PROGRESS   TRUE
 	)
 
-FetchContent_GetProperties(tclaplib)
-if(NOT tclaplib_POPULATED)
-	FetchContent_Populate(tclaplib)
-	set (TCLAP_LIBRARIES "${tclaplib_SOURCE_DIR}/include")
+FetchContent_GetProperties(clipplib)
+	# suppress that weird INSTALL_DIRS message clipp makes.
+	if(NOT clipplib_POPULATED)
+	function(message)
+		if (NOT MESSAGE_QUIET)
+			_message(${ARGN})
+		endif()
+	endfunction()
+
+	set(MESSAGE_QUIET ON)
+	FetchContent_Populate(clipplib)
+	add_subdirectory(${clipplib_SOURCE_DIR} ${clipplib_BINARY_DIR} EXCLUDE_FROM_ALL)
+	unset(MESSAGE_QUIET)
 endif()
 
 message(STATUS "Downloading whereami...")
