@@ -53,14 +53,15 @@ void parse(int argc, char **argv)
         command("password").set(toset, user_option::password),
         command("clientsecret").set(toset, user_option::clientsecret)));
 
-    auto configMode = (command("config").set(selected, mode::config).doc("Set and show account-specific options."),
+    auto configMode = (command("config").set(selected, mode::config).doc("Set and show account-specific options.") &
                        one_of(
                            command("showall").set(toset, user_option::show).doc("Print options for the specified account. If no account is specified, print options for all accounts."),
                            in_sequence(command("sync"),
                                        one_of(command("home").set(toset, user_option::home),
                                               command("dms").set(toset, user_option::dms),
                                               command("notifications").set(toset, user_option::notifications)),
-                                       one_of(command("on").set(optionval, "T"s), command("off").set(optionval, "F"s))).doc("Whether to synchronize an account's home timeline, direct messages, and notifications."),
+                                       one_of(command("on").set(optionval, "T"s), command("off").set(optionval, "F"s)))
+                               .doc("Whether to synchronize an account's home timeline, direct messages, and notifications."),
                            in_sequence(command("list"), one_of(command("add").set(toset, user_option::addlist), command("remove").set(toset, user_option::removelist)), value("list name", optionval)).doc("Add and remove lists from being synchronized for an account"),
                            settableoptions & opt_value("value", optionval)));
 
@@ -70,7 +71,7 @@ void parse(int argc, char **argv)
 
     auto genMode = ((command("gen").set(selected, mode::gen) | command("generate").set(selected, mode::gen)).doc("Generate a post template in the current folder."));
 
-    auto queueMode = ((command("queue").set(selected, mode::gen) | command("q").set(selected, mode::gen)).doc("Manage the queue of things to send."));
+    auto queueMode = ((command("queue").set(selected, mode::queue) | command("q").set(selected, mode::queue)).doc("Manage the queue of things to send."));
 
     auto universalOptions = (option("-a", "--account") & value("account", account).doc("The account name to operate on."),
                              option("-v", "--verbose").set(options.verbose).doc("Verbose mode. Program will be more chatty."));
