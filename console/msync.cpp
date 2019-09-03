@@ -1,8 +1,4 @@
-#include <iostream>
-#include <array>
-#include <vector>
-#include "../lib/common/net.hpp"
-#include "../lib/parse/inoutbox.hpp"
+#include "../lib/common/printlog.hpp"
 
 #include "../lib/options/options.hpp"
 
@@ -15,8 +11,7 @@ int main(int argc, char *argv[])
 
 	parse(argc, argv);
 
-	if (options.verbose)
-	{
-		std::cout << "I think that my executable is in " << options.executable_location << "\nand my current working directory is " << options.current_working_directory << std::endl;
-	}
+	PrintLogger<logtype::verbose> pl;
+	pl << "My executable is in " << options.executable_location << '\n';
+	pl << "My current working directory is " << options.current_working_directory << '\n';
 }
