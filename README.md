@@ -29,6 +29,6 @@ Once `msync` has features, I'll have releases available for download. For now, i
 - [Nlohmann Json](https://github.com/nlohmann/json)
 - [Frozen](https://github.com/serge-sans-paille/frozen)
 - [whereami](https://github.com/gpakosz/whereami.git)
-- [TCLAP](http://tclap.sourceforge.net/)
+- [clipp](https://github.com/muellan/clipp)
 - [CPR](https://github.com/whoshuu/cpr)
 - [curl](https://github.com/curl/curl)
