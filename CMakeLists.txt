@@ -15,6 +15,7 @@ add_library(sync STATIC "")
 add_library(net STATIC "")
 add_library(options STATIC "")
 add_library(optionparsing STATIC "")
+add_library(printlog INTERFACE)
 add_library(constants INTERFACE)
 add_executable(msync "")
 
@@ -35,4 +36,4 @@ target_link_libraries(net PRIVATE ${CPR_LIBRARIES})
 target_link_libraries(options PRIVATE constants whereami filesystem)
 target_link_libraries(optionparsing PRIVATE frozen::frozen clipp::clipp)
 
-target_link_libraries(msync PRIVATE net parse sync options optionparsing)
+target_link_libraries(msync PRIVATE net parse sync options optionparsing printlog)

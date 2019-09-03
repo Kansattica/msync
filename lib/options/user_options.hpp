@@ -1,6 +1,13 @@
 #include <string>
 #include <vector>
 
+enum class sync_settings
+{
+    off,
+    newest_first,
+    oldest_first
+};
+
 struct user_options
 {
     // including instance name, like name@instance.social
@@ -31,11 +38,4 @@ enum class user_option
     dms,
     notifications,
     newaccount
-};
-
-enum class sync_settings
-{
-    off,
-    newest_first,
-    oldest_first
 };
