@@ -4,6 +4,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "../options/options.hpp"
+
 using std::cout;
 using std::ofstream;
 
@@ -16,7 +18,7 @@ enum class logtype
 template <logtype isverbose = logtype::normal>
 struct PrintLogger
 {
-    PrintLogger::PrintLogger() : logfile("msync.log") {}
+    PrintLogger() : logfile("msync.log") {}
 
     template <typename T>
     PrintLogger &operator<<(const T &towrite)
