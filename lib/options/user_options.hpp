@@ -1,5 +1,8 @@
 #include <string>
 #include <vector>
+#include <iostream>
+
+#include "filesystem.hpp"
 
 enum class sync_settings
 {
@@ -10,8 +13,12 @@ enum class sync_settings
 
 struct user_options
 {
-    // including instance name, like name@instance.social
+    user_options() = default;
+    user_options(fs::path toread);
+
     std::string account_name;
+    std::string instance_url;
+
     std::string access_token;
 
     std::vector<std::string> ids_to_favorite;

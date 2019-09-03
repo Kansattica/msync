@@ -36,7 +36,7 @@ target_link_libraries(net PRIVATE ${CPR_LIBRARIES})
 
 target_link_libraries(printlog INTERFACE options)
 
-target_link_libraries(options PRIVATE constants whereami filesystem)
-target_link_libraries(optionparsing PRIVATE frozen::frozen clipp::clipp)
+target_link_libraries(options PRIVATE constants whereami filesystem frozen::frozen printlog)
+target_link_libraries(optionparsing PRIVATE clipp::clipp)
 
 target_link_libraries(msync PRIVATE net parse sync options optionparsing printlog)
