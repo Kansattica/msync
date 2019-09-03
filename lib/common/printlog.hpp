@@ -13,7 +13,7 @@ enum class logtype
     verbose
 };
 
-template <logtype isverbose>
+template <logtype isverbose = logtype::normal>
 struct PrintLogger
 {
     PrintLogger::PrintLogger() : logfile("msync.log") {}
@@ -30,6 +30,7 @@ struct PrintLogger
         {
             cout << towrite;
         }
+
         logfile << towrite;
         return *this;
     }
