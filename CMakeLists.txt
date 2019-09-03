@@ -31,7 +31,7 @@ target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(net PRIVATE ${CPR_LIBRARIES})
 
 target_link_libraries(options PRIVATE constants whereami )
-target_link_libraries(options PUBLIC filesystem )
+target_link_libraries(options PRIVATE filesystem )
 
 
 target_include_directories(msync PRIVATE ${TCLAP_LIBRARIES})
