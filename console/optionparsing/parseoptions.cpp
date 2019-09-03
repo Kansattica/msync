@@ -21,12 +21,6 @@ msync config new -a [account name]
 New account names must be fully specified, like: GoddessGrace@goodchristian.website
 )";
 
-const std::string configMessage = R"(optionname	Sets the named option to the named value. If no value is given, print the value of that option.
-showall	Print options for the specified account. If no account is specified, print options for all accounts.
-list	Add and remove lists from being synchronized for an account.
-sync	Whether to synchronize an account's home timeline, direct messages, and notifications.
-)";
-
 enum class mode
 {
     config,
