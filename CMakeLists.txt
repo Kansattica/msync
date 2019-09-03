@@ -29,6 +29,7 @@ add_subdirectory(lib/sync)
 add_subdirectory(lib/common)
 add_subdirectory(lib/options)
 add_subdirectory(lib/constants)
+add_subdirectory(lib/printlog)
 
 target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(net PRIVATE ${CPR_LIBRARIES})

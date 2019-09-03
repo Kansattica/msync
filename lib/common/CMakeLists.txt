@@ -3,8 +3,3 @@ target_sources_local(net
         net.hpp
         net.cpp
 )
-
-target_sources_local(printlog
-	INTERFACE
-        printlog.hpp
-)
