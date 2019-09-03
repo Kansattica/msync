@@ -34,6 +34,8 @@ add_subdirectory(lib/printlog)
 target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(net PRIVATE ${CPR_LIBRARIES})
 
+target_link_libraries(printlog INTERFACE options)
+
 target_link_libraries(options PRIVATE constants whereami filesystem)
 target_link_libraries(optionparsing PRIVATE frozen::frozen clipp::clipp)
 
