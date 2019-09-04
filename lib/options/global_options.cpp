@@ -11,6 +11,5 @@ fs::path global_options::get_exe_location()
 
     int dirname_length;
     wai_getExecutablePath(path.get(), length, &dirname_length);
-    path[dirname_length + 1] = '\0';
-    return fs::path(path.get());
+    return fs::path(path.get(), path.get() + dirname_length + 1);
 }
