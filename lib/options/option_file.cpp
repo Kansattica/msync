@@ -22,7 +22,7 @@ option_file::option_file(fs::path filename) : optionfilename(filename)
             continue; //skip comments
 
         const auto equals = line.find_first_of('=');
-        const auto [it, success] = parsed_options.insert({line.substr(0, equals - 1), line.substr(equals + 1)});
+        const auto [it, success] = parsed_options.insert({line.substr(0, equals), line.substr(equals + 1)});
         if (!success)
             logger << "Duplicate key " << it->first << " found. Ignoring.\n";
     }
@@ -33,7 +33,8 @@ option_file::~option_file()
     fs::path backup(optionfilename);
     backup += ".bak";
 
-    fs::rename(optionfilename, backup);
+    if (fs::exists(optionfilename))
+        fs::rename(optionfilename, backup);
 
     ofstream of(optionfilename);
     for (auto &kvp : parsed_options)
