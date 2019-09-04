@@ -1,10 +1,24 @@
 #include <string>
 #include <vector>
+#include <iostream>
+
+#include "filesystem.hpp"
+
+enum class sync_settings
+{
+    off,
+    newest_first,
+    oldest_first
+};
 
 struct user_options
 {
-    // including instance name, like name@instance.social
+    user_options() = default;
+    user_options(fs::path toread);
+
     std::string account_name;
+    std::string instance_url;
+
     std::string access_token;
 
     std::vector<std::string> ids_to_favorite;
@@ -13,10 +27,22 @@ struct user_options
 
     std::vector<std::string> lists_to_pull;
 
-    bool pull_profile;
-    bool push_profile;
+    sync_settings pull_home = sync_settings::newest_first;
+    sync_settings pull_dms = sync_settings::oldest_first;
+    sync_settings pull_notifications = sync_settings::oldest_first;
+};
 
-    bool pull_home;
-    bool pull_dms;
-    bool pull_notifications;
+enum class user_option
+{
+    show,
+    accesstoken,
+    username,
+    password,
+    clientsecret,
+    addlist,
+    removelist,
+    home,
+    dms,
+    notifications,
+    newaccount
 };
