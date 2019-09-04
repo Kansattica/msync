@@ -30,15 +30,24 @@ option_file::option_file(fs::path filename) : optionfilename(filename)
 
 option_file::~option_file()
 {
+    if (optionfilename == "") return; // optionfile got moved from, so the new version will save it
+
+    PrintLogger<logtype::verbose> logger;
+
     fs::path backup(optionfilename);
     backup += ".bak";
 
     if (fs::exists(optionfilename))
+    {
         fs::rename(optionfilename, backup);
+        logger << "Saved backup to " << backup << '\n';
+    }
 
     ofstream of(optionfilename);
     for (auto &kvp : parsed_options)
     {
         of << kvp.first << '=' << kvp.second << '\n';
     }
+
+    logger << "Saved " << optionfilename << '\n';
 }
