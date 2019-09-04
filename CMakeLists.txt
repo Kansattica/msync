@@ -15,6 +15,7 @@ add_library(sync STATIC "")
 add_library(net STATIC "")
 add_library(options STATIC "")
 add_library(optionparsing STATIC "")
+add_library(printlog INTERFACE)
 add_library(constants INTERFACE)
 add_executable(msync "")
 
@@ -28,11 +29,14 @@ add_subdirectory(lib/sync)
 add_subdirectory(lib/common)
 add_subdirectory(lib/options)
 add_subdirectory(lib/constants)
+add_subdirectory(lib/printlog)
 
 target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(net PRIVATE ${CPR_LIBRARIES})
 
-target_link_libraries(options PRIVATE constants whereami filesystem)
-target_link_libraries(optionparsing PRIVATE frozen::frozen clipp::clipp)
+target_link_libraries(printlog INTERFACE options)
 
-target_link_libraries(msync PRIVATE net parse sync options optionparsing)
+target_link_libraries(options PRIVATE constants whereami filesystem frozen::frozen printlog)
+target_link_libraries(optionparsing PRIVATE clipp::clipp)
+
+target_link_libraries(msync PRIVATE net parse sync options optionparsing printlog)

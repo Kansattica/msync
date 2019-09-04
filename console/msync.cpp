@@ -1,22 +1,29 @@
-#include <iostream>
-#include <array>
-#include <vector>
-#include "../lib/common/net.hpp"
-#include "../lib/parse/inoutbox.hpp"
+#include <printlogger.hpp>
 
 #include "../lib/options/options.hpp"
+#include "../lib/options/option_file.hpp"
 
 #include "optionparsing/parseoptions.hpp"
+
+
+option_file makeoption()
+{
+	option_file coolopts("regularfile.options");
+
+	coolopts.parsed_options["itsbeen"] = "oneweeksinceyoulookedatme";
+	return coolopts;
+}
 
 int main(int argc, char *argv[])
 {
 	std::cout << "Sup, nerds. Welcome to Mastosync.\n";
-	//getgoodstuff(read_url("https://cybre.space/api/v1/instance"));
 
 	parse(argc, argv);
 
-	if (options.verbose)
-	{
-		std::cout << "I think that my executable is in " << options.executable_location << "\nand my current working directory is " << options.current_working_directory << std::endl;
-	}
+	PrintLogger<logtype::verbose> pl;
+	pl << "Looking for options in " << options.executable_location << '\n';
+	pl << "My current working directory for logs and arguments is " << options.current_working_directory << '\n';
+
+	auto cool = makeoption();
+	cool.parsed_options["bonus"] = "ducks";
 }

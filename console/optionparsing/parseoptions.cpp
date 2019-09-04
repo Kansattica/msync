@@ -46,7 +46,7 @@ void parse(int argc, char **argv)
         command("password").set(toset, user_option::password),
         command("clientsecret").set(toset, user_option::clientsecret)));
 
-    auto configMode = (command("config").set(selected, mode::config).doc("Set and show account-specific options."),
+    auto configMode = (command("config").set(selected, mode::config).doc("Set and show account-specific options.") &
                        one_of(
                            (command("new").set(toset, user_option::newaccount)).doc("Register a new account with msync. Start here."),
                            command("showall").set(toset, user_option::show).doc("Print options for the specified account. If no account is specified, print options for all accounts."),
@@ -66,7 +66,7 @@ void parse(int argc, char **argv)
 
     auto genMode = ((command("gen").set(selected, mode::gen) | command("generate").set(selected, mode::gen)).doc("Generate a post template in the current folder."));
 
-    auto queueMode = ((command("queue").set(selected, mode::gen) | command("q").set(selected, mode::gen)).doc("Manage the queue of things to send."));
+    auto queueMode = ((command("queue").set(selected, mode::queue) | command("q").set(selected, mode::queue)).doc("Manage the queue of things to send."));
 
     auto universalOptions = (option("-a", "--account") & value("account", account).doc("The account name to operate on."),
                              option("-v", "--verbose").set(options.verbose).doc("Verbose mode. Program will be more chatty."));
