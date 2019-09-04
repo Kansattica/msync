@@ -5,7 +5,6 @@
 
 #include <constants.hpp>
 
-
 global_options options;
 
 std::optional<std::string> account_exists(std::string name)

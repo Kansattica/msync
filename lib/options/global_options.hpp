@@ -4,8 +4,8 @@
 struct global_options
 {
     public:
-        bool verbose;
-        int retries;
+        bool verbose = false;
+        int retries = 3;
         fs::path executable_location = get_exe_location();
         fs::path current_working_directory = fs::current_path();
 
