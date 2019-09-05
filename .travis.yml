@@ -25,7 +25,7 @@ script:
   - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE -DUSE_SYSTEM_CURL=OFF ..
   - cmake --build . --config $BUILDTYPE --parallel 2
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then EXELOCATION="./$BUILDTYPE/msync.exe"; else EXELOCATION="./msync"; fi
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then TESTLOCATION="./tests/tests.exe"; else TESTLOCATION="./tests/tests"; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then TESTLOCATION="./tests/$BUILDTYPE/tests.exe"; else TESTLOCATION="./tests/tests"; fi
 
 after_success:
   - echo "Binary size:"
