@@ -1,4 +1,5 @@
 #include <catch2/catch.hpp>
+#include "test_file.hpp"
 
 #include "../lib/options/option_file.hpp"
 
@@ -13,8 +14,7 @@ SCENARIO("option_files save their data when destroyed.", "[option_file]")
     GIVEN("An option file with some values.")
     {
         const fs::path testfilename = "testfileopt";
-        if (fs::exists(testfilename))
-            fs::remove(testfilename);
+        test_file tf(testfilename);
 
         option_file opts(testfilename);
         opts.parsed_options["atestoption"] = "coolstuff";
@@ -28,7 +28,7 @@ SCENARIO("option_files save their data when destroyed.", "[option_file]")
 
             THEN("no file is written")
             {
-                REQUIRE(!fs::exists(testfilename));
+                REQUIRE_FALSE(fs::exists(testfilename));
             }
         }
 
@@ -59,7 +59,7 @@ SCENARIO("option_files save their data when destroyed.", "[option_file]")
                 option_file newopts = std::move(opts);
             }
 
-            THEN("the file is written")
+            THEN("the file gets written")
             {
                 REQUIRE(fs::exists(testfilename));
 
@@ -83,11 +83,8 @@ SCENARIO("option_files read data when created.", "[option_file]")
         const fs::path testfilename = "testfileoptread";
         fs::path backupfilename(testfilename);
         backupfilename += ".bak";
-        if (fs::exists(testfilename))
-            fs::remove(testfilename);
-
-        if (fs::exists(backupfilename))
-            fs::remove(backupfilename);
+        test_file tf(testfilename);
+        test_file tfbak(backupfilename);
 
         {
             std::ofstream fout(testfilename);
