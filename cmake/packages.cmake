@@ -119,3 +119,18 @@ if(NOT libcpr_POPULATED)
 	message(STATUS "Prepared CPR libraries ${CPR_LIBRARIES}")
 	#target_compile_definitions(${CPR_LIBRARIES} PUBLIC "CURL_STATICLIB")
 endif()
+
+if (MSYNC_BUILD_TESTS)
+	message(STATUS "Downloading catch2...")
+	FetchContent_Declare(
+		catch2lib
+		GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+		GIT_TAG		   2c869e17e4803d30b3d5ca5b0d76387b9db97fa5
+		)
+
+	FetchContent_GetProperties(catch2lib)
+	if(NOT catch2lib_POPULATED)
+		FetchContent_Populate(catch2lib)
+		add_subdirectory(${catch2lib_SOURCE_DIR} ${catch2lib_BINARY_DIR})
+	endif()
+endif()
