@@ -1,5 +1,5 @@
 #include <catch2/catch.hpp>
-#include "test_file.hpp"
+#include "test_helpers.hpp"
 
 #include "../lib/options/option_file.hpp"
 
@@ -11,7 +11,7 @@
 
 SCENARIO("option_files save their data when destroyed.", "[option_file]")
 {
-    GIVEN("An option file with some values.")
+    GIVEN("An option_file with some values.")
     {
         const fs::path testfilename = "testfileopt";
         test_file tf(testfilename);
@@ -32,7 +32,7 @@ SCENARIO("option_files save their data when destroyed.", "[option_file]")
             }
         }
 
-        WHEN("an option file is moved from with the move constructor and destroyed")
+        WHEN("an option_file is moved from with the move constructor and destroyed")
         {
             {
                 option_file newopts(std::move(opts));
@@ -42,18 +42,15 @@ SCENARIO("option_files save their data when destroyed.", "[option_file]")
             {
                 REQUIRE(fs::exists(testfilename));
 
-                std::array<std::string, 2> lines;
-                std::ifstream fin(testfilename);
+                auto lines = read_lines(testfilename);
 
-                std::getline(fin, lines[0]);
-                std::getline(fin, lines[1]);
-
+                REQUIRE(lines.size() == 2);
                 REQUIRE(lines[0] == "atestoption=coolstuff");
                 REQUIRE(lines[1] == "test=time");
             }
         }
 
-        WHEN("an option file is moved from with move assignment and destroyed")
+        WHEN("an option_file is moved from with move assignment and destroyed")
         {
             {
                 option_file newopts = std::move(opts);
@@ -63,12 +60,9 @@ SCENARIO("option_files save their data when destroyed.", "[option_file]")
             {
                 REQUIRE(fs::exists(testfilename));
 
-                std::array<std::string, 2> lines;
-                std::ifstream fin(testfilename);
+                auto lines = read_lines(testfilename);
 
-                std::getline(fin, lines[0]);
-                std::getline(fin, lines[1]);
-
+                REQUIRE(lines.size() == 2);
                 REQUIRE(lines[0] == "atestoption=coolstuff");
                 REQUIRE(lines[1] == "test=time");
             }
@@ -78,7 +72,7 @@ SCENARIO("option_files save their data when destroyed.", "[option_file]")
 
 SCENARIO("option_files read data when created.", "[option_file]")
 {
-    GIVEN("An option file with some data.")
+    GIVEN("An option file on disk with some data.")
     {
         const fs::path testfilename = "testfileoptread";
         fs::path backupfilename(testfilename);
@@ -120,13 +114,9 @@ SCENARIO("option_files read data when created.", "[option_file]")
 
             THEN("it saves the new information back to the file.")
             {
-                std::array<std::string, 3> lines;
-                std::ifstream fin(testfilename);
+                auto lines = read_lines(testfilename);
 
-                std::getline(fin, lines[0]);
-                std::getline(fin, lines[1]);
-                std::getline(fin, lines[2]);
-
+                REQUIRE(lines.size() == 3);
                 REQUIRE(lines[0] == "anotherentry=foryou");
                 REQUIRE(lines[1] == "different=tests");
                 REQUIRE(lines[2] == "somecool=isnowthis");
@@ -135,16 +125,12 @@ SCENARIO("option_files read data when created.", "[option_file]")
                 {
                     REQUIRE(fs::exists(backupfilename));
 
-                    std::array<std::string, 3> lines;
-                    std::ifstream fin(backupfilename);
+                    auto linesbak = read_lines(backupfilename);
 
-                    std::getline(fin, lines[0]);
-                    std::getline(fin, lines[1]);
-                    std::getline(fin, lines[2]);
-
-                    REQUIRE(lines[0] == "somecool=teststuff");
-                    REQUIRE(lines[1] == "different=tests");
-                    REQUIRE(lines[2] == "imgetting=testy");
+                    REQUIRE(linesbak.size() == 3);
+                    REQUIRE(linesbak[0] == "somecool=teststuff");
+                    REQUIRE(linesbak[1] == "different=tests");
+                    REQUIRE(linesbak[2] == "imgetting=testy");
                 }
             }
         }

@@ -1,8 +1,9 @@
 #include <string>
-#include <vector>
-#include <iostream>
+#include <optional>
 
 #include "filesystem.hpp"
+
+#include "option_file.hpp"
 
 enum class sync_settings
 {
@@ -11,38 +12,34 @@ enum class sync_settings
     oldest_first
 };
 
-struct user_options
-{
-    user_options() = default;
-    user_options(fs::path toread);
-
-    std::string account_name;
-    std::string instance_url;
-
-    std::string access_token;
-
-    std::vector<std::string> ids_to_favorite;
-    std::vector<std::string> ids_to_boost;
-    std::vector<std::string> filenames_to_post;
-
-    std::vector<std::string> lists_to_pull;
-
-    sync_settings pull_home = sync_settings::newest_first;
-    sync_settings pull_dms = sync_settings::oldest_first;
-    sync_settings pull_notifications = sync_settings::oldest_first;
-};
-
 enum class user_option
 {
-    show,
+    accountname,
+    instanceurl,
     accesstoken,
     username,
     password,
     clientsecret,
-    addlist,
-    removelist,
     home,
     dms,
     notifications,
-    newaccount
+
+    // these guys have to be handled specially
+    // fix it later because having special enums is gonna cause bugs later.
+    addlist,
+    removelist,
+    newaccount,
+    show
+};
+
+struct user_options
+{
+public:
+    user_options(fs::path toread) : backing(toread){};
+
+    std::optional<std::string> get_option(user_option toget);
+    void set_option(user_option toset, std::string value);
+
+private:
+    option_file backing;
 };
