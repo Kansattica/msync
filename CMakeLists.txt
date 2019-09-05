@@ -3,6 +3,8 @@ project (msync VERSION 0.1
 	DESCRIPTION "Store and forward messages with a Mastodon-compatible API server."
 	LANGUAGES CXX C)
 
+option(MSYNC_BUILD_TESTS "Download catch2 and build tests with it." ON)
+
 include(cmake/linktimeoptimization.cmake)
 
 include(cmake/packages.cmake)
@@ -40,3 +42,7 @@ target_link_libraries(options PRIVATE constants whereami filesystem frozen::froz
 target_link_libraries(optionparsing PRIVATE clipp::clipp)
 
 target_link_libraries(msync PRIVATE net parse sync options optionparsing printlog)
+
+if (MSYNC_BUILD_TESTS)
+	add_subdirectory(tests)
+endif()
