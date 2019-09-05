@@ -41,7 +41,6 @@ void parse(int argc, char **argv)
     string account;
 
     auto settableoptions = (one_of(
-        command("new").set(toset, user_option::newaccount),
         command("accesstoken").set(toset, user_option::accesstoken),
         command("username").set(toset, user_option::username),
         command("password").set(toset, user_option::password),
@@ -49,6 +48,7 @@ void parse(int argc, char **argv)
 
     auto configMode = (command("config").set(selected, mode::config).doc("Set and show account-specific options.") &
                        one_of(
+                           (command("new").set(toset, user_option::newaccount)).doc("Register a new account with msync. Start here."),
                            command("showall").set(toset, user_option::show).doc("Print options for the specified account. If no account is specified, print options for all accounts."),
                            in_sequence(command("sync"),
                                        one_of(command("home").set(toset, user_option::home),
@@ -57,7 +57,8 @@ void parse(int argc, char **argv)
                                        one_of(command("on").set(optionval, "T"s), command("off").set(optionval, "F"s)))
                                .doc("Whether to synchronize an account's home timeline, direct messages, and notifications."),
                            in_sequence(command("list"), one_of(command("add").set(toset, user_option::addlist), command("remove").set(toset, user_option::removelist)), value("list name", optionval)).doc("Add and remove lists from being synchronized for an account"),
-                           settableoptions & opt_value("value", optionval)));
+                           (settableoptions & opt_value("value", optionval) % "If value given, set the specified option to that. Otherwise, show the corresponding value.")) %
+                           "config commands");
 
     auto syncMode = ((command("sync").set(selected, mode::sync))
                          .doc("Synchronize your account[s] with their server[s]. Synchronizes all accounts unless one is specified with -a."),
