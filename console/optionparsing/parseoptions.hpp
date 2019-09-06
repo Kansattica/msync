@@ -25,4 +25,4 @@ struct parse_result
     std::string account;
 };
 
-parse_result parse(int argc, char **argv, bool silent = true);
+parse_result parse(int argc, const char *argv[], bool silent = true);
