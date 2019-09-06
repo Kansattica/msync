@@ -1,7 +1,6 @@
 #include <clipp.h>
 
 #include <iostream>
-#include <string>
 
 #include "../../lib/options/options.hpp"
 #include "parseoptions.hpp"
@@ -21,65 +20,59 @@ msync config new -a [account name]
 New account names must be fully specified, like: GoddessGrace@goodchristian.website
 )";
 
-enum class mode
-{
-    config,
-    sync,
-    gen,
-    queue,
-    help
-};
-
-void parse(int argc, char **argv)
+parse_result parse(int argc, char **argv, bool silent)
 {
     using namespace std::string_literals;
 
-    mode selected = mode::help;
-
-    user_option toset;
-    string optionval;
-    string account;
+    parse_result ret;
 
     auto settableoptions = (one_of(
-        command("accesstoken").set(toset, user_option::accesstoken),
-        command("username").set(toset, user_option::username),
-        command("password").set(toset, user_option::password),
-        command("clientsecret").set(toset, user_option::clientsecret)));
+        command("accesstoken").set(ret.toset, user_option::accesstoken).set(ret.selected, mode::showopt),
+        command("username").set(ret.toset, user_option::username).set(ret.selected, mode::showopt),
+        command("password").set(ret.toset, user_option::password).set(ret.selected, mode::showopt),
+        command("clientsecret").set(ret.toset, user_option::clientsecret).set(ret.selected, mode::showopt)));
 
-    auto configMode = (command("config").set(selected, mode::config).doc("Set and show account-specific options.") &
+    auto newaccount = (command("new").set(ret.selected, mode::newuser)).doc("Register a new account with msync. Start here.");
+    auto configMode = (command("config").set(ret.selected, mode::config).doc("Set and show account-specific options.") &
                        one_of(
-                           (command("new").set(toset, user_option::newaccount)).doc("Register a new account with msync. Start here."),
-                           command("showall").set(toset, user_option::show).doc("Print options for the specified account. If no account is specified, print options for all accounts."),
-                           in_sequence(command("sync"),
-                                       one_of(command("home").set(toset, user_option::home),
-                                              command("dms").set(toset, user_option::dms),
-                                              command("notifications").set(toset, user_option::notifications)),
-                                       one_of(command("on").set(optionval, "T"s), command("off").set(optionval, "F"s)))
-                               .doc("Whether to synchronize an account's home timeline, direct messages, and notifications."),
-                           in_sequence(command("list"), one_of(command("add").set(toset, user_option::addlist), command("remove").set(toset, user_option::removelist)), value("list name", optionval)).doc("Add and remove lists from being synchronized for an account"),
-                           (settableoptions & opt_value("value", optionval) % "If value given, set the specified option to that. Otherwise, show the corresponding value.")) %
+                           command("showall").set(ret.selected, mode::showopt).doc("Print options for the specified account. If no account is specified, print options for all accounts."),
+                           in_sequence(command("sync").set(ret.selected, mode::configsync),
+                                       one_of(command("home").set(ret.toset, user_option::home),
+                                              command("dms").set(ret.toset, user_option::dms),
+                                              command("notifications").set(ret.toset, user_option::notifications)),
+                                       one_of(command("newest").set(ret.syncset, sync_settings::newest_first),
+                                              command("oldest").set(ret.syncset, sync_settings::oldest_first),
+                                              command("off").set(ret.syncset, sync_settings::off)))
+                               .doc("Whether to synchronize an account's home timeline, direct messages, and notifications, and whether to do it newest first, oldest first, or not at all."),
+                           in_sequence(command("list").set(ret.selected, mode::configlist),
+                                       one_of(command("add").set(ret.listops, list_operations::add),
+                                              command("remove").set(ret.listops, list_operations::remove)),
+                                       value("list name", ret.optionval))
+                               .doc("Add and remove lists from being synchronized for an account"),
+                           (settableoptions & opt_value("value", ret.optionval).set(ret.selected, mode::config) % "If value given, set the specified option to that. Otherwise, show the corresponding value.")) %
                            "config commands");
 
-    auto syncMode = ((command("sync").set(selected, mode::sync))
+    auto syncMode = ((command("sync").set(ret.selected, mode::sync))
                          .doc("Synchronize your account[s] with their server[s]. Synchronizes all accounts unless one is specified with -a."),
                      (option("-r", "--retries") & value("times", options.retries)) % "Retry failed requests n times. (default: 3)");
 
-    auto genMode = ((command("gen").set(selected, mode::gen) | command("generate").set(selected, mode::gen)).doc("Generate a post template in the current folder."));
+    auto genMode = ((command("gen").set(ret.selected, mode::gen) | command("generate").set(ret.selected, mode::gen)).doc("Generate a post template in the current folder."));
 
-    auto queueMode = ((command("queue").set(selected, mode::queue) | command("q").set(selected, mode::queue)).doc("Manage the queue of things to send."));
+    auto queueMode = ((command("queue").set(ret.selected, mode::queue) | command("q").set(ret.selected, mode::queue)).doc("Manage the queue of things to send."));
 
-    auto universalOptions = (option("-a", "--account") & value("account", account).doc("The account name to operate on."),
+    auto universalOptions = ((option("-a", "--account") & value("account", ret.account)).doc("The account name to operate on."),
                              option("-v", "--verbose").set(options.verbose).doc("Verbose mode. Program will be more chatty."));
 
-    auto cli = (configMode | syncMode | genMode | queueMode | (command("help").set(selected, mode::help)), universalOptions);
+    auto cli = (newaccount | configMode | syncMode | genMode | queueMode | (command("help").set(ret.selected, mode::help)), universalOptions);
 
     auto result = parse(argc, argv, cli);
 
-    if (!result)
+    if (!result && !silent)
     {
         cout << make_man_page(cli, "msync").append_section("NOTES", helpmessage);
     }
 
-    cout << static_cast<int>(selected) << '\n';
-    cout << static_cast<int>(toset) << '\n';
+    ret.okay = static_cast<bool>(result);
+
+    return ret;
 }

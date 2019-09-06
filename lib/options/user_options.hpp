@@ -5,6 +5,13 @@
 
 #include "option_file.hpp"
 
+enum class list_operations
+{
+    add,
+    remove,
+    clear
+};
+
 enum class sync_settings
 {
     off,
@@ -23,13 +30,6 @@ enum class user_option
     home,
     dms,
     notifications,
-
-    // these guys have to be handled specially
-    // fix it later because having special enums is gonna cause bugs later.
-    addlist,
-    removelist,
-    newaccount,
-    show
 };
 
 struct user_options
