@@ -1,4 +1,5 @@
 #include <string>
+#include <string_view>
 #include <optional>
 
 #include "filesystem.hpp"
@@ -37,7 +38,7 @@ struct user_options
 public:
     user_options(fs::path toread) : backing(toread){};
 
-    std::optional<std::string> get_option(user_option toget);
+    std::optional<std::string_view> get_option(user_option toget);
     void set_option(user_option toset, std::string value);
 
 private:
