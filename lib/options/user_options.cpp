@@ -14,7 +14,7 @@ const auto optionsToKeys =
          "pull_dms",
          "pull_notifications"});
 
-std::optional<std::string> user_options::get_option(user_option opt)
+std::optional<std::string_view> user_options::get_option(user_option opt)
 {
     auto val = backing.parsed_options.find(optionsToKeys[static_cast<int>(opt)]);
     if (val == backing.parsed_options.end())
