@@ -67,7 +67,7 @@ parse_result parse(int argc, char **argv, bool silent)
 
     auto result = parse(argc, argv, cli);
 
-    if (!result && !silent)
+    if ((!result || ret.selected == mode::help) && !silent)
     {
         cout << make_man_page(cli, "msync").append_section("NOTES", helpmessage);
     }
