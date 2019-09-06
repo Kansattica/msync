@@ -7,7 +7,7 @@ SCENARIO("The command line parser recognizes when the user wants to start a new 
     GIVEN("A command line that doesn't specify an account.")
     {
         int argc = 2;
-        char *argv[]{"msync", "new"};
+        char const *argv[] {"msync", "new"};
 
         WHEN("the command line is parsed")
         {
@@ -33,7 +33,7 @@ SCENARIO("The command line parser recognizes when the user wants to start a new 
     GIVEN("A command line that does specify an account.")
     {
         int argc = 4;
-        char *argv[]{"msync", "new", "-a", "regular@folks.egg"};
+        char const *argv[]{"msync", "new", "-a", "regular@folks.egg"};
 
         WHEN("the command line is parsed")
         {
@@ -62,7 +62,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
     GIVEN("A command line setting an option without an account.")
     {
         int argc = 4;
-        char *argv[]{"msync", "config", "accesstoken", "sometoken"};
+        char const *argv[]{"msync", "config", "accesstoken", "sometoken"};
 
         WHEN("the command line is parsed")
         {
@@ -98,7 +98,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
     GIVEN("A command line setting an option with an account.")
     {
         int argc = 6;
-        char *argv[]{"msync", "config", "clientsecret", "asecret!", "-a", "jerk@fun.website"};
+        char const *argv[]{"msync", "config", "clientsecret", "asecret!", "-a", "jerk@fun.website"};
 
         WHEN("the command line is parsed")
         {
@@ -134,7 +134,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
     GIVEN("A command line reading an option without an account.")
     {
         int argc = 3;
-        char *argv[]{"msync", "config", "username"};
+        char const *argv[]{"msync", "config", "username"};
 
         WHEN("the command line is parsed")
         {
@@ -170,7 +170,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
     GIVEN("A command line reading an option with an account.")
     {
         int argc = 5;
-        char *argv[]{"msync", "config", "password", "-a", "niceperson@impolite.egg"};
+        char const *argv[]{"msync", "config", "password", "-a", "niceperson@impolite.egg"};
 
         WHEN("the command line is parsed")
         {
@@ -206,7 +206,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
     GIVEN("A showall command that doesn't specify an account.")
     {
         int argc = 3;
-        char *argv[]{"msync", "config", "showall"};
+        char const *argv[]{"msync", "config", "showall"};
 
         WHEN("the command line is parsed")
         {
@@ -237,7 +237,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
     GIVEN("A showall command that specifies an account.")
     {
         int argc = 5;
-        char *argv[]{"msync", "config", "showall", "-a", "regular@folks.egg"};
+        char const *argv[]{"msync", "config", "showall", "-a", "regular@folks.egg"};
 
         WHEN("the command line is parsed")
         {
@@ -268,7 +268,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
     GIVEN("A command line adding a list to be pulled.")
     {
         int argc = 5;
-        char *argv[]{"msync", "config", "list", "add", "somelist"};
+        char const *argv[]{"msync", "config", "list", "add", "somelist"};
 
         WHEN("the command line is parsed")
         {
@@ -304,7 +304,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
     GIVEN("A command line specifying a list to be removed.")
     {
         int argc = 7;
-        char *argv[]{"msync", "config", "list", "remove", "anotherlist", "-a", "coolfriend"};
+        char const *argv[]{"msync", "config", "list", "remove", "anotherlist", "-a", "coolfriend"};
 
         WHEN("the command line is parsed")
         {
@@ -340,7 +340,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
     GIVEN("A command line specifying that the home timeline should be synced oldest first.")
     {
         int argc = 7;
-        char *argv[]{"msync", "config", "sync", "home", "oldest", "-a", "coolerfriend"};
+        char const *argv[]{"msync", "config", "sync", "home", "oldest", "-a", "coolerfriend"};
 
         WHEN("the command line is parsed")
         {
@@ -376,7 +376,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
     GIVEN("A command line specifying that DMs should be synced newest first.")
     {
         int argc = 5;
-        char *argv[]{"msync", "config", "sync", "dms", "newest"};
+        char const *argv[]{"msync", "config", "sync", "dms", "newest"};
 
         WHEN("the command line is parsed")
         {
@@ -412,7 +412,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
     GIVEN("A command line specifying that the notifications timeline should not be synced.")
     {
         int argc = 7;
-        char *argv[]{"msync", "config", "sync", "notifications", "off", "-a", "coolestfriend"};
+        char const *argv[]{"msync", "config", "sync", "notifications", "off", "-a", "coolestfriend"};
 
         WHEN("the command line is parsed")
         {
@@ -451,7 +451,7 @@ SCENARIO("The command line parser recognizes when the user wants help.")
     GIVEN("A command line that says 'help'.")
     {
         int argc = 2;
-        char *argv[]{"msync", "help"};
+        char const *argv[]{"msync", "help"};
 
         WHEN("the command line is parsed")
         {
