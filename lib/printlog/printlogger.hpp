@@ -12,7 +12,8 @@ using std::ofstream;
 enum class logtype
 {
     normal,
-    verbose
+    verbose,
+    fileonly
 };
 
 template <logtype isverbose = logtype::normal>
@@ -28,7 +29,7 @@ struct PrintLogger
             if (options.verbose)
                 cout << towrite;
         }
-        else
+        else if constexpr (isverbose != logtype::fileonly)
         {
             cout << towrite;
         }
