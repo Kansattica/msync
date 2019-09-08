@@ -20,7 +20,7 @@ msync config new -a [account name]
 New account names must be fully specified, like: GoddessGrace@goodchristian.website
 )";
 
-parse_result parse(int argc, char **argv, bool silent)
+parse_result parse(const int argc, const char *argv[], const bool silent)
 {
     using namespace std::string_literals;
 
@@ -65,9 +65,11 @@ parse_result parse(int argc, char **argv, bool silent)
 
     auto cli = (newaccount | configMode | syncMode | genMode | queueMode | (command("help").set(ret.selected, mode::help)), universalOptions);
 
-    auto result = parse(argc, argv, cli);
+    //skip the first result.
+    //we do it this way because C++11 and later don't like it when you turn a string literal into a char*, so we have to use the iterator interface
+    auto result = clipp::parse(argv+1, argc+argv, cli);
 
-    if (!result && !silent)
+    if (!silent && (!result || ret.selected == mode::help))
     {
         cout << make_man_page(cli, "msync").append_section("NOTES", helpmessage);
     }
