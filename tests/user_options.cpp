@@ -28,13 +28,13 @@ SCENARIO("User_options reads from a file when created", "[user_options]")
 
             THEN("the fields are set correctly.")
             {
-                REQUIRE(opt.get_option(user_option::accountname).value() == "sometester");
-                REQUIRE(opt.get_option(user_option::instanceurl).value() == "website.egg");
+                REQUIRE(*opt.get_option(user_option::accountname) == "sometester");
+                REQUIRE(*opt.get_option(user_option::instanceurl) == "website.egg");
             }
 
             THEN("empty fields are handled gracefully.")
             {
-                REQUIRE_FALSE(opt.get_option(user_option::accesstoken).has_value());
+                REQUIRE_FALSE(opt.get_option(user_option::accesstoken) != nullptr);
             }
 
             THEN("No .bak file is created.")
@@ -73,12 +73,12 @@ SCENARIO("User_options saves changes back to its file", "[user_options]")
             THEN("a newly created user_options for the same path should see the change.")
             {
                 user_options newopt(filepath);
-                REQUIRE(newopt.get_option(user_option::accountname).value() == "someoneelse");
-                REQUIRE(newopt.get_option(user_option::instanceurl).value() == "website.egg");
-                REQUIRE_FALSE(newopt.get_option(user_option::accesstoken).has_value());
+                REQUIRE(*newopt.get_option(user_option::accountname) == "someoneelse");
+                REQUIRE(*newopt.get_option(user_option::instanceurl) == "website.egg");
+                REQUIRE(newopt.get_option(user_option::accesstoken) == nullptr);
             }
 
-            THEN ("a .bak file with the original information should be created.")
+            THEN("a .bak file with the original information should be created.")
             {
                 REQUIRE(fs::exists(backup));
 
@@ -129,6 +129,52 @@ SCENARIO("An empty user_options writes to a file when destroyed", "[user_options
                 fs::path backup(filepath);
                 backup += ".bak";
                 REQUIRE_FALSE(fs::exists(backup));
+            }
+        }
+    }
+}
+
+SCENARIO("Get and set options manage string references correctly.", "[user_options]")
+{
+    GIVEN("A file on disk with some properly formatted data")
+    {
+        const fs::path filepath("someuser.test");
+        test_file fi(filepath);
+
+        fs::path backup(filepath);
+        backup += ".bak";
+        test_file fibak(backup);
+
+        {
+            std::ofstream maketest(filepath);
+
+            maketest << "account_name=sometester\n";
+            maketest << "instance_url=website.egg\n";
+        }
+
+        WHEN("an option that exists in the dictionary is requested")
+        {
+            user_options opt(filepath);
+            auto val = opt.get_option(user_option::accountname);
+
+            THEN("the value is present.")
+            {
+                REQUIRE(val != nullptr);
+            }
+
+            THEN("the value is correct.")
+            {
+                REQUIRE(*val == "sometester");
+            }
+
+            AND_WHEN("the option is modified")
+            {
+                opt.set_option(user_option::accountname, "someotherguy");
+
+                THEN("the change is reflected in the original value")
+                {
+                    REQUIRE(*val == "someotherguy");
+                }
             }
         }
     }
