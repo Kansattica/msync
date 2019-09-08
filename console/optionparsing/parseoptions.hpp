@@ -19,8 +19,10 @@ struct parse_result
     bool okay;
     mode selected = mode::help;
     user_option toset;
-    sync_settings syncset;
-    list_operations listops;
+    union { //only one or the other will be set
+        sync_settings syncset;
+        list_operations listops;
+    }; 
     std::string optionval;
     std::string account;
 };
