@@ -1,5 +1,6 @@
 #include <string>
 #include "../../lib/options/options.hpp"
+#include "selection_types.hpp"
 
 enum class mode
 {
@@ -22,6 +23,7 @@ struct parse_result
     union { //only one or the other will be set
         sync_settings syncset;
         list_operations listops;
+        sync_options syncopts;
     }; 
     std::string optionval;
     std::string account;
