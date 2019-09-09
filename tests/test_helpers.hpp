@@ -3,9 +3,9 @@
 
 #include "../lib/options/filesystem.hpp"
 
-#include <vector>
-#include <string>
 #include <fstream>
+#include <string>
+#include <vector>
 
 //ensures a file doesn't exist before and after each test run.
 struct test_file
@@ -19,6 +19,9 @@ public:
 
     ~test_file()
     {
+        if (fs::exists(filename))
+            fs::remove(filename);
+        filename += ".bak";
         if (fs::exists(filename))
             fs::remove(filename);
     };

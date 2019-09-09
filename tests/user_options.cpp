@@ -13,7 +13,6 @@ SCENARIO("User_options reads from a file when created", "[user_options]")
         const fs::path filepath("someuser.test");
         test_file fi(filepath);
         const fs::path backup("someuser.test.bak");
-        test_file fibak(backup);
 
         {
             std::ofstream maketest(filepath);
@@ -54,7 +53,6 @@ SCENARIO("User_options saves changes back to its file", "[user_options]")
 
         fs::path backup(filepath);
         backup += ".bak";
-        test_file fibak(backup);
 
         {
             std::ofstream maketest(filepath);
@@ -140,10 +138,6 @@ SCENARIO("Get and set options manage string references correctly.", "[user_optio
     {
         const fs::path filepath("someuser.test");
         test_file fi(filepath);
-
-        fs::path backup(filepath);
-        backup += ".bak";
-        test_file fibak(backup);
 
         {
             std::ofstream maketest(filepath);
