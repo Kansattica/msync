@@ -168,63 +168,57 @@ SCENARIO("select_account selects exactly one account.", "[options]")
 
 SCENARIO("parse_account_name correctly parses account names into a username and instance URL.")
 {
-    for (const auto [input, expectedUser, expectedInstance] : {
-             std::make_tuple("GoddessGrace@goodchristian.website"s, "GoddessGrace"s, "goodchristian.website"s),
-             std::make_tuple("BestGirl102@good.time.website"s, "BestGirl102"s, "good.time.website"s),
-             std::make_tuple("hey_its_m3@internet12.for.egg"s, "hey_its_m3"s, "internet12.for.egg"s),
-             std::make_tuple("_@some_website.comb"s, "_"s, "some_website.comb"s),
-             std::make_tuple("@_@some_website.comb"s, "_"s, "some_website.comb"s),
-             std::make_tuple("@leadingat@boringplace.comb"s, "leadingat"s, "boringplace.comb"s),
-         })
+    GIVEN("A correct account name")
     {
+        auto input = GENERATE(
+            std::make_tuple("GoddessGrace@goodchristian.website"s, "GoddessGrace"s, "goodchristian.website"s),
+            std::make_tuple("BestGirl102@good.time.website"s, "BestGirl102"s, "good.time.website"s),
+            std::make_tuple("hey_its_m3@internet12.for.egg"s, "hey_its_m3"s, "internet12.for.egg"s),
+            std::make_tuple("_@some_website.comb"s, "_"s, "some_website.comb"s),
+            std::make_tuple("@_@some_website.comb"s, "_"s, "some_website.comb"s),
+            std::make_tuple("@leadingat@boringplace.comb"s, "leadingat"s, "boringplace.comb"s));
 
-        GIVEN("a correct account name: " + input)
+        WHEN("it's parsed by parse_account_name")
         {
-            WHEN("it's parsed by parse_account_name")
+            auto result = parse_account_name(std::get<0>(input));
+
+            THEN("the parse is good")
             {
-                auto result = parse_account_name(input);
+                REQUIRE(result.has_value());
+            }
 
-                THEN("the parse is good")
-                {
-                    REQUIRE(result.has_value());
-                }
+            THEN("the username was parsed correctly")
+            {
+                REQUIRE(result->username == std::get<1>(input));
+            }
 
-                THEN("the username was parsed correctly")
-                {
-                    REQUIRE(result->username == expectedUser);
-                }
-
-                THEN("the instance name was parsed correctly")
-                {
-                    REQUIRE(result->instance == expectedInstance);
-                }
+            THEN("the instance name was parsed correctly")
+            {
+                REQUIRE(result->instance == std::get<2>(input));
             }
         }
     }
 
-    for (const auto input : {
-             "as;dfhasldfasd"s,
-             "badcharacter**@website.com"s,
-             "knockitoff@too.dang.many.subdomains"s,
-             "noinstance@"s,
-             "@nousername"s,
-             "what"s,
-             "|pipekateer"s,
-             ""s,
-             ":3@:33.:4"s,
-         })
+    GIVEN("A bad account name")
     {
+        auto input = GENERATE(
+            "as;dfhasldfasd"s,
+            "badcharacter**@website.com"s,
+            "knockitoff@too.dang.many.subdomains"s,
+            "noinstance@"s,
+            "@nousername"s,
+            "what"s,
+            "|pipekateer"s,
+            ""s,
+            ":3@:33.:4"s);
 
-        GIVEN("a bad account name: " + input)
+        WHEN("it's parsed by parse_account_name")
         {
-            WHEN("it's parsed by parse_account_name")
-            {
-                auto result = parse_account_name(input);
+            auto result = parse_account_name(input);
 
-                THEN("the parse is bad")
-                {
-                    REQUIRE_FALSE(result.has_value());
-                }
+            THEN("the parse is bad")
+            {
+                REQUIRE_FALSE(result.has_value());
             }
         }
     }
