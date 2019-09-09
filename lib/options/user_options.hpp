@@ -27,7 +27,7 @@ struct user_options {
 public:
   user_options(fs::path toread) : backing(toread){};
 
-  const std::string* const get_option(user_option toget);
+  const std::string* const get_option(user_option toget) const;
   void set_option(user_option toset, std::string&& value);
 
 private:
