@@ -1,9 +1,38 @@
 #include "global_options.hpp"
-
+#include "filesystem.hpp"
+#include <constants.hpp>
 #include <print_logger.hpp>
 #include <whereami.h>
 
 global_options options;
+
+bool global_options::add_new_account(std::string name)
+{
+    print_logger<logtype::normal> pl;
+    fs::path user_path{executable_location};
+    user_path /= Account_Directory;
+
+    if (!fs::exists(user_path)) // ensure accounts directory exists
+        fs::create_directory(user_path);
+
+    if (!fs::is_directory(user_path))
+    {
+        pl << user_path << " exists and is not a directory. Please rename or delete this file and try again.\n";
+        return false;
+    }
+
+    user_path /= name;
+
+    const auto [it, inserted] = accounts.emplace(std::move(name), user_options{user_path});
+
+    if (!inserted)
+    {
+        pl << "Account already exists. Nothing changed.\n";
+        return false;
+    }
+
+    return true;
+}
 
 fs::path global_options::get_exe_location()
 {
