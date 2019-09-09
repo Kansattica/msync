@@ -15,6 +15,9 @@ public:
     {
         if (fs::exists(filename))
             fs::remove(filename);
+        filename += ".bak";
+        if (fs::exists(filename))
+            fs::remove(filename);
     };
 
     ~test_file()
