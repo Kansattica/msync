@@ -5,7 +5,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <variant>
 
 struct parsed_account
 {
@@ -14,5 +13,5 @@ struct parsed_account
 };
 
 std::optional<parsed_account> parse_account_name(const std::string& name);
-std::variant<const user_options*, const char*> select_account(const std::string_view name);
+const user_options* select_account(const std::string_view name);
 #endif

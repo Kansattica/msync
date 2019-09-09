@@ -16,14 +16,9 @@ SCENARIO("select_account selects exactly one account.", "[options]")
         {
             auto account = select_account("");
 
-            THEN("an error message is returned")
+            THEN("a nullptr is returned")
             {
-                REQUIRE(std::holds_alternative<const char*>(account));
-            }
-
-            THEN("the error is that it couldn't find a match")
-            {
-                REQUIRE(std::get<const char*>(account) == "Couldn't find a match.");
+                REQUIRE(account == nullptr);
             }
         }
 
@@ -31,14 +26,9 @@ SCENARIO("select_account selects exactly one account.", "[options]")
         {
             auto account = select_account("coolperson");
 
-            THEN("an error message is returned")
+            THEN("a nullptr is returned")
             {
-                REQUIRE(std::holds_alternative<const char*>(account));
-            }
-
-            THEN("the error is that it couldn't find a match")
-            {
-                REQUIRE(std::get<const char*>(account) == "Couldn't find a match.");
+                REQUIRE(account == nullptr);
             }
         }
     }
@@ -57,7 +47,7 @@ SCENARIO("select_account selects exactly one account.", "[options]")
 
             THEN("a user_options is returned.")
             {
-                REQUIRE(std::holds_alternative<const user_options*>(account));
+                REQUIRE_FALSE(account == nullptr);
             }
         }
 
@@ -67,7 +57,7 @@ SCENARIO("select_account selects exactly one account.", "[options]")
 
             THEN("a user_options is returned.")
             {
-                REQUIRE(std::holds_alternative<const user_options*>(account));
+                REQUIRE_FALSE(account == nullptr);
             }
         }
 
@@ -75,14 +65,9 @@ SCENARIO("select_account selects exactly one account.", "[options]")
         {
             auto account = select_account("bad");
 
-            THEN("an error message is returned")
+            THEN("a nullptr is returned")
             {
-                REQUIRE(std::holds_alternative<const char*>(account));
-            }
-
-            THEN("the error is that it couldn't find a match")
-            {
-                REQUIRE(std::get<const char*>(account) == "Couldn't find a match.");
+                REQUIRE(account == nullptr);
             }
         }
     }
@@ -107,14 +92,9 @@ SCENARIO("select_account selects exactly one account.", "[options]")
         {
             auto account = select_account("");
 
-            THEN("an error message is returned")
+            THEN("a nullptr is returned")
             {
-                REQUIRE(std::holds_alternative<const char*>(account));
-            }
-
-            THEN("the error is that it couldn't find an unambiguous match.")
-            {
-                REQUIRE(std::get<const char*>(account) == "Couldn't find an unambiguous match.");
+                REQUIRE(account == nullptr);
             }
         }
 
@@ -122,14 +102,9 @@ SCENARIO("select_account selects exactly one account.", "[options]")
         {
             auto account = select_account("some");
 
-            THEN("an error message is returned")
+            THEN("a nullptr is returned")
             {
-                REQUIRE(std::holds_alternative<const char*>(account));
-            }
-
-            THEN("the error is that it couldn't find an unambiguous match")
-            {
-                REQUIRE(std::get<const char*>(account) == "Couldn't find an unambiguous match.");
+                REQUIRE(account == nullptr);
             }
         }
 
@@ -139,12 +114,12 @@ SCENARIO("select_account selects exactly one account.", "[options]")
 
             THEN("a user_options is returned.")
             {
-                REQUIRE(std::holds_alternative<const user_options*>(account));
+                REQUIRE_FALSE(account == nullptr);
             }
 
             THEN("the user_options is the correct one.")
             {
-                const std::string account_name = *std::get<const user_options*>(account)->get_option(user_option::accountname);
+                const std::string account_name = *account->get_option(user_option::accountname);
                 REQUIRE(account_name == "someotheraccount@place2.egg");
             }
         }
@@ -153,14 +128,9 @@ SCENARIO("select_account selects exactly one account.", "[options]")
         {
             auto account = select_account("bad");
 
-            THEN("an error message is returned")
+            THEN("a nullptr is returned")
             {
-                REQUIRE(std::holds_alternative<const char*>(account));
-            }
-
-            THEN("the error is that it couldn't find a match")
-            {
-                REQUIRE(std::get<const char*>(account) == "Couldn't find a match.");
+                REQUIRE(account == nullptr);
             }
         }
     }
