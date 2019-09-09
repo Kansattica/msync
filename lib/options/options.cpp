@@ -7,7 +7,7 @@
 
 global_options options;
 
-std::variant<const user_options* const, const std::string> select_account(const std::string& name)
+std::variant<const user_options*, const std::string> select_account(const std::string& name)
 {
     PrintLogger<logtype::verbose> pl;
 
@@ -28,11 +28,11 @@ std::variant<const user_options* const, const std::string> select_account(const 
 
     switch (matched)
     {
-        case 0:
-            return "Couldn't find a match.";
-        case 1:
-            return candidate;
-        default:
-            return "Couldn't find an unambiguous match.";
+    case 0:
+        return "Couldn't find a match.";
+    case 1:
+        return candidate;
+    default:
+        return "Couldn't find an unambiguous match.";
     }
 }
