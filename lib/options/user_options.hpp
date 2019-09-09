@@ -1,3 +1,6 @@
+#ifndef _USER_OPTIONS_HPP_
+#define _USER_OPTIONS_HPP_
+
 #include <string>
 
 #include "filesystem.hpp"
@@ -30,3 +33,4 @@ public:
 private:
   option_file backing;
 };
+#endif
