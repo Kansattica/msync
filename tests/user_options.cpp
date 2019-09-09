@@ -1,8 +1,8 @@
-#include <catch2/catch.hpp>
 #include "test_helpers.hpp"
+#include <catch2/catch.hpp>
 
-#include <fstream>
 #include <array>
+#include <fstream>
 
 #include "../lib/options/user_options.hpp"
 
