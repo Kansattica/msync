@@ -18,7 +18,7 @@ struct global_options
 
     private:
         fs::path get_exe_location();
-        std::unordered_map<std::string, user_options> global_options::read_accounts();
+        std::unordered_map<std::string, user_options> read_accounts();
 };
 
 #endif
