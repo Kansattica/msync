@@ -3,13 +3,13 @@
 
 #include <algorithm>
 
-#include <printlogger.hpp>
+#include <print_logger.hpp>
 
 global_options options;
 
 std::variant<const user_options*, const std::string> select_account(const std::string& name)
 {
-    PrintLogger<logtype::verbose> pl;
+    print_logger<logtype::verbose> pl;
 
     int matched = 0;
     user_options* candidate = nullptr;

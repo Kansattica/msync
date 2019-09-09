@@ -1,8 +1,8 @@
 #ifndef _PRINTLOG_HPP_
 #define _PRINTLOG_HPP_
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 #include "../options/options.hpp"
 
@@ -17,12 +17,12 @@ enum class logtype
 };
 
 template <logtype isverbose = logtype::normal>
-struct PrintLogger
+struct print_logger
 {
-    PrintLogger() : logfile("msync.log") {}
+    print_logger() : logfile("msync.log") {}
 
     template <typename T>
-    PrintLogger &operator<<(const T &towrite)
+    print_logger& operator<<(const T& towrite)
     {
         if constexpr (isverbose == logtype::verbose)
         {

@@ -1,24 +1,24 @@
 #include <iostream>
 
-#include <printlogger.hpp>
+#include <print_logger.hpp>
 
 #include "optionparsing/parseoptions.hpp"
 
-int main(int argc, const char *argv[])
+int main(int argc, const char* argv[])
 {
-	std::cout << "Sup, nerds. Welcome to Mastosync.\n";
-	PrintLogger<logtype::fileonly> pl;
-	pl << "--- Mastosync started ---\n";
+    std::cout << "Sup, nerds. Welcome to Mastosync.\n";
+    print_logger<logtype::fileonly> pl;
+    pl << "--- Mastosync started ---\n";
 
-	auto parsed = parse(argc, argv, false);
-	
-	switch (parsed.selected)
-	{
-		case mode::newuser:
+    auto parsed = parse(argc, argv, false);
 
-		default:
-			std::cout << "[option not implemented]\n";
-	}
+    switch (parsed.selected)
+    {
+    case mode::newuser:
 
-	pl << "--- Mastosync finished normally ---\n";
+    default:
+        std::cout << "[option not implemented]\n";
+    }
+
+    pl << "--- Mastosync finished normally ---\n";
 }
