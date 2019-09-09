@@ -54,7 +54,7 @@ parse_result parse(const int argc, const char *argv[], const bool silent)
 
     auto syncMode = ((command("sync").set(ret.selected, mode::sync)
                          .doc("Synchronize your account[s] with their server[s]. Synchronizes all accounts unless one is specified with -a.")) &
-                     (option("-r", "--retries").set(ret.syncopts.retries_set, true) & value("retries", ret.syncopts.retries)) % "Retry failed requests n times. (default: 3)");
+                     (option("-r", "--retries") & value("retries", ret.syncopts.retries)) % "Retry failed requests n times. (default: 3)");
 
     auto genMode = ((command("gen").set(ret.selected, mode::gen) | command("generate").set(ret.selected, mode::gen)).doc("Generate a post template in the current folder."));
 
