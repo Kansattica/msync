@@ -467,9 +467,9 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
                 REQUIRE(parsed.account.empty());
             }
 
-            THEN("retries are not set")
+            THEN("retries are set to the default.")
             {
-                REQUIRE_FALSE(parsed.syncopts.retries_set);
+                REQUIRE(parsed.syncopts.retries == 3);
             }
 
             THEN("the parse is good")
@@ -496,11 +496,6 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
             THEN("account is not set")
             {
                 REQUIRE(parsed.account.empty());
-            }
-
-            THEN("retries are set")
-            {
-                REQUIRE(parsed.syncopts.retries_set);
             }
 
             THEN("the correct number of retries is set")
@@ -532,11 +527,6 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
             THEN("account is set")
             {
                 REQUIRE(parsed.account == "coolfella");
-            }
-
-            THEN("retries are set")
-            {
-                REQUIRE(parsed.syncopts.retries_set);
             }
 
             THEN("the correct number of retries is set")
