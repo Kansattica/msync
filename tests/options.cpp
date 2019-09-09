@@ -21,6 +21,7 @@ SCENARIO("select_account selects exactly one account.", "[options]")
             {
                 REQUIRE(std::get<const std::string>(account) == "Couldn't find a match.");
             }
+        }
 
         WHEN ("select_account is given a non-empty string to search on")
         {
@@ -35,7 +36,6 @@ SCENARIO("select_account selects exactly one account.", "[options]")
             {
                 REQUIRE(std::get<const std::string>(account) == "Couldn't find a match.");
             }
-        }
         }
     }
 }
