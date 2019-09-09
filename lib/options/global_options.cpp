@@ -3,6 +3,8 @@
 #include <print_logger.hpp>
 #include <whereami.h>
 
+global_options options;
+
 fs::path global_options::get_exe_location()
 {
     // see https://github.com/gpakosz/whereami
