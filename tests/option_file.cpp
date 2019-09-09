@@ -1,13 +1,13 @@
-#include <catch2/catch.hpp>
 #include "test_helpers.hpp"
+#include <catch2/catch.hpp>
 
 #include "../lib/options/option_file.hpp"
 
 #include "../lib/options/filesystem.hpp"
 
+#include <array>
 #include <fstream>
 #include <string>
-#include <array>
 
 SCENARIO("option_files save their data when destroyed.", "[option_file]")
 {
@@ -78,7 +78,6 @@ SCENARIO("option_files read data when created.", "[option_file]")
         fs::path backupfilename(testfilename);
         backupfilename += ".bak";
         test_file tf(testfilename);
-        test_file tfbak(backupfilename);
 
         {
             std::ofstream fout(testfilename);
