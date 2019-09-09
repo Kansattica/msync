@@ -2,12 +2,24 @@
 #include "user_options.hpp"
 
 #include <algorithm>
+#include <regex>
 
 #include <print_logger.hpp>
 
-global_options options;
+std::optional<parsed_account> parse_account_name(const std::string& name)
+{
+    const static std::regex account_name{"@?(\\w*)@(\\w*\\.\\w*(?:\\.[a-zA-Z]*)?)", std::regex::ECMAScript | std::regex::icase};
 
-std::variant<const user_options*, const std::string> select_account(const std::string& name)
+    std::smatch results;
+    if (std::regex_match(name, results, account_name))
+    {
+        return parsed_account{results[1], results[2]};
+    }
+
+    return {};
+}
+
+std::variant<const user_options*, const std::string> select_account(const std::string_view name)
 {
     print_logger<logtype::verbose> pl;
 
