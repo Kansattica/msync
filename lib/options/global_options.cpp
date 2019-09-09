@@ -1,6 +1,7 @@
 #include "global_options.hpp"
 
 #include <whereami.h>
+#include <printlogger.hpp>
 
 fs::path global_options::get_exe_location()
 {
@@ -12,4 +13,14 @@ fs::path global_options::get_exe_location()
     int dirname_length;
     wai_getExecutablePath(path.get(), length, &dirname_length);
     return fs::path(path.get(), path.get() + dirname_length);
+}
+
+std::unordered_map<std::string, user_options> global_options::read_accounts()
+{
+    PrintLogger<logtype::verbose> pl;
+    pl << "Reading accounts from " << executable_location << "\n";
+
+    std::unordered_map<std::string, user_options> toreturn;
+
+    return toreturn;
 }
