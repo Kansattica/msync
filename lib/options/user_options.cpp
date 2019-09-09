@@ -8,7 +8,7 @@ const auto optionsToKeys =
         {"account_name", "instance_url", "access_token", "username", "password",
          "client_secret", "pull_home", "pull_dms", "pull_notifications"});
 
-const std::string* const user_options::get_option(user_option opt) {
+const std::string* const user_options::get_option(user_option opt) const {
   const auto val =
       backing.parsed_options.find(optionsToKeys[static_cast<int>(opt)]);
   if (val == backing.parsed_options.end())
