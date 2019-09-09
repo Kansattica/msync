@@ -19,6 +19,7 @@ Once `msync` has features, I'll have releases available for download. For now, i
 - [ ] Download posts from your profile
 - [ ] Post template file generation
 - [ ] Attachment support
+- [ ] Nicknames for accounts
 
 ### Roadmap (things for later)
 - [ ] Queue and send profile updates
