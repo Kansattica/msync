@@ -7,8 +7,8 @@ using namespace std::string_literals;
 const auto optionsToKeys =
     std::array<const std::string,
                static_cast<int>(user_option::notifications) + 1>(
-        {"account_name"s, "instance_url"s, "access_token"s, "username"s, "password"s,
-         "client_secret"s, "pull_home"s, "pull_dms"s, "pull_notifications"s});
+        {"account_name"s, "instance_url"s, "access_token"s,
+         "client_secret"s, "client_id"s, "pull_home"s, "pull_dms"s, "pull_notifications"s});
 
 const std::string* user_options::get_option(user_option opt) const
 {

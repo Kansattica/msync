@@ -20,7 +20,7 @@ msync config new -a [account name]
 New account names must be fully specified, like: GoddessGrace@goodchristian.website
 )";
 
-parse_result parse(const int argc, const char *argv[], const bool silent)
+parse_result parse(const int argc, const char* argv[], const bool silent)
 {
     using namespace std::string_literals;
 
@@ -28,8 +28,9 @@ parse_result parse(const int argc, const char *argv[], const bool silent)
 
     auto settableoptions = (one_of(
         command("accesstoken").set(ret.toset, user_option::accesstoken).set(ret.selected, mode::showopt),
-        command("username").set(ret.toset, user_option::username).set(ret.selected, mode::showopt),
-        command("password").set(ret.toset, user_option::password).set(ret.selected, mode::showopt),
+        command("accountname").set(ret.toset, user_option::accountname).set(ret.selected, mode::showopt),
+        command("instanceurl").set(ret.toset, user_option::instanceurl).set(ret.selected, mode::showopt),
+        command("clientid").set(ret.toset, user_option::clientid).set(ret.selected, mode::showopt),
         command("clientsecret").set(ret.toset, user_option::clientsecret).set(ret.selected, mode::showopt)));
 
     auto newaccount = (command("new").set(ret.selected, mode::newuser)).doc("Register a new account with msync. Start here.");
@@ -52,8 +53,7 @@ parse_result parse(const int argc, const char *argv[], const bool silent)
                            (settableoptions & opt_value("value", ret.optionval).set(ret.selected, mode::config) % "If given, set the specified option to that. Otherwise, show the corresponding value.")) %
                            "config commands");
 
-    auto syncMode = ((command("sync").set(ret.selected, mode::sync)
-                         .doc("Synchronize your account[s] with their server[s]. Synchronizes all accounts unless one is specified with -a.")) &
+    auto syncMode = ((command("sync").set(ret.selected, mode::sync).doc("Synchronize your account[s] with their server[s]. Synchronizes all accounts unless one is specified with -a.")) &
                      (option("-r", "--retries") & value("retries", ret.syncopts.retries)) % "Retry failed requests n times. (default: 3)");
 
     auto genMode = ((command("gen").set(ret.selected, mode::gen) | command("generate").set(ret.selected, mode::gen)).doc("Generate a post template in the current folder."));
@@ -67,7 +67,7 @@ parse_result parse(const int argc, const char *argv[], const bool silent)
 
     //skip the first result.
     //we do it this way because C++11 and later don't like it when you turn a string literal into a char*, so we have to use the iterator interface
-    auto result = clipp::parse(argv+1, argc+argv, cli);
+    auto result = clipp::parse(argv + 1, argc + argv, cli);
 
     if (!silent && (!result || ret.selected == mode::help))
     {
