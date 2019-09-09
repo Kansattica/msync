@@ -19,7 +19,7 @@ std::optional<parsed_account> parse_account_name(const std::string& name)
     return {};
 }
 
-std::variant<const user_options*, const char*> select_account(const std::string_view name)
+const user_options* select_account(const std::string_view name)
 {
     print_logger<logtype::verbose> pl;
 
@@ -38,13 +38,8 @@ std::variant<const user_options*, const char*> select_account(const std::string_
         }
     }
 
-    switch (matched)
-    {
-    case 0:
-        return "Couldn't find a match.";
-    case 1:
+    if (matched == 1)
         return candidate;
-    default:
-        return "Couldn't find an unambiguous match.";
-    }
+
+    return nullptr;
 }
