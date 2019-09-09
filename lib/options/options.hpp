@@ -14,5 +14,5 @@ struct parsed_account
 };
 
 std::optional<parsed_account> parse_account_name(const std::string& name);
-std::variant<const user_options*, const std::string> select_account(const std::string_view name);
+std::variant<const user_options*, const char*> select_account(const std::string_view name);
 #endif

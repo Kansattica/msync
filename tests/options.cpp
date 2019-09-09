@@ -18,12 +18,12 @@ SCENARIO("select_account selects exactly one account.", "[options]")
 
             THEN("an error message is returned")
             {
-                REQUIRE(std::holds_alternative<const std::string>(account));
+                REQUIRE(std::holds_alternative<const char*>(account));
             }
 
             THEN("the error is that it couldn't find a match")
             {
-                REQUIRE(std::get<const std::string>(account) == "Couldn't find a match.");
+                REQUIRE(std::get<const char*>(account) == "Couldn't find a match.");
             }
         }
 
@@ -33,12 +33,12 @@ SCENARIO("select_account selects exactly one account.", "[options]")
 
             THEN("an error message is returned")
             {
-                REQUIRE(std::holds_alternative<const std::string>(account));
+                REQUIRE(std::holds_alternative<const char*>(account));
             }
 
             THEN("the error is that it couldn't find a match")
             {
-                REQUIRE(std::get<const std::string>(account) == "Couldn't find a match.");
+                REQUIRE(std::get<const char*>(account) == "Couldn't find a match.");
             }
         }
     }
@@ -77,12 +77,12 @@ SCENARIO("select_account selects exactly one account.", "[options]")
 
             THEN("an error message is returned")
             {
-                REQUIRE(std::holds_alternative<const std::string>(account));
+                REQUIRE(std::holds_alternative<const char*>(account));
             }
 
             THEN("the error is that it couldn't find a match")
             {
-                REQUIRE(std::get<const std::string>(account) == "Couldn't find a match.");
+                REQUIRE(std::get<const char*>(account) == "Couldn't find a match.");
             }
         }
     }
@@ -109,12 +109,12 @@ SCENARIO("select_account selects exactly one account.", "[options]")
 
             THEN("an error message is returned")
             {
-                REQUIRE(std::holds_alternative<const std::string>(account));
+                REQUIRE(std::holds_alternative<const char*>(account));
             }
 
             THEN("the error is that it couldn't find an unambiguous match.")
             {
-                REQUIRE(std::get<const std::string>(account) == "Couldn't find an unambiguous match.");
+                REQUIRE(std::get<const char*>(account) == "Couldn't find an unambiguous match.");
             }
         }
 
@@ -124,12 +124,12 @@ SCENARIO("select_account selects exactly one account.", "[options]")
 
             THEN("an error message is returned")
             {
-                REQUIRE(std::holds_alternative<const std::string>(account));
+                REQUIRE(std::holds_alternative<const char*>(account));
             }
 
             THEN("the error is that it couldn't find an unambiguous match")
             {
-                REQUIRE(std::get<const std::string>(account) == "Couldn't find an unambiguous match.");
+                REQUIRE(std::get<const char*>(account) == "Couldn't find an unambiguous match.");
             }
         }
 
@@ -155,12 +155,12 @@ SCENARIO("select_account selects exactly one account.", "[options]")
 
             THEN("an error message is returned")
             {
-                REQUIRE(std::holds_alternative<const std::string>(account));
+                REQUIRE(std::holds_alternative<const char*>(account));
             }
 
             THEN("the error is that it couldn't find a match")
             {
-                REQUIRE(std::get<const std::string>(account) == "Couldn't find a match.");
+                REQUIRE(std::get<const char*>(account) == "Couldn't find a match.");
             }
         }
     }
@@ -174,8 +174,8 @@ SCENARIO("parse_account_name correctly parses account names into a username and 
             std::make_tuple("GoddessGrace@goodchristian.website"s, "GoddessGrace"s, "goodchristian.website"s),
             std::make_tuple("BestGirl102@good.time.website"s, "BestGirl102"s, "good.time.website"s),
             std::make_tuple("hey_its_m3@internet12.for.egg"s, "hey_its_m3"s, "internet12.for.egg"s),
-            std::make_tuple("_@some_website.comb"s, "_"s, "some_website.comb"s),
-            std::make_tuple("@_@some_website.comb"s, "_"s, "some_website.comb"s),
+            std::make_tuple("_@some-website.comb"s, "_"s, "some-website.comb"s),
+            std::make_tuple("@_@some-website.comb"s, "_"s, "some-website.comb"s),
             std::make_tuple("@leadingat@boringplace.comb"s, "leadingat"s, "boringplace.comb"s));
 
         WHEN("it's parsed by parse_account_name")

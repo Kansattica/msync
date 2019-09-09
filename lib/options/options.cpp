@@ -8,7 +8,7 @@
 
 std::optional<parsed_account> parse_account_name(const std::string& name)
 {
-    const static std::regex account_name{"@?(\\w*)@(\\w*\\.\\w*(?:\\.[a-zA-Z]*)?)", std::regex::ECMAScript | std::regex::icase};
+    const static std::regex account_name{"@?([_a-z0-9]+)@([a-z0-9-]+\\.[a-z0-9-]+(?:\\.[a-z0-9-]+)?)", std::regex::ECMAScript | std::regex::icase};
 
     std::smatch results;
     if (std::regex_match(name, results, account_name))
@@ -19,7 +19,7 @@ std::optional<parsed_account> parse_account_name(const std::string& name)
     return {};
 }
 
-std::variant<const user_options*, const std::string> select_account(const std::string_view name)
+std::variant<const user_options*, const char*> select_account(const std::string_view name)
 {
     print_logger<logtype::verbose> pl;
 
