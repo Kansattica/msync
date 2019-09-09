@@ -1,13 +1,13 @@
 #include "option_file.hpp"
 
-#include <printlogger.hpp>
+#include <print_logger.hpp>
 
 using std::getline;
 using std::string;
 
 option_file::option_file(fs::path filename) : optionfilename(filename)
 {
-    PrintLogger<logtype::verbose> logger;
+    print_logger<logtype::verbose> logger;
     std::ifstream optionfile(optionfilename);
     for (string line; getline(optionfile, line);)
     {
@@ -30,9 +30,10 @@ option_file::option_file(fs::path filename) : optionfilename(filename)
 
 option_file::~option_file()
 {
-    if (optionfilename == "") return; // optionfile got moved from, so the new version will save it
+    if (optionfilename == "")
+        return; // optionfile got moved from, so the new version will save it
 
-    PrintLogger<logtype::verbose> logger;
+    print_logger<logtype::verbose> logger;
 
     fs::path backup(optionfilename);
     backup += ".bak";
@@ -44,7 +45,7 @@ option_file::~option_file()
     }
 
     ofstream of(optionfilename);
-    for (auto &kvp : parsed_options)
+    for (auto& kvp : parsed_options)
     {
         of << kvp.first << '=' << kvp.second << '\n';
     }

@@ -1,7 +1,7 @@
 #include "global_options.hpp"
 
+#include <print_logger.hpp>
 #include <whereami.h>
-#include <printlogger.hpp>
 
 fs::path global_options::get_exe_location()
 {
@@ -17,7 +17,7 @@ fs::path global_options::get_exe_location()
 
 std::unordered_map<std::string, user_options> global_options::read_accounts()
 {
-    PrintLogger<logtype::verbose> pl;
+    print_logger<logtype::verbose> pl;
     pl << "Reading accounts from " << executable_location << "\n";
 
     std::unordered_map<std::string, user_options> toreturn;
