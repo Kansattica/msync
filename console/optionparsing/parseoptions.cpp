@@ -49,12 +49,12 @@ parse_result parse(const int argc, const char *argv[], const bool silent)
                                               command("remove").set(ret.listops, list_operations::remove)),
                                        value("list name", ret.optionval))
                                .doc("Add and remove lists from being synchronized for an account"),
-                           (settableoptions & opt_value("value", ret.optionval).set(ret.selected, mode::config) % "If value given, set the specified option to that. Otherwise, show the corresponding value.")) %
+                           (settableoptions & opt_value("value", ret.optionval).set(ret.selected, mode::config) % "If given, set the specified option to that. Otherwise, show the corresponding value.")) %
                            "config commands");
 
-    auto syncMode = ((command("sync").set(ret.selected, mode::sync))
-                         .doc("Synchronize your account[s] with their server[s]. Synchronizes all accounts unless one is specified with -a."),
-                     (option("-r", "--retries") & value("times", ret.syncopts.retries)) % "Retry failed requests n times. (default: 3)");
+    auto syncMode = ((command("sync").set(ret.selected, mode::sync)
+                         .doc("Synchronize your account[s] with their server[s]. Synchronizes all accounts unless one is specified with -a.")) &
+                     (option("-r", "--retries").set(ret.syncopts.retries_set, true) & value("retries", ret.syncopts.retries)) % "Retry failed requests n times. (default: 3)");
 
     auto genMode = ((command("gen").set(ret.selected, mode::gen) | command("generate").set(ret.selected, mode::gen)).doc("Generate a post template in the current folder."));
 

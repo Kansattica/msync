@@ -446,6 +446,113 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
     }
 }
 
+SCENARIO("The command line parser recognizes when the user wants to sync.")
+{
+    GIVEN("A command line that says 'sync'.")
+    {
+        int argc = 2;
+        char const *argv[]{"msync", "sync"};
+
+        WHEN("the command line is parsed")
+        {
+            auto parsed = parse(argc, argv);
+
+            THEN("the selected mode is sync")
+            {
+                REQUIRE(parsed.selected == mode::sync);
+            }
+
+            THEN("account is not set")
+            {
+                REQUIRE(parsed.account.empty());
+            }
+
+            THEN("retries are not set")
+            {
+                REQUIRE_FALSE(parsed.syncopts.retries_set);
+            }
+
+            THEN("the parse is good")
+            {
+                REQUIRE(parsed.okay);
+            }
+        }
+    }
+
+    GIVEN("A command line that says 'sync' and specifies a number of retries.")
+    {
+        int argc = 4;
+        char const *argv[]{"msync", "sync", "-r", "10"};
+
+        WHEN("the command line is parsed")
+        {
+            auto parsed = parse(argc, argv);
+
+            THEN("the selected mode is sync")
+            {
+                REQUIRE(parsed.selected == mode::sync);
+            }
+
+            THEN("account is not set")
+            {
+                REQUIRE(parsed.account.empty());
+            }
+
+            THEN("retries are set")
+            {
+                REQUIRE(parsed.syncopts.retries_set);
+            }
+
+            THEN("the correct number of retries is set")
+            {
+                REQUIRE(parsed.syncopts.retries == 10);
+            }
+
+            THEN("the parse is good")
+            {
+                REQUIRE(parsed.okay);
+            }
+        }
+    }
+
+    GIVEN("A command line that says 'sync' and specifies an account and number of retries with the long options.")
+    {
+        int argc = 6;
+        char const *argv[]{"msync", "sync", "--retries", "15", "--account", "coolfella"};
+
+        WHEN("the command line is parsed")
+        {
+            auto parsed = parse(argc, argv);
+
+            THEN("the selected mode is sync")
+            {
+                REQUIRE(parsed.selected == mode::sync);
+            }
+
+            THEN("account is set")
+            {
+                REQUIRE(parsed.account == "coolfella");
+            }
+
+            THEN("retries are set")
+            {
+                REQUIRE(parsed.syncopts.retries_set);
+            }
+
+            THEN("the correct number of retries is set")
+            {
+                REQUIRE(parsed.syncopts.retries == 15);
+            }
+
+            THEN("the parse is good")
+            {
+                REQUIRE(parsed.okay);
+            }
+        }
+    }
+}
+
+
 SCENARIO("The command line parser recognizes when the user wants help.")
 {
     GIVEN("A command line that says 'help'.")
