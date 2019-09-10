@@ -16,7 +16,7 @@ public:
 
     std::unordered_map<std::string, user_options> accounts = read_accounts();
 
-    bool global_options::add_new_account(std::string name);
+    bool add_new_account(std::string name);
 
 private:
     fs::path get_exe_location();
