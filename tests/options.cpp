@@ -6,139 +6,6 @@
 
 using namespace std::string_literals;
 
-SCENARIO("select_account selects exactly one account.", "[options]")
-{
-    GIVEN("An empty account_options")
-    {
-        global_options options;
-        options.accounts.clear();
-
-        WHEN("select_account is given an empty string to search on")
-        {
-            auto account = options.select_account("");
-
-            THEN("a nullptr is returned")
-            {
-                REQUIRE(account == nullptr);
-            }
-        }
-
-        WHEN("select_account is given a non-empty string to search on")
-        {
-            auto account = options.select_account("coolperson");
-
-            THEN("a nullptr is returned")
-            {
-                REQUIRE(account == nullptr);
-            }
-        }
-    }
-
-    GIVEN("An account_options with one entry")
-    {
-        const fs::path optiontestfile{"regulartest"};
-        test_file fi{optiontestfile};
-
-        global_options options;
-        options.accounts.clear();
-        options.accounts.insert({"someaccount@website.com", user_options(optiontestfile)});
-
-        WHEN("select_account is given an empty string to search on")
-        {
-            auto account = options.select_account("");
-
-            THEN("a user_options is returned.")
-            {
-                REQUIRE_FALSE(account == nullptr);
-            }
-        }
-
-        WHEN("select_account is given a non-empty string to search on that's a valid prefix")
-        {
-            auto account = options.select_account("some");
-
-            THEN("a user_options is returned.")
-            {
-                REQUIRE_FALSE(account == nullptr);
-            }
-        }
-
-        WHEN("select_account is given a non-empty string to search on that's not a valid prefix")
-        {
-            auto account = options.select_account("bad");
-
-            THEN("a nullptr is returned")
-            {
-                REQUIRE(account == nullptr);
-            }
-        }
-    }
-
-    GIVEN("An account_options with two entries")
-    {
-        const fs::path optiontestfile{"regulartest"};
-        test_file fi{optiontestfile};
-        const fs::path anotheroptiontestfile{"regulartestguy"};
-        test_file anotherfi{anotheroptiontestfile};
-
-        global_options options;
-        options.accounts.clear();
-        options.accounts.insert({"someaccount@website.com", user_options(optiontestfile)});
-        options.accounts.insert({"someotheraccount@place2.egg", user_options(anotheroptiontestfile)});
-
-        for (auto& pair : options.accounts)
-        {
-            pair.second.set_option(user_option::accountname, std::string(pair.first)); //make a copy because you can't mutate keys, and user_option might mutate
-        }
-
-        WHEN("select_account is given an empty string to search on")
-        {
-            auto account = options.select_account("");
-
-            THEN("a nullptr is returned")
-            {
-                REQUIRE(account == nullptr);
-            }
-        }
-
-        WHEN("select_account is given a non-empty string to search on that's an ambiguous prefix")
-        {
-            auto account = options.select_account("some");
-
-            THEN("a nullptr is returned")
-            {
-                REQUIRE(account == nullptr);
-            }
-        }
-
-        WHEN("select_account is given a non-empty string to search on that's an unambiguous prefix")
-        {
-            auto account = options.select_account("someother");
-
-            THEN("a user_options is returned.")
-            {
-                REQUIRE_FALSE(account == nullptr);
-            }
-
-            THEN("the user_options is the correct one.")
-            {
-                const std::string account_name = *account->get_option(user_option::accountname);
-                REQUIRE(account_name == "someotheraccount@place2.egg");
-            }
-        }
-
-        WHEN("select_account is given a non-empty string to search on that's not a valid prefix")
-        {
-            auto account = options.select_account("bad");
-
-            THEN("a nullptr is returned")
-            {
-                REQUIRE(account == nullptr);
-            }
-        }
-    }
-}
-
 SCENARIO("parse_account_name correctly parses account names into a username and instance URL.")
 {
     GIVEN("A correct account name")
@@ -149,6 +16,9 @@ SCENARIO("parse_account_name correctly parses account names into a username and 
             std::make_tuple("hey_its_m3@internet12.for.egg"s, "hey_its_m3"s, "internet12.for.egg"s),
             std::make_tuple("_@some-website.comb"s, "_"s, "some-website.comb"s),
             std::make_tuple("@_@some-website.comb"s, "_"s, "some-website.comb"s),
+            std::make_tuple("@_@some-website.comb/"s, "_"s, "some-website.comb"s),
+            std::make_tuple("@_@some-website.comb\\"s, "_"s, "some-website.comb"s),
+            std::make_tuple("@_@some-website.comb?"s, "_"s, "some-website.comb"s),
             std::make_tuple("@leadingat@boringplace.comb"s, "leadingat"s, "boringplace.comb"s));
 
         WHEN("it's parsed by parse_account_name")
