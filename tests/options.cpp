@@ -19,9 +19,11 @@ SCENARIO("parse_account_name correctly parses account names into a username and 
             std::make_tuple("@_@some-website.comb/"s, "_"s, "some-website.comb"s),
             std::make_tuple("@_@some-website.comb\\"s, "_"s, "some-website.comb"s),
             std::make_tuple("@_@some-website.comb?"s, "_"s, "some-website.comb"s),
-            std::make_tuple("@leadingat@boringplace.comb"s, "leadingat"s, "boringplace.comb"s));
+            std::make_tuple("@leadingat@boringplace.comb"s, "leadingat"s, "boringplace.comb"s),
+            std::make_tuple("@leadingat@http://boringplace.comb"s, "leadingat"s, "boringplace.comb"s),
+            std::make_tuple("@leadingat@https://boringplace.comb"s, "leadingat"s, "boringplace.comb"s));
 
-        WHEN("it's parsed by parse_account_name")
+        WHEN(std::get<0>(input) + " is parsed by parse_account_name")
         {
             auto result = parse_account_name(std::get<0>(input));
 
