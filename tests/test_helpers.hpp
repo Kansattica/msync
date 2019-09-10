@@ -11,26 +11,26 @@
 struct test_file
 {
 public:
-    test_file(fs::path name) : filename(name)
+    test_file(fs::path name) : filename(name), filenamebak(name)
     {
+        filenamebak += ".bak";
         if (fs::exists(filename))
-            fs::remove(filename);
-        filename += ".bak";
-        if (fs::exists(filename))
-            fs::remove(filename);
+            fs::remove_all(filename);
+        if (fs::exists(filenamebak))
+            fs::remove_all(filenamebak);
     };
 
     ~test_file()
     {
         if (fs::exists(filename))
-            fs::remove(filename);
-        filename += ".bak";
-        if (fs::exists(filename))
-            fs::remove(filename);
+            fs::remove_all(filename);
+        if (fs::exists(filenamebak))
+            fs::remove_all(filenamebak);
     };
 
 private:
     fs::path filename;
+    fs::path filenamebak;
 };
 
 std::vector<std::string> inline read_lines(fs::path toread)

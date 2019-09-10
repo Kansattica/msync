@@ -14,14 +14,11 @@ user_options& global_options::add_new_account(std::string name)
     print_logger<logtype::verbose> pl;
     fs::path user_path{executable_location};
     user_path /= Account_Directory;
-
-    if (!fs::exists(user_path)) // ensure accounts directory exists
-        fs::create_directory(user_path);
-
-    if (!fs::is_directory(user_path))
-        throw msync_exception("Path exists and is not a directory. Please rename or delete this file and try again: "s + user_path.string());
-
     user_path /= name;
+
+    fs::create_directories(user_path); //can throw if something goes wrong
+
+    user_path /= User_Options_Filename;
 
     const auto [it, inserted] = accounts.emplace(std::move(name), user_options{user_path});
 
