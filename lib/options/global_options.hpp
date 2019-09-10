@@ -5,6 +5,7 @@
 #include "user_options.hpp"
 
 #include <string>
+#include <string_view>
 #include <unordered_map>
 
 struct global_options
@@ -16,6 +17,7 @@ public:
 
     std::unordered_map<std::string, user_options> accounts = read_accounts();
 
+    const user_options* select_account(const std::string_view name) const;
     user_options& add_new_account(std::string name);
 
 private:

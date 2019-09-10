@@ -10,11 +10,12 @@ SCENARIO("select_account selects exactly one account.", "[options]")
 {
     GIVEN("An empty account_options")
     {
+        global_options options;
         options.accounts.clear();
 
         WHEN("select_account is given an empty string to search on")
         {
-            auto account = select_account("");
+            auto account = options.select_account("");
 
             THEN("a nullptr is returned")
             {
@@ -24,7 +25,7 @@ SCENARIO("select_account selects exactly one account.", "[options]")
 
         WHEN("select_account is given a non-empty string to search on")
         {
-            auto account = select_account("coolperson");
+            auto account = options.select_account("coolperson");
 
             THEN("a nullptr is returned")
             {
@@ -38,12 +39,13 @@ SCENARIO("select_account selects exactly one account.", "[options]")
         const fs::path optiontestfile{"regulartest"};
         test_file fi{optiontestfile};
 
+        global_options options;
         options.accounts.clear();
         options.accounts.insert({"someaccount@website.com", user_options(optiontestfile)});
 
         WHEN("select_account is given an empty string to search on")
         {
-            auto account = select_account("");
+            auto account = options.select_account("");
 
             THEN("a user_options is returned.")
             {
@@ -53,7 +55,7 @@ SCENARIO("select_account selects exactly one account.", "[options]")
 
         WHEN("select_account is given a non-empty string to search on that's a valid prefix")
         {
-            auto account = select_account("some");
+            auto account = options.select_account("some");
 
             THEN("a user_options is returned.")
             {
@@ -63,7 +65,7 @@ SCENARIO("select_account selects exactly one account.", "[options]")
 
         WHEN("select_account is given a non-empty string to search on that's not a valid prefix")
         {
-            auto account = select_account("bad");
+            auto account = options.select_account("bad");
 
             THEN("a nullptr is returned")
             {
@@ -79,6 +81,7 @@ SCENARIO("select_account selects exactly one account.", "[options]")
         const fs::path anotheroptiontestfile{"regulartestguy"};
         test_file anotherfi{anotheroptiontestfile};
 
+        global_options options;
         options.accounts.clear();
         options.accounts.insert({"someaccount@website.com", user_options(optiontestfile)});
         options.accounts.insert({"someotheraccount@place2.egg", user_options(anotheroptiontestfile)});
@@ -90,7 +93,7 @@ SCENARIO("select_account selects exactly one account.", "[options]")
 
         WHEN("select_account is given an empty string to search on")
         {
-            auto account = select_account("");
+            auto account = options.select_account("");
 
             THEN("a nullptr is returned")
             {
@@ -100,7 +103,7 @@ SCENARIO("select_account selects exactly one account.", "[options]")
 
         WHEN("select_account is given a non-empty string to search on that's an ambiguous prefix")
         {
-            auto account = select_account("some");
+            auto account = options.select_account("some");
 
             THEN("a nullptr is returned")
             {
@@ -110,7 +113,7 @@ SCENARIO("select_account selects exactly one account.", "[options]")
 
         WHEN("select_account is given a non-empty string to search on that's an unambiguous prefix")
         {
-            auto account = select_account("someother");
+            auto account = options.select_account("someother");
 
             THEN("a user_options is returned.")
             {
@@ -126,7 +129,7 @@ SCENARIO("select_account selects exactly one account.", "[options]")
 
         WHEN("select_account is given a non-empty string to search on that's not a valid prefix")
         {
-            auto account = select_account("bad");
+            auto account = options.select_account("bad");
 
             THEN("a nullptr is returned")
             {
