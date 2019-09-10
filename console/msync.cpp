@@ -7,7 +7,7 @@
 
 int main(int argc, const char* argv[])
 {
-    std::cout << "Sup, nerds. Welcome to Mastosync.\n";
+    std::cout << "Sup, nerds. Welcome to msync.\n";
     print_logger<logtype::fileonly> pl;
     print_logger<logtype::normal> plerr;
     pl << "--- msync started ---\n";
