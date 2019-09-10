@@ -13,7 +13,6 @@ struct global_options
 public:
     bool verbose = false;
     const fs::path executable_location = get_exe_location();
-    const fs::path current_working_directory = fs::current_path();
 
     std::unordered_map<std::string, user_options> accounts = read_accounts();
 
