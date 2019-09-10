@@ -1,4 +1,5 @@
 #include "global_options.hpp"
+#include "user_options.hpp"
 #include "filesystem.hpp"
 #include <constants.hpp>
 #include <msync_exception.hpp>
@@ -12,7 +13,7 @@ using namespace std::string_literals;
 user_options& global_options::add_new_account(std::string name)
 {
     print_logger<logtype::verbose> pl;
-    fs::path user_path{executable_location};
+    fs::path user_path = executable_location;
     user_path /= Account_Directory;
     user_path /= name;
 
@@ -20,7 +21,7 @@ user_options& global_options::add_new_account(std::string name)
 
     user_path /= User_Options_Filename;
 
-    const auto [it, inserted] = accounts.emplace(std::move(name), user_options{user_path});
+    const auto [it, inserted] = accounts.emplace(name, user_options{user_path});
 
     if (!inserted)
         pl << "Account already exists. Nothing changed.\n";
@@ -43,9 +44,36 @@ fs::path global_options::get_exe_location()
 std::unordered_map<std::string, user_options> global_options::read_accounts()
 {
     print_logger<logtype::verbose> pl;
-    pl << "Reading accounts from " << executable_location << "\n";
+
+    fs::path account_location = executable_location / Account_Directory;
+
+    pl << "Reading accounts from " << account_location << "\n";
 
     std::unordered_map<std::string, user_options> toreturn;
+
+    if (!fs::exists(account_location))
+        return toreturn;
+
+    for (auto& userfolder : fs::directory_iterator(account_location))
+    {
+        if (!fs::is_directory(userfolder))
+        {
+            pl << userfolder << " is not a directory. Skipping.\n";
+            continue;
+        }
+
+        fs::path configfile = userfolder / User_Options_Filename;
+
+        if (!fs::exists(configfile))
+        {
+            throw msync_exception("Expected to find a config file and didn't find it. Try deleting the folder and running new again: " + userfolder.path().string());
+        }
+
+        auto accountname = userfolder.path().stem().string();
+        user_options config_file{configfile};
+
+        toreturn.emplace(accountname, std::move(config_file));
+    }
 
     return toreturn;
 }
