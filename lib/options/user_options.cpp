@@ -20,8 +20,7 @@ const std::string* user_options::get_option(user_option opt) const
     return &val->second;
 }
 
-void user_options::set_option(user_option opt, std::string&& value)
+void user_options::set_option(user_option opt, std::string value)
 {
-    backing.parsed_options.insert_or_assign(optionsToKeys[static_cast<int>(opt)],
-                                            std::forward<std::string>(value));
+    backing.parsed_options.insert_or_assign(optionsToKeys[static_cast<int>(opt)], std::move(value));
 }
