@@ -3,6 +3,7 @@
 #include <exception>
 #include <print_logger.hpp>
 
+#include "newaccount.hpp"
 #include "optionparsing/parseoptions.hpp"
 
 int main(int argc, const char* argv[])
@@ -19,7 +20,7 @@ int main(int argc, const char* argv[])
         switch (parsed.selected)
         {
         case mode::newuser:
-
+            make_new_account(parsed.account);
         default:
             std::cout << "[option not implemented]\n";
         }
