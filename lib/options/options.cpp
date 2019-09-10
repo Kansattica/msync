@@ -8,7 +8,7 @@
 
 std::optional<parsed_account> parse_account_name(const std::string& name)
 {
-    const static std::regex account_name{"@?([_a-z0-9]+)@([a-z0-9-]+\\.[a-z0-9-]+(?:\\.[a-z0-9-]+)?)", std::regex::ECMAScript | std::regex::icase};
+    const static std::regex account_name{"@?([_a-z0-9]+)@([a-z0-9-]+\\.[a-z0-9-]+(?:\\.[a-z0-9-]+)?)[, =/\\\\?]*$", std::regex::ECMAScript | std::regex::icase};
 
     std::smatch results;
     if (std::regex_match(name, results, account_name))
@@ -18,4 +18,3 @@ std::optional<parsed_account> parse_account_name(const std::string& name)
 
     return {};
 }
-
