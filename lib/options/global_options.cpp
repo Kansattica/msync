@@ -1,14 +1,18 @@
 #include "global_options.hpp"
 #include "filesystem.hpp"
 #include <constants.hpp>
+#include <msync_exception.hpp>
 #include <print_logger.hpp>
+#include <exception>
 #include <whereami.h>
 
 global_options options;
 
+using namespace std::string_literals;
+
 bool global_options::add_new_account(std::string name)
 {
-    print_logger<logtype::normal> pl;
+    print_logger<logtype::verbose> pl;
     fs::path user_path{executable_location};
     user_path /= Account_Directory;
 
@@ -16,20 +20,14 @@ bool global_options::add_new_account(std::string name)
         fs::create_directory(user_path);
 
     if (!fs::is_directory(user_path))
-    {
-        pl << user_path << " exists and is not a directory. Please rename or delete this file and try again.\n";
-        return false;
-    }
+        throw msync_exception("Path exists and is not a directory. Please rename or delete this file and try again: "s + user_path.string());
 
     user_path /= name;
 
     const auto [it, inserted] = accounts.emplace(std::move(name), user_options{user_path});
 
     if (!inserted)
-    {
         pl << "Account already exists. Nothing changed.\n";
-        return false;
-    }
 
     return true;
 }
