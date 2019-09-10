@@ -39,7 +39,7 @@ public:
     user_options(fs::path toread) : backing(toread){};
 
     const std::string* get_option(user_option toget) const;
-    void set_option(user_option toset, std::string&& value);
+    void set_option(user_option toset, std::string value);
 
 private:
     option_file backing;
