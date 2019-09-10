@@ -108,6 +108,16 @@ SCENARIO ("read_accounts correctly fills global_options on construction.")
                 REQUIRE(*found->second.get_option(user_option::instanceurl) == "website.com");
             }
         }
+
+        WHEN ("an incorrect account is looked up")
+        {
+            auto found = opt.accounts.find("boringaccount@badsize.pling");
+
+            THEN ("nothing was found")
+            {
+                REQUIRE(found == opt.accounts.end());
+            }
+        }
         test_file fi{accountdir};
     }
 }
