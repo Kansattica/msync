@@ -43,7 +43,7 @@ target_link_libraries(printlog INTERFACE options)
 target_link_libraries(options PRIVATE constants whereami filesystem frozen::frozen printlog exception)
 target_link_libraries(optionparsing PRIVATE clipp::clipp)
 
-target_link_libraries(msync PRIVATE net parse sync options optionparsing printlog exception)
+target_link_libraries(msync PRIVATE net parse sync options optionparsing printlog)
 
 if (MSYNC_BUILD_TESTS)
 	add_subdirectory(tests)

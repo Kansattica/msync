@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <msync_exception.hpp>
+#include <exception>
 #include <print_logger.hpp>
 
 #include "optionparsing/parseoptions.hpp"
@@ -24,7 +24,7 @@ int main(int argc, const char* argv[])
             std::cout << "[option not implemented]\n";
         }
     }
-    catch (const msync_exception& e)
+    catch (const std::exception& e)
     {
         plerr << "An error occurred: " << e.what() << '\n';
     }
