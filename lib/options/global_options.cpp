@@ -78,14 +78,14 @@ std::unordered_map<std::string, user_options> global_options::read_accounts()
     return toreturn;
 }
 
-const user_options* global_options::select_account(const std::string_view name) const
+user_options* global_options::select_account(const std::string_view name)
 {
     print_logger<logtype::verbose> pl;
 
     int matched = 0;
-    const user_options* candidate = nullptr;
+    user_options* candidate = nullptr;
 
-    for (const auto& entry : accounts)
+    for (auto& entry : accounts)
     {
         // won't have string.starts_with until c++20, so
         // if the name given is a prefix of (or equal to) this entry, it's a candidate
