@@ -69,11 +69,36 @@ std::unordered_map<std::string, user_options> global_options::read_accounts()
             throw msync_exception("Expected to find a config file and didn't find it. Try deleting the folder and running new again: " + userfolder.path().string());
         }
 
-        auto accountname = userfolder.path().stem().string();
+        auto accountname = userfolder.path().filename().string();
         user_options config_file{configfile};
 
         toreturn.emplace(accountname, std::move(config_file));
     }
 
     return toreturn;
+}
+
+const user_options* global_options::select_account(const std::string_view name) const
+{
+    print_logger<logtype::verbose> pl;
+
+    int matched = 0;
+    const user_options* candidate = nullptr;
+
+    for (auto& entry : accounts)
+    {
+        // won't have string.starts_with until c++20, so
+        // if the name given is a prefix of (or equal to) this entry, it's a candidate
+        if (std::equal(name.begin(), name.end(), entry.first.begin()))
+        {
+            pl << "Matched account" << entry.first << "\n";
+            matched++;
+            candidate = &entry.second;
+        }
+    }
+
+    if (matched == 1)
+        return candidate;
+
+    return nullptr;
 }

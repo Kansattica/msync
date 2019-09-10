@@ -19,27 +19,3 @@ std::optional<parsed_account> parse_account_name(const std::string& name)
     return {};
 }
 
-const user_options* select_account(const std::string_view name)
-{
-    print_logger<logtype::verbose> pl;
-
-    int matched = 0;
-    user_options* candidate = nullptr;
-
-    for (auto& entry : options.accounts)
-    {
-        // won't have string.starts_with until c++20, so
-        // if the name given is a prefix of (or equal to) this entry, it's a candidate
-        if (std::equal(name.begin(), name.end(), entry.first.begin()))
-        {
-            pl << "Matched account" << entry.first << "\n";
-            matched++;
-            candidate = &entry.second;
-        }
-    }
-
-    if (matched == 1)
-        return candidate;
-
-    return nullptr;
-}

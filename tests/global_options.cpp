@@ -108,5 +108,6 @@ SCENARIO ("read_accounts correctly fills global_options on construction.")
                 REQUIRE(*found->second.get_option(user_option::instanceurl) == "website.com");
             }
         }
+        test_file fi{accountdir};
     }
 }
