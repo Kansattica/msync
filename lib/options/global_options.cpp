@@ -3,14 +3,13 @@
 #include <constants.hpp>
 #include <msync_exception.hpp>
 #include <print_logger.hpp>
-#include <exception>
 #include <whereami.h>
 
 global_options options;
 
 using namespace std::string_literals;
 
-bool global_options::add_new_account(std::string name)
+user_options& global_options::add_new_account(std::string name)
 {
     print_logger<logtype::verbose> pl;
     fs::path user_path{executable_location};
@@ -29,7 +28,7 @@ bool global_options::add_new_account(std::string name)
     if (!inserted)
         pl << "Account already exists. Nothing changed.\n";
 
-    return true;
+    return it->second;
 }
 
 fs::path global_options::get_exe_location()

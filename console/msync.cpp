@@ -16,7 +16,6 @@ int main(int argc, const char* argv[])
 
     try
     {
-
         switch (parsed.selected)
         {
         case mode::newuser:
