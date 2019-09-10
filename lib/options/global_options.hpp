@@ -16,7 +16,7 @@ public:
 
     std::unordered_map<std::string, user_options> accounts = read_accounts();
 
-    const user_options* select_account(const std::string_view name) const;
+    user_options* select_account(const std::string_view name);
     user_options& add_new_account(std::string name);
 
 private:
