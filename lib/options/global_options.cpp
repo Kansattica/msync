@@ -1,6 +1,6 @@
 #include "global_options.hpp"
-#include "user_options.hpp"
 #include "filesystem.hpp"
+#include "user_options.hpp"
 #include <constants.hpp>
 #include <msync_exception.hpp>
 #include <print_logger.hpp>
@@ -85,7 +85,7 @@ const user_options* global_options::select_account(const std::string_view name) 
     int matched = 0;
     const user_options* candidate = nullptr;
 
-    for (auto& entry : accounts)
+    for (const auto& entry : accounts)
     {
         // won't have string.starts_with until c++20, so
         // if the name given is a prefix of (or equal to) this entry, it's a candidate
