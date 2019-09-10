@@ -1,23 +1,18 @@
-#include <catch2/catch.hpp>
 #include "test_helpers.hpp"
+#include <catch2/catch.hpp>
 #include <constants.hpp>
 
 #include "../lib/options/global_options.hpp"
 
-SCENARIO ("Both paths we care about are directories.")
+SCENARIO("Both paths we care about are directories.")
 {
     GIVEN("A global_options object")
     {
         global_options opts;
 
-        WHEN ("the object is created")
+        WHEN("the object is created")
         {
-            THEN ("current_working_directory is actually a directory.")
-            {
-                REQUIRE(fs::is_directory(opts.current_working_directory));
-            }
-
-            THEN ("executable_location is actually a directory.")
+            THEN("executable_location is actually a directory.")
             {
                 REQUIRE(fs::is_directory(opts.executable_location));
             }
@@ -25,7 +20,7 @@ SCENARIO ("Both paths we care about are directories.")
     }
 }
 
-SCENARIO ("add_new_account correctly handles input.")
+SCENARIO("add_new_account correctly handles input.")
 {
     GIVEN("A global_options object")
     {
@@ -44,8 +39,8 @@ SCENARIO ("add_new_account correctly handles input.")
 
             THEN("the accounts directory is created.")
             {
-               REQUIRE(fs::exists(accountdir));
-               REQUIRE(fs::is_directory(accountdir));
+                REQUIRE(fs::exists(accountdir));
+                REQUIRE(fs::is_directory(accountdir));
             }
 
             THEN("no file is created immediately.")
@@ -69,7 +64,7 @@ SCENARIO ("add_new_account correctly handles input.")
     }
 }
 
-SCENARIO ("read_accounts correctly fills global_options on construction.")
+SCENARIO("read_accounts correctly fills global_options on construction.")
 {
     GIVEN("A global_options with some values added to it, destroyed, and then a new one created.")
     {
@@ -92,16 +87,16 @@ SCENARIO ("read_accounts correctly fills global_options on construction.")
 
         global_options opt;
 
-        WHEN ("a given account is looked up")
+        WHEN("a given account is looked up")
         {
             auto found = opt.accounts.find("coolaccount@website.com");
 
-            THEN ("something was found")
+            THEN("something was found")
             {
                 REQUIRE(found != opt.accounts.end());
             }
 
-            THEN ("it was what we expected")
+            THEN("it was what we expected")
             {
                 REQUIRE(found->first == "coolaccount@website.com");
                 REQUIRE(*found->second.get_option(user_option::accountname) == "coolaccount");
@@ -109,11 +104,11 @@ SCENARIO ("read_accounts correctly fills global_options on construction.")
             }
         }
 
-        WHEN ("an incorrect account is looked up")
+        WHEN("an incorrect account is looked up")
         {
             auto found = opt.accounts.find("boringaccount@badsize.pling");
 
-            THEN ("nothing was found")
+            THEN("nothing was found")
             {
                 REQUIRE(found == opt.accounts.end());
             }
