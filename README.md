@@ -26,9 +26,9 @@ Once `msync` has features, I'll have releases available for download. For now, i
 - [ ] Nicer UI, like a minimal webpage to show downloaded posts in.
 
 ### Build Dependencies
+Cmake will download all of these for you, except it'll use your system's libcurl if you have it.
 - C++ 17 std::filesystem support
 - [Nlohmann Json](https://github.com/nlohmann/json)
-- [Frozen](https://github.com/serge-sans-paille/frozen)
 - [whereami](https://github.com/gpakosz/whereami.git)
 - [clipp](https://github.com/muellan/clipp)
 - [CPR](https://github.com/whoshuu/cpr)
