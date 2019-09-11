@@ -1,5 +1,5 @@
 #include "newaccount.hpp"
-#include "../lib/options/options.hpp"
+#include "../lib/options/global_options.hpp"
 #include "../lib/util/util.hpp"
 #include <cpr/cpr.h>
 #include <nlohmann/json.hpp>

@@ -2,7 +2,8 @@
 
 #include <iostream>
 
-#include "../../lib/options/options.hpp"
+#include "../../lib/options/user_options.hpp"
+#include "../../lib/options/global_options.hpp"
 #include "parseoptions.hpp"
 
 using namespace clipp;
