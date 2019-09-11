@@ -25,6 +25,7 @@ enum class user_option
 {
     accountname,
     instanceurl,
+    authcode,
     accesstoken,
     clientsecret,
     clientid,
