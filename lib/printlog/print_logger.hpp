@@ -4,7 +4,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "../options/options.hpp"
+#include "../options/global_options.hpp"
 
 using std::cout;
 using std::ofstream;
