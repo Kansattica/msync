@@ -4,7 +4,6 @@
 #include <array>
 #include <fstream>
 
-
 #include "../lib/options/user_options.hpp"
 
 SCENARIO("User_options reads from a file when created", "[user_options]")
@@ -171,6 +170,81 @@ SCENARIO("Get and set options manage string references correctly.", "[user_optio
                 THEN("the change is reflected in the original value")
                 {
                     REQUIRE(*val == "someotherguy");
+                }
+            }
+        }
+    }
+}
+
+CATCH_REGISTER_ENUM(sync_settings, sync_settings::dont_sync, sync_settings::newest_first, sync_settings::oldest_first);
+
+SCENARIO("The enum overload for get_option works.")
+{
+    GIVEN("An empty user_options")
+    {
+        test_file fi{"testfilefriend"};
+        user_options opt{"testfilefriend"};
+
+        WHEN("one of the three options that have sync settings is asked for.")
+        {
+            auto option = GENERATE(user_option::pull_home, user_option::pull_dms, user_option::pull_notifications);
+            auto result = opt.get_sync_option(option);
+
+            THEN("the result has the correct default.")
+            {
+                //newest_first for home, oldest_first for the other two
+                if (option == user_option::pull_home)
+                {
+                    REQUIRE(result == sync_settings::newest_first);
+                }
+                else
+                {
+                    REQUIRE(result == sync_settings::oldest_first);
+                }
+            }
+        }
+    }
+
+    GIVEN("A user_options with some of the pull options set.")
+    {
+        const fs::path testfilepath = "testfilefriend";
+        test_file fi{testfilepath};
+        user_options opt{testfilepath};
+        opt.set_option(user_option::pull_home, sync_settings::oldest_first);
+
+        WHEN("one of the three options that have sync settings is asked for.")
+        {
+            auto option = GENERATE(user_option::pull_home, user_option::pull_dms, user_option::pull_notifications);
+            auto result = opt.get_sync_option(option);
+
+            THEN("the result has the correct set or default value.")
+            {
+                REQUIRE(result == sync_settings::oldest_first);
+            }
+        }
+
+        WHEN("the user_options is destroyed")
+        {
+            {
+                user_options newopt = std::move(opt);
+            }
+
+            THEN("The generated file has the correct option set.")
+            {
+                auto lines = read_lines(testfilepath);
+
+                REQUIRE(lines.size() == 1);
+                REQUIRE(lines[0] == "pull_home=oldest_first");
+            }
+
+            AND_WHEN("a new user_options is created from that file")
+            {
+                user_options neweropt(testfilepath);
+
+                THEN("it has the correct value.")
+                {
+                    REQUIRE(neweropt.get_sync_option(user_option::pull_home) == sync_settings::oldest_first);
+                    REQUIRE(*neweropt.get_option(user_option::pull_home) == "oldest_first");
                 }
             }
         }

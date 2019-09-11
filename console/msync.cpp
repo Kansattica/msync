@@ -1,8 +1,8 @@
 #include <iostream>
 
 #include <exception>
-#include <print_logger.hpp>
 #include <msync_exception.hpp>
+#include <print_logger.hpp>
 #include <string>
 
 #include "newaccount.hpp"
@@ -42,6 +42,7 @@ int main(int argc, const char* argv[])
     catch (const std::exception& e)
     {
         plerr << "An error occurred: " << e.what();
+        plerr << "\nFor account: " << parsed.account;
     }
 
     plerr << '\n';
@@ -49,11 +50,10 @@ int main(int argc, const char* argv[])
     pl << "--- msync finished normally ---\n";
 }
 
-
 user_options& assume_account(user_options* user, const std::string& name)
 {
     if (user == nullptr)
-        throw msync_exception("Could not find a match [or an unambiguous match] for: " + name);
+        throw msync_exception("Could not find a match [or an unambiguous match].");
     return *user;
 }
 
@@ -64,5 +64,4 @@ void print_stringptr(const std::string* toprint)
         pl << "[none]";
     else
         pl << *toprint;
-    
 }
