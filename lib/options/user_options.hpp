@@ -7,32 +7,7 @@
 
 #include "option_file.hpp"
 
-enum class list_operations
-{
-    add,
-    remove,
-    clear
-};
-
-enum class sync_settings
-{
-    off,
-    newest_first,
-    oldest_first
-};
-
-enum class user_option
-{
-    accountname,
-    instanceurl,
-    authcode,
-    accesstoken,
-    clientsecret,
-    clientid,
-    home,
-    dms,
-    notifications,
-};
+#include "option_enums.hpp"
 
 struct user_options
 {

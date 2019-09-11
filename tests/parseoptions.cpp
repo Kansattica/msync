@@ -75,7 +75,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
             THEN("the correct option will be changed")
             {
-                REQUIRE(parsed.toset == user_option::accesstoken);
+                REQUIRE(parsed.toset == user_option::access_token);
             }
 
             THEN("the option is correctly set")
@@ -111,7 +111,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
             THEN("the correct option will be changed")
             {
-                REQUIRE(parsed.toset == user_option::clientsecret);
+                REQUIRE(parsed.toset == user_option::client_secret);
             }
 
             THEN("the option is correctly set")
@@ -147,7 +147,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
             THEN("the correct option will be read")
             {
-                REQUIRE(parsed.toset == user_option::accountname);
+                REQUIRE(parsed.toset == user_option::account_name);
             }
 
             THEN("the option is not set")
@@ -188,7 +188,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
             THEN("the correct option will be read")
             {
-                REQUIRE(parsed.toset == user_option::instanceurl);
+                REQUIRE(parsed.toset == user_option::instance_url);
             }
 
             THEN("account is set")
@@ -353,7 +353,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
             THEN("the correct sync location is set")
             {
-                REQUIRE(parsed.toset == user_option::home);
+                REQUIRE(parsed.toset == user_option::pull_home);
             }
 
             THEN("the correct sync operation is set")
@@ -389,7 +389,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
             THEN("the correct sync location is set")
             {
-                REQUIRE(parsed.toset == user_option::dms);
+                REQUIRE(parsed.toset == user_option::pull_dms);
             }
 
             THEN("the correct sync operation is set")
@@ -425,7 +425,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
             THEN("the correct sync location is set")
             {
-                REQUIRE(parsed.toset == user_option::notifications);
+                REQUIRE(parsed.toset == user_option::pull_notifications);
             }
 
             THEN("the correct sync operation is set")

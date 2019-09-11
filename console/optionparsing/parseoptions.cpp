@@ -28,21 +28,21 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
     parse_result ret;
 
     auto settableoptions = (one_of(
-        command("accesstoken").set(ret.toset, user_option::accesstoken).set(ret.selected, mode::showopt),
-        command("authcode").set(ret.toset, user_option::authcode).set(ret.selected, mode::showopt),
-        command("accountname").set(ret.toset, user_option::accountname).set(ret.selected, mode::showopt),
-        command("instanceurl").set(ret.toset, user_option::instanceurl).set(ret.selected, mode::showopt),
-        command("clientid").set(ret.toset, user_option::clientid).set(ret.selected, mode::showopt),
-        command("clientsecret").set(ret.toset, user_option::clientsecret).set(ret.selected, mode::showopt)));
+        command("accesstoken").set(ret.toset, user_option::access_token).set(ret.selected, mode::showopt),
+        command("authcode").set(ret.toset, user_option::auth_code).set(ret.selected, mode::showopt),
+        command("accountname").set(ret.toset, user_option::account_name).set(ret.selected, mode::showopt),
+        command("instanceurl").set(ret.toset, user_option::instance_url).set(ret.selected, mode::showopt),
+        command("clientid").set(ret.toset, user_option::client_id).set(ret.selected, mode::showopt),
+        command("clientsecret").set(ret.toset, user_option::client_secret).set(ret.selected, mode::showopt)));
 
     auto newaccount = (command("new").set(ret.selected, mode::newuser)).doc("Register a new account with msync. Start here.");
     auto configMode = (command("config").set(ret.selected, mode::config).doc("Set and show account-specific options.") &
                        one_of(
                            command("showall").set(ret.selected, mode::showopt).doc("Print options for the specified account. If no account is specified, print options for all accounts."),
                            in_sequence(command("sync").set(ret.selected, mode::configsync),
-                                       one_of(command("home").set(ret.toset, user_option::home),
-                                              command("dms").set(ret.toset, user_option::dms),
-                                              command("notifications").set(ret.toset, user_option::notifications)),
+                                       one_of(command("home").set(ret.toset, user_option::pull_home),
+                                              command("dms").set(ret.toset, user_option::pull_dms),
+                                              command("notifications").set(ret.toset, user_option::pull_notifications)),
                                        one_of(command("newest").set(ret.syncset, sync_settings::newest_first),
                                               command("oldest").set(ret.syncset, sync_settings::oldest_first),
                                               command("off").set(ret.syncset, sync_settings::off)))
