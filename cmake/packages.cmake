@@ -37,22 +37,6 @@ if(NOT njson_POPULATED)
 	add_subdirectory(${njson_SOURCE_DIR} ${njson_BINARY_DIR})
 endif()
 
-message(STATUS "Downloading serge-sans-paille/frozen...")
-FetchContent_Declare(
-	frozenlib
-	GIT_REPOSITORY https://github.com/serge-sans-paille/frozen.git
-	GIT_TAG		   origin/master
-	GIT_SHALLOW    TRUE
-	GIT_PROGRESS   TRUE
-	)
-
-set (frozen.installation OFF CACHE BOOL "Don't install frozen, just link it in." FORCE)
-FetchContent_GetProperties(frozenlib)
-if(NOT frozenlib_POPULATED)
-	FetchContent_Populate(frozenlib)
-	add_subdirectory(${frozenlib_SOURCE_DIR} ${frozenlib_BINARY_DIR})
-endif()
-
 message(STATUS "Downloading clipp...")
 FetchContent_Declare(
 	clipplib
