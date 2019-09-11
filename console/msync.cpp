@@ -5,10 +5,12 @@
 #include <print_logger.hpp>
 #include <string>
 
+#include "../lib/options/option_enums.hpp"
+#include "../lib/options/user_options.hpp"
 #include "newaccount.hpp"
 #include "optionparsing/parseoptions.hpp"
 
-user_options& assume_account(user_options* user, const std::string& name);
+user_options& assume_account(user_options* user);
 void print_stringptr(const std::string* toprint);
 
 int main(int argc, const char* argv[])
@@ -28,12 +30,28 @@ int main(int argc, const char* argv[])
             make_new_account(parsed.account);
             break;
         case mode::showopt:
-            print_stringptr(assume_account(user, parsed.account).get_option(parsed.toset));
+            print_stringptr(assume_account(user).get_option(parsed.toset));
             break;
         case mode::showallopt:
+            for (user_option opt = user_option(0); opt <= user_option::pull_notifications; opt = user_option(static_cast<int>(opt) + 1))
+            {
+                plerr << USER_OPTION_NAMES[static_cast<int>(opt)] << ": ";
+                if (opt < user_option::pull_home)
+                    print_stringptr(assume_account(user).get_option(opt));
+                else
+                    plerr << SYNC_SETTING_NAMES[static_cast<int>(assume_account(user).get_sync_option(opt))];
+                plerr << '\n';
+            }
+            plerr << "Accounts registered: ";
+            for (auto it = options.accounts.begin(); it != options.accounts.end();)
+            {
+                plerr << it->first;
+                if (++it != options.accounts.end())
+                    plerr << ", ";
+            }
             break;
         case mode::config:
-            assume_account(user, parsed.account).set_option(parsed.toset, parsed.optionval);
+            assume_account(user).set_option(parsed.toset, parsed.optionval);
             break;
         case mode::help:
             break;
@@ -52,7 +70,7 @@ int main(int argc, const char* argv[])
     pl << "--- msync finished normally ---\n";
 }
 
-user_options& assume_account(user_options* user, const std::string& name)
+user_options& assume_account(user_options* user)
 {
     if (user == nullptr)
         throw msync_exception("Could not find a match [or an unambiguous match].");
@@ -63,7 +81,7 @@ void print_stringptr(const std::string* toprint)
 {
     print_logger<logtype::normal> pl;
     if (toprint == nullptr)
-        pl << "[none]";
+        pl << "[not set]";
     else
         pl << *toprint;
 }

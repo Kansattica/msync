@@ -38,7 +38,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
     auto newaccount = (command("new").set(ret.selected, mode::newuser)).doc("Register a new account with msync. Start here.");
     auto configMode = (command("config").set(ret.selected, mode::config).doc("Set and show account-specific options.") &
                        one_of(
-                           command("showall").set(ret.selected, mode::showallopt).doc("Print options for the specified account. If no account is specified, print options for all accounts."),
+                           command("showall").set(ret.selected, mode::showallopt).doc("Print all options for the specified account."),
                            in_sequence(command("sync").set(ret.selected, mode::configsync),
                                        one_of(command("home").set(ret.toset, user_option::pull_home),
                                               command("dms").set(ret.toset, user_option::pull_dms),
