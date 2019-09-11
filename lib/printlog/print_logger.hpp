@@ -19,7 +19,13 @@ enum class logtype
 template <logtype isverbose = logtype::normal>
 struct print_logger
 {
-    print_logger() : logfile("msync.log") {}
+    print_logger() : logfile("msync.log", std::ios::out | std::ios::app) {}
+
+    void flush()
+    {
+        cout.flush();
+        logfile.flush();
+    }
 
     template <typename T>
     print_logger& operator<<(const T& towrite)

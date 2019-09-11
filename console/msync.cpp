@@ -18,6 +18,7 @@ int main(int argc, const char* argv[])
     print_logger<logtype::fileonly> pl;
     print_logger<logtype::normal> plerr;
     pl << "--- msync started ---\n";
+    pl.flush();
 
     auto parsed = parse(argc, argv, false);
 
