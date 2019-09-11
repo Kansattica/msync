@@ -3,6 +3,9 @@
 #include <array>
 #include <string>
 
+template <typename ToParse>
+ToParse parse_enum(char first);
+
 enum class list_operations
 {
     add,
@@ -15,9 +18,10 @@ const auto LIST_OPERATION_NAMES =
                static_cast<int>(list_operations::clear) + 1>(
         {"add", "remove", "clear"});
 
+
 enum class sync_settings
 {
-    off,
+    dont_sync,
     newest_first,
     oldest_first
 };
@@ -25,7 +29,8 @@ enum class sync_settings
 const auto SYNC_SETTING_NAMES =
     std::array<const std::string,
                static_cast<int>(sync_settings::oldest_first) + 1>(
-        {"off", "newest_first", "oldest_first"});
+        {"dont_sync", "newest_first", "oldest_first"});
+
 
 enum class user_option
 {

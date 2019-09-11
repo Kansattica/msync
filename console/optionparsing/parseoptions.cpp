@@ -45,7 +45,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
                                               command("notifications").set(ret.toset, user_option::pull_notifications)),
                                        one_of(command("newest").set(ret.syncset, sync_settings::newest_first),
                                               command("oldest").set(ret.syncset, sync_settings::oldest_first),
-                                              command("off").set(ret.syncset, sync_settings::off)))
+                                              command("off").set(ret.syncset, sync_settings::dont_sync)))
                                .doc("Whether to synchronize an account's home timeline, direct messages, and notifications, and whether to do it newest first, oldest first, or not at all."),
                            in_sequence(command("list").set(ret.selected, mode::configlist),
                                        one_of(command("add").set(ret.listops, list_operations::add),
