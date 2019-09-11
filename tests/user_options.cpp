@@ -4,6 +4,7 @@
 #include <array>
 #include <fstream>
 
+
 #include "../lib/options/user_options.hpp"
 
 SCENARIO("User_options reads from a file when created", "[user_options]")
@@ -104,6 +105,7 @@ SCENARIO("An empty user_options writes to a file when destroyed", "[user_options
 
                 opt.set_option(user_option::account_name, "somejerk");
                 opt.set_option(user_option::instance_url, "rude.website");
+                opt.set_option(user_option::pull_dms, sync_settings::newest_first);
 
                 THEN("the file is not created until the user_options is destroyed")
                 {
@@ -117,9 +119,10 @@ SCENARIO("An empty user_options writes to a file when destroyed", "[user_options
 
                 const auto lines = read_lines(filepath);
 
-                REQUIRE(lines.size() == 2);
+                REQUIRE(lines.size() == 3);
                 REQUIRE(lines[0] == "account_name=somejerk");
                 REQUIRE(lines[1] == "instance_url=rude.website");
+                REQUIRE(lines[2] == "pull_dms=newest_first");
             }
 
             THEN("No .bak file is created.")
