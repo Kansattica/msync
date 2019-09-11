@@ -47,7 +47,8 @@ option_file::~option_file()
     ofstream of(optionfilename);
     for (auto& kvp : parsed_options)
     {
-        of << kvp.first << '=' << kvp.second << '\n';
+        if (!kvp.second.empty()) //don't serialize
+            of << kvp.first << '=' << kvp.second << '\n';
     }
 
     logger << "Saved " << optionfilename << '\n';
