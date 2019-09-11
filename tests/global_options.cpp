@@ -278,5 +278,15 @@ SCENARIO("select_account selects exactly one account.", "[options]")
                 REQUIRE(account == nullptr);
             }
         }
+
+        WHEN("select_account is given a non-empty string to search on that's longer than the account names.")
+        {
+            auto account = options.select_account(std::string(100, 'b'));
+
+            THEN("a nullptr is returned")
+            {
+                REQUIRE(account == nullptr);
+            }
+        }
     }
 }

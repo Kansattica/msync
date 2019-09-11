@@ -89,6 +89,12 @@ user_options* global_options::select_account(const std::string_view name)
 
     for (auto& entry : accounts)
     {
+
+        // if name is longer than the entry, we'll step off the end of entry and segfault
+        // since name can't possibly match something it's longer than, just skip this
+        if (name.size() > entry.first.size())
+            continue;
+
         // won't have string.starts_with until c++20, so
         // if the name given is a prefix of (or equal to) this entry, it's a candidate
         if (std::equal(name.begin(), name.end(), entry.first.begin(), [](auto a, auto b) {
