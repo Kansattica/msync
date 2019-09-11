@@ -67,6 +67,25 @@ SCENARIO("option_files save their data when destroyed.", "[option_file]")
                 REQUIRE(lines[1] == "test=time");
             }
         }
+
+        WHEN("an option's value is set to an empty string and destroyed")
+        {
+            opts.parsed_options["test"] = "";
+
+            {
+                option_file newopts = std::move(opts);
+            }
+
+            THEN("the file gets written without the deleted options.")
+            {
+                REQUIRE(fs::exists(testfilename));
+
+                auto lines = read_lines(testfilename);
+
+                REQUIRE(lines.size() == 1);
+                REQUIRE(lines[0] == "atestoption=coolstuff");
+            }
+        }
     }
 }
 
