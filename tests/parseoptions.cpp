@@ -430,7 +430,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
             THEN("the correct sync operation is set")
             {
-                REQUIRE(parsed.syncset == sync_settings::off);
+                REQUIRE(parsed.syncset == sync_settings::dont_sync);
             }
 
             THEN("account is set")

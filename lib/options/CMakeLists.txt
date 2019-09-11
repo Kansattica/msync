@@ -4,6 +4,7 @@ target_sources_local(options
         global_options.cpp
         user_options.hpp
         option_enums.hpp
+        option_enums.cpp
         user_options.cpp
         option_file.cpp
         option_file.hpp

@@ -4,7 +4,7 @@
 
 CATCH_REGISTER_ENUM(list_operations, list_operations::add, list_operations::remove, list_operations::clear)
 
-SCENARIO ("list_operations stringify properly.")
+SCENARIO ("list_operations stringify and parse properly.")
 {
     Catch::StringMaker<list_operations> sm;
     GIVEN ("A list_operation")
@@ -17,7 +17,18 @@ SCENARIO ("list_operations stringify properly.")
             {
                 REQUIRE(result == sm.convert(val));
             }
+
+            AND_WHEN("the looked-up string is parsed")
+            {
+                auto parsedval = parse_enum<list_operations>(result[0]);
+
+                THEN("it matches the original.")
+                {
+                    REQUIRE(parsedval == val);
+                }
+            }
         }
+
     }
 
     GIVEN("A list_operations type")
@@ -27,22 +38,33 @@ SCENARIO ("list_operations stringify properly.")
             STATIC_REQUIRE(LIST_OPERATION_NAMES.size() == static_cast<int>(list_operations::clear)+1);
         }
     }
+
 }
 
-CATCH_REGISTER_ENUM(sync_settings, sync_settings::off, sync_settings::newest_first, sync_settings::oldest_first)
+CATCH_REGISTER_ENUM(sync_settings, sync_settings::dont_sync, sync_settings::newest_first, sync_settings::oldest_first)
 
 SCENARIO ("sync_settings stringify properly.")
 {
     Catch::StringMaker<sync_settings> sm;
     GIVEN ("A sync_setting")
     {
-        auto val = GENERATE(sync_settings::off, sync_settings::newest_first, sync_settings::oldest_first);
+        auto val = GENERATE(sync_settings::dont_sync, sync_settings::newest_first, sync_settings::oldest_first);
         WHEN("that sync_setting is looked up in its array")
         {
             auto result = SYNC_SETTING_NAMES[static_cast<int>(val)];
             THEN ("the corresponding string is the correct one.")
             {
                 REQUIRE(result == sm.convert(val));
+            }
+
+            AND_WHEN("the looked-up string is parsed")
+            {
+                auto parsedval = parse_enum<sync_settings>(result[0]);
+
+                THEN("it matches the original.")
+                {
+                    REQUIRE(parsedval == val);
+                }
             }
         }
     }
