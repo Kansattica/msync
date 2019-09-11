@@ -1,11 +1,12 @@
-#include <string>
 #include "../../lib/options/user_options.hpp"
 #include "selection_types.hpp"
+#include <string>
 
 enum class mode
 {
     newuser,
     showopt,
+    showallopt,
     config,
     configsync,
     configlist,
