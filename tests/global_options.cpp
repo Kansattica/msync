@@ -81,11 +81,11 @@ SCENARIO("read_accounts correctly fills global_options on construction.")
             }
 
             user_options& added = opt.add_new_account("coolaccount@website.com");
-            added.set_option(user_option::accountname, "coolaccount");
-            added.set_option(user_option::instanceurl, "website.com");
+            added.set_option(user_option::account_name, "coolaccount");
+            added.set_option(user_option::instance_url, "website.com");
             user_options& alsoadded = opt.add_new_account("evencooleraccount@wedsize.egg");
-            alsoadded.set_option(user_option::accountname, "evencooleraccount");
-            alsoadded.set_option(user_option::instanceurl, "wedsize.egg");
+            alsoadded.set_option(user_option::account_name, "evencooleraccount");
+            alsoadded.set_option(user_option::instance_url, "wedsize.egg");
         }
 
         global_options opt;
@@ -102,8 +102,8 @@ SCENARIO("read_accounts correctly fills global_options on construction.")
             THEN("it was what we expected")
             {
                 REQUIRE(found->first == "coolaccount@website.com");
-                REQUIRE(*found->second.get_option(user_option::accountname) == "coolaccount");
-                REQUIRE(*found->second.get_option(user_option::instanceurl) == "website.com");
+                REQUIRE(*found->second.get_option(user_option::account_name) == "coolaccount");
+                REQUIRE(*found->second.get_option(user_option::instance_url) == "website.com");
             }
         }
 
@@ -213,7 +213,7 @@ SCENARIO("select_account selects exactly one account.", "[options]")
 
         for (auto& pair : options.accounts)
         {
-            pair.second.set_option(user_option::accountname, std::string(pair.first)); //make a copy because you can't mutate keys, and user_option might mutate
+            pair.second.set_option(user_option::account_name, std::string(pair.first)); //make a copy because you can't mutate keys, and user_option might mutate
         }
 
         WHEN("select_account is given an empty string to search on")
@@ -247,7 +247,7 @@ SCENARIO("select_account selects exactly one account.", "[options]")
 
             THEN("the user_options is the correct one.")
             {
-                const std::string account_name = *account->get_option(user_option::accountname);
+                const std::string account_name = *account->get_option(user_option::account_name);
                 REQUIRE(account_name == "someotheraccount@place2.egg");
             }
         }
@@ -264,7 +264,7 @@ SCENARIO("select_account selects exactly one account.", "[options]")
 
             THEN("the user_options is the correct one.")
             {
-                const std::string account_name = *account->get_option(user_option::accountname);
+                const std::string account_name = *account->get_option(user_option::account_name);
                 REQUIRE(account_name == "someotheraccount@place2.egg");
             }
         }

@@ -27,13 +27,13 @@ SCENARIO("User_options reads from a file when created", "[user_options]")
 
             THEN("the fields are set correctly.")
             {
-                REQUIRE(*opt.get_option(user_option::accountname) == "sometester");
-                REQUIRE(*opt.get_option(user_option::instanceurl) == "website.egg");
+                REQUIRE(*opt.get_option(user_option::account_name) == "sometester");
+                REQUIRE(*opt.get_option(user_option::instance_url) == "website.egg");
             }
 
             THEN("empty fields are handled gracefully.")
             {
-                REQUIRE_FALSE(opt.get_option(user_option::accesstoken) != nullptr);
+                REQUIRE_FALSE(opt.get_option(user_option::access_token) != nullptr);
             }
 
             THEN("No .bak file is created.")
@@ -65,15 +65,15 @@ SCENARIO("User_options saves changes back to its file", "[user_options]")
         {
             {
                 user_options opt(filepath);
-                opt.set_option(user_option::accountname, "someoneelse");
+                opt.set_option(user_option::account_name, "someoneelse");
             }
 
             THEN("a newly created user_options for the same path should see the change.")
             {
                 user_options newopt(filepath);
-                REQUIRE(*newopt.get_option(user_option::accountname) == "someoneelse");
-                REQUIRE(*newopt.get_option(user_option::instanceurl) == "website.egg");
-                REQUIRE(newopt.get_option(user_option::accesstoken) == nullptr);
+                REQUIRE(*newopt.get_option(user_option::account_name) == "someoneelse");
+                REQUIRE(*newopt.get_option(user_option::instance_url) == "website.egg");
+                REQUIRE(newopt.get_option(user_option::access_token) == nullptr);
             }
 
             THEN("a .bak file with the original information should be created.")
@@ -102,8 +102,8 @@ SCENARIO("An empty user_options writes to a file when destroyed", "[user_options
             {
                 user_options opt(filepath);
 
-                opt.set_option(user_option::accountname, "somejerk");
-                opt.set_option(user_option::instanceurl, "rude.website");
+                opt.set_option(user_option::account_name, "somejerk");
+                opt.set_option(user_option::instance_url, "rude.website");
 
                 THEN("the file is not created until the user_options is destroyed")
                 {
@@ -149,7 +149,7 @@ SCENARIO("Get and set options manage string references correctly.", "[user_optio
         WHEN("an option that exists in the dictionary is requested")
         {
             user_options opt(filepath);
-            auto val = opt.get_option(user_option::accountname);
+            auto val = opt.get_option(user_option::account_name);
 
             THEN("the value is present.")
             {
@@ -163,7 +163,7 @@ SCENARIO("Get and set options manage string references correctly.", "[user_optio
 
             AND_WHEN("the option is modified")
             {
-                opt.set_option(user_option::accountname, "someotherguy");
+                opt.set_option(user_option::account_name, "someotherguy");
 
                 THEN("the change is reflected in the original value")
                 {
