@@ -13,3 +13,13 @@ void user_options::set_option(user_option opt, std::string value)
 {
     backing.parsed_options.insert_or_assign(USER_OPTION_NAMES[static_cast<int>(opt)], std::move(value));
 }
+
+void user_options::set_option(user_option opt, list_operations value)
+{
+    backing.parsed_options.insert_or_assign(USER_OPTION_NAMES[static_cast<int>(opt)], LIST_OPERATION_NAMES[static_cast<int>(value)]);
+}
+
+void user_options::set_option(user_option opt, sync_settings value)
+{
+    backing.parsed_options.insert_or_assign(USER_OPTION_NAMES[static_cast<int>(opt)], SYNC_SETTING_NAMES[static_cast<int>(value)]);
+}
