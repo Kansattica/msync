@@ -16,7 +16,7 @@ Account names for accounts that you have logged into msync with can be shortened
 The account name can be left out of most commands entirely if you only have one account registered with msync.
 If this is your first time, try running:
 
-msync config new -a [account name]
+msync new -a [account name]
 
 New account names must be fully specified, like: GoddessGrace@goodchristian.website
 )";
@@ -29,6 +29,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 
     auto settableoptions = (one_of(
         command("accesstoken").set(ret.toset, user_option::accesstoken).set(ret.selected, mode::showopt),
+        command("authcode").set(ret.toset, user_option::authcode).set(ret.selected, mode::showopt),
         command("accountname").set(ret.toset, user_option::accountname).set(ret.selected, mode::showopt),
         command("instanceurl").set(ret.toset, user_option::instanceurl).set(ret.selected, mode::showopt),
         command("clientid").set(ret.toset, user_option::clientid).set(ret.selected, mode::showopt),
@@ -70,9 +71,12 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
     //we do it this way because C++11 and later don't like it when you turn a string literal into a char*, so we have to use the iterator interface
     auto result = clipp::parse(argv + 1, argc + argv, cli);
 
-    if (!silent && (!result || ret.selected == mode::help))
+    if (!result || ret.selected == mode::help)
     {
-        cout << make_man_page(cli, "msync").append_section("NOTES", helpmessage);
+        if(!silent)
+            cout << make_man_page(cli, "msync").append_section("NOTES", helpmessage);
+        
+        ret.selected = mode::help; //possible for, say, config to be set but still be a parse fail
     }
 
     ret.okay = static_cast<bool>(result);

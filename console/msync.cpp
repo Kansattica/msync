@@ -2,33 +2,67 @@
 
 #include <exception>
 #include <print_logger.hpp>
+#include <msync_exception.hpp>
+#include <string>
 
 #include "newaccount.hpp"
 #include "optionparsing/parseoptions.hpp"
 
+user_options& assume_account(user_options* user, const std::string& name);
+void print_stringptr(const std::string* toprint);
+
 int main(int argc, const char* argv[])
 {
-    std::cout << "Sup, nerds. Welcome to msync.\n";
     print_logger<logtype::fileonly> pl;
     print_logger<logtype::normal> plerr;
     pl << "--- msync started ---\n";
 
     auto parsed = parse(argc, argv, false);
 
+    auto user = options.select_account(parsed.account);
     try
     {
         switch (parsed.selected)
         {
         case mode::newuser:
             make_new_account(parsed.account);
+            break;
+        case mode::showopt:
+            print_stringptr(assume_account(user, parsed.account).get_option(parsed.toset));
+            break;
+        case mode::config:
+            assume_account(user, parsed.account).set_option(parsed.toset, parsed.optionval);
+            break;
+        case mode::help:
+            break;
         default:
-            std::cout << "[option not implemented]\n";
+            plerr << "[option not implemented]";
         }
     }
     catch (const std::exception& e)
     {
-        plerr << "An error occurred: " << e.what() << '\n';
+        plerr << "An error occurred: " << e.what();
     }
 
+    plerr << '\n';
+
     pl << "--- msync finished normally ---\n";
+}
+
+
+user_options& assume_account(user_options* user, const std::string& name)
+{
+    if (user == nullptr)
+        throw msync_exception("Could not find a match [or an unambiguous match] for: " + name);
+    return *user;
+}
+
+void print_stringptr(const std::string* toprint)
+{
+    print_logger<logtype::normal> pl;
+    if (toprint == nullptr)
+        pl << "[none]";
+    else
+        pl << *toprint;
+    
 }
