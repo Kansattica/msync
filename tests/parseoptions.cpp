@@ -212,9 +212,9 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
         {
             auto parsed = parse(argc, argv);
 
-            THEN("the selected mode is showopt")
+            THEN("the selected mode is showallopt")
             {
-                REQUIRE(parsed.selected == mode::showopt);
+                REQUIRE(parsed.selected == mode::showallopt);
             }
 
             THEN("the option is not set")
@@ -243,9 +243,9 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
         {
             auto parsed = parse(argc, argv);
 
-            THEN("the selected mode is showopt")
+            THEN("the selected mode is showallopt")
             {
-                REQUIRE(parsed.selected == mode::showopt);
+                REQUIRE(parsed.selected == mode::showallopt);
             }
 
             THEN("the option is not set")

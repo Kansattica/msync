@@ -30,6 +30,8 @@ int main(int argc, const char* argv[])
         case mode::showopt:
             print_stringptr(assume_account(user, parsed.account).get_option(parsed.toset));
             break;
+        case mode::showallopt:
+            break;
         case mode::config:
             assume_account(user, parsed.account).set_option(parsed.toset, parsed.optionval);
             break;
