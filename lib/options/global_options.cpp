@@ -6,6 +6,8 @@
 #include <print_logger.hpp>
 #include <whereami.h>
 
+#include <cctype>
+
 global_options options;
 
 using namespace std::string_literals;
@@ -89,7 +91,9 @@ user_options* global_options::select_account(const std::string_view name)
     {
         // won't have string.starts_with until c++20, so
         // if the name given is a prefix of (or equal to) this entry, it's a candidate
-        if (std::equal(name.begin(), name.end(), entry.first.begin()))
+        if (std::equal(name.begin(), name.end(), entry.first.begin(), [](auto a, auto b) {
+                return std::tolower(a) == std::tolower(b); //case insensitive
+            }))
         {
             pl << "Matched account" << entry.first << "\n";
             matched++;
