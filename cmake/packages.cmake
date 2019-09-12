@@ -1,7 +1,5 @@
 include(FetchContent)
 
-add_library (filesystem INTERFACE IMPORTED)
-target_compile_features(filesystem INTERFACE cxx_std_17)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   # use GNU STL because we're on a Linux system
   # later, bother detecting if we should use the llvm or gnu stl

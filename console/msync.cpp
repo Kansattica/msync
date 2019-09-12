@@ -5,6 +5,7 @@
 #include <print_logger.hpp>
 #include <string>
 
+#include "../lib/options/global_options.hpp"
 #include "../lib/options/option_enums.hpp"
 #include "../lib/options/user_options.hpp"
 #include "newaccount.hpp"
