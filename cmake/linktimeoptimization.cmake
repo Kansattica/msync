@@ -1,6 +1,5 @@
 if((CMAKE_BUILD_TYPE MATCHES Release) OR (CMAKE_BUILD_TYPE MATCHES MinSizeRel))
 	message("Testing for IPO / LTO support...")
-	cmake_policy(SET CMP0069 NEW)
 	include(CheckIPOSupported)
 	check_ipo_supported(RESULT ipo_is_supported OUTPUT error)
 	if (ipo_is_supported)
