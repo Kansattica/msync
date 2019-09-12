@@ -43,6 +43,7 @@ target_link_libraries(options PRIVATE constants whereami printlog exception )
 target_link_libraries(options PUBLIC filesystem) 
 
 target_link_libraries(queue PUBLIC filesystem) 
+target_link_libraries(queue PRIVATE constants) 
 
 target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options)
 
