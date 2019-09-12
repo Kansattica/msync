@@ -2,6 +2,8 @@
 
 #include <msync_exception.hpp>
 
+using namespace std::string_literals;
+
 template <>
 list_operations parse_enum<list_operations>(const char first)
 {
@@ -15,7 +17,7 @@ list_operations parse_enum<list_operations>(const char first)
         return list_operations::clear;
     }
 
-    throw msync_exception("No list_operation starting with " + first);
+    throw msync_exception("No list_operation starting with "s + first);
 }
 
 template <>
@@ -31,5 +33,5 @@ sync_settings parse_enum<sync_settings>(const char first)
         return sync_settings::oldest_first;
     }
 
-    throw msync_exception("No sync_setting starting with " + first);
+    throw msync_exception("No sync_setting starting with "s + first);
 }
