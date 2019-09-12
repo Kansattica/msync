@@ -7,7 +7,7 @@
 #include <string>
 using namespace std::string_literals;
 
-SCENARIO("Both paths we care about are directories.")
+SCENARIO("Both paths we care about are directories.", "[global_options]")
 {
     GIVEN("A global_options object")
     {
@@ -23,7 +23,7 @@ SCENARIO("Both paths we care about are directories.")
     }
 }
 
-SCENARIO("add_new_account correctly handles input.")
+SCENARIO("add_new_account correctly handles input.", "[global_options]")
 {
     GIVEN("A global_options object")
     {
@@ -67,7 +67,7 @@ SCENARIO("add_new_account correctly handles input.")
     }
 }
 
-SCENARIO("read_accounts correctly fills global_options on construction.")
+SCENARIO("read_accounts correctly fills global_options on construction.", "[global_options]")
 {
     GIVEN("A global_options with some values added to it, destroyed, and then a new one created.")
     {
@@ -120,7 +120,7 @@ SCENARIO("read_accounts correctly fills global_options on construction.")
     }
 }
 
-SCENARIO("select_account selects exactly one account.", "[options]")
+SCENARIO("select_account selects exactly one account.", "[global_options]")
 {
     GIVEN("An empty accounts unordered_map")
     {
