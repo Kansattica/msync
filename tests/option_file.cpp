@@ -5,7 +5,6 @@
 
 #include <filesystem.hpp>
 
-#include <array>
 #include <fstream>
 #include <string>
 
