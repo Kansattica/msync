@@ -21,7 +21,7 @@ msync new -a [account name]
 New account names must be fully specified, like: GoddessGrace@goodchristian.website
 )";
 
-parse_result parse(const int argc, const char* argv[], const bool silent)
+parse_result parse(const int argc, const char *argv[], const bool silent)
 {
     using namespace std::string_literals;
 
@@ -60,7 +60,15 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 
     auto genMode = ((command("gen").set(ret.selected, mode::gen) | command("generate").set(ret.selected, mode::gen)).doc("Generate a post template in the current folder."));
 
-    auto queueMode = ((command("queue").set(ret.selected, mode::queue) | command("q").set(ret.selected, mode::queue)).doc("Manage the queue of things to send."));
+    auto queueMode = in_sequence((command("queue").set(ret.selected, mode::queue).doc("Manage the queue of things to send.") | command("q").set(ret.selected, mode::queue)),
+                                 one_of(
+                                     option("-r", "--remove").set(ret.removeFromQueue, true).doc("Remove the post ids or filenames from the queue instead of adding them."),
+                                     option("-c", "--clear").set(ret.clearQueue, true).doc("Remove everything in the specified queue.")),
+                                 one_of(
+                                     command("fav").set(ret.queueaction, to_queue::fav).doc("queue post IDs to be favorited.") & values("post ids", ret.queued),
+                                     command("boost").set(ret.queueaction, to_queue::boost).doc("queue post IDs to be boosted.") & values("post ids", ret.queued),
+                                     command("post").set(ret.queueaction, to_queue::post).doc("queue files to be posted (see generate)") & values("filenames", ret.queued))
+                                     .doc("queue commands"));
 
     auto universalOptions = ((option("-a", "--account") & value("account", ret.account)).doc("The account name to operate on."),
                              option("-v", "--verbose").set(options.verbose).doc("Verbose mode. Program will be more chatty."));
