@@ -42,6 +42,8 @@ target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(options PRIVATE constants whereami printlog exception )
 target_link_libraries(options PUBLIC filesystem) 
 
+target_link_libraries(parse PUBLIC filesystem) 
+
 target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options)
 
 target_link_libraries(msync PRIVATE parse sync options optionparsing printlog ${CPR_LIBRARIES} util nlohmann_json::nlohmann_json exception)
