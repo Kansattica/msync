@@ -11,7 +11,7 @@
 #include "optionparsing/parseoptions.hpp"
 
 user_options& assume_account(user_options* user);
-void print_stringptr(const std::string* toprint);
+void print_stringptr(const std::string* toprint, print_logger<>& pl);
 
 int main(int argc, const char* argv[])
 {
@@ -31,14 +31,14 @@ int main(int argc, const char* argv[])
             make_new_account(parsed.account);
             break;
         case mode::showopt:
-            print_stringptr(assume_account(user).get_option(parsed.toset));
+            print_stringptr(assume_account(user).get_option(parsed.toset), plerr);
             break;
         case mode::showallopt:
             for (user_option opt = user_option(0); opt <= user_option::pull_notifications; opt = user_option(static_cast<int>(opt) + 1))
             {
                 plerr << USER_OPTION_NAMES[static_cast<int>(opt)] << ": ";
                 if (opt < user_option::pull_home)
-                    print_stringptr(assume_account(user).get_option(opt));
+                    print_stringptr(assume_account(user).get_option(opt), plerr);
                 else
                     plerr << SYNC_SETTING_NAMES[static_cast<int>(assume_account(user).get_sync_option(opt))];
                 plerr << '\n';
@@ -78,9 +78,8 @@ user_options& assume_account(user_options* user)
     return *user;
 }
 
-void print_stringptr(const std::string* toprint)
+void print_stringptr(const std::string* toprint, print_logger<>& pl)
 {
-    print_logger<logtype::normal> pl;
     if (toprint == nullptr)
         pl << "[not set]";
     else
