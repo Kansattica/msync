@@ -1,8 +1,8 @@
 #ifndef _GLOBAL_OPTIONS_HPP_
 #define _GLOBAL_OPTIONS_HPP_
 
-#include "filesystem.hpp"
 #include "user_options.hpp"
+#include <filesystem.hpp>
 
 #include <string>
 #include <string_view>
@@ -11,7 +11,6 @@
 struct global_options
 {
 public:
-    bool verbose = false;
     const fs::path executable_location = get_exe_location();
 
     std::unordered_map<std::string, user_options> accounts = read_accounts();

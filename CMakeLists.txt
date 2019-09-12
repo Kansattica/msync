@@ -17,9 +17,10 @@ add_library(sync STATIC "")
 add_library(options STATIC "")
 add_library(util STATIC "")
 add_library(optionparsing STATIC "")
-add_library(printlog INTERFACE)
+add_library(printlog STATIC "")
 add_library(constants INTERFACE)
 add_library(exception INTERFACE)
+add_library(filesystem INTERFACE)
 add_executable(msync "")
 
 # see https://crascit.com/2016/01/31/enhanced-source-file-handling-with-target_sources/
@@ -29,6 +30,7 @@ add_subdirectory(console)
 add_subdirectory(console/optionparsing)
 add_subdirectory(lib/parse)
 add_subdirectory(lib/sync)
+add_subdirectory(lib/filesystem)
 add_subdirectory(lib/options)
 add_subdirectory(lib/constants)
 add_subdirectory(lib/exception)
@@ -37,10 +39,10 @@ add_subdirectory(lib/util)
 
 target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json)
 
-target_link_libraries(printlog INTERFACE options)
+target_link_libraries(options PRIVATE constants whereami printlog exception )
+target_link_libraries(options PUBLIC filesystem) 
 
-target_link_libraries(options PRIVATE constants whereami filesystem printlog exception)
-target_link_libraries(optionparsing PRIVATE clipp::clipp)
+target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options)
 
 target_link_libraries(msync PRIVATE parse sync options optionparsing printlog ${CPR_LIBRARIES} util nlohmann_json::nlohmann_json exception)
 

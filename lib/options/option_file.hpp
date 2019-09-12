@@ -1,9 +1,9 @@
 #ifndef _OPTION_FILE_HPP_
 #define _OPTION_FILE_HPP_
 
-#include <string>
+#include <filesystem.hpp>
 #include <map> //use an ordered map so keys don't get shuffled around between runs
-#include "filesystem.hpp"
+#include <string>
 
 using std::string;
 
@@ -15,9 +15,10 @@ public:
     ~option_file();
 
     // can be moved
-    option_file(option_file &&other) noexcept // move constructor
+    option_file(option_file&& other) noexcept // move constructor
         : optionfilename(std::move(other.optionfilename)), parsed_options(std::move(other.parsed_options))
-    {}
+    {
+    }
 
     option_file& operator=(option_file&& other) noexcept // move assignment
     {
@@ -25,9 +26,9 @@ public:
         std::swap(optionfilename, other.optionfilename);
         return *this;
     }
- 
+
     // optionfiles can't be copied
-    option_file(const option_file& other) = delete; // copy constructor
+    option_file(const option_file& other) = delete;            // copy constructor
     option_file& operator=(const option_file& other) = delete; // copy assignment
 
 private:
