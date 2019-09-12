@@ -178,7 +178,7 @@ SCENARIO("Get and set options manage string references correctly.", "[user_optio
 
 CATCH_REGISTER_ENUM(sync_settings, sync_settings::dont_sync, sync_settings::newest_first, sync_settings::oldest_first);
 
-SCENARIO("The enum overload for get_option works.")
+SCENARIO("The enum overload for get_option works.", "[user_options]")
 {
     GIVEN("An empty user_options")
     {
