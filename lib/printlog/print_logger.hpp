@@ -4,8 +4,6 @@
 #include <fstream>
 #include <iostream>
 
-#include "../options/global_options.hpp"
-
 using std::cout;
 using std::ofstream;
 
@@ -15,6 +13,8 @@ enum class logtype
     verbose,
     fileonly
 };
+
+extern bool verbose_logs;
 
 template <logtype isverbose = logtype::normal>
 struct print_logger
@@ -32,7 +32,7 @@ struct print_logger
     {
         if constexpr (isverbose == logtype::verbose)
         {
-            if (options.verbose)
+            if (verbose_logs)
                 cout << towrite;
         }
         else if constexpr (isverbose != logtype::fileonly)

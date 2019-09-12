@@ -2,9 +2,9 @@
 
 #include <iostream>
 
-#include "../../lib/options/global_options.hpp"
 #include "../../lib/options/user_options.hpp"
 #include "parseoptions.hpp"
+#include <print_logger.hpp>
 
 using namespace clipp;
 using std::cout;
@@ -63,7 +63,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
     auto queueMode = ((command("queue").set(ret.selected, mode::queue) | command("q").set(ret.selected, mode::queue)).doc("Manage the queue of things to send."));
 
     auto universalOptions = ((option("-a", "--account") & value("account", ret.account)).doc("The account name to operate on."),
-                             option("-v", "--verbose").set(options.verbose).doc("Verbose mode. Program will be more chatty."));
+                             option("-v", "--verbose").set(verbose_logs).doc("Verbose mode. Program will be more chatty."));
 
     auto cli = (newaccount | configMode | syncMode | genMode | queueMode | (command("help").set(ret.selected, mode::help)), universalOptions);
 
