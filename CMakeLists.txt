@@ -46,7 +46,7 @@ target_link_libraries(queue PUBLIC filesystem)
 
 target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options)
 
-target_link_libraries(msync PRIVATE parse sync options optionparsing printlog ${CPR_LIBRARIES} util nlohmann_json::nlohmann_json exception)
+target_link_libraries(msync PRIVATE options optionparsing printlog ${CPR_LIBRARIES} util nlohmann_json::nlohmann_json exception)
 
 if (MSYNC_BUILD_TESTS)
 	add_subdirectory(tests)
