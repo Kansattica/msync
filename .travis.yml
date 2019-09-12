@@ -18,7 +18,6 @@ matrix:
   
 before_install:
   - if [ "$TRAVIS_COMPILER" = "gcc" ]; then sudo -E apt-get -yq --no-install-suggests --no-install-recommends install g++-8 && CC=gcc-8 && CXX=g++-8; fi
-  - if [ "$TRAVIS_COMPILER" = "clang" ]; then sudo -E apt-get -yq --no-install-suggests --no-install-recommends install llvm-dev; fi
 
 script:
   - mkdir build
