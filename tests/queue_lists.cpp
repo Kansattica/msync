@@ -3,7 +3,7 @@
 #include "test_helpers.hpp"
 #include <catch2/catch.hpp>
 
-#include "../lib/parse/queue_list.hpp"
+#include "../lib/queue/queue_list.hpp"
 
 #include <filesystem.hpp>
 

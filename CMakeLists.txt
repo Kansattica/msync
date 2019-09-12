@@ -12,7 +12,7 @@ include(cmake/packages.cmake)
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_EXTENSIONS off)
 
-add_library(parse STATIC "")
+add_library(queue STATIC "")
 add_library(sync STATIC "")
 add_library(options STATIC "")
 add_library(util STATIC "")
@@ -28,7 +28,7 @@ include(cmake/compatibility.cmake)
 
 add_subdirectory(console)
 add_subdirectory(console/optionparsing)
-add_subdirectory(lib/parse)
+add_subdirectory(lib/queue)
 add_subdirectory(lib/sync)
 add_subdirectory(lib/filesystem)
 add_subdirectory(lib/options)
@@ -42,7 +42,7 @@ target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(options PRIVATE constants whereami printlog exception )
 target_link_libraries(options PUBLIC filesystem) 
 
-target_link_libraries(parse PUBLIC filesystem) 
+target_link_libraries(queue PUBLIC filesystem) 
 
 target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options)
 
