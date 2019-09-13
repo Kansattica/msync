@@ -1,6 +1,7 @@
 #include "../../lib/options/user_options.hpp"
 #include "selection_types.hpp"
 #include <string>
+#include <vector>
 
 enum class mode
 {
@@ -25,6 +26,10 @@ struct parse_result
     sync_settings syncset;
     list_operations listops;
     sync_options syncopts;
+    to_queue queueaction;
+    std::vector<std::string> queued; 
+    bool removeFromQueue = false;
+    bool clearQueue = false;
     std::string optionval;
     std::string account;
 };
