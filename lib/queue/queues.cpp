@@ -4,11 +4,32 @@
 #include <constants.hpp>
 #include <filesystem.hpp>
 
-void queue_post(const std::string& account, const std::vector<std::string>& filenames)
+#include <algorithm>
+
+void queue_post(const std::string &account, const std::vector<std::string> &filenames)
 {
 }
 
-void enqueue(queues toenqueue, const std::string& account, const std::vector<std::string>& add)
+queue_list open_queue(const queues to_open, const std::string &account)
+{
+    fs::path qfile = fs::current_path() / account;
+    const std::string *to_append;
+    switch (to_open)
+    {
+    case queues::fav:
+        to_append = &Fav_Queue_Filename;
+        break;
+    case queues::boost:
+        to_append = &Boost_Queue_Filename;
+        break;
+    case queues::post:
+        to_append = &Post_Queue_Filename;
+        break;
+    }
+    return queue_list{qfile / *to_append};
+}
+
+void enqueue(const queues toenqueue, const std::string &account, const std::vector<std::string> &add)
 {
     if (toenqueue == queues::post)
     {
@@ -16,8 +37,10 @@ void enqueue(queues toenqueue, const std::string& account, const std::vector<std
         return;
     }
 
-    fs::path qfile = fs::current_path() / account;
-    qfile /= (toenqueue == queues::fav ? Fav_Queue_Filename : Boost_Queue_Filename);
+    queue_list toadd = open_queue(toenqueue, account);
 
-    queue_list toadd{qfile};
+    for (auto &id : add)
+    {
+        toadd.queued.emplace_back(id);
+    }
 }

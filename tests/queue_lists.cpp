@@ -18,8 +18,8 @@ SCENARIO("queue_lists save their data when destroyed.", "[queue_list]")
         test_file tf(testfilename);
 
         queue_list opts(testfilename);
-        opts.queued.emplace("thingone");
-        opts.queued.emplace("thingtwo");
+        opts.queued.emplace_back("thingone");
+        opts.queued.emplace_back("thingtwo");
 
         REQUIRE(opts.queued.size() == 2);
 
@@ -71,7 +71,7 @@ SCENARIO("queue_lists save their data when destroyed.", "[queue_list]")
 
         WHEN("an item is popped and the queue_list is destroyed")
         {
-            opts.queued.pop();
+            opts.queued.pop_front();
 
             {
                 queue_list newopts = std::move(opts);
@@ -114,11 +114,11 @@ SCENARIO("queue_lists read data when created.", "[queue_list]")
             {
                 REQUIRE(testfi.queued.size() == 3);
                 REQUIRE(testfi.queued.front() == "firsthing");
-                testfi.queued.pop();
+                testfi.queued.pop_front();
                 REQUIRE(testfi.queued.front() == "secondthing");
-                testfi.queued.pop();
+                testfi.queued.pop_front();
                 REQUIRE(testfi.queued.front() == "thirdthing");
-                testfi.queued.pop();
+                testfi.queued.pop_front();
             }
         }
 
@@ -127,9 +127,9 @@ SCENARIO("queue_lists read data when created.", "[queue_list]")
             {
                 queue_list testfi(testfilename);
 
-                testfi.queued.pop();
-                testfi.queued.emplace(":) :)");
-                testfi.queued.emplace(":) :4");
+                testfi.queued.pop_front();
+                testfi.queued.emplace_back(":) :)");
+                testfi.queued.emplace_back(":) :4");
                 REQUIRE(testfi.queued.size() == 4);
             }
 

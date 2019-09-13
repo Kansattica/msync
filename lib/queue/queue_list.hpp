@@ -2,7 +2,7 @@
 #define _QUEUE_LIST_HPP_
 
 #include <filesystem.hpp>
-#include <queue>
+#include <deque>
 #include <string>
 
 using std::string;
@@ -10,7 +10,7 @@ using std::string;
 struct queue_list
 {
 public:
-    std::queue<string> queued;
+    std::deque<string> queued;
     queue_list(fs::path filename);
     ~queue_list();
 
