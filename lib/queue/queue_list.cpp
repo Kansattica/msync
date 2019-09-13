@@ -19,7 +19,7 @@ queue_list::queue_list(fs::path filename) : listfilename(filename)
         if (line[first_non_whitespace] == '#')
             continue; //skip comments
 
-        queued.emplace(std::move(line));
+        queued.emplace_back(std::move(line));
     }
 }
 
@@ -40,6 +40,6 @@ queue_list::~queue_list()
     while (!queued.empty())
     {
         of << queued.front() << '\n';
-        queued.pop();
+        queued.pop_front();
     }
 }
