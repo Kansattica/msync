@@ -16,10 +16,10 @@ SCENARIO("option_files save their data when destroyed.", "[option_file]")
         test_file tf(testfilename);
 
         option_file opts(testfilename);
-        opts.parsed["atestoption"] = "coolstuff";
-        opts.parsed["test"] = "time";
+        opts.backed["atestoption"] = "coolstuff";
+        opts.backed["test"] = "time";
 
-        REQUIRE(opts.parsed.size() == 2);
+        REQUIRE(opts.backed.size() == 2);
 
         WHEN("an option file is moved from")
         {
@@ -69,7 +69,7 @@ SCENARIO("option_files save their data when destroyed.", "[option_file]")
 
         WHEN("an option's value is set to an empty string and destroyed")
         {
-            opts.parsed["test"] = "";
+            opts.backed["test"] = "";
 
             {
                 option_file newopts = std::move(opts);
@@ -110,10 +110,10 @@ SCENARIO("option_files read data when created.", "[option_file]")
 
             THEN("it has the parsed information from the file.")
             {
-                REQUIRE(testfi.parsed.size() == 3);
-                REQUIRE(testfi.parsed["somecool"] == "teststuff");
-                REQUIRE(testfi.parsed["different"] == "tests");
-                REQUIRE(testfi.parsed["imgetting"] == "testy");
+                REQUIRE(testfi.backed.size() == 3);
+                REQUIRE(testfi.backed["somecool"] == "teststuff");
+                REQUIRE(testfi.backed["different"] == "tests");
+                REQUIRE(testfi.backed["imgetting"] == "testy");
             }
         }
 
@@ -122,11 +122,11 @@ SCENARIO("option_files read data when created.", "[option_file]")
             {
                 option_file testfi(testfilename);
 
-                testfi.parsed["anotherentry"] = "foryou";
-                testfi.parsed["somecool"] = "isnowthis";
-                testfi.parsed.erase("imgetting");
+                testfi.backed["anotherentry"] = "foryou";
+                testfi.backed["somecool"] = "isnowthis";
+                testfi.backed.erase("imgetting");
 
-                REQUIRE(testfi.parsed.size() == 3);
+                REQUIRE(testfi.backed.size() == 3);
             }
 
             THEN("it saves the new information back to the file.")
