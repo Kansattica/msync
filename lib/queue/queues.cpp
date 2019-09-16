@@ -6,14 +6,14 @@
 
 #include <algorithm>
 
-void queue_post(const std::string &account, const std::vector<std::string> &filenames)
+void queue_post(const std::string& account, const std::vector<std::string>& filenames)
 {
 }
 
-queue_list open_queue(const queues to_open, const std::string &account)
+queue_list open_queue(const queues to_open, const std::string& account)
 {
     fs::path qfile = fs::current_path() / account;
-    const std::string *to_append;
+    const std::string* to_append;
     switch (to_open)
     {
     case queues::fav:
@@ -29,7 +29,7 @@ queue_list open_queue(const queues to_open, const std::string &account)
     return queue_list{qfile / *to_append};
 }
 
-void enqueue(const queues toenqueue, const std::string &account, const std::vector<std::string> &add)
+void enqueue(const queues toenqueue, const std::string& account, const std::vector<std::string>& add)
 {
     if (toenqueue == queues::post)
     {
@@ -39,8 +39,8 @@ void enqueue(const queues toenqueue, const std::string &account, const std::vect
 
     queue_list toadd = open_queue(toenqueue, account);
 
-    for (auto &id : add)
+    for (auto& id : add)
     {
-        toadd.queued.emplace_back(id);
+        toadd.parsed.emplace_back(id);
     }
 }
