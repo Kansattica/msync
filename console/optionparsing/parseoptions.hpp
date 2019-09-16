@@ -1,4 +1,3 @@
-#include "../../lib/options/user_options.hpp"
 #include "selection_types.hpp"
 #include <string>
 #include <vector>
@@ -23,13 +22,9 @@ struct parse_result
     mode selected = mode::help;
     user_option toset;
     // maybe later, do a union or variant for the mutually exclusive ones
-    sync_settings syncset;
     list_operations listops;
-    sync_options syncopts;
-    to_queue queueaction;
-    std::vector<std::string> queued; 
-    bool removeFromQueue = false;
-    bool clearQueue = false;
+    sync_options sync_opts;
+    queue_options queue_opt;
     std::string optionval;
     std::string account;
 };

@@ -358,7 +358,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
             THEN("the correct sync operation is set")
             {
-                REQUIRE(parsed.syncset == sync_settings::oldest_first);
+                REQUIRE(parsed.sync_opts.mode == sync_settings::oldest_first);
             }
 
             THEN("account is set")
@@ -394,7 +394,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
             THEN("the correct sync operation is set")
             {
-                REQUIRE(parsed.syncset == sync_settings::newest_first);
+                REQUIRE(parsed.sync_opts.mode == sync_settings::newest_first);
             }
 
             THEN("account is set")
@@ -430,7 +430,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
             THEN("the correct sync operation is set")
             {
-                REQUIRE(parsed.syncset == sync_settings::dont_sync);
+                REQUIRE(parsed.sync_opts.mode == sync_settings::dont_sync);
             }
 
             THEN("account is set")
@@ -469,7 +469,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
             THEN("retries are set to the default.")
             {
-                REQUIRE(parsed.syncopts.retries == 3);
+                REQUIRE(parsed.sync_opts.retries == 3);
             }
 
             THEN("the parse is good")
@@ -500,7 +500,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
             THEN("the correct number of retries is set")
             {
-                REQUIRE(parsed.syncopts.retries == 10);
+                REQUIRE(parsed.sync_opts.retries == 10);
             }
 
             THEN("the parse is good")
@@ -531,12 +531,57 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
             THEN("the correct number of retries is set")
             {
-                REQUIRE(parsed.syncopts.retries == 15);
+                REQUIRE(parsed.sync_opts.retries == 15);
             }
 
             THEN("the parse is good")
             {
                 REQUIRE(parsed.okay);
+            }
+        }
+    }
+}
+
+SCENARIO("The command line parser correctly parses when the user wants to queue.")
+{
+    GIVEN("A command line that just says 'queue'")
+    {
+        int argc = 2;
+        char const* argv[]{"msync", "queue"};
+
+        WHEN("the command line is parsed")
+        {
+            auto result = parse(argc, argv);
+
+            THEN("the parse is bad.")
+            {
+                REQUIRE_FALSE(result.okay);
+            }
+        }
+    }
+
+    GIVEN("A command line that adds a bunch of things to the fav queue.")
+    {
+        int argc = 6;
+        char const* argv[]{"msync", "queue", "fav", "12345", "6789", "123FQ43"};
+
+        WHEN("the command line is parsed")
+        {
+            auto result = parse(argc, argv);
+
+            THEN("the parse is good.")
+            {
+                REQUIRE(result.okay);
+            }
+
+            THEN("the correct queue is selected")
+            {
+                REQUIRE(result.queue_opt.selected == to_queue::fav);
+            }
+
+            THEN("the post IDs are parsed.")
+            {
+                REQUIRE(result.queue_opt.queued == std::vector<std::string>{"12345", "6789", "123FQ43"});
             }
         }
     }

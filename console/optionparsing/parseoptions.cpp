@@ -21,7 +21,7 @@ msync new -a [account name]
 New account names must be fully specified, like: GoddessGrace@goodchristian.website
 )";
 
-parse_result parse(const int argc, const char *argv[], const bool silent)
+parse_result parse(const int argc, const char* argv[], const bool silent)
 {
     using namespace std::string_literals;
 
@@ -43,9 +43,9 @@ parse_result parse(const int argc, const char *argv[], const bool silent)
                                        one_of(command("home").set(ret.toset, user_option::pull_home),
                                               command("dms").set(ret.toset, user_option::pull_dms),
                                               command("notifications").set(ret.toset, user_option::pull_notifications)),
-                                       one_of(command("newest").set(ret.syncset, sync_settings::newest_first),
-                                              command("oldest").set(ret.syncset, sync_settings::oldest_first),
-                                              command("off").set(ret.syncset, sync_settings::dont_sync)))
+                                       one_of(command("newest").set(ret.sync_opts.mode, sync_settings::newest_first),
+                                              command("oldest").set(ret.sync_opts.mode, sync_settings::oldest_first),
+                                              command("off").set(ret.sync_opts.mode, sync_settings::dont_sync)))
                                .doc("Whether to synchronize an account's home timeline, direct messages, and notifications, and whether to do it newest first, oldest first, or not at all."),
                            in_sequence(command("list").set(ret.selected, mode::configlist),
                                        one_of(command("add").set(ret.listops, list_operations::add),
@@ -56,25 +56,24 @@ parse_result parse(const int argc, const char *argv[], const bool silent)
                            "config commands");
 
     auto syncMode = ((command("sync").set(ret.selected, mode::sync).doc("Synchronize your account[s] with their server[s]. Synchronizes all accounts unless one is specified with -a.")) &
-                     (option("-r", "--retries") & value("retries", ret.syncopts.retries)) % "Retry failed requests n times. (default: 3)");
+                     (option("-r", "--retries") & value("retries", ret.sync_opts.retries)) % "Retry failed requests n times. (default: 3)");
 
-    auto genMode = ((command("gen").set(ret.selected, mode::gen) | command("generate").set(ret.selected, mode::gen)).doc("Generate a post template in the current folder."));
+    auto genMode = (command("gen").set(ret.selected, mode::gen)).doc("Generate a post template in the current folder.");
 
     auto queueMode = (command("queue").set(ret.selected, mode::queue) &
+                          one_of(option("-r", "--remove").set(ret.queue_opt.to_do, queue_action::remove).doc("Remove the post ids or filenames from the queue instead of adding them."),
+                                 option("-c", "--clear").set(ret.queue_opt.to_do, queue_action::clear).doc("Remove everything in the specified queue.")) %
+                              "queue options",
                       one_of(
-                          option("-r", "--remove").set(ret.removeFromQueue, true).doc("Remove the post ids or filenames from the queue instead of adding them."),
-                          option("-c", "--clear").set(ret.clearQueue, true).doc("Remove everything in the specified queue."))
-                          .doc("queue options") &
-                      one_of(
-                          (command("fav").set(ret.queueaction, to_queue::fav) & values("post ids", ret.queued)).doc("queue post IDs to be favorited."),
-                          (command("boost").set(ret.queueaction, to_queue::boost) & values("post ids", ret.queued)).doc("queue post IDs to be boosted."),
-                          (command("post").set(ret.queueaction, to_queue::post) & values("filenames", ret.queued)).doc("queue files to be posted (see generate)"))
+                          command("fav").set(ret.queue_opt.selected, to_queue::fav) & opt_values("post ids", ret.queue_opt.queued),
+                          command("boost").set(ret.queue_opt.selected, to_queue::boost) & opt_values("post ids", ret.queue_opt.queued),
+                          command("post").set(ret.queue_opt.selected, to_queue::post) & opt_values("filenames", ret.queue_opt.queued))
                           .doc("queue commands"));
 
     auto universalOptions = ((option("-a", "--account") & value("account", ret.account)).doc("The account name to operate on."),
                              option("-v", "--verbose").set(verbose_logs).doc("Verbose mode. Program will be more chatty."));
 
-    auto cli = (newaccount | configMode | syncMode | genMode | queueMode | (command("help").set(ret.selected, mode::help)), universalOptions);
+    auto cli = (newaccount | configMode | syncMode | queueMode | genMode | (command("help").set(ret.selected, mode::help)), universalOptions);
 
     //skip the first result.
     //we do it this way because C++11 and later don't like it when you turn a string literal into a char*, so we have to use the iterator interface
@@ -86,6 +85,8 @@ parse_result parse(const int argc, const char *argv[], const bool silent)
             cout << make_man_page(cli, "msync").append_section("NOTES", helpmessage);
 
         ret.selected = mode::help; //possible for, say, config to be set but still be a parse fail
+
+        // clipp::debug::print(cout, result);
     }
 
     ret.okay = static_cast<bool>(result);
