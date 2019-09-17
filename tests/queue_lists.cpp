@@ -18,10 +18,10 @@ SCENARIO("queue_lists save their data when destroyed.", "[queue_list]")
         test_file tf(testfilename);
 
         queue_list opts(testfilename);
-        opts.backed.emplace_back("thingone");
-        opts.backed.emplace_back("thingtwo");
+        opts.parsed.emplace_back("thingone");
+        opts.parsed.emplace_back("thingtwo");
 
-        REQUIRE(opts.backed.size() == 2);
+        REQUIRE(opts.parsed.size() == 2);
 
         WHEN("an queue_list is moved from")
         {
@@ -71,7 +71,7 @@ SCENARIO("queue_lists save their data when destroyed.", "[queue_list]")
 
         WHEN("an item is popped and the queue_list is destroyed")
         {
-            opts.backed.pop_front();
+            opts.parsed.pop_front();
 
             {
                 queue_list newopts = std::move(opts);
@@ -112,13 +112,13 @@ SCENARIO("queue_lists read data when created.", "[queue_list]")
 
             THEN("it has the parsed information from the file.")
             {
-                REQUIRE(testfi.backed.size() == 3);
-                REQUIRE(testfi.backed.front() == "firsthing");
-                testfi.backed.pop_front();
-                REQUIRE(testfi.backed.front() == "secondthing");
-                testfi.backed.pop_front();
-                REQUIRE(testfi.backed.front() == "thirdthing");
-                testfi.backed.pop_front();
+                REQUIRE(testfi.parsed.size() == 3);
+                REQUIRE(testfi.parsed.front() == "firsthing");
+                testfi.parsed.pop_front();
+                REQUIRE(testfi.parsed.front() == "secondthing");
+                testfi.parsed.pop_front();
+                REQUIRE(testfi.parsed.front() == "thirdthing");
+                testfi.parsed.pop_front();
             }
         }
 
@@ -127,10 +127,10 @@ SCENARIO("queue_lists read data when created.", "[queue_list]")
             {
                 queue_list testfi(testfilename);
 
-                testfi.backed.pop_front();
-                testfi.backed.emplace_back(":) :)");
-                testfi.backed.emplace_back(":) :4");
-                REQUIRE(testfi.backed.size() == 4);
+                testfi.parsed.pop_front();
+                testfi.parsed.emplace_back(":) :)");
+                testfi.parsed.emplace_back(":) :4");
+                REQUIRE(testfi.parsed.size() == 4);
             }
 
             THEN("it saves the new information back to the file.")
