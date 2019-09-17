@@ -9,19 +9,19 @@ template <typename Container, typename void Read(std::string&&, Container&), typ
 class backed_file
 {
 public:
-    Container backed;
+    Container parsed;
     backed_file(fs::path filename);
     ~backed_file();
 
     // can be moved
     backed_file(backed_file&& other) noexcept // move constructor
-        : backedfilename(std::move(other.backedfilename)), backed(std::move(other.backed))
+        : backedfilename(std::move(other.backedfilename)), parsed(std::move(other.parsed))
     {
     }
 
     backed_file& operator=(backed_file&& other) noexcept // move assignment
     {
-        std::swap(backed, other.backed);
+        std::swap(parsed, other.parsed);
         std::swap(backedfilename, other.backedfilename);
         return *this;
     }
@@ -48,7 +48,7 @@ backed_file<Container, Read, Write>::backed_file(fs::path filename) : backedfile
         if (line[first_non_whitespace] == '#')
             continue; //skip comments
 
-        Read(std::move(line), backed);
+        Read(std::move(line), parsed);
     }
 }
 
@@ -67,6 +67,6 @@ backed_file<Container, Read, Write>::~backed_file()
     }
 
     std::ofstream of(backedfilename);
-    Write(std::move(backed), of);
+    Write(std::move(parsed), of);
 }
 #endif
