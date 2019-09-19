@@ -6,14 +6,14 @@
 
 #include <algorithm>
 
-void queue_post(const std::string &account, const std::vector<std::string> &filenames)
+void queue_post(const std::string& account, const std::vector<std::string>& filenames)
 {
 }
 
-queue_list open_queue(const queues to_open, const std::string &account)
+queue_list open_queue(const queues to_open, const std::string& account)
 {
     fs::path qfile = fs::current_path() / account;
-    const std::string *to_append;
+    const std::string* to_append;
     switch (to_open)
     {
     case queues::fav:
@@ -29,18 +29,40 @@ queue_list open_queue(const queues to_open, const std::string &account)
     return queue_list{qfile / *to_append};
 }
 
-void enqueue(const queues toenqueue, const std::string &account, const std::vector<std::string> &add)
+void enqueue(const queues toenqueue, const std::string& account, const std::vector<std::string>& add)
 {
+    queue_list toaddto = open_queue(toenqueue, account);
+
+    for (auto& id : add)
+    {
+        toaddto.queued.emplace_back(id);
+    }
+
     if (toenqueue == queues::post)
     {
         queue_post(account, add);
-        return;
     }
 
-    queue_list toadd = open_queue(toenqueue, account);
+    return;
+}
 
-    for (auto &id : add)
+void dequeue(queues todequeue, const std::string& account, const std::vector<std::string>& toremove)
+{
+    queue_list toremovefrom = open_queue(todequeue, account);
+
+    for (auto it = toremovefrom.queued.begin(); it != toremovefrom.queued.end();)
     {
-        toadd.queued.emplace_back(id);
+        // this is slow. if it becomes an issue, consider sorting toremove first and doing
+        // a binary search or making an unordered_set from the contents of toremove.
+        if (std::any_of(toremove.begin(), toremove.end(), [it](auto& tor) {
+                return tor == *it;
+            }))
+        {
+            it = toremovefrom.queued.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
     }
 }
