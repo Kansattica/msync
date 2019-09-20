@@ -65,9 +65,9 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
                                  option("-c", "--clear").set(ret.queue_opt.to_do, queue_action::clear).doc("Remove everything in the specified queue.")) %
                               "queue options",
                       one_of(
-                          command("fav").set(ret.queue_opt.selected, to_queue::fav) & opt_values("post ids", ret.queue_opt.queued),
-                          command("boost").set(ret.queue_opt.selected, to_queue::boost) & opt_values("post ids", ret.queue_opt.queued),
-                          command("post").set(ret.queue_opt.selected, to_queue::post) & opt_values("filenames", ret.queue_opt.queued))
+                          command("fav").set(ret.queue_opt.selected, queues::fav) & opt_values("post ids", ret.queue_opt.queued),
+                          command("boost").set(ret.queue_opt.selected, queues::boost) & opt_values("post ids", ret.queue_opt.queued),
+                          command("post").set(ret.queue_opt.selected, queues::post) & opt_values("filenames", ret.queue_opt.queued))
                           .doc("queue commands"));
 
     auto universalOptions = ((option("-a", "--account") & value("account", ret.account)).doc("The account name to operate on."),
