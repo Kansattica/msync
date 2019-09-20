@@ -45,7 +45,7 @@ target_link_libraries(options PUBLIC filesystem)
 target_link_libraries(queue PUBLIC filesystem) 
 target_link_libraries(queue PRIVATE constants) 
 
-target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options)
+target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options queue)
 
 target_link_libraries(msync PRIVATE options optionparsing printlog ${CPR_LIBRARIES} util nlohmann_json::nlohmann_json exception)
 

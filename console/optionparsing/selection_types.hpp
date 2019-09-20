@@ -1,16 +1,10 @@
 #include "../../lib/options/user_options.hpp"
+#include "../../lib/queue/queues.hpp"
 
 struct sync_options
 {
     int retries = 3;
     sync_settings mode;
-};
-
-enum class to_queue
-{
-    fav,
-    boost,
-    post
 };
 
 enum class queue_action
@@ -24,5 +18,5 @@ struct queue_options
 {
     std::vector<std::string> queued;
     queue_action to_do;
-    to_queue selected;
+    queues selected;
 };

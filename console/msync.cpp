@@ -55,6 +55,11 @@ int main(int argc, const char* argv[])
         case mode::config:
             assume_account(user).set_option(parsed.toset, parsed.optionval);
             break;
+		case mode::queue:
+			switch (parsed.queue_opt.to_do)
+			{
+
+			}
         case mode::help:
             break;
         default:

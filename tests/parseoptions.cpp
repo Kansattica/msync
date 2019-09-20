@@ -576,7 +576,7 @@ SCENARIO("The command line parser correctly parses when the user wants to queue.
 
             THEN("the correct queue is selected")
             {
-                REQUIRE(result.queue_opt.selected == to_queue::fav);
+                REQUIRE(result.queue_opt.selected == queues::fav);
             }
 
             THEN("the post IDs are parsed.")
