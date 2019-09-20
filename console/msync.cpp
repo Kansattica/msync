@@ -11,7 +11,7 @@
 #include "newaccount.hpp"
 #include "optionparsing/parseoptions.hpp"
 
-user_options& assume_account(user_options* user);
+std::pair<const std::string, user_options>& assume_account(std::pair<const std::string, user_options>* user);
 void print_stringptr(const std::string* toprint, print_logger<>& pl);
 
 int main(int argc, const char* argv[])
@@ -32,16 +32,16 @@ int main(int argc, const char* argv[])
             make_new_account(parsed.account);
             break;
         case mode::showopt:
-            print_stringptr(assume_account(user).get_option(parsed.toset), plerr);
+            print_stringptr(assume_account(user).second.get_option(parsed.toset), plerr);
             break;
         case mode::showallopt:
             for (user_option opt = user_option(0); opt <= user_option::pull_notifications; opt = user_option(static_cast<int>(opt) + 1))
             {
                 plerr << USER_OPTION_NAMES[static_cast<int>(opt)] << ": ";
                 if (opt < user_option::pull_home)
-                    print_stringptr(assume_account(user).get_option(opt), plerr);
+                    print_stringptr(assume_account(user).second.get_option(opt), plerr);
                 else
-                    plerr << SYNC_SETTING_NAMES[static_cast<int>(assume_account(user).get_sync_option(opt))];
+                    plerr << SYNC_SETTING_NAMES[static_cast<int>(assume_account(user).second.get_sync_option(opt))];
                 plerr << '\n';
             }
             plerr << "Accounts registered: ";
@@ -53,13 +53,9 @@ int main(int argc, const char* argv[])
             }
             break;
         case mode::config:
-            assume_account(user).set_option(parsed.toset, parsed.optionval);
+            assume_account(user).second.set_option(parsed.toset, parsed.optionval);
             break;
 		case mode::queue:
-			switch (parsed.queue_opt.to_do)
-			{
-
-			}
         case mode::help:
             break;
         default:
@@ -77,7 +73,7 @@ int main(int argc, const char* argv[])
     pl << "--- msync finished normally ---\n";
 }
 
-user_options& assume_account(user_options* user)
+std::pair<const std::string, user_options>& assume_account(std::pair<const std::string, user_options>* user)
 {
     if (user == nullptr)
         throw msync_exception("Could not find a match [or an unambiguous match].");

@@ -7,6 +7,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <utility>
 
 struct global_options
 {
@@ -15,8 +16,8 @@ public:
 
     std::unordered_map<std::string, user_options> accounts = read_accounts();
 
-    user_options* select_account(const std::string_view name);
-    user_options& add_new_account(std::string name);
+	std::pair<const std::string, user_options>& add_new_account(std::string name);
+	std::pair<const std::string, user_options>* select_account(const std::string_view name);
 
 private:
     fs::path get_exe_location();
