@@ -13,5 +13,6 @@ enum class queues
 
 void enqueue(queues toenqueue, const std::string& account, const std::vector<std::string>& add);
 void dequeue(queues todequeue, const std::string& account, const std::vector<std::string>& remove);
+void clear(queues toclear, const std::string& account);
 
 #endif
