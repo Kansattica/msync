@@ -12,7 +12,7 @@ global_options options;
 
 using namespace std::string_literals;
 
-user_options& global_options::add_new_account(std::string name)
+std::pair<const std::string, user_options>& global_options::add_new_account(std::string name)
 {
     print_logger<logtype::verbose> pl;
     fs::path user_path = executable_location;
@@ -28,7 +28,7 @@ user_options& global_options::add_new_account(std::string name)
     if (!inserted)
         pl << "Account already exists. Nothing changed.\n";
 
-    return it->second;
+    return *it;
 }
 
 fs::path global_options::get_exe_location()
@@ -80,12 +80,12 @@ std::unordered_map<std::string, user_options> global_options::read_accounts()
     return toreturn;
 }
 
-user_options* global_options::select_account(const std::string_view name)
+std::pair<const std::string, user_options>* global_options::select_account(const std::string_view name)
 {
     print_logger<logtype::verbose> pl;
 
     int matched = 0;
-    user_options* candidate = nullptr;
+	std::pair<const std::string, user_options>* candidate = nullptr;
 
     for (auto& entry : accounts)
     {
@@ -103,7 +103,7 @@ user_options* global_options::select_account(const std::string_view name)
         {
             pl << "Matched account" << entry.first << "\n";
             matched++;
-            candidate = &entry.second;
+            candidate = &entry;
         }
     }
 

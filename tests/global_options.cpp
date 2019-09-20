@@ -38,7 +38,7 @@ SCENARIO("add_new_account correctly handles input.", "[global_options]")
             userfile /= "coolguy@website.com";
             userfile /= User_Options_Filename;
 
-            user_options& added = opts.add_new_account("coolguy@website.com");
+            auto& added = opts.add_new_account("coolguy@website.com");
 
             THEN("the accounts directory is created.")
             {
@@ -80,12 +80,14 @@ SCENARIO("read_accounts correctly fills global_options on construction.", "[glob
                 test_file fi{accountdir};
             }
 
-            user_options& added = opt.add_new_account("coolaccount@website.com");
-            added.set_option(user_option::account_name, "coolaccount");
-            added.set_option(user_option::instance_url, "website.com");
-            user_options& alsoadded = opt.add_new_account("evencooleraccount@wedsize.egg");
-            alsoadded.set_option(user_option::account_name, "evencooleraccount");
-            alsoadded.set_option(user_option::instance_url, "wedsize.egg");
+            auto& added = opt.add_new_account("coolaccount@website.com");
+			REQUIRE(added.first == "coolaccount@website.com");
+            added.second.set_option(user_option::account_name, "coolaccount");
+            added.second.set_option(user_option::instance_url, "website.com");
+            auto& alsoadded = opt.add_new_account("evencooleraccount@wedsize.egg");
+			REQUIRE(alsoadded.first == "evencooleraccount@wedsize.egg");
+            alsoadded.second.set_option(user_option::account_name, "evencooleraccount");
+            alsoadded.second.set_option(user_option::instance_url, "wedsize.egg");
         }
 
         global_options opt;
@@ -247,7 +249,7 @@ SCENARIO("select_account selects exactly one account.", "[global_options]")
 
             THEN("the user_options is the correct one.")
             {
-                const std::string account_name = *account->get_option(user_option::account_name);
+                const std::string account_name = *account->second.get_option(user_option::account_name);
                 REQUIRE(account_name == "someotheraccount@place2.egg");
             }
         }
@@ -264,7 +266,7 @@ SCENARIO("select_account selects exactly one account.", "[global_options]")
 
             THEN("the user_options is the correct one.")
             {
-                const std::string account_name = *account->get_option(user_option::account_name);
+                const std::string account_name = *account->second.get_option(user_option::account_name);
                 REQUIRE(account_name == "someotheraccount@place2.egg");
             }
         }
