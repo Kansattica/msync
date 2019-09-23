@@ -4,6 +4,8 @@
 #include <msync_exception.hpp>
 #include <print_logger.hpp>
 #include <string>
+#include <algorithm>
+#include <vector>
 
 #include "../lib/options/global_options.hpp"
 #include "../lib/options/option_enums.hpp"
@@ -14,6 +16,9 @@
 std::pair<const std::string, user_options>& assume_account(std::pair<const std::string, user_options>* user);
 void print_stringptr(const std::string* toprint, print_logger<>& pl);
 
+template <typename T>
+void uniqueify(T& toprint);
+
 int main(int argc, const char* argv[])
 {
     print_logger<logtype::fileonly> pl;
@@ -21,7 +26,7 @@ int main(int argc, const char* argv[])
     pl << "--- msync started ---\n";
     pl.flush();
 
-    const auto parsed = parse(argc, argv, false);
+    auto parsed = parse(argc, argv, false);
 
     auto user = options.select_account(parsed.account);
     try
@@ -56,12 +61,13 @@ int main(int argc, const char* argv[])
             assume_account(user).second.set_option(parsed.toset, parsed.optionval);
             break;
 		case mode::queue:
+			uniqueify(parsed.queue_opt.queued);
 			switch (parsed.queue_opt.to_do)
 			{
 			case queue_action::add:
 				enqueue(parsed.queue_opt.selected, assume_account(user).first, parsed.queue_opt.queued);
 			case queue_action::remove:
-				dequeue(parsed.queue_opt.selected, assume_account(user).first, parsed.queue_opt.queued);
+				dequeue(parsed.queue_opt.selected, assume_account(user).first, std::move(parsed.queue_opt.queued));
 			case queue_action::clear:
 				clear(parsed.queue_opt.selected, assume_account(user).first);
 			}
@@ -80,6 +86,13 @@ int main(int argc, const char* argv[])
     plerr << '\n';
 
     pl << "--- msync finished normally ---\n";
+}
+
+template <typename T>
+void uniqueify(T& toprint)
+{
+	auto last = std::unique(toprint.begin(), toprint.end());
+	toprint.erase(last, toprint.end());
 }
 
 std::pair<const std::string, user_options>& assume_account(std::pair<const std::string, user_options>* user)
