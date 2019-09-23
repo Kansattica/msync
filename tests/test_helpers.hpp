@@ -28,8 +28,8 @@ public:
             fs::remove_all(filenamebak);
     };
 
-private:
     fs::path filename;
+private:
     fs::path filenamebak;
 };
 

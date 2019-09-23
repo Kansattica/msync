@@ -51,32 +51,30 @@ void enqueue(const queues toenqueue, const std::string& account, const std::vect
 	return;
 }
 
-void dequeue(queues todequeue, const std::string& account, const std::vector<std::string>& toremove)
+void dequeue(queues todequeue, const std::string& account, std::vector<std::string>&& toremove)
 {
 	queue_list toremovefrom = open_queue(todequeue, account);
 
-	std::vector<std::string> todel;
-
-	for (auto it = toremovefrom.queued.begin(); it != toremovefrom.queued.end();)
+	for (auto it = toremove.begin(); it != toremove.end(); )
 	{
-		// this is slow. if it becomes an issue, consider sorting toremove first and doing
-		// a binary search or making an unordered_set from the contents of toremove.
-		if (std::any_of(toremove.begin(), toremove.end(), [it](auto& tor) {
-			return tor == *it;
-			}))
+		// if the item is in the queue, remove it form the queue and from the toremove vector
+		// if this gets to be a performance bottleneck (since it's an n^2 algorithm), make an unordered_set from toremove
+		auto inqueue = std::find(toremovefrom.queued.begin(), toremovefrom.queued.end(), *it);
+		if (inqueue != toremovefrom.queued.end()) // if we found the thing in the queue, remove from both
 		{
-			it = toremovefrom.queued.erase(it);
+			toremovefrom.queued.erase(inqueue);
+			it = toremove.erase(it);
 		}
 		else
 		{
-			todel.push_back(*it);
 			++it;
 		}
 	}
 
 	//basically, if a thing isn't in the queue, enqueue removing that thing. unboosting, unfaving, deleting a post
+	//consider removing duplicate removes?
 
-	for (auto& queuedel : todel)
+	for (auto& queuedel : toremove)
 	{
 		queuedel.push_back('-');
 		toremovefrom.queued.emplace_back(std::move(queuedel));
