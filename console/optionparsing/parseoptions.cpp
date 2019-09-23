@@ -61,7 +61,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
     auto genMode = (command("gen").set(ret.selected, mode::gen)).doc("Generate a post template in the current folder.");
 
     auto queueMode = (command("queue").set(ret.selected, mode::queue) &
-                          one_of(option("-r", "--remove").set(ret.queue_opt.to_do, queue_action::remove).doc("Remove the post ids or filenames from the queue instead of adding them."),
+                          one_of(option("-r", "--remove").set(ret.queue_opt.to_do, queue_action::remove).doc("Remove the post ids or filenames from the queue instead of adding them. If not in the queue, queue unfaving, unboosting, or deleting the post."),
                                  option("-c", "--clear").set(ret.queue_opt.to_do, queue_action::clear).doc("Remove everything in the specified queue.")) %
                               "queue options",
                       one_of(
