@@ -18,12 +18,17 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 
 		WHEN("some items are enqueued")
 		{
+			auto totest = GENERATE(
+				std::make_pair(queues::boost, Boost_Queue_Filename),
+				std::make_pair(queues::fav, Fav_Queue_Filename)
+			);
+
 			std::vector<std::string> someids{ "12345", "67890", "123123123123123123123", "longtextboy", "friend" };
-			enqueue(queues::boost, account, someids);
+			enqueue(totest.first, account, someids);
 
 			THEN("the items are written immediately.")
 			{
-				auto lines = read_lines(accountdir.filename / Boost_Queue_Filename);
+				auto lines = read_lines(accountdir.filename / totest.second);
 				REQUIRE(lines.size() == 5);
 				REQUIRE(lines == someids);
 			}
@@ -31,11 +36,11 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 			AND_WHEN("some of those are dequeued")
 			{
 				std::vector<std::string> removethese{ "12345", "longtextboy" };
-				dequeue(queues::boost, account, std::move(removethese));
+				dequeue(totest.first, account, std::move(removethese));
 
 				THEN("they're removed from the file.")
 				{
-					auto lines = read_lines(accountdir.filename / Boost_Queue_Filename);
+					auto lines = read_lines(accountdir.filename / totest.second);
 					REQUIRE(lines.size() == 3);
 					REQUIRE(lines[0] == "67890");
 					REQUIRE(lines[1] == "123123123123123123123");
@@ -46,11 +51,11 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 			AND_WHEN("some of those are dequeued and some aren't in the queue")
 			{
 				std::vector<std::string> removethese{ "12345", "longtextboy", "not in the queue", "other" };
-				dequeue(queues::boost, account, std::move(removethese));
+				dequeue(totest.first, account, std::move(removethese));
 
 				THEN("the ones in the queue are removed from the file, the ones not in the queue are appended.")
 				{
-					auto lines = read_lines(accountdir.filename / Boost_Queue_Filename);
+					auto lines = read_lines(accountdir.filename / totest.second);
 					REQUIRE(lines.size() == 5);
 					REQUIRE(lines[0] == "67890");
 					REQUIRE(lines[1] == "123123123123123123123");
@@ -62,11 +67,11 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 
 			AND_WHEN("the queue is cleared")
 			{
-				clear(queues::boost, account);
+				clear(totest.first, account);
 
 				THEN("The file is empty, but exists.")
 				{
-					auto lines = read_lines(accountdir.filename / Boost_Queue_Filename);
+					auto lines = read_lines(accountdir.filename / totest.second);
 					REQUIRE(lines.size() == 0);
 				}
 			}
