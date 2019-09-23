@@ -45,12 +45,17 @@ void enqueue(const queues toenqueue, const std::string& account, const std::vect
 		queue_post(account, add);
 	}
 
+	// consider looking for those "delete" guys, the ones with the - at the end, and having this cancel them out, 
+	// but "unboost and reboost", for example, is a valid thing to want to do.
+
 	return;
 }
 
 void dequeue(queues todequeue, const std::string& account, const std::vector<std::string>& toremove)
 {
 	queue_list toremovefrom = open_queue(todequeue, account);
+
+	std::vector<std::string> todel;
 
 	for (auto it = toremovefrom.queued.begin(); it != toremovefrom.queued.end();)
 	{
@@ -64,8 +69,17 @@ void dequeue(queues todequeue, const std::string& account, const std::vector<std
 		}
 		else
 		{
+			todel.push_back(*it);
 			++it;
 		}
+	}
+
+	//basically, if a thing isn't in the queue, enqueue removing that thing. unboosting, unfaving, deleting a post
+
+	for (auto& queuedel : todel)
+	{
+		queuedel.push_back('-');
+		toremovefrom.queued.emplace_back(std::move(queuedel));
 	}
 }
 

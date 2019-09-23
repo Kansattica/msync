@@ -21,7 +21,7 @@ int main(int argc, const char* argv[])
     pl << "--- msync started ---\n";
     pl.flush();
 
-    auto parsed = parse(argc, argv, false);
+    const auto parsed = parse(argc, argv, false);
 
     auto user = options.select_account(parsed.account);
     try
@@ -56,6 +56,15 @@ int main(int argc, const char* argv[])
             assume_account(user).second.set_option(parsed.toset, parsed.optionval);
             break;
 		case mode::queue:
+			switch (parsed.queue_opt.to_do)
+			{
+			case queue_action::add:
+				enqueue(parsed.queue_opt.selected, assume_account(user).first, parsed.queue_opt.queued);
+			case queue_action::remove:
+				dequeue(parsed.queue_opt.selected, assume_account(user).first, parsed.queue_opt.queued);
+			case queue_action::clear:
+				clear(parsed.queue_opt.selected, assume_account(user).first);
+			}
         case mode::help:
             break;
         default:
