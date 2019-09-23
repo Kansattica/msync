@@ -1,7 +1,6 @@
 #include <catch2/catch.hpp>
 
 #include "test_helpers.hpp"
-#include <catch2/catch.hpp>
 
 #include "../lib/queue/queue_list.hpp"
 
