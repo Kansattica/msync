@@ -7,13 +7,15 @@
 
 #include "../lib/queue/queues.hpp"
 #include "../lib/constants/constants.hpp"
+#include "../lib/options/global_options.hpp"
+#include "../lib/printlog/print_logger.hpp"
 
 SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 {
 	const std::string account = "regularguy@internet.egg";
 	GIVEN("An empty queue")
 	{
-		test_file accountdir = fs::current_path() / account;
+		test_file accountdir = options.executable_location / account;
 		fs::create_directory(accountdir.filename);
 
 		WHEN("some items are enqueued")
@@ -79,4 +81,77 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 
 	}
 
+}
+
+void files_match(const std::string& account, const std::string& filename)
+{
+	fs::path relative = fs::path{account} / filename;
+	REQUIRE(read_lines(fs::current_path() / relative) == read_lines(options.executable_location / relative));
+}
+
+SCENARIO("Queues correctly enqueue and dequeue posts.")
+{
+	logs_off = true; //shut up the printlogger
+
+	const std::string account = "queueboy@website.egg";
+	test_file accountdir = options.executable_location / account;
+	fs::create_directory(accountdir.filename);
+	GIVEN("Some posts to enqueue")
+	{
+		const test_file postfiles[]{ "postboy", "guy.extension", "../up.here", "yeeeeeeehaw" };
+		for (auto& file : postfiles)
+		{
+			std::ofstream of{ file.filename };
+			of << "My name is " << file.filename.filename() << "\n";
+		}
+
+		WHEN("a post is enqueued")
+		{
+			auto idx = GENERATE(0, 1, 2, 3);
+			std::vector<std::string> toq { postfiles[idx].filename.string() };
+			std::string justfilename = postfiles[idx].filename.filename().string();
+
+			enqueue(queues::post, account, toq);
+
+			THEN("the post is copied to the user's account folder")
+			{
+				files_match(account, justfilename);
+			}
+
+			THEN("the queue post file is filled correctly")
+			{
+				auto lines = read_lines(accountdir.filename / Post_Queue_Filename);
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0] == justfilename);
+			}
+
+			AND_WHEN("that post is dequeued")
+			{
+				dequeue(queues::post, account, std::move(toq));
+
+				THEN("msync's copy of the post is deleted")
+				{
+					REQUIRE_FALSE(fs::exists(accountdir.filename / File_Queue_Directory / justfilename));
+				}
+
+				THEN("the original copy of the post is fine")
+				{
+					REQUIRE(fs::exists(postfiles[idx].filename));
+					auto lines = read_lines(postfiles[idx].filename);
+					REQUIRE(lines.size() == 1);
+
+					std::string compareto{ "My name is \"" };
+					compareto.append(justfilename);
+					compareto.push_back('\"');
+					REQUIRE(lines[0] == compareto);
+				}
+
+				THEN("the queue post file is emptied.")
+				{
+					auto lines = read_lines(accountdir.filename / Post_Queue_Filename);
+					REQUIRE(lines.size() == 0);
+				}
+			}
+		}
+	}
 }
