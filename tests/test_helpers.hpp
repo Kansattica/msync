@@ -28,7 +28,7 @@ public:
             fs::remove_all(filenamebak);
     };
 
-    fs::path filename;
+    const fs::path filename;
 private:
     fs::path filenamebak;
 };

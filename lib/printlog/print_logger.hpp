@@ -15,6 +15,7 @@ enum class logtype
 };
 
 extern bool verbose_logs;
+extern bool logs_off;
 
 template <logtype isverbose = logtype::normal>
 struct print_logger
@@ -30,6 +31,9 @@ struct print_logger
     template <typename T>
     print_logger& operator<<(const T& towrite)
     {
+		if (logs_off)
+			return *this;
+
         if constexpr (isverbose == logtype::verbose)
         {
             if (verbose_logs)

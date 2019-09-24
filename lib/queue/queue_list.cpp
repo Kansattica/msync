@@ -39,7 +39,8 @@ queue_list::~queue_list()
     std::ofstream of(listfilename);
     while (!queued.empty())
     {
-        of << queued.front() << '\n';
+		if (!queued.front().empty())
+			of << queued.front() << '\n';
         queued.pop_front();
     }
 }
