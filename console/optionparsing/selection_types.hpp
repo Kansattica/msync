@@ -11,12 +11,13 @@ enum class queue_action
 {
     add,
     remove,
-    clear
+    clear,
+	print
 };
 
 struct queue_options
 {
     std::vector<std::string> queued;
-    queue_action to_do;
+    queue_action to_do = queue_action::add;
     queues selected;
 };
