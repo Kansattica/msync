@@ -88,6 +88,7 @@ void files_match(const std::string& account, const fs::path& original, const std
 	REQUIRE(read_lines(original) == read_lines(options.executable_location / account / File_Queue_Directory / outfile));
 }
 
+
 SCENARIO("Queues correctly enqueue and dequeue posts.")
 {
 	logs_off = true; //shut up the printlogger
@@ -97,7 +98,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 	fs::create_directory(accountdir.filename);
 	GIVEN("Some posts to enqueue")
 	{
-		const test_file postfiles[]{ "postboy", "guy.extension", "../up.here", "yeeeeeeehaw" };
+		const test_file postfiles[]{ test_file{"postboy"}, test_file{"guy.extension"}, test_file{"../up.here"}, test_file{"yeeeeeeehaw"} };
 		for (auto& file : postfiles)
 		{
 			std::ofstream of{ file.filename };
@@ -173,7 +174,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 	GIVEN("Two different posts with the same name to enqueue")
 	{
 		const test_file testdir{ "somedir" };
-		const test_file postfiles[]{ "thisisapost.hi", "somedir/thisisapost.hi" };
+		const test_file postfiles[]{ test_file{"thisisapost.hi"}, test_file{"somedir/thisisapost.hi"} };
 		fs::create_directory(testdir.filename);
 
 		int postno = 1;
