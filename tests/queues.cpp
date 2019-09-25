@@ -227,8 +227,8 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 				THEN("both original files are still there")
 				{
-					REQUIRE(fs::exists(thisfile));
-					REQUIRE(fs::exists(otherfile));
+					REQUIRE(fs::exists(postfiles[0].filename));
+					REQUIRE(fs::exists(postfiles[1].filename));
 				}
 			}
 		}
