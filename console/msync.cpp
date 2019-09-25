@@ -62,6 +62,12 @@ int main(int argc, const char* argv[])
         case mode::config:
             assume_account(user).second.set_option(parsed.toset, parsed.optionval);
             break;
+        case mode::configsync:
+            assume_account(user).second.set_option(parsed.toset, parsed.sync_opt_mode);
+            break;
+        case mode::configlist:
+            assume_account(user).second.set_option(parsed.toset, parsed.listops);
+            break;
 		case mode::queue:
 			uniqueify(parsed.queue_opt.queued);
 			switch (parsed.queue_opt.to_do)
