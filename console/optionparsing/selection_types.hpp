@@ -4,7 +4,6 @@
 struct sync_options
 {
     int retries = 3;
-    sync_settings mode;
 };
 
 enum class queue_action

@@ -24,6 +24,7 @@ struct parse_result
     // maybe later, do a union or variant for the mutually exclusive ones
     list_operations listops;
     sync_options sync_opts;
+    sync_settings sync_opt_mode;
     queue_options queue_opt;
     std::string optionval;
     std::string account;

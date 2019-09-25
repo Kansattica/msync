@@ -43,9 +43,9 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
                                        one_of(command("home").set(ret.toset, user_option::pull_home),
                                               command("dms").set(ret.toset, user_option::pull_dms),
                                               command("notifications").set(ret.toset, user_option::pull_notifications)),
-                                       one_of(command("newest").set(ret.sync_opts.mode, sync_settings::newest_first),
-                                              command("oldest").set(ret.sync_opts.mode, sync_settings::oldest_first),
-                                              command("off").set(ret.sync_opts.mode, sync_settings::dont_sync)))
+                                       one_of(command("newest").set(ret.sync_opt_mode, sync_settings::newest_first),
+                                              command("oldest").set(ret.sync_opt_mode, sync_settings::oldest_first),
+                                              command("off").set(ret.sync_opt_mode, sync_settings::dont_sync)))
                                .doc("Whether to synchronize an account's home timeline, direct messages, and notifications, and whether to do it newest first, oldest first, or not at all."),
                            in_sequence(command("list").set(ret.selected, mode::configlist),
                                        one_of(command("add").set(ret.listops, list_operations::add),
@@ -56,7 +56,11 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
                            "config commands");
 
     auto syncMode = ((command("sync").set(ret.selected, mode::sync).doc("Synchronize your account[s] with their server[s]. Synchronizes all accounts unless one is specified with -a.")) &
-                     (option("-r", "--retries") & value("retries", ret.sync_opts.retries)) % "Retry failed requests n times. (default: 3)");
+                     (option("-r", "--retries") & value("retries", ret.sync_opts.retries)) % "Retry failed requests n times. (default: 3)",
+		             one_of(
+						 option("-s", "--send-only").doc("Only send queued messages, don't download anything."),
+						 option("-g", "--get-only").doc("Only download posts, don't send anything from queues.")
+					 ));
 
     auto genMode = (command("gen").set(ret.selected, mode::gen)).doc("Generate a post template in the current folder.");
 

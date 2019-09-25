@@ -358,7 +358,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
             THEN("the correct sync operation is set")
             {
-                REQUIRE(parsed.sync_opts.mode == sync_settings::oldest_first);
+                REQUIRE(parsed.sync_opt_mode == sync_settings::oldest_first);
             }
 
             THEN("account is set")
@@ -394,7 +394,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
             THEN("the correct sync operation is set")
             {
-                REQUIRE(parsed.sync_opts.mode == sync_settings::newest_first);
+                REQUIRE(parsed.sync_opt_mode == sync_settings::newest_first);
             }
 
             THEN("account is set")
@@ -430,7 +430,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
             THEN("the correct sync operation is set")
             {
-                REQUIRE(parsed.sync_opts.mode == sync_settings::dont_sync);
+                REQUIRE(parsed.sync_opt_mode == sync_settings::dont_sync);
             }
 
             THEN("account is set")
