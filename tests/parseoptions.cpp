@@ -542,7 +542,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
     }
 }
 
-SCENARIO("The command line parser correctly parses when the user wants to queue.")
+SCENARIO("The command line parser correctly parses when the user wants to interact with the queue.")
 {
     GIVEN("A command line that just says 'queue'")
     {
@@ -574,7 +574,7 @@ SCENARIO("The command line parser correctly parses when the user wants to queue.
                 REQUIRE(result.okay);
             }
 
-            THEN("the correct queue is selected")
+            THEN("the correct queue is selected.")
             {
                 REQUIRE(result.queue_opt.selected == queues::fav);
             }
@@ -583,6 +583,120 @@ SCENARIO("The command line parser correctly parses when the user wants to queue.
             {
                 REQUIRE(result.queue_opt.queued == std::vector<std::string>{"12345", "6789", "123FQ43"});
             }
+
+			THEN("the correct action is selected.")
+			{
+				REQUIRE(result.queue_opt.to_do == queue_action::add);
+			}
+        }
+    }
+
+    GIVEN("A command line that removes a bunch of things from the boost queue.")
+    {
+        int argc = 7;
+        char const* argv[]{"msync", "queue", "-r", "boost", "12345", "6789", "bwingus"};
+
+        WHEN("the command line is parsed")
+        {
+            auto result = parse(argc, argv);
+
+            THEN("the parse is good.")
+            {
+                REQUIRE(result.okay);
+            }
+
+            THEN("the correct queue is selected")
+            {
+                REQUIRE(result.queue_opt.selected == queues::boost);
+            }
+
+            THEN("the post IDs are parsed.")
+            {
+                REQUIRE(result.queue_opt.queued == std::vector<std::string>{"12345", "6789", "bwingus"});
+            }
+
+			THEN("the correct action is selected.")
+			{
+				REQUIRE(result.queue_opt.to_do == queue_action::remove);
+			}
+        }
+    }
+
+    GIVEN("A command line that clears the post queue.")
+    {
+        int argc = 4;
+        char const* argv[]{"msync", "queue", "-c", "post"};
+
+        WHEN("the command line is parsed")
+        {
+            auto result = parse(argc, argv);
+
+            THEN("the parse is good.")
+            {
+                REQUIRE(result.okay);
+            }
+
+            THEN("the correct queue is selected")
+            {
+                REQUIRE(result.queue_opt.selected == queues::post);
+            }
+
+			THEN("the correct action is selected.")
+			{
+				REQUIRE(result.queue_opt.to_do == queue_action::clear);
+			}
+        }
+    }
+
+    GIVEN("A command line that prints the post queue.")
+    {
+        int argc = 4;
+        char const* argv[]{"msync", "queue", "-p", "post"};
+
+        WHEN("the command line is parsed")
+        {
+            auto result = parse(argc, argv);
+
+            THEN("the parse is good.")
+            {
+                REQUIRE(result.okay);
+            }
+
+            THEN("the correct queue is selected")
+            {
+                REQUIRE(result.queue_opt.selected == queues::post);
+            }
+
+			THEN("the correct action is selected.")
+			{
+				REQUIRE(result.queue_opt.to_do == queue_action::print);
+			}
+        }
+    }
+
+    GIVEN("A command line that prints the post queue with long options.")
+    {
+        int argc = 4;
+        char const* argv[]{"msync", "queue", "--print", "post"};
+
+        WHEN("the command line is parsed")
+        {
+            auto result = parse(argc, argv);
+
+            THEN("the parse is good.")
+            {
+                REQUIRE(result.okay);
+            }
+
+            THEN("the correct queue is selected")
+            {
+                REQUIRE(result.queue_opt.selected == queues::post);
+            }
+
+			THEN("the correct action is selected.")
+			{
+				REQUIRE(result.queue_opt.to_do == queue_action::print);
+			}
         }
     }
 }
