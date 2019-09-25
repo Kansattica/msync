@@ -151,6 +151,22 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 					REQUIRE(lines.size() == 0);
 				}
 			}
+
+			AND_WHEN("the list is cleared")
+			{
+				clear(queues::post, account);
+
+				THEN("the queue file is empty.")
+				{
+					auto lines = read_lines(accountdir.filename / Post_Queue_Filename);
+					REQUIRE(lines.size() == 0);
+				}
+
+				THEN("the queue directory has been erased.")
+				{
+					REQUIRE_FALSE(fs::exists(accountdir.filename / File_Queue_Directory));
+				}
+			}
 		}
 	}
 
@@ -229,6 +245,22 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 				{
 					REQUIRE(fs::exists(postfiles[0].filename));
 					REQUIRE(fs::exists(postfiles[1].filename));
+				}
+			}
+
+			AND_WHEN("the list is cleared")
+			{
+				clear(queues::post, account);
+
+				THEN("the queue file is empty.")
+				{
+					auto lines = read_lines(accountdir.filename / Post_Queue_Filename);
+					REQUIRE(lines.size() == 0);
+				}
+
+				THEN("the queue directory has been erased.")
+				{
+					REQUIRE_FALSE(fs::exists(accountdir.filename / File_Queue_Directory));
 				}
 			}
 		}

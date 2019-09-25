@@ -152,4 +152,9 @@ void clear(queues toclear, const std::string& account)
 	queue_list clearthis = open_queue(toclear, account);
 
 	clearthis.queued.clear();
+
+	if (toclear == queues::post)
+	{
+		fs::remove_all(get_file_queue_directory(account, true));
+	}
 }
