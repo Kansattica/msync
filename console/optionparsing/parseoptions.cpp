@@ -58,8 +58,8 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
     auto syncMode = ((command("sync").set(ret.selected, mode::sync).doc("Synchronize your account[s] with their server[s]. Synchronizes all accounts unless one is specified with -a.")) &
                      (option("-r", "--retries") & value("retries", ret.sync_opts.retries)) % "Retry failed requests n times. (default: 3)",
 		             one_of(
-						 option("-s", "--send-only").doc("Only send queued messages, don't download anything."),
-						 option("-g", "--get-only").doc("Only download posts, don't send anything from queues.")
+						 option("-s", "--send-only").set(ret.sync_opts.get, false).doc("Only send queued messages, don't download anything."),
+						 option("-g", "--get-only").set(ret.sync_opts.send, false).doc("Only download posts, don't send anything from queues.")
 					 ));
 
     auto genMode = (command("gen").set(ret.selected, mode::gen)).doc("Generate a post template in the current folder.");

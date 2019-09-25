@@ -4,6 +4,8 @@
 struct sync_options
 {
     int retries = 3;
+	bool send = true;
+	bool get = true;
 };
 
 enum class queue_action

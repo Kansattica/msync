@@ -123,8 +123,13 @@ void print_stringptr(const std::string* toprint, print_logger<>& pl)
 template <typename T>
 void print_iterable(const T& vec, print_logger<>& pl)
 {
+	bool minushelp = false;
 	for (auto& item : vec)
 	{
 		pl << item << '\n';
+		minushelp = minushelp || (item.back() == '-');
 	}
+	if (minushelp)
+		pl << "IDs followed by a - will be deleted next time you sync.\n";
+
 }

@@ -510,6 +510,70 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
         }
     }
 
+    GIVEN("A command line that says 'sync' and specifies getting only.")
+    {
+        int argc = 3;
+        char const* argv[]{"msync", "sync", "-g"};
+
+        WHEN("the command line is parsed")
+        {
+            auto parsed = parse(argc, argv);
+
+            THEN("the selected mode is sync")
+            {
+                REQUIRE(parsed.selected == mode::sync);
+            }
+
+            THEN("account is not set")
+            {
+                REQUIRE(parsed.account.empty());
+            }
+
+            THEN("the correct options are set")
+            {
+                REQUIRE(parsed.sync_opts.get);
+                REQUIRE_FALSE(parsed.sync_opts.send);
+            }
+
+            THEN("the parse is good")
+            {
+                REQUIRE(parsed.okay);
+            }
+        }
+    }
+
+    GIVEN("A command line that says 'sync' and specifies sending only.")
+    {
+        int argc = 3;
+        char const* argv[]{"msync", "sync", "-s"};
+
+        WHEN("the command line is parsed")
+        {
+            auto parsed = parse(argc, argv);
+
+            THEN("the selected mode is sync")
+            {
+                REQUIRE(parsed.selected == mode::sync);
+            }
+
+            THEN("account is not set")
+            {
+                REQUIRE(parsed.account.empty());
+            }
+
+            THEN("the correct options are set")
+            {
+                REQUIRE(parsed.sync_opts.send);
+                REQUIRE_FALSE(parsed.sync_opts.get);
+            }
+
+            THEN("the parse is good")
+            {
+                REQUIRE(parsed.okay);
+            }
+        }
+    }
+
     GIVEN("A command line that says 'sync' and specifies an account and number of retries with the long options.")
     {
         int argc = 6;
@@ -532,6 +596,43 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
             THEN("the correct number of retries is set")
             {
                 REQUIRE(parsed.sync_opts.retries == 15);
+            }
+
+            THEN("the parse is good")
+            {
+                REQUIRE(parsed.okay);
+            }
+        }
+    }
+
+    GIVEN("A command line that says 'sync' and specifies an account, get only, and number of retries with the long options.")
+    {
+        int argc = 7;
+        char const* argv[]{"msync", "sync", "--get-only", "--retries", "15", "--account", "coolfella"};
+
+        WHEN("the command line is parsed")
+        {
+            auto parsed = parse(argc, argv);
+
+            THEN("the selected mode is sync")
+            {
+                REQUIRE(parsed.selected == mode::sync);
+            }
+
+            THEN("account is set")
+            {
+                REQUIRE(parsed.account == "coolfella");
+            }
+
+            THEN("the correct number of retries is set")
+            {
+                REQUIRE(parsed.sync_opts.retries == 15);
+            }
+
+            THEN("the correct options are set")
+            {
+                REQUIRE(parsed.sync_opts.get);
+                REQUIRE_FALSE(parsed.sync_opts.send);
             }
 
             THEN("the parse is good")
