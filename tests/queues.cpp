@@ -30,7 +30,7 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 
 			THEN("the items are written immediately.")
 			{
-				auto lines = read_lines(accountdir.filename / totest.second);
+				auto lines = print(totest.first, account);
 				REQUIRE(lines.size() == 5);
 				REQUIRE(lines == someids);
 			}
@@ -42,7 +42,7 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 
 				THEN("they're removed from the file.")
 				{
-					auto lines = read_lines(accountdir.filename / totest.second);
+					auto lines = print(totest.first, account);
 					REQUIRE(lines.size() == 3);
 					REQUIRE(lines[0] == "67890");
 					REQUIRE(lines[1] == "123123123123123123123");
@@ -57,7 +57,7 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 
 				THEN("the ones in the queue are removed from the file, the ones not in the queue are appended.")
 				{
-					auto lines = read_lines(accountdir.filename / totest.second);
+					auto lines = print(totest.first, account);
 					REQUIRE(lines.size() == 5);
 					REQUIRE(lines[0] == "67890");
 					REQUIRE(lines[1] == "123123123123123123123");
@@ -73,7 +73,7 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 
 				THEN("The file is empty, but exists.")
 				{
-					auto lines = read_lines(accountdir.filename / totest.second);
+					auto lines = print(totest.first, account);
 					REQUIRE(lines.size() == 0);
 				}
 			}
@@ -119,7 +119,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 			THEN("the queue post file is filled correctly")
 			{
-				auto lines = read_lines(accountdir.filename / Post_Queue_Filename);
+				auto lines = print(queues::post, account);
 				REQUIRE(lines.size() == 1);
 				REQUIRE(lines[0] == justfilename);
 			}
@@ -210,6 +210,14 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 			THEN("the queue file is correct.")
 			{
 				auto lines = read_lines(accountdir.filename / Post_Queue_Filename);
+				REQUIRE(lines.size() == 2);
+				REQUIRE(lines[0] == "thisisapost.hi");
+				REQUIRE(lines[1] == "thisisapost.hi.1");
+			}
+
+			THEN("print returns the correct output.")
+			{
+				auto lines = print(queues::post, account);
 				REQUIRE(lines.size() == 2);
 				REQUIRE(lines[0] == "thisisapost.hi");
 				REQUIRE(lines[1] == "thisisapost.hi.1");
