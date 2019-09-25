@@ -37,7 +37,7 @@ add_subdirectory(lib/exception)
 add_subdirectory(lib/printlog)
 add_subdirectory(lib/util)
 
-target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json cpr options printlog queue)
 
 target_link_libraries(options PRIVATE constants whereami printlog exception )
 target_link_libraries(options PUBLIC filesystem) 
