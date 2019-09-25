@@ -5,7 +5,6 @@
 #include <print_logger.hpp>
 #include <string>
 #include <algorithm>
-#include <vector>
 
 #include "../lib/options/global_options.hpp"
 #include "../lib/options/option_enums.hpp"

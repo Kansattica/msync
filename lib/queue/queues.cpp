@@ -1,6 +1,5 @@
 #include "queues.hpp"
 
-#include "queue_list.hpp"
 #include <constants.hpp>
 #include <filesystem.hpp>
 #include <print_logger.hpp>
@@ -157,6 +156,11 @@ void clear(queues toclear, const std::string& account)
 	{
 		fs::remove_all(get_file_queue_directory(account, true));
 	}
+}
+
+queue_list get(queues toget, const std::string& account)
+{
+
 }
 
 std::vector<std::string> print(queues toprint, const std::string& account)
