@@ -158,3 +158,9 @@ void clear(queues toclear, const std::string& account)
 		fs::remove_all(get_file_queue_directory(account, true));
 	}
 }
+
+std::vector<std::string> print(queues toprint, const std::string& account)
+{
+	const queue_list printthis = open_queue(toprint, account);
+	return std::vector<std::string> {printthis.queued.begin(), printthis.queued.end()};
+}

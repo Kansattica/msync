@@ -17,4 +17,6 @@ void enqueue(queues toenqueue, const std::string& account, const std::vector<std
 void dequeue(queues todequeue, const std::string& account, std::vector<std::string>&& remove);
 void clear(queues toclear, const std::string& account);
 
+std::vector<std::string> print(queues toprint, const std::string& account);
+
 #endif

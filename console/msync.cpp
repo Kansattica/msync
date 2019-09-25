@@ -19,6 +19,9 @@ void print_stringptr(const std::string* toprint, print_logger<>& pl);
 template <typename T>
 void uniqueify(T& toprint);
 
+template <typename T>
+void print_iterable(const T& vec, print_logger<>& pl);
+
 int main(int argc, const char* argv[])
 {
     print_logger<logtype::fileonly> pl;
@@ -70,6 +73,8 @@ int main(int argc, const char* argv[])
 				dequeue(parsed.queue_opt.selected, assume_account(user).first, std::move(parsed.queue_opt.queued));
 			case queue_action::clear:
 				clear(parsed.queue_opt.selected, assume_account(user).first);
+			case queue_action::print:
+				print_iterable(print(parsed.queue_opt.selected, assume_account(user).first), plerr);
 			}
         case mode::help:
             break;
@@ -108,4 +113,13 @@ void print_stringptr(const std::string* toprint, print_logger<>& pl)
         pl << "[not set]";
     else
         pl << *toprint;
+}
+
+template <typename T>
+void print_iterable(const T& vec, print_logger<>& pl)
+{
+	for (auto& item : vec)
+	{
+		pl << item << '\n';
+	}
 }
