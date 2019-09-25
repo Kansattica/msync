@@ -160,7 +160,7 @@ void clear(queues toclear, const std::string& account)
 
 queue_list get(queues toget, const std::string& account)
 {
-
+	return open_queue(toget, account);
 }
 
 std::vector<std::string> print(queues toprint, const std::string& account)
