@@ -83,10 +83,9 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 
 }
 
-void files_match(const std::string& account, const std::string& filename)
+void files_match(const std::string& account, const fs::path& original, const std::string& outfile)
 {
-	fs::path relative = fs::path{account} / filename;
-	REQUIRE(read_lines(fs::current_path() / relative) == read_lines(options.executable_location / relative));
+	REQUIRE(read_lines(original) == read_lines(options.executable_location / account / File_Queue_Directory / outfile));
 }
 
 SCENARIO("Queues correctly enqueue and dequeue posts.")
@@ -115,7 +114,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 			THEN("the post is copied to the user's account folder")
 			{
-				files_match(account, justfilename);
+				files_match(account, postfiles[idx].filename, justfilename);
 			}
 
 			THEN("the queue post file is filled correctly")
@@ -150,6 +149,86 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 				{
 					auto lines = read_lines(accountdir.filename / Post_Queue_Filename);
 					REQUIRE(lines.size() == 0);
+				}
+			}
+		}
+	}
+
+	GIVEN("Two different posts with the same name to enqueue")
+	{
+		const test_file testdir{ "somedir" };
+		const test_file postfiles[]{ "thisisapost.hi", "somedir/thisisapost.hi" };
+		fs::create_directory(testdir.filename);
+
+		int postno = 1;
+		for (auto& fi : postfiles)
+		{
+			std::ofstream of{ fi.filename };
+			of << "I'm number " << postno++ << '\n';
+		}
+
+		WHEN("both are enqueued")
+		{
+			enqueue(queues::post, account, std::vector<std::string>{ postfiles, postfiles + 2 });
+
+			const fs::path unsuffixedname = accountdir.filename / File_Queue_Directory / "thisisapost.hi";
+			const fs::path suffixedname = accountdir.filename / File_Queue_Directory / "thisisapost.hi.1";
+
+			THEN("one file goes in with the original name, one goes in with a new suffix.")
+			{
+				REQUIRE(fs::exists(unsuffixedname));
+				REQUIRE(fs::exists(suffixedname));
+			}
+
+			THEN("the file contents are correct.")
+			{
+				auto unsuflines = read_lines(unsuffixedname);
+				REQUIRE(unsuflines.size() == 1);
+				REQUIRE(unsuflines[0] == "I'm number 1");
+
+				auto suflines = read_lines(suffixedname);
+				REQUIRE(suflines.size() == 1);
+				REQUIRE(suflines[0] == "I'm number 2");
+			}
+
+			THEN("the queue file is correct.")
+			{
+				auto lines = read_lines(accountdir.filename / Post_Queue_Filename);
+				REQUIRE(lines.size() == 2);
+				REQUIRE(lines[0] == "thisisapost.hi");
+				REQUIRE(lines[1] == "thisisapost.hi.1");
+			}
+
+			AND_WHEN("one is removed")
+			{
+				auto idx = GENERATE(0, 1);
+
+				std::string thisfile = idx == 0 ? "thisisapost.hi" : "thisisapost.hi.1";
+				std::string otherfile = idx == 1 ? "thisisapost.hi" : "thisisapost.hi.1";
+
+				dequeue(queues::post, account, std::vector<std::string> { thisfile });
+
+				THEN("msync's copy of the dequeued file is deleted.")
+				{
+					REQUIRE_FALSE(fs::exists(accountdir.filename / File_Queue_Directory / thisfile));
+				}
+
+				THEN("msync's copy of the other file is still there.")
+				{
+					REQUIRE(fs::exists(accountdir.filename / File_Queue_Directory / otherfile));
+				}
+
+				THEN("the queue file is updated correctly.")
+				{
+					auto lines = read_lines(accountdir.filename / Post_Queue_Filename);
+					REQUIRE(lines.size() == 1);
+					REQUIRE(lines[0] == otherfile);
+				}
+
+				THEN("both original files are still there")
+				{
+					REQUIRE(fs::exists(thisfile));
+					REQUIRE(fs::exists(otherfile));
 				}
 			}
 		}

@@ -28,6 +28,7 @@ public:
             fs::remove_all(filenamebak);
     };
 
+	operator std::string() const { return filename.string(); }
     const fs::path filename;
 private:
     fs::path filenamebak;

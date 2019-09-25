@@ -52,7 +52,7 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 	}
 
 	fs::copy(postfile, copyto);
-	return postfile.filename().string();
+	return copyto.filename().string();
 }
 
 queue_list open_queue(const queues to_open, const std::string& account)
@@ -91,11 +91,8 @@ void enqueue(const queues toenqueue, const std::string& account, const std::vect
 		toaddto.queued.emplace_back(std::move(queuethis));
 	}
 
-
 	// consider looking for those "delete" guys, the ones with the - at the end, and having this cancel them out, 
 	// but "unboost and reboost", for example, is a valid thing to want to do.
-
-	return;
 }
 
 void dequeue_post(const fs::path &queuedir, const fs::path& filename)
