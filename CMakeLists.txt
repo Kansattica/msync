@@ -37,7 +37,7 @@ add_subdirectory(lib/exception)
 add_subdirectory(lib/printlog)
 add_subdirectory(lib/util)
 
-target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json cpr options printlog queue)
+target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json cpr options printlog queue util)
 
 target_link_libraries(options PRIVATE constants whereami printlog exception )
 target_link_libraries(options PUBLIC filesystem) 
@@ -45,7 +45,7 @@ target_link_libraries(options PUBLIC filesystem)
 target_link_libraries(queue PUBLIC filesystem) 
 target_link_libraries(queue PRIVATE constants printlog options) 
 
-target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options queue)
+target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options queue util)
 
 target_link_libraries(msync PRIVATE options optionparsing printlog ${CPR_LIBRARIES} util nlohmann_json::nlohmann_json exception)
 
