@@ -4,4 +4,5 @@ target_sources_local(sync
 	send.cpp
 	recv.hpp
 	recv.cpp
+	error_code_messages.hpp
 	)
