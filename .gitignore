@@ -12,3 +12,4 @@ CTestTestfile.cmake
 _deps
 .vscode/
 msync.log
+/.vs
