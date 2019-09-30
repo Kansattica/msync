@@ -6,12 +6,12 @@
 #include <filesystem.hpp>
 #include <print_logger.hpp>
 
-template <typename Container, typename T, void(*Read)(Container&, std::string&), void(*Write)(T&, std::ofstream&)>
+template <typename Container, typename T, void(*Read)(Container&, std::string&&), void(*Write)(T&, std::ofstream&)>
 class file_backed
 {
 public:
     Container parsed;
-	file_backed::file_backed(fs::path filename) : backing(filename)
+	file_backed(fs::path filename) : backing(filename)
 	{
 		print_logger<logtype::verbose> logger;
 		std::ifstream backingfile(backing);
@@ -31,7 +31,7 @@ public:
 		}
 	}
 
-	file_backed::~file_backed()
+	~file_backed()
 	{
 		if (backing == "")
 			return; // we got moved from, so the new version will save it
