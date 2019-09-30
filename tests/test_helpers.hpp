@@ -11,6 +11,7 @@
 struct test_file
 {
 public:
+	test_file(const char* name) : test_file(fs::path(name)) {};
     test_file(fs::path name) : filename(name), filenamebak(name)
     {
         filenamebak += ".bak";
