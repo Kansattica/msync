@@ -22,7 +22,7 @@ const std::string statusroute = "/api/v1/statuses/";
 const std::array<string_view, 2> favroutepost = { "/favourite", "/unfavourite" };
 const std::array<string_view, 2> boostroutepost = { "/reblog", "/unreblog" };
 
-int simple_post(const std::string& url, const std::string& access_token);
+cpr::Response simple_post(const std::string& url, const std::string& access_token);
 
 template <const string_view& doroute, const string_view& undoroute, queues toread>
 void process_queue(const std::string& account, const std::string& baseurl, const std::string& access_token, int retries);
@@ -64,7 +64,31 @@ std::string paramaterize_url(const string_view before, const string_view middle,
 	return toreturn.append(middle).append(after);
 }
 
-template <const string_view& doroute, const string_view& undoroute, queues toread>
+bool post_with_retries(const std::string& requesturl, const std::string& access_token, int retries)
+{
+	for (int i = 0; i < retries; i++)
+	{
+		auto response = simple_post(requesturl, access_token);
+
+		if (response.error.code == cpr::ErrorCode::OPERATION_TIMEDOUT || (response.status_code >= 500 && response.status_code < 600))
+		{
+			// should retry
+			continue;
+		}
+
+		// some other error, assume unrecoverable
+		if (response.error)
+		{
+			return false;
+		}
+
+		// must be 200, OK response
+		return true;
+	}
+	return false;
+}
+
+template <const string_view & doroute, const string_view & undoroute, queues toread>
 void process_queue(const std::string& account, const std::string& baseurl, const std::string& access_token, int retries)
 {
 	auto queuefile = get(toread, account);
@@ -79,24 +103,9 @@ void process_queue(const std::string& account, const std::string& baseurl, const
 
 		std::string requesturl = paramaterize_url(baseurl, id, undo ? undoroute : doroute);
 
-		for (int i = 0; i < retries; i++)
+		if (post_with_retries(requesturl, access_token, retries) == false)
 		{
-			int response = simple_post(requesturl, access_token);
-			
-			if (response.error.code == cpr::ErrorCode::OPERATION_TIMEDOUT || (response.status_code >= 500 && response.status_code < 600))
-			{
-				// should retry
-				continue;
-			}
-
-			// some other error, assume unrecoverable
-			if (response != 200)
-			{
-				failedids.emplace_back(id);
-			}
-
-			// must be 200, OK response
-			break;
+			failedids.emplace_back(id);
 		}
 
 		// remove ID from this queue
@@ -107,7 +116,7 @@ void process_queue(const std::string& account, const std::string& baseurl, const
 }
 
 
-int simple_post(const std::string& url, const std::string& access_token)
+cpr::Response simple_post(const std::string& url, const std::string& access_token)
 {
 	auto response = cpr::Post(cpr::Url{ url }, cpr::Authentication{ "Bearer", access_token }, cpr::Header{ {"Idempotency-Key", url} });
 
@@ -120,8 +129,7 @@ int simple_post(const std::string& url, const std::string& access_token)
 
 	pl << get_error_message(response.status_code, verbose_logs);
 
-	// return if we need to retry, which is a timeout or a server error
-	return response.status_code;
+	return response;
 }
 
 
