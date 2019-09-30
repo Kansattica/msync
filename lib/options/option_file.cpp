@@ -2,7 +2,7 @@
 
 using std::getline;
 
-void Read(std::map<std::string, std::string>& parsed, std::string& line)
+void Read(std::map<std::string, std::string>& parsed, std::string&& line)
 {
 	const auto equals = line.find_first_of('=');
 	const auto [it, success] = parsed.insert({ line.substr(0, equals), line.substr(equals + 1) });
