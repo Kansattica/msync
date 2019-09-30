@@ -18,6 +18,7 @@ add_library(options STATIC "")
 add_library(util STATIC "")
 add_library(optionparsing STATIC "")
 add_library(printlog STATIC "")
+add_library(filebacked INTERFACE)
 add_library(constants INTERFACE)
 add_library(exception INTERFACE)
 add_library(filesystem INTERFACE)
@@ -37,13 +38,15 @@ add_subdirectory(lib/exception)
 add_subdirectory(lib/printlog)
 add_subdirectory(lib/util)
 
+target_include_directories(filebacked INTERFACE lib/filebacked)
+target_link_libraries(filebacked INTERFACE printlog filesystem)
+
 target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json)
 
-target_link_libraries(options PRIVATE constants whereami printlog exception )
+target_link_libraries(options PRIVATE constants whereami printlog exception filebacked)
 target_link_libraries(options PUBLIC filesystem) 
 
-target_link_libraries(queue PUBLIC filesystem) 
-target_link_libraries(queue PRIVATE constants printlog options) 
+target_link_libraries(queue PRIVATE constants printlog options filebacked) 
 
 target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options queue)
 

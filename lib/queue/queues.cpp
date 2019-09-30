@@ -88,7 +88,7 @@ void enqueue(const queues toenqueue, const std::string& account, const std::vect
 		{
 			queuethis = queue_post(filequeuedir, id);
 		}
-		toaddto.queued.emplace_back(std::move(queuethis));
+		toaddto.parsed.emplace_back(std::move(queuethis));
 	}
 
 	// consider looking for those "delete" guys, the ones with the - at the end, and having this cancel them out, 
@@ -121,14 +121,14 @@ void dequeue(queues todequeue, const std::string& account, std::vector<std::stri
 		
 		// if the item is in the queue, remove it form the queue and from the toremove vector
 		// if this gets to be a performance bottleneck (since it's an n^2 algorithm), make an unordered_set from toremove or sort and do a binary search
-		auto inqueue = std::find(toremovefrom.queued.begin(), toremovefrom.queued.end(), *it);
-		if (inqueue != toremovefrom.queued.end()) // if we found the thing in the queue, remove from both
+		auto inqueue = std::find(toremovefrom.parsed.begin(), toremovefrom.parsed.end(), *it);
+		if (inqueue != toremovefrom.parsed.end()) // if we found the thing in the queue, remove from both
 		{
 			if (todequeue == queues::post)
 			{
 				dequeue_post(filequeuedir, *it);
 			}
-			toremovefrom.queued.erase(inqueue);
+			toremovefrom.parsed.erase(inqueue);
 			it = toremove.erase(it);
 		}
 		else
@@ -143,7 +143,7 @@ void dequeue(queues todequeue, const std::string& account, std::vector<std::stri
 	for (auto& queuedel : toremove)
 	{
 		queuedel.push_back('-');
-		toremovefrom.queued.emplace_back(std::move(queuedel));
+		toremovefrom.parsed.emplace_back(std::move(queuedel));
 	}
 }
 
@@ -151,7 +151,7 @@ void clear(queues toclear, const std::string& account)
 {
 	queue_list clearthis = open_queue(toclear, account);
 
-	clearthis.queued.clear();
+	clearthis.parsed.clear();
 
 	if (toclear == queues::post)
 	{
@@ -162,5 +162,5 @@ void clear(queues toclear, const std::string& account)
 std::vector<std::string> print(queues toprint, const std::string& account)
 {
 	const queue_list printthis = open_queue(toprint, account);
-	return std::vector<std::string> {printthis.queued.begin(), printthis.queued.end()};
+	return std::vector<std::string> {printthis.parsed.begin(), printthis.parsed.end()};
 }
