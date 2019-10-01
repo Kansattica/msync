@@ -69,12 +69,16 @@ int main(int argc, const char* argv[])
 			{
 			case queue_action::add:
 				enqueue(parsed.queue_opt.selected, assume_account(user).first, parsed.queue_opt.queued);
+				break;
 			case queue_action::remove:
 				dequeue(parsed.queue_opt.selected, assume_account(user).first, std::move(parsed.queue_opt.queued));
+				break;
 			case queue_action::clear:
 				clear(parsed.queue_opt.selected, assume_account(user).first);
+				break;
 			case queue_action::print:
 				print_iterable(print(parsed.queue_opt.selected, assume_account(user).first), plerr);
+				break;
 			}
         case mode::help:
             break;
