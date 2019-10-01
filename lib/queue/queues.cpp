@@ -28,18 +28,17 @@ void unique_file_name(fs::path& path)
 
 std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 {
-	print_logger pl;
 	fs::create_directories(queuedir);
 
 	if (!fs::exists(postfile))
 	{
-		pl << "Could not find " << postfile << ". Skipping.\n";
+		pl() << "Could not find " << postfile << ". Skipping.\n";
 		return "";
 	}
 
 	if (!fs::is_regular_file(postfile))
 	{
-		pl << postfile << " is not a file. Skipping.\n";
+		pl() << postfile << " is not a file. Skipping.\n";
 		return "";
 	}
 
@@ -47,9 +46,9 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 
 	if (fs::exists(copyto))
 	{
-		pl << copyto << " already exists. " << postfile << " will be saved as ";
+		pl() << copyto << " already exists. " << postfile << " will be saved as ";
 		unique_file_name(copyto);
-		pl << copyto << '\n';
+		pl() << copyto << '\n';
 	}
 
 	fs::copy(postfile, copyto);
@@ -100,10 +99,9 @@ void enqueue(const queues toenqueue, const std::string& account, const std::vect
 
 void dequeue_post(const fs::path &queuedir, const fs::path& filename)
 {
-	print_logger pl;
 	if (!fs::remove(queuedir / filename))
 	{
-		pl << "Could not delete " << filename << ", could not find it in " << queuedir << '\n';
+		pl() << "Could not delete " << filename << ", could not find it in " << queuedir << '\n';
 	}
 }
 
