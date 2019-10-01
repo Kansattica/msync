@@ -9,6 +9,7 @@
 #include "../lib/options/global_options.hpp"
 #include "../lib/options/option_enums.hpp"
 #include "../lib/options/user_options.hpp"
+#include "../lib/sync/send.hpp"
 #include "newaccount.hpp"
 #include "optionparsing/parseoptions.hpp"
 
@@ -81,6 +82,13 @@ int main(int argc, const char* argv[])
 			case queue_action::print:
 				print_iterable(print(parsed.queue_opt.selected, assume_account(user).first), plerr);
 			}
+		case mode::sync:
+			if (parsed.sync_opts.send)
+				if (user == nullptr)
+					send_all(parsed.sync_opts.retries);
+				else
+					send(user->first, *user->second.get_option(user_option::instance_url), *user->second.get_option(user_option::access_token), parsed.sync_opts.retries);
+				
         case mode::help:
             break;
         default:
