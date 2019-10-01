@@ -7,7 +7,7 @@
 #include "../filebacked/file_backed.hpp"
 
 void Read(std::deque<std::string>&, std::string&&);
-void Write(std::string&, std::ofstream&);
+void Write(std::deque<std::string>&&, std::ofstream&);
 
-using queue_list = file_backed<std::deque<std::string>, std::string, Read, Write>;
+using queue_list = file_backed<std::deque<std::string>, Read, Write>;
 #endif

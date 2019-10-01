@@ -6,7 +6,7 @@
 #include <filesystem.hpp>
 #include <print_logger.hpp>
 
-template <typename Container, typename T, void(*Read)(Container&, std::string&&), void(*Write)(T&, std::ofstream&)>
+template <typename Container, void(*Read)(Container&, std::string&&), void(*Write)(Container&&, std::ofstream&)>
 class file_backed
 {
 public:
@@ -48,10 +48,7 @@ public:
 		}
 
 		ofstream of(backing);
-		for (auto& elem : parsed)
-		{
-			Write(elem, of);
-		}
+		Write(std::move(parsed), of);
 
 		logger << "Saved " << backing << '\n';
 	}
