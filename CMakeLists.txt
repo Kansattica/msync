@@ -46,7 +46,7 @@ target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(options PRIVATE constants whereami printlog exception filebacked)
 target_link_libraries(options PUBLIC filesystem) 
 
-target_link_libraries(queue PRIVATE constants printlog options filebacked) 
+target_link_libraries(queue PRIVATE constants printlog options filebacked exception) 
 
 target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options queue)
 
