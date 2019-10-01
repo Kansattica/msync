@@ -4,7 +4,7 @@
 
 #include <string>
 #include <string_view>
-#include <array>
+#include <utility>
 #include <deque>
 
 #include "../options/global_options.hpp"
@@ -19,12 +19,12 @@ using std::string_view;
 
 const std::string statusroute = "/api/v1/statuses/";
 
-const std::array<string_view, 2> favroutepost = { "/favourite", "/unfavourite" };
-const std::array<string_view, 2> boostroutepost = { "/reblog", "/unreblog" };
+constexpr std::pair<string_view, string_view> favroutepost = { "/favourite", "/unfavourite" };
+constexpr std::pair<string_view, string_view> boostroutepost = { "/reblog", "/unreblog" };
 
 cpr::Response simple_post(const std::string& url, const std::string& access_token);
 
-template <const string_view& doroute, const string_view& undoroute, queues toread>
+template <queues toread>
 void process_queue(const std::string& account, const std::string& baseurl, const std::string& access_token, int retries);
 
 bool should_undo(string_view& id);
@@ -42,10 +42,10 @@ void send(const std::string& account, const std::string& instanceurl, const std:
 	std::string baseurl = make_api_url(instanceurl, statusroute);
 
 	pl << "Sending queued favorites for " << account << '\n';
-	process_queue<favroutepost[0], favroutepost[1], queues::fav>(account, baseurl, access_token, retries);
+	process_queue<queues::fav>(account, baseurl, access_token, retries);
 
 	pl << "Sending queued boosts for " << account << '\n';
-	process_queue<boostroutepost[0], boostroutepost[1], queues::boost>(account, baseurl, access_token, retries);
+	process_queue<queues::boost>(account, baseurl, access_token, retries);
 }
 
 void send_all(int retries)
@@ -88,20 +88,38 @@ bool post_with_retries(const std::string& requesturl, const std::string& access_
 	return false;
 }
 
-template <const string_view & doroute, const string_view & undoroute, queues toread>
+template <queues tosend, bool create>
+constexpr string_view route()
+{
+	std::pair<string_view, string_view> toreturn;
+	if constexpr (tosend == queues::fav)
+	{
+		toreturn = favroutepost;
+	}
+
+	if constexpr (tosend == queues::boost)
+	{
+		toreturn = boostroutepost;
+	}
+
+	return std::get<create ? 0 : 1>(toreturn);
+
+}
+
+template <queues toread>
 void process_queue(const std::string& account, const std::string& baseurl, const std::string& access_token, int retries)
 {
 	auto queuefile = get(toread, account);
 
 	std::deque<std::string> failedids;
 
-	while (!queuefile.queued.empty())
+	while (!queuefile.parsed.empty())
 	{
-		std::string_view id = queuefile.queued.front();
+		std::string_view id = queuefile.parsed.front();
 
 		bool undo = should_undo(id);
 
-		std::string requesturl = paramaterize_url(baseurl, id, undo ? undoroute : doroute);
+		std::string requesturl = paramaterize_url(baseurl, id, undo ? route<toread, false>() : route<toread, true>());
 
 		if (post_with_retries(requesturl, access_token, retries) == false)
 		{
@@ -109,10 +127,10 @@ void process_queue(const std::string& account, const std::string& baseurl, const
 		}
 
 		// remove ID from this queue
-		queuefile.queued.pop_front();
+		queuefile.parsed.pop_front();
 	}
 
-	queuefile.queued = failedids;
+	queuefile.parsed = failedids;
 }
 
 
