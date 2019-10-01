@@ -16,10 +16,10 @@ SCENARIO("option_files save their data when destroyed.", "[option_file]")
         test_file tf(testfilename);
 
         option_file opts(testfilename);
-        opts.parsed_options["atestoption"] = "coolstuff";
-        opts.parsed_options["test"] = "time";
+        opts.parsed["atestoption"] = "coolstuff";
+        opts.parsed["test"] = "time";
 
-        REQUIRE(opts.parsed_options.size() == 2);
+        REQUIRE(opts.parsed.size() == 2);
 
         WHEN("an option file is moved from")
         {
@@ -69,7 +69,7 @@ SCENARIO("option_files save their data when destroyed.", "[option_file]")
 
         WHEN("an option's value is set to an empty string and destroyed")
         {
-            opts.parsed_options["test"] = "";
+            opts.parsed["test"] = "";
 
             {
                 option_file newopts = std::move(opts);
@@ -110,10 +110,10 @@ SCENARIO("option_files read data when created.", "[option_file]")
 
             THEN("it has the parsed information from the file.")
             {
-                REQUIRE(testfi.parsed_options.size() == 3);
-                REQUIRE(testfi.parsed_options["somecool"] == "teststuff");
-                REQUIRE(testfi.parsed_options["different"] == "tests");
-                REQUIRE(testfi.parsed_options["imgetting"] == "testy");
+                REQUIRE(testfi.parsed.size() == 3);
+                REQUIRE(testfi.parsed["somecool"] == "teststuff");
+                REQUIRE(testfi.parsed["different"] == "tests");
+                REQUIRE(testfi.parsed["imgetting"] == "testy");
             }
         }
 
@@ -122,11 +122,11 @@ SCENARIO("option_files read data when created.", "[option_file]")
             {
                 option_file testfi(testfilename);
 
-                testfi.parsed_options["anotherentry"] = "foryou";
-                testfi.parsed_options["somecool"] = "isnowthis";
-                testfi.parsed_options.erase("imgetting");
+                testfi.parsed["anotherentry"] = "foryou";
+                testfi.parsed["somecool"] = "isnowthis";
+                testfi.parsed.erase("imgetting");
 
-                REQUIRE(testfi.parsed_options.size() == 3);
+                REQUIRE(testfi.parsed.size() == 3);
             }
 
             THEN("it saves the new information back to the file.")
