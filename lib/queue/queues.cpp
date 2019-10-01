@@ -6,6 +6,7 @@
 #include <print_logger.hpp>
 #include "../options/global_options.hpp"
 #include <algorithm>
+#include <msync_exception.hpp>
 
 
 fs::path get_file_queue_directory(const std::string& account, bool create)
@@ -70,6 +71,8 @@ queue_list open_queue(const queues to_open, const std::string& account)
 		case queues::post:
 			return Post_Queue_Filename;
 			break;
+		default:
+			throw msync_exception("whoops, this shouldn't happen.");
 		}
 	}();
 
