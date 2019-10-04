@@ -50,7 +50,7 @@ target_link_libraries(options PUBLIC filesystem)
 
 target_link_libraries(postfile PRIVATE filebacked printlog)
 
-target_link_libraries(queue PRIVATE constants printlog options filebacked exception) 
+target_link_libraries(queue PRIVATE constants printlog options filebacked exception postfile) 
 
 target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options queue)
 
