@@ -17,7 +17,8 @@ struct post_content
 	std::string reply_to_id;
 	std::string content_warning;
 	std::vector<std::string> attachments;
-	visibility vis;
+	visibility vis = visibility::pub;
+	bool seen_line = false;
 };
 
 void Read(post_content&, std::string&&);
