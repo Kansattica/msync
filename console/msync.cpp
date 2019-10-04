@@ -25,7 +25,6 @@ void print_iterable(const T& vec);
 int main(int argc, const char* argv[])
 {
     plfile() << "--- msync started ---\n";
-    plfile().flush();
 
     auto parsed = parse(argc, argv, false);
 
@@ -92,7 +91,7 @@ int main(int argc, const char* argv[])
 
     pl() << '\n';
 
-    pl() << "--- msync finished normally ---\n";
+    plfile() << "--- msync finished normally ---\n";
 }
 
 template <typename T>
