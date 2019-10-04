@@ -51,4 +51,8 @@ struct print_logger
 private:
     ofstream logfile;
 };
+
+print_logger<logtype::normal>& pl();
+print_logger<logtype::verbose>& plverb();
+print_logger<logtype::fileonly>& plfile();
 #endif

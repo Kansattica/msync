@@ -14,7 +14,6 @@ using namespace std::string_literals;
 
 std::pair<const std::string, user_options>& global_options::add_new_account(std::string name)
 {
-    print_logger<logtype::verbose> pl;
     fs::path user_path = executable_location;
     user_path /= Account_Directory;
     user_path /= name;
@@ -26,7 +25,7 @@ std::pair<const std::string, user_options>& global_options::add_new_account(std:
     const auto [it, inserted] = accounts.emplace(name, user_options{user_path});
 
     if (!inserted)
-        pl << "Account already exists. Nothing changed.\n";
+        plverb() << "Account already exists. Nothing changed.\n";
 
     return *it;
 }
@@ -45,11 +44,9 @@ fs::path global_options::get_exe_location()
 
 std::unordered_map<std::string, user_options> global_options::read_accounts()
 {
-    print_logger<logtype::verbose> pl;
-
     fs::path account_location = executable_location / Account_Directory;
 
-    pl << "Reading accounts from " << account_location << "\n";
+    plverb() << "Reading accounts from " << account_location << "\n";
 
     std::unordered_map<std::string, user_options> toreturn;
 
@@ -60,7 +57,7 @@ std::unordered_map<std::string, user_options> global_options::read_accounts()
     {
         if (!fs::is_directory(userfolder))
         {
-            pl << userfolder << " is not a directory. Skipping.\n";
+            plverb() << userfolder << " is not a directory. Skipping.\n";
             continue;
         }
 
@@ -82,8 +79,6 @@ std::unordered_map<std::string, user_options> global_options::read_accounts()
 
 std::pair<const std::string, user_options>* global_options::select_account(const std::string_view name)
 {
-    print_logger<logtype::verbose> pl;
-
     int matched = 0;
 	std::pair<const std::string, user_options>* candidate = nullptr;
 
@@ -101,7 +96,7 @@ std::pair<const std::string, user_options>* global_options::select_account(const
                 return std::tolower(a) == std::tolower(b); //case insensitive
             }))
         {
-            pl << "Matched account" << entry.first << "\n";
+            plverb() << "Matched account" << entry.first << "\n";
             matched++;
             candidate = &entry;
         }
