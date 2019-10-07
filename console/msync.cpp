@@ -14,20 +14,17 @@
 #include "optionparsing/parseoptions.hpp"
 
 std::pair<const std::string, user_options>& assume_account(std::pair<const std::string, user_options>* user);
-void print_stringptr(const std::string* toprint, print_logger<>& pl);
+void print_stringptr(const std::string* toprint);
 
 template <typename T>
 void uniqueify(T& toprint);
 
 template <typename T>
-void print_iterable(const T& vec, print_logger<>& pl);
+void print_iterable(const T& vec);
 
 int main(int argc, const char* argv[])
 {
-    print_logger<logtype::fileonly> pl;
-    print_logger<logtype::normal> plerr;
-    pl << "--- msync started ---\n";
-    pl.flush();
+    plfile() << "--- msync started ---\n";
 
     auto parsed = parse(argc, argv, false);
 
@@ -40,24 +37,24 @@ int main(int argc, const char* argv[])
             make_new_account(parsed.account);
             break;
         case mode::showopt:
-            print_stringptr(assume_account(user).second.get_option(parsed.toset), plerr);
+            print_stringptr(assume_account(user).second.get_option(parsed.toset));
             break;
         case mode::showallopt:
             for (user_option opt = user_option(0); opt <= user_option::pull_notifications; opt = user_option(static_cast<int>(opt) + 1))
             {
-                plerr << USER_OPTION_NAMES[static_cast<int>(opt)] << ": ";
+                pl() << USER_OPTION_NAMES[static_cast<int>(opt)] << ": ";
                 if (opt < user_option::pull_home)
-                    print_stringptr(assume_account(user).second.get_option(opt), plerr);
+                    print_stringptr(assume_account(user).second.get_option(opt));
                 else
-                    plerr << SYNC_SETTING_NAMES[static_cast<int>(assume_account(user).second.get_sync_option(opt))];
-                plerr << '\n';
+                    pl() << SYNC_SETTING_NAMES[static_cast<int>(assume_account(user).second.get_sync_option(opt))];
+                pl() << '\n';
             }
-            plerr << "Accounts registered: ";
+            pl() << "Accounts registered: ";
             for (auto it = options.accounts.begin(); it != options.accounts.end();)
             {
-                plerr << it->first;
+                pl() << it->first;
                 if (++it != options.accounts.end())
-                    plerr << ", ";
+                    pl() << ", ";
             }
             break;
         case mode::config:
@@ -77,24 +74,24 @@ int main(int argc, const char* argv[])
 				clear(parsed.queue_opt.selected, assume_account(user).first);
 				break;
 			case queue_action::print:
-				print_iterable(print(parsed.queue_opt.selected, assume_account(user).first), plerr);
+				print_iterable(print(parsed.queue_opt.selected, assume_account(user).first));
 				break;
 			}
         case mode::help:
             break;
         default:
-            plerr << "[option not implemented]";
+            pl() << "[option not implemented]";
         }
     }
     catch (const std::exception& e)
     {
-        plerr << "An error occurred: " << e.what();
-        plerr << "\nFor account: " << parsed.account;
+        pl() << "An error occurred: " << e.what();
+        pl() << "\nFor account: " << parsed.account;
     }
 
-    plerr << '\n';
+    pl() << '\n';
 
-    pl << "--- msync finished normally ---\n";
+    plfile() << "--- msync finished normally ---\n";
 }
 
 template <typename T>
@@ -111,19 +108,19 @@ std::pair<const std::string, user_options>& assume_account(std::pair<const std::
     return *user;
 }
 
-void print_stringptr(const std::string* toprint, print_logger<>& pl)
+void print_stringptr(const std::string* toprint)
 {
     if (toprint == nullptr)
-        pl << "[not set]";
+        pl() << "[not set]";
     else
-        pl << *toprint;
+        pl() << *toprint;
 }
 
 template <typename T>
-void print_iterable(const T& vec, print_logger<>& pl)
+void print_iterable(const T& vec)
 {
 	for (auto& item : vec)
 	{
-		pl << item << '\n';
+		pl() << item << '\n';
 	}
 }
