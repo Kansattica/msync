@@ -11,6 +11,11 @@ enum class visibility
 	pub, priv, unlisted, direct
 };
 
+enum class raw_text_mode
+{
+	unset, raw, cooked
+};
+
 struct post_content
 {
 	std::string text;
@@ -18,7 +23,7 @@ struct post_content
 	std::string content_warning;
 	std::vector<std::string> attachments;
 	visibility vis = visibility::pub;
-	bool seen_line = false;
+	raw_text_mode is_raw = raw_text_mode::unset;
 };
 
 void Read(post_content&, std::string&&);
