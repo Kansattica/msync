@@ -6,7 +6,7 @@
 #include <filesystem.hpp>
 #include <print_logger.hpp>
 
-template <typename Container, void(*Read)(Container&, std::string&&), void(*Write)(Container&&, std::ofstream&)>
+template <typename Container, void(*Read)(Container&, std::string&&), void(*Write)(Container&&, std::ofstream&), bool skip_blank = true, bool skip_comment = true>
 class file_backed
 {
 public:
@@ -20,11 +20,13 @@ public:
 
 			const auto first_non_whitespace = line.find_first_not_of(" \t\r\n");
 
-			if (first_non_whitespace == std::string::npos)
-				continue; // blank line?
+			if constexpr (skip_blank)
+				if (first_non_whitespace == std::string::npos)
+					continue; // blank line?
 
-			if (line[first_non_whitespace] == '#')
-				continue; //skip comments
+			if constexpr (skip_comment)
+				if (line[first_non_whitespace] == '#')
+					continue; //skip comments
 
 			Read(parsed, std::move(line));
 		}
