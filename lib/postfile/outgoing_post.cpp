@@ -14,13 +14,13 @@ constexpr std::array<std::array<std::string_view, 2>, 4> VISIBILITIES = { {
 	{"direct", "dm"}
 } };
 
-constexpr std::array<std::string_view, 4> OPTIONS = { 
+constexpr std::array<std::string_view, 4> OPTIONS = {
 	"visibility", "cw", "reply_to", "attach"
 };
 
 size_t is_option(const std::string& line, size_t equals_sign);
 bool is_snip(const std::string& line);
-void parse_option(post_content& post, size_t option_index,  std::string_view value);
+void parse_option(post_content& post, size_t option_index, std::string_view value);
 
 void Read(post_content& post, std::string&& line)
 {
@@ -150,11 +150,20 @@ visibility parse_visibility(std::string_view value)
 			{
 				return static_cast<visibility>(visibility_index);
 			}
-
 		}
 	}
 
-	//bad visibility setting?
+	pl() << "Bad visibility option: " << value << ". Defaulting to public. Valid options are:\n";
+	for (size_t i = 0; i < VISIBILITIES.size(); i++)
+	{
+		pl() << VISIBILITIES[i][0];
+		if (!VISIBILITIES[i][1].empty())
+		{
+			pl() << " or " << VISIBILITIES[i][1];
+		}
+		pl() << '\n';
+	}
+	return visibility::pub;
 }
 
 void store_string(std::string& store_in, std::string_view value)
@@ -185,15 +194,15 @@ void parse_option(post_content& post, size_t option_index, std::string_view valu
 	case 0:
 		post.vis = parse_visibility(value);
 		break;
-	// cw and reply_to just get stored
 	case 1:
+		// cw and reply_to just get stored
 		store_string(post.content_warning, value);
 		break;
 	case 2:
 		store_string(post.reply_to_id, value);
 		break;
-	// attachments are a comma-separated list
 	case 3:
+		// attachments are a comma-separated list
 		store_vector(post.attachments, value);
 		break;
 	}
