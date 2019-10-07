@@ -13,11 +13,10 @@ public:
     Container parsed;
 	file_backed(fs::path filename) : backing(filename)
 	{
-		print_logger<logtype::verbose> logger;
 		std::ifstream backingfile(backing);
 		for (std::string line; getline(backingfile, line);)
 		{
-			logger << "Parsing line: " << line << '\n';
+			plverb() << "Parsing line: " << line << '\n';
 
 			const auto first_non_whitespace = line.find_first_not_of(" \t\r\n");
 
@@ -36,21 +35,19 @@ public:
 		if (backing == "")
 			return; // we got moved from, so the new version will save it
 
-		print_logger<logtype::verbose> logger;
-
 		fs::path backup(backing);
 		backup += ".bak";
 
 		if (fs::exists(backing))
 		{
 			fs::rename(backing, backup);
-			logger << "Saved backup to " << backup << '\n';
+			plverb() << "Saved backup to " << backup << '\n';
 		}
 
 		ofstream of(backing);
 		Write(std::move(parsed), of);
 
-		logger << "Saved " << backing << '\n';
+		plverb() << "Saved " << backing << '\n';
 	}
 
 	// can be moved
