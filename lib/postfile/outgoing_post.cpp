@@ -54,7 +54,7 @@ void Read(post_content& post, std::string&& line)
 	// if it's an option, parse it
 	if (option_index != -1)
 	{
-		post.is_raw == raw_text_mode::cooked;
+		post.is_raw = raw_text_mode::cooked;
 		std::string_view option_val{ line };
 		option_val.remove_prefix(equals);
 		parse_option(post, option_index, option_val);
@@ -64,12 +64,12 @@ void Read(post_content& post, std::string&& line)
 	// if it's a snip, everything else is raw
 	if (is_snip(line))
 	{
-		post.is_raw == raw_text_mode::raw;
+		post.is_raw = raw_text_mode::raw;
 		return;
 	}
 
 	// if it's anything else, must be raw, including this line
-	post.is_raw == raw_text_mode::raw;
+	post.is_raw = raw_text_mode::raw;
 	Read(post, std::move(line));
 	return;
 }
