@@ -32,8 +32,9 @@ void Read(post_content& post, std::string&& line)
 	if (post.is_raw == raw_text_mode::raw)
 	{
 		post.text.reserve(post.text.length() + line.length() + 1);
+		if (!post.text.empty())
+			post.text.append(1, '\n');
 		post.text.append(line);
-		post.text.append(1, '\n');
 		return;
 	}
 
@@ -56,7 +57,7 @@ void Read(post_content& post, std::string&& line)
 	{
 		post.is_raw = raw_text_mode::cooked;
 		std::string_view option_val{ line };
-		option_val.remove_prefix(equals);
+		option_val.remove_prefix(equals + 1);
 		parse_option(post, option_index, option_val);
 		return;
 	}
@@ -107,7 +108,13 @@ size_t is_option(const std::string& line, size_t equals_sign)
 {
 	for (int i = 0; i < OPTIONS.size(); i++)
 	{
-		if (std::equal(line.begin(), line.end(), OPTIONS[i].begin(), OPTIONS[i].begin() + equals_sign))
+		if (OPTIONS[i].size() != equals_sign)
+		{
+			// if the option is the wrong length, can't be it
+			continue;
+		}
+
+		if (std::equal(line.begin(), line.begin() + equals_sign, OPTIONS[i].begin(), OPTIONS[i].end()))
 		{
 			return i;
 		}
