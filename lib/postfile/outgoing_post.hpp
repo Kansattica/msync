@@ -29,5 +29,5 @@ struct post_content
 void Read(post_content&, std::string&&);
 void Write(post_content&&, std::ofstream&);
 
-using outgoing_post = file_backed<post_content, Read, Write>;
+using outgoing_post = file_backed<post_content, Read, Write, false, false>;
 #endif
