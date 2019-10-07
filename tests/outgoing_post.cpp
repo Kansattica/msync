@@ -113,7 +113,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.")
 
 		auto testtext = GENERATE(as<std::string>{},
 			"Rad post for you, baby.",
-			"This\none's\tgot newlines",
+			"This\n\none's\tgot newlines",
 			"phony=option",
 			"#lookslikeacomment",
 			" ---" );
