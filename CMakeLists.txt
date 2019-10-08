@@ -52,9 +52,9 @@ target_link_libraries(postfile PRIVATE filebacked printlog util)
 
 target_link_libraries(queue PRIVATE constants printlog options filebacked exception postfile) 
 
-target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options queue)
+target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options queue postfile)
 
-target_link_libraries(msync PRIVATE options optionparsing printlog ${CPR_LIBRARIES} util nlohmann_json::nlohmann_json exception)
+target_link_libraries(msync PRIVATE options optionparsing printlog ${CPR_LIBRARIES} util nlohmann_json::nlohmann_json exception postfile)
 
 if (MSYNC_BUILD_TESTS)
 	add_subdirectory(tests)
