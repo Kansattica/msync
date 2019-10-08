@@ -58,7 +58,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
     auto syncMode = (command("sync").set(ret.selected, mode::sync).doc("Synchronize your account[s] with their server[s]. Synchronizes all accounts unless one is specified with -a.") &
                      (option("-r", "--retries") & value("retries", ret.sync_opts.retries)) % "Retry failed requests n times. (default: 3)");
 
-    auto genMode = (command("gen").set(ret.selected, mode::gen).doc("Generate a post template in the current folder. Edit this file afterwards to add a body.") &
+	auto genMode = (command("gen", "generate").set(ret.selected, mode::gen).doc("Generate a post template in the current folder. Edit this file afterwards to add a body.") &
 					 (
 						(option("-f", "--file", "--attach") & values(match::prefix_not("-"), "path", ret.gen_opt.post.attachments)).doc("Attach these files to the post."),
 						(option("-o", "--output") & value("filename", ret.gen_opt.filename)).doc("Specify an output file. Default is post.msync."),

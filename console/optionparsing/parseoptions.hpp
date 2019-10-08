@@ -18,7 +18,7 @@ enum class mode
 
 struct parse_result
 {
-    bool okay;
+    bool okay = false;
     mode selected = mode::help;
     user_option toset;
     // maybe later, do a union or variant for the mutually exclusive ones

@@ -765,7 +765,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 {
 	GIVEN("A combination of options for the file generator")
 	{
-		auto combination = GENERATE(range(0, (1 << 3) - 1));
+		auto combination = GENERATE(range(0, (1 << 4) - 1));
 		auto attach = GENERATE(0, 1, 2, 3, 4);
 
 		gen_options expected;
@@ -829,7 +829,11 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		{
 			do
 			{
-				argv = { "msync", "gen" };
+				if (flag_set(combination, 3))
+					argv = { "msync", "gen" };
+				else
+					argv = { "msync", "generate" };
+
 				for (auto& option : options)
 				{
 					argv.insert(argv.end(), option.options.begin(), option.options.end());
