@@ -8,8 +8,9 @@ void Read(std::map<std::string, std::string>& parsed, std::string&& line)
 	const auto [it, success] = parsed.insert({ line.substr(0, equals), line.substr(equals + 1) });
 }
 
-void Write(std::pair<const std::string, std::string>& kvp, std::ofstream& of)
+void Write(std::map<std::string, std::string>&& map, std::ofstream& of)
 {
-	if (!kvp.second.empty()) //don't serialize
-		of << kvp.first << '=' << kvp.second << '\n';
+	for (auto& kvp : map)
+		if (!kvp.second.empty()) //don't serialize
+			of << kvp.first << '=' << kvp.second << '\n';
 }
