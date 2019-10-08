@@ -84,6 +84,7 @@ int main(int argc, const char* argv[])
 			outgoing_post post(parsed.gen_opt.filename);
 			post.parsed = parsed.gen_opt.post;
 		}
+		pl() << "Wrote post template to " << parsed.gen_opt.filename;
 		break;
 		case mode::help:
 			break;
