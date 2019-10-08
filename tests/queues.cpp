@@ -9,6 +9,7 @@
 #include "../lib/constants/constants.hpp"
 #include "../lib/options/global_options.hpp"
 #include "../lib/printlog/print_logger.hpp"
+#include "../postfile/outgoing_post.hpp"
 
 SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 {
@@ -85,7 +86,10 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 
 void files_match(const std::string& account, const fs::path& original, const std::string& outfile)
 {
-	REQUIRE(read_lines(original) == read_lines(options.executable_location / account / File_Queue_Directory / outfile));
+	outgoing_post orig{ original };
+	outgoing_post newfile{ options.executable_location / account / File_Queue_Directory / outfile };
+
+	REQUIRE(orig.parsed.text == newfile.parsed.text);
 }
 
 SCENARIO("Queues correctly enqueue and dequeue posts.")
@@ -198,13 +202,11 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 			THEN("the file contents are correct.")
 			{
-				auto unsuflines = read_lines(unsuffixedname);
-				REQUIRE(unsuflines.size() == 1);
-				REQUIRE(unsuflines[0] == "I'm number 1");
+				auto unsuflines = outgoing_post(unsuffixedname);
+				REQUIRE(unsuflines.parsed.text == "I'm number 1");
 
-				auto suflines = read_lines(suffixedname);
-				REQUIRE(suflines.size() == 1);
-				REQUIRE(suflines[0] == "I'm number 2");
+				auto suflines = outgoing_post(suffixedname);
+				REQUIRE(suflines.parsed.text == "I'm number 2");
 			}
 
 			THEN("the queue file is correct.")

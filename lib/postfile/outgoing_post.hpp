@@ -1,5 +1,5 @@
-#ifndef _QUEUE_LIST_HPP_
-#define _QUEUE_LIST_HPP_
+#ifndef _OUTGOING_POST_HPP_
+#define _OUTGOING_POST_HPP_
 
 #include <vector>
 #include <string>

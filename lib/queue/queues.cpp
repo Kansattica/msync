@@ -5,6 +5,7 @@
 #include <filesystem.hpp>
 #include <print_logger.hpp>
 #include "../options/global_options.hpp"
+#include "../postfile/outgoing_post.hpp"
 #include <algorithm>
 #include <msync_exception.hpp>
 
@@ -24,6 +25,15 @@ void unique_file_name(fs::path& path)
 	{
 		path.replace_extension(std::to_string(extensionint++));
 	} while (fs::exists(path));
+}
+
+void queue_attachments(const fs::path& postfile)
+{
+	outgoing_post post{ postfile };
+	for (auto& attach : post.parsed.attachments)
+	{
+		attach = fs::canonical(attach).string();
+	}
 }
 
 std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
@@ -52,6 +62,9 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 	}
 
 	fs::copy(postfile, copyto);
+
+	queue_attachments(copyto);
+
 	return copyto.filename().string();
 }
 
@@ -162,6 +175,7 @@ void clear(queues toclear, const std::string& account)
 
 std::vector<std::string> print(queues toprint, const std::string& account)
 {
+	//prettyprint posts
 	const queue_list printthis = open_queue(toprint, account);
 	return std::vector<std::string> {printthis.parsed.begin(), printthis.parsed.end()};
 }
