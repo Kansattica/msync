@@ -549,8 +549,9 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 {
     GIVEN("A command line that just says 'queue'")
     {
+		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
         int argc = 2;
-        char const* argv[]{"msync", "queue"};
+		char const* argv[]{ "msync", qcommand };
 
         WHEN("the command line is parsed")
         {
@@ -565,8 +566,9 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
     GIVEN("A command line that adds a bunch of things to the fav queue.")
     {
+		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
         int argc = 6;
-        char const* argv[]{"msync", "queue", "fav", "12345", "6789", "123FQ43"};
+		char const* argv[]{ "msync", qcommand, "fav", "12345", "6789", "123FQ43" };
 
         WHEN("the command line is parsed")
         {
@@ -596,8 +598,9 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
     GIVEN("A command line that removes a bunch of things from the boost queue.")
     {
+		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
         int argc = 7;
-        char const* argv[]{"msync", "queue", "-r", "boost", "12345", "6789", "bwingus"};
+		char const* argv[]{ "msync", qcommand, "-r", "boost", "12345", "6789", "bwingus" };
 
         WHEN("the command line is parsed")
         {
@@ -627,8 +630,9 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
     GIVEN("A command line that clears the post queue.")
     {
+		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
         int argc = 4;
-        char const* argv[]{"msync", "queue", "-c", "post"};
+		char const* argv[]{ "msync", qcommand, "-c", "post" };
 
         WHEN("the command line is parsed")
         {
@@ -653,8 +657,9 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
     GIVEN("A command line that prints the post queue.")
     {
+		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
         int argc = 4;
-        char const* argv[]{"msync", "queue", "-p", "post"};
+		char const* argv[]{ "msync", qcommand, "-p", "post" };
 
         WHEN("the command line is parsed")
         {
@@ -679,8 +684,9 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
     GIVEN("A command line that prints the post queue with long options.")
     {
+		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
         int argc = 4;
-        char const* argv[]{"msync", "queue", "--print", "post"};
+		char const* argv[]{ "msync", qcommand, "--print", "post" };
 
         WHEN("the command line is parsed")
         {
