@@ -25,6 +25,7 @@ struct parse_result
     list_operations listops;
     sync_options sync_opts;
     queue_options queue_opt;
+	gen_options gen_opt;
     std::string optionval;
     std::string account;
 };
