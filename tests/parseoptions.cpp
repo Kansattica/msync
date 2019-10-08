@@ -720,79 +720,67 @@ struct command_line_option
 	}
 };
 
-command_line_option pick_attachment(int combination, gen_options& expected)
+command_line_option pick_attachment(int number, gen_options& expected)
 {
 	command_line_option opt;
-	if (flag_set(combination, 0))
+
+	switch (number)
 	{
+	case 0:
 		opt.order = 0;
 		opt.options.push_back("-f");
 		opt.options.push_back("someattach");
 		expected.post.attachments.push_back("someattach");
-	}
-
-	if (flag_set(combination, 1))
-	{
-		opt.options.clear();
-		expected.post.attachments.clear();
+		break;
+	case 1:
 		opt.order = 1;
 		opt.options.push_back("-f");
 		opt.options.push_back("someotherattach");
 		opt.options.push_back("thirdattach");
 		expected.post.attachments.push_back("someotherattach");
 		expected.post.attachments.push_back("thirdattach");
-	}
-
-	if (flag_set(combination, 2))
-	{
-		opt.options.clear();
-		expected.post.attachments.clear();
+		break;
+	case 2:
 		opt.order = 2;
 		opt.options.push_back("--attach");
 		opt.options.push_back("attacher");
 		opt.options.push_back("somefile");
 		expected.post.attachments.push_back("attacher");
 		expected.post.attachments.push_back("somefile");
-	}
-
-	if (flag_set(combination, 3))
-	{
-		opt.options.clear();
-		expected.post.attachments.clear();
+		break;
+	case 3:
 		opt.order = 3;
 		opt.options.push_back("--file");
 		opt.options.push_back("filey");
 		expected.post.attachments.push_back("filey");
+		break;
+	case 4:
+		break;
 	}
-
-	if (flag_set(combination, 7))
-	{
-		opt.order = -1;
-		expected.post.attachments.clear();
-	}
-
 	return opt;
 }
+
 
 SCENARIO("The command line parser recognizes when the user wants to generate a file.")
 {
 	GIVEN("A combination of options for the file generator")
 	{
-		auto combination = GENERATE(range(0, (1 << 8) - 1));
+		auto combination = GENERATE(range(0, (1 << 3) - 1));
+		auto attach = GENERATE(0, 1, 2, 3, 4);
 
 		gen_options expected;
 		std::vector<command_line_option> options;
 
 		// pick one of the attachment guys
 		{
-			auto attachopt = pick_attachment(combination, expected);
+			auto attachopt = pick_attachment(attach, expected);
 			if (attachopt.order != -1)
 			{
 				options.push_back(std::move(attachopt));
 			}
 		}
 
-		if (flag_set(combination, 4))
+		if (flag_set(combination, 0))
 		{
 			command_line_option opt;
 			opt.order = 4;
@@ -806,7 +794,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 			options.push_back(std::move(opt));
 		}
 
-		if (flag_set(combination, 5))
+		if (flag_set(combination, 1))
 		{
 			command_line_option opt;
 			opt.order = 5;
@@ -820,7 +808,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 			options.push_back(std::move(opt));
 		}
 
-		if (flag_set(combination, 6))
+		if (flag_set(combination, 2))
 		{
 			command_line_option opt;
 			opt.order = 6;
