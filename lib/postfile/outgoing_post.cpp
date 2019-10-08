@@ -106,7 +106,7 @@ void Write(post_content&& post, std::ofstream& of)
 
 size_t is_option(const std::string& line, size_t equals_sign)
 {
-	for (int i = 0; i < OPTIONS.size(); i++)
+	for (size_t i = 0; i < OPTIONS.size(); i++)
 	{
 		if (OPTIONS[i].size() != equals_sign)
 		{
@@ -130,7 +130,7 @@ bool is_snip(const std::string& line)
 		return false;
 	}
 
-	for (int i = 0; i < 3; i++)
+	for (size_t i = 0; i < 3; i++)
 	{
 		if (line[i] != '-')
 		{
@@ -151,7 +151,7 @@ visibility parse_visibility(std::string_view value)
 
 	for (size_t visibility_index = 0; visibility_index < VISIBILITIES.size(); visibility_index++)
 	{
-		for (int i = 0; i < VISIBILITIES[visibility_index].size(); i++)
+		for (size_t i = 0; i < VISIBILITIES[visibility_index].size(); i++)
 		{
 			if (VISIBILITIES[visibility_index][i] == value)
 			{
