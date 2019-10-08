@@ -851,23 +851,11 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 
 				auto parsed = parse(argv.size(), argv.data());
 
-				THEN("the parse is good")
+				THEN("the options are parsed as expected")
 				{
 					REQUIRE(parsed.okay);
-				}
-
-				THEN("the correct mode is set")
-				{
 					REQUIRE(parsed.selected == mode::gen);
-				}
-
-				THEN("the account is not set")
-				{
 					REQUIRE(parsed.account.empty());
-				}
-
-				THEN("the options are set as expected")
-				{
 					REQUIRE(expected.filename == parsed.gen_opt.filename);
 					REQUIRE(expected.post.attachments == parsed.gen_opt.post.attachments);
 					REQUIRE(std::is_permutation(expected.post.attachments.begin(), expected.post.attachments.end(),
