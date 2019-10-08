@@ -771,7 +771,9 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 {
 	GIVEN("A combination of options for the file generator")
 	{
-		auto combination = GENERATE(range(0, (1 << 4) - 1));
+		// try every combination of bits. note that the ranges are half-open, including the 0 and excluding the maximum.
+		auto combination = GENERATE(range(0, 0b111 + 1)); 
+		auto longopt = GENERATE(range(0, 0b1111 + 1));
 		auto attach = GENERATE(0, 1, 2, 3, 4);
 
 		gen_options expected;
@@ -790,7 +792,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		{
 			command_line_option opt;
 			opt.order = 4;
-			if (combination % 2 == 0)
+			if (flag_set(longopt, 0))
 				opt.options.push_back("-o");
 			else
 				opt.options.push_back("--output");
@@ -804,7 +806,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		{
 			command_line_option opt;
 			opt.order = 5;
-			if (combination % 2 == 0)
+			if (flag_set(longopt, 1))
 				opt.options.push_back("-r");
 			else
 				opt.options.push_back("--reply-to");
@@ -818,7 +820,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		{
 			command_line_option opt;
 			opt.order = 6;
-			if (combination % 2 == 0)
+			if (flag_set(longopt, 2))
 				opt.options.push_back("-c");
 			else
 				opt.options.push_back("--content-warning");
@@ -835,10 +837,12 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		{
 			do
 			{
-				if (flag_set(combination, 3))
-					argv = { "msync", "gen" };
+				argv.clear();
+				argv.push_back("msync");
+				if (flag_set(longopt, 3))
+					argv.push_back("gen");
 				else
-					argv = { "msync", "generate" };
+					argv.push_back("generate");
 
 				for (auto& option : options)
 				{
