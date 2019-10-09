@@ -11,7 +11,7 @@
 #include <msync_exception.hpp>
 
 
-fs::path get_file_queue_directory(const std::string& account, bool create)
+fs::path get_file_queue_directory(const std::string_view account, bool create)
 {
 	if (!create)
 		return "";
@@ -86,7 +86,7 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 	return copyto.filename().string();
 }
 
-queue_list open_queue(const queues to_open, const std::string& account)
+queue_list open_queue(const queues to_open, const std::string_view account)
 {
 	fs::path qfile = options.executable_location / account;
 	const std::string& to_append = [to_open]() {
@@ -109,7 +109,7 @@ queue_list open_queue(const queues to_open, const std::string& account)
 	return queue_list{ qfile / to_append };
 }
 
-void enqueue(const queues toenqueue, const std::string& account, const std::vector<std::string>& add)
+void enqueue(const queues toenqueue, const std::string_view account, const std::vector<std::string>& add)
 {
 	queue_list toaddto = open_queue(toenqueue, account);
 
@@ -141,7 +141,7 @@ void just_filename(std::string& path)
 	path = fs::path(path).filename().string();
 }
 
-void dequeue(queues todequeue, const std::string& account, std::vector<std::string>&& toremove)
+void dequeue(queues todequeue, const std::string_view account, std::vector<std::string>&& toremove)
 {
 	queue_list toremovefrom = open_queue(todequeue, account);
 
@@ -179,7 +179,7 @@ void dequeue(queues todequeue, const std::string& account, std::vector<std::stri
 	}
 }
 
-void clear(queues toclear, const std::string& account)
+void clear(queues toclear, const std::string_view account)
 {
 	queue_list clearthis = open_queue(toclear, account);
 
@@ -191,7 +191,7 @@ void clear(queues toclear, const std::string& account)
 	}
 }
 
-std::vector<std::string> print(queues toprint, const std::string& account)
+std::vector<std::string> print(queues toprint, const std::string_view account)
 {
 	//prettyprint posts
 	const queue_list printthis = open_queue(toprint, account);

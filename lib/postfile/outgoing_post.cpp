@@ -18,9 +18,9 @@ constexpr std::array<std::string_view, 4> OPTIONS = {
 	"visibility", "cw", "reply_to", "attach"
 };
 
-size_t is_option(const std::string& line, size_t equals_sign);
-bool is_snip(const std::string& line);
-void parse_option(post_content& post, size_t option_index, std::string_view value);
+size_t is_option(const std::string_view line, size_t equals_sign);
+bool is_snip(const std::string_view line);
+void parse_option(post_content& post, size_t option_index, const std::string_view value);
 
 void Read(post_content& post, std::string&& line)
 {
@@ -104,7 +104,7 @@ void Write(post_content&& post, std::ofstream& of)
 	of << post.text;
 }
 
-size_t is_option(const std::string& line, size_t equals_sign)
+size_t is_option(const std::string_view line, size_t equals_sign)
 {
 	for (size_t i = 0; i < OPTIONS.size(); i++)
 	{
@@ -123,7 +123,7 @@ size_t is_option(const std::string& line, size_t equals_sign)
 	return -1;
 }
 
-bool is_snip(const std::string& line)
+bool is_snip(const std::string_view line)
 {
 	if (line.size() < 3)
 	{
@@ -141,7 +141,7 @@ bool is_snip(const std::string& line)
 	return true;
 }
 
-visibility parse_visibility(std::string_view value)
+visibility parse_visibility(const std::string_view value)
 {
 	static_assert(VISIBILITIES.size() == 4);
 	static_assert(VISIBILITIES[static_cast<int>(visibility::pub)][0] == "public");
@@ -173,12 +173,12 @@ visibility parse_visibility(std::string_view value)
 	return visibility::pub;
 }
 
-void store_string(std::string& store_in, std::string_view value)
+void store_string(std::string& store_in, const std::string_view value)
 {
 	store_in = std::string{ value };
 }
 
-void store_vector(std::vector<std::string>& store_in, std::string_view value)
+void store_vector(std::vector<std::string>& store_in, const std::string_view value)
 {
 	auto split = split_string(value, ',');
 	store_in.reserve(split.size());
@@ -188,7 +188,7 @@ void store_vector(std::vector<std::string>& store_in, std::string_view value)
 	}
 }
 
-void parse_option(post_content& post, size_t option_index, std::string_view value)
+void parse_option(post_content& post, size_t option_index, const std::string_view value)
 {
 	static_assert(OPTIONS.size() == 4);
 	static_assert(OPTIONS[0] == "visibility");
