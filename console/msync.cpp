@@ -41,7 +41,7 @@ int main(int argc, const char* argv[])
 			print_stringptr(assume_account(user).second.get_option(parsed.toset));
 			break;
 		case mode::showallopt:
-			for (user_option opt = user_option(0); opt <= user_option::pull_notifications; opt = user_option(static_cast<int>(opt) + 1))
+			for (auto opt = user_option(0); opt <= user_option::pull_notifications; opt = user_option(static_cast<int>(opt) + 1))
 			{
 				pl() << USER_OPTION_NAMES[static_cast<int>(opt)] << ": ";
 				if (opt < user_option::pull_home)

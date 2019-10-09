@@ -734,31 +734,31 @@ command_line_option pick_attachment(int number, gen_options& expected)
 	{
 	case 0:
 		opt.order = 0;
-		opt.options.push_back("-f");
-		opt.options.push_back("someattach");
-		expected.post.attachments.push_back("someattach");
+		opt.options.emplace_back("-f");
+		opt.options.emplace_back("someattach");
+		expected.post.attachments.emplace_back("someattach");
 		break;
 	case 1:
 		opt.order = 1;
-		opt.options.push_back("-f");
-		opt.options.push_back("someotherattach");
-		opt.options.push_back("thirdattach");
-		expected.post.attachments.push_back("someotherattach");
-		expected.post.attachments.push_back("thirdattach");
+		opt.options.emplace_back("-f");
+		opt.options.emplace_back("someotherattach");
+		opt.options.emplace_back("thirdattach");
+		expected.post.attachments.emplace_back("someotherattach");
+		expected.post.attachments.emplace_back("thirdattach");
 		break;
 	case 2:
 		opt.order = 2;
-		opt.options.push_back("--attach");
-		opt.options.push_back("attacher");
-		opt.options.push_back("somefile");
-		expected.post.attachments.push_back("attacher");
-		expected.post.attachments.push_back("somefile");
+		opt.options.emplace_back("--attach");
+		opt.options.emplace_back("attacher");
+		opt.options.emplace_back("somefile");
+		expected.post.attachments.emplace_back("attacher");
+		expected.post.attachments.emplace_back("somefile");
 		break;
 	case 3:
 		opt.order = 3;
-		opt.options.push_back("--file");
-		opt.options.push_back("filey");
-		expected.post.attachments.push_back("filey");
+		opt.options.emplace_back("--file");
+		opt.options.emplace_back("filey");
+		expected.post.attachments.emplace_back("filey");
 		break;
 	case 4:
 		break;

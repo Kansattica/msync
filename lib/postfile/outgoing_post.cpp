@@ -161,12 +161,12 @@ visibility parse_visibility(const std::string_view value)
 	}
 
 	pl() << "Bad visibility option: " << value << ". Defaulting to public. Valid options are:\n";
-	for (size_t i = 0; i < VISIBILITIES.size(); i++)
+	for (const auto& vis : VISIBILITIES)
 	{
-		pl() << VISIBILITIES[i][0];
-		if (!VISIBILITIES[i][1].empty())
+		pl() << vis[0];
+		if (!vis[1].empty())
 		{
-			pl() << " or " << VISIBILITIES[i][1];
+			pl() << " or " << vis[1];
 		}
 		pl() << '\n';
 	}
