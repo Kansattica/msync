@@ -2,6 +2,7 @@
 
 #include "test_helpers.hpp"
 #include <filesystem.hpp>
+#include <fstream>
 #include <vector>
 #include <string>
 
@@ -172,6 +173,45 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 				}
 			}
 		}
+	}
+
+	GIVEN("A post with attachments to enqueue")
+	{
+		const test_file files[]{ "somepost", "attachment.mp3", "filey.png" };
+
+		// make these files exist
+		for (int i = 1; i < 3; i++)
+		{
+			std::ofstream of{ files[i] };
+			of << "I'm file number " << i;
+		}
+
+		std::string expected_text = GENERATE(as<std::string>{}, "", "Hey, check this out");
+
+		{
+			outgoing_post op{ files[0].filename };
+			op.parsed.text = expected_text;
+			op.parsed.attachments = {"attachment.mp3", "filey.png" };
+		}
+
+		WHEN("the post is enqueued")
+		{
+			enqueue(queues::post, account, { "somepost" });
+
+			THEN("the text is as expected")
+			{
+				files_match(account, files[0].filename, "somepost");
+			}
+
+			THEN("the attachments are absolute paths")
+			{
+				outgoing_post post{ accountdir.filename / File_Queue_Directory / "somepost" };
+				REQUIRE(post.parsed.attachments.size() == 2);
+				REQUIRE(fs::path{ post.parsed.attachments[0] }.is_absolute());
+				REQUIRE(fs::path{ post.parsed.attachments[1] }.is_absolute());
+			}
+		}
+
 	}
 
 	GIVEN("Two different posts with the same name to enqueue")

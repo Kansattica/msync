@@ -3,6 +3,7 @@
 #include "queue_list.hpp"
 #include <constants.hpp>
 #include <filesystem.hpp>
+#include <system_error>
 #include <print_logger.hpp>
 #include "../options/global_options.hpp"
 #include "../postfile/outgoing_post.hpp"
@@ -30,9 +31,26 @@ void unique_file_name(fs::path& path)
 void queue_attachments(const fs::path& postfile)
 {
 	outgoing_post post{ postfile };
+	std::error_code err;
 	for (auto& attach : post.parsed.attachments)
 	{
-		attach = fs::canonical(attach).string();
+		auto attachpath = fs::canonical(attach, err);
+
+		if (err)
+		{
+			pl() << "Error finding file: " << attach << "\nError:\n" << err << "\nSkipping.";
+			continue;
+		}
+
+		if (!fs::is_regular_file(attachpath))
+		{
+			pl() << attachpath << " is not a regular file. Skipping.";
+			continue;
+		}
+
+		attach = attachpath.string();
+
+		err.clear();
 	}
 }
 
