@@ -1,11 +1,10 @@
 #ifndef _PRINTLOG_HPP_
 #define _PRINTLOG_HPP_
 
-#include <fstream>
 #include <iostream>
+#include <fstream>
 
 using std::cout;
-using std::ofstream;
 
 enum class logtype
 {
@@ -49,7 +48,7 @@ struct print_logger
     }
 
 private:
-    ofstream logfile;
+    std::ofstream logfile;
 };
 
 print_logger<logtype::normal>& pl();

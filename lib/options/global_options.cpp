@@ -5,6 +5,8 @@
 #include <msync_exception.hpp>
 #include <print_logger.hpp>
 #include <whereami.h>
+#include <algorithm>
+#include <memory>
 
 #include <cctype>
 

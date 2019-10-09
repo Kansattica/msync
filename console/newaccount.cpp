@@ -1,10 +1,18 @@
 #include "newaccount.hpp"
+
 #include "../lib/options/global_options.hpp"
 #include "../lib/util/util.hpp"
+#include "../lib/options/option_enums.hpp"    // for user_option, user_optio...
+#include "../lib/options/option_file.hpp"     // for string
+#include "../lib/options/user_options.hpp"    // for user_options
+
 #include <cpr/cpr.h>
 #include <nlohmann/json.hpp>
 #include <print_logger.hpp>
+
 #include <string>
+#include <optional>                           // for optional
+#include <utility>                            // for pair
 
 using json = nlohmann::json;
 

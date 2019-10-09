@@ -1,5 +1,7 @@
 #include "option_file.hpp"
 
+#include <utility>
+
 using std::getline;
 
 void Read(std::map<std::string, std::string>& parsed, std::string&& line)

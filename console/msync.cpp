@@ -11,6 +11,7 @@
 #include "../lib/options/option_enums.hpp"
 #include "../lib/options/user_options.hpp"
 #include "../lib/postfile/outgoing_post.hpp"
+#include "../lib/queue/queues.hpp"
 #include "newaccount.hpp"
 #include "optionparsing/parseoptions.hpp"
 

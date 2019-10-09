@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cassert>
+#include <utility>
 
 const std::string* user_options::get_option(user_option toget) const
 {

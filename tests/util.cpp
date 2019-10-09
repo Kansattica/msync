@@ -2,6 +2,7 @@
 #include <catch2/catch.hpp>
 
 #include <string>
+#include <tuple>
 
 using namespace std::string_literals;
 
