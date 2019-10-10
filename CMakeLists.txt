@@ -22,7 +22,6 @@ add_library(postfile STATIC "")
 add_library(filebacked INTERFACE)
 add_library(constants INTERFACE)
 add_library(exception INTERFACE)
-add_library(filesystem INTERFACE)
 add_executable(msync "")
 
 # see https://crascit.com/2016/01/31/enhanced-source-file-handling-with-target_sources/
