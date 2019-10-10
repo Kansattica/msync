@@ -99,6 +99,7 @@ int main(int argc, const char* argv[])
 					send_all(parsed.sync_opts.retries);
 				else
 					send(user->first, *user->second.get_option(user_option::instance_url), *user->second.get_option(user_option::access_token), parsed.sync_opts.retries);
+			break;
 		case mode::help:
 			break;
 		default:
