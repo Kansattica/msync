@@ -20,7 +20,7 @@ void enqueue(queues toenqueue, const std::string_view account, const std::vector
 void dequeue(queues todequeue, const std::string_view account, std::vector<std::string>&& remove);
 void clear(queues toclear, const std::string_view account);
 
-queue_list get(queues toget, const std::string& account);
+queue_list get(queues toget, const std::string_view account);
 
 std::vector<std::string> print(queues toprint, const std::string_view account);
 

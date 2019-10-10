@@ -17,7 +17,7 @@
 
 using std::string_view;
 
-constexpr char* statusroute = "/api/v1/statuses/";
+constexpr string_view statusroute = "/api/v1/statuses/";
 
 constexpr std::pair<string_view, string_view> favroutepost = { "/favourite", "/unfavourite" };
 constexpr std::pair<string_view, string_view> boostroutepost = { "/reblog", "/unreblog" };
@@ -136,7 +136,9 @@ void process_queue(const string_view account, const string_view baseurl, const s
 
 cpr::Response simple_post(const string_view url, const string_view access_token)
 {
-	auto response = cpr::Post(cpr::Url{ url }, cpr::Authentication{ "Bearer", access_token }, cpr::Header{ {"Idempotency-Key", url} });
+	static const std::string key_header{ "Idempotency-Key" };
+
+	auto response = cpr::Post(cpr::Url{ url }, cpr::Authentication{ "Bearer", access_token }, cpr::Header{ {key_header, std::string{url} } });
 
 	print_logger pl;
 

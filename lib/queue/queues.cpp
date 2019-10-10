@@ -190,7 +190,7 @@ void clear(queues toclear, const std::string_view account)
 	}
 }
 
-queue_list get(queues toget, const std::string& account)
+queue_list get(queues toget, const std::string_view account)
 {
 	return open_queue(toget, account);
 }

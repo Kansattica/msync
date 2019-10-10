@@ -39,7 +39,7 @@ int main(int argc, const char* argv[])
             make_new_account(parsed.account);
             break;
         case mode::showopt:
-            print_stringptr(assume_account(user).second.get_option(parsed.toset), plerr);
+            print_stringptr(assume_account(user).second.get_option(parsed.toset));
             break;
         case mode::showallopt:
 			for (auto opt = user_option(0); opt <= user_option::pull_notifications; opt = user_option(static_cast<int>(opt) + 1))
@@ -63,7 +63,7 @@ int main(int argc, const char* argv[])
             assume_account(user).second.set_option(parsed.toset, parsed.optionval);
             break;
         case mode::configsync:
-            assume_account(user).second.set_option(parsed.toset, parsed.sync_opt_mode);
+            assume_account(user).second.set_option(parsed.toset, parsed.sync_opts.mode);
             break;
         case mode::configlist:
             assume_account(user).second.set_option(parsed.toset, parsed.listops);
