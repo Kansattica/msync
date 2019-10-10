@@ -126,7 +126,7 @@ private:
 		return false;
 	}
 
-	constexpr bool send_posts::should_undo(std::string_view& id) const
+	constexpr bool should_undo(std::string_view& id) const
 	{
 		if (id.back() == '-')
 		{
