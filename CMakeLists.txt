@@ -5,6 +5,7 @@ project (msync VERSION 0.1
 
 option(MSYNC_BUILD_TESTS "Download catch2 and build tests with it." ON)
 
+set(CMAKE_POLICY_DEFAULT_CMP0069 NEW) #enable interprocedural optimization for all projects
 include(cmake/linktimeoptimization.cmake)
 
 include(cmake/packages.cmake)
