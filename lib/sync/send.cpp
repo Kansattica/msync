@@ -31,20 +31,18 @@ bool should_undo(string_view& id);
 
 void send(const string_view account, const string_view instanceurl, const string_view access_token, int retries)
 {
-	print_logger pl;
-
 	if (retries < 1)
 	{
-		pl << "Number of retries must be positive (got " << retries << "). Resetting to 3.\n";
+		pl() << "Number of retries must be positive (got " << retries << "). Resetting to 3.\n";
 		retries = 3;
 	}
 
 	std::string baseurl = make_api_url(instanceurl, statusroute);
 
-	pl << "Sending queued favorites for " << account << '\n';
+	pl() << "Sending queued favorites for " << account << '\n';
 	process_queue<queues::fav>(account, baseurl, access_token, retries);
 
-	pl << "Sending queued boosts for " << account << '\n';
+	pl() << "Sending queued boosts for " << account << '\n';
 	process_queue<queues::boost>(account, baseurl, access_token, retries);
 }
 
@@ -69,6 +67,8 @@ bool post_with_retries(const string_view requesturl, const string_view access_to
 	for (int i = 0; i < retries; i++)
 	{
 		auto response = simple_post(requesturl, access_token);
+
+		// later, handle what happens if we get rate limited
 
 		if (response.error.code == cpr::ErrorCode::OPERATION_TIMEDOUT || (response.status_code >= 500 && response.status_code < 600))
 		{
@@ -140,14 +140,12 @@ cpr::Response simple_post(const string_view url, const string_view access_token)
 
 	auto response = cpr::Post(cpr::Url{ url }, cpr::Authentication{ "Bearer", access_token }, cpr::Header{ {key_header, std::string{url} } });
 
-	print_logger pl;
-
 	if (response.error)
 	{
-		pl << response.error.message << '\n';
+		pl() << response.error.message << '\n';
 	}
 
-	pl << get_error_message(response.status_code, verbose_logs);
+	pl() << get_error_message(response.status_code, verbose_logs);
 
 	return response;
 }
