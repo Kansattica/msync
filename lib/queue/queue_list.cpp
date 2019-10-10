@@ -5,8 +5,9 @@ void Read(std::deque<std::string>& queued, std::string&& line)
 	queued.emplace_back(std::move(line));
 }
 
-void Write(std::string& str, std::ofstream& of)
+void Write(std::deque<std::string>&& que, std::ofstream& of)
 {
-	if (!str.empty())
-		of << str << '\n';
+	for (auto& str : que)
+		if (!str.empty())
+			of << str << '\n';
 }

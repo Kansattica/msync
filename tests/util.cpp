@@ -2,6 +2,7 @@
 #include <catch2/catch.hpp>
 
 #include <string>
+#include <tuple>
 
 using namespace std::string_literals;
 
@@ -87,4 +88,86 @@ SCENARIO("parse_account_name correctly parses account names into a username and 
             }
         }
     }
+}
+
+SCENARIO("split_string correctly splits strings")
+{
+	GIVEN("Some strings with the delimiter and nothing extra at the end.")
+	{
+		auto input = GENERATE(
+			std::make_tuple("a,delimited,string", ',', std::vector<std::string_view>{"a", "delimited", "string"}),
+			std::make_tuple("a,delimited,string", ';', std::vector<std::string_view>{"a,delimited,string"}),
+			std::make_tuple("a;delimited;string", ';', std::vector<std::string_view>{"a", "delimited", "string"}),
+			std::make_tuple("just;one", ';', std::vector<std::string_view>{"just", "one"}),
+			std::make_tuple("what,about,a,really,long,one;huh", ',', std::vector<std::string_view>{"what", "about", "a", "really", "long", "one;huh"}));
+
+		WHEN("the string is split")
+		{
+			auto result = split_string(std::get<0>(input), std::get<1>(input));
+
+			THEN("the result is what we expected.")
+			{
+				REQUIRE(result == std::get<2>(input));
+			}
+		}
+	}
+
+	GIVEN("Some strings with the delimiter at the end.")
+	{
+		auto input = GENERATE(
+			std::make_tuple("a,delimited,string,", ',', std::vector<std::string_view>{"a", "delimited", "string"}),
+			std::make_tuple("a,delimited,string,,,", ',', std::vector<std::string_view>{"a", "delimited", "string"}),
+			std::make_tuple(",", ',', std::vector<std::string_view>{}),
+			std::make_tuple("a,delimited,string;", ';', std::vector<std::string_view>{"a,delimited,string"}),
+			std::make_tuple("a;delimited;string;", ';', std::vector<std::string_view>{"a", "delimited", "string"}),
+			std::make_tuple("just;one;", ';', std::vector<std::string_view>{"just", "one"}),
+			std::make_tuple("what,about,a,really,long,one;huh,", ',', std::vector<std::string_view>{"what", "about", "a", "really", "long", "one;huh"}));
+
+		WHEN("the string is split")
+		{
+			auto result = split_string(std::get<0>(input), std::get<1>(input));
+
+			THEN("the result is what we expected.")
+			{
+				REQUIRE(result == std::get<2>(input));
+			}
+		}
+	}
+
+	GIVEN("Some strings with multiple consecutive delimiters.")
+	{
+		auto input = GENERATE(
+			std::make_tuple("a,,,delimited,,string,", ',', std::vector<std::string_view>{"a", "delimited", "string"}),
+			std::make_tuple("a,del,,imited,,string,,,", ',', std::vector<std::string_view>{"a", "del", "imited", "string"}),
+			std::make_tuple(",,,,", ',', std::vector<std::string_view>{}),
+			std::make_tuple(";a,delimited,string;;", ';', std::vector<std::string_view>{"a,delimited,string"}),
+			std::make_tuple("a;;;;delimited;;;string;;;;;", ';', std::vector<std::string_view>{"a", "delimited", "string"}),
+			std::make_tuple("just;;one;", ';', std::vector<std::string_view>{"just", "one"}),
+			std::make_tuple("what,about,,,,a,,really,,long,,,,,one;huh,", ',', std::vector<std::string_view>{"what", "about", "a", "really", "long", "one;huh"}));
+
+		WHEN("the string is split")
+		{
+			auto result = split_string(std::get<0>(input), std::get<1>(input));
+
+			THEN("the result is what we expected.")
+			{
+				REQUIRE(result == std::get<2>(input));
+			}
+		}
+	}
+
+	GIVEN("The empty string")
+	{
+		auto input = "";
+
+		WHEN("the empty string is split")
+		{
+			auto result = split_string(input, ',');
+
+			THEN("we get an empty vector back.")
+			{
+				REQUIRE(result.size() == 0);
+			}
+		}
+	}
 }

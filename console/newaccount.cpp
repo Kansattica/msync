@@ -1,10 +1,18 @@
 #include "newaccount.hpp"
+
 #include "../lib/options/global_options.hpp"
 #include "../lib/util/util.hpp"
+#include "../lib/options/option_enums.hpp"    // for user_option, user_optio...
+#include "../lib/options/option_file.hpp"     // for string
+#include "../lib/options/user_options.hpp"    // for user_options
+
 #include <cpr/cpr.h>
 #include <nlohmann/json.hpp>
 #include <print_logger.hpp>
+
 #include <string>
+#include <optional>                           // for optional
+#include <utility>                            // for pair
 
 using json = nlohmann::json;
 
@@ -14,7 +22,6 @@ const auto redirect_uri = "urn:ietf:wg:oauth:2.0:oob";
 
 void make_new_account(const std::string& accountname)
 {
-    print_logger<logtype::normal> pl;
     auto useraccountpair = options.select_account(accountname);
 
     // see: https://docs.joinmastodon.org/api/authentication/
@@ -22,11 +29,11 @@ void make_new_account(const std::string& accountname)
     // if no user was found, make a new one
     if (useraccountpair == nullptr)
     {
-        pl << "Creating new account for " << accountname << "\n";
+        pl() << "Creating new account for " << accountname << "\n";
         auto parsed = parse_account_name(accountname);
         if (!parsed.has_value())
         {
-            pl << "Could not parse a username and instance name from: " << accountname << ". It should look like: username@instance.url\n";
+            pl() << "Could not parse a username and instance name from: " << accountname << ". It should look like: username@instance.url\n";
             return;
         }
         // make a new account
@@ -36,7 +43,7 @@ void make_new_account(const std::string& accountname)
     }
     else
     {
-        pl << "Existing user found.\n";
+        pl() << "Existing user found.\n";
     }
     
 	auto& useraccount = useraccountpair->second;
@@ -48,25 +55,25 @@ void make_new_account(const std::string& accountname)
     auto instanceurl = *useraccount.get_option(user_option::instance_url);
     if (client_id == nullptr || client_secret == nullptr)
     {
-        pl << "Registering app with " << instanceurl << '\n';
+        pl() << "Registering app with " << instanceurl << '\n';
         auto r = cpr::Post(cpr::Url{make_api_url(instanceurl, "/api/v1/apps")},
                            cpr::Parameters{{"client_name", "msync"}, {"redirect_uris", redirect_uri}, {"scopes", scopes}, {"website", "https://github.com/kansattica/msync"}});
 
         if (r.error)
         {
-            pl << "Could not register app with server. Responded with error code " << r.status_code << ": " << r.error.message << '\n';
-            pl << "Please try again.\n";
+            pl() << "Could not register app with server. Responded with error code " << r.status_code << ": " << r.error.message << '\n';
+            pl() << "Please try again.\n";
             return;
         }
 
         json parsed = json::parse(r.text);
         useraccount.set_option(user_option::client_id, parsed["client_id"].get<std::string>());
         useraccount.set_option(user_option::client_secret, parsed["client_secret"].get<std::string>());
-        pl << "Registered!\n";
+        pl() << "Registered!\n";
     }
     else
     {
-        pl << "App already registered.\n";
+        pl() << "App already registered.\n";
     }
 
     if (client_id == nullptr)
@@ -76,7 +83,7 @@ void make_new_account(const std::string& accountname)
     if (authcode == nullptr)
     {
         auto foundaccountname = *useraccount.get_option(user_option::account_name);
-        pl << "Please open this URL in your browser:\n"
+        pl() << "Please open this URL in your browser:\n"
            << "https://" << instanceurl << "/oauth/authorize?response_type=code&client_id=" << *client_id
            << "&redirect_uri=" << redirect_uri << "&scope=" << urlscopes << '\n'
            << "Enter your authorization code like so:\n"
@@ -91,11 +98,11 @@ void make_new_account(const std::string& accountname)
     auto access_token = useraccount.get_option(user_option::access_token);
     if (access_token != nullptr)
     {
-        pl << "Your account is already registered! You're done!\n";
+        pl() << "Your account is already registered! You're done!\n";
         return;
     }
 
-    pl << "Getting access token from server with authorization code.\n";
+    pl() << "Getting access token from server with authorization code.\n";
     auto response = cpr::Post(cpr::Url{make_api_url(instanceurl, "/oauth/token")}, 
         cpr::Parameters{{"client_id", *client_id}, {"client_secret", *client_secret}, {"grant_type", "authorization_code"}, 
         {"code", *authcode}, {"redirect_uri", redirect_uri}});
@@ -104,7 +111,7 @@ void make_new_account(const std::string& accountname)
     if (response.error)
     {
         auto foundaccountname = *useraccount.get_option(user_option::account_name);
-        pl << "Could not get access token from server. Authorization codes can only be used once, so it's been deleted and you should get another one.\n"
+        pl() << "Could not get access token from server. Authorization codes can only be used once, so it's been deleted and you should get another one.\n"
            << "Please open this URL in your browser:\n"
            << "https://" << instanceurl << "/oauth/authorize?response_type=code&client_id=" << *client_id
            << "&redirect_uri=" << redirect_uri << "&scope=" << urlscopes << '\n'
@@ -117,7 +124,7 @@ void make_new_account(const std::string& accountname)
 
     json parsed = json::parse(response.text);
     useraccount.set_option(user_option::access_token, parsed["access_token"].get<std::string>());
-    pl << "Done! You're ready to start using this account.\n";
+    pl() << "Done! You're ready to start using this account.\n";
 
     //don't need these any more once we're good
     useraccount.set_option(user_option::client_id, "");

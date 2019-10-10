@@ -1,10 +1,9 @@
-#include <clipp.h>
-
-#include <iostream>
-
-#include "../../lib/options/user_options.hpp"
 #include "parseoptions.hpp"
-#include <print_logger.hpp>
+#include <clipp.h>                               // for parameter, command
+#include <iostream>                              // for ostream, cout
+#include <print_logger.hpp>                      // for verbose_logs
+#include "../../lib/postfile/outgoing_post.hpp"  // for post_content
+#include "../../lib/queue/queues.hpp"            // for queues, queues::boost
 
 using namespace clipp;
 using std::cout;
@@ -43,9 +42,9 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
                                        one_of(command("home").set(ret.toset, user_option::pull_home),
                                               command("dms").set(ret.toset, user_option::pull_dms),
                                               command("notifications").set(ret.toset, user_option::pull_notifications)),
-                                       one_of(command("newest").set(ret.sync_opt_mode, sync_settings::newest_first),
-                                              command("oldest").set(ret.sync_opt_mode, sync_settings::oldest_first),
-                                              command("off").set(ret.sync_opt_mode, sync_settings::dont_sync)))
+                                       one_of(command("newest").set(ret.sync_opts.mode, sync_settings::newest_first),
+                                              command("oldest").set(ret.sync_opts.mode, sync_settings::oldest_first),
+                                              command("off").set(ret.sync_opts.mode, sync_settings::dont_sync)))
                                .doc("Whether to synchronize an account's home timeline, direct messages, and notifications, and whether to do it newest first, oldest first, or not at all."),
                            in_sequence(command("list").set(ret.selected, mode::configlist),
                                        one_of(command("add").set(ret.listops, list_operations::add),
@@ -62,9 +61,15 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 						 option("-g", "--get-only").set(ret.sync_opts.send, false).doc("Only download posts, don't send anything from queues.")
 					 ));
 
-    auto genMode = (command("gen").set(ret.selected, mode::gen)).doc("Generate a post template in the current folder.");
+	auto genMode = (command("gen", "generate").set(ret.selected, mode::gen).doc("Generate a post template in the current folder. Edit this file afterwards to add a body.") &
+					 (
+						(option("-f", "--file", "--attach") & values(match::prefix_not("-"), "path", ret.gen_opt.post.attachments)).doc("Attach these files to the post."),
+						(option("-o", "--output") & value("filename", ret.gen_opt.filename)).doc("Specify an output file. Default is post.msync."),
+						(option("-r", "--reply-to") & value("reply_to", ret.gen_opt.post.reply_to_id)).doc("Reply to the specified post ID."),
+						(option("-c", "--content-warning") & value("warning", ret.gen_opt.post.content_warning)).doc("Set a content warning (or subject) for the post.")
+					) % "generate options");
 
-    auto queueMode = (command("queue").set(ret.selected, mode::queue) &
+	auto queueMode = (command("q", "queue").set(ret.selected, mode::queue).doc("Manage queued favs, boosts, and posts") &
                           one_of(option("-r", "--remove").set(ret.queue_opt.to_do, queue_action::remove).doc("Remove the post ids or filenames from the queue instead of adding them. If not in the queue, queue unfaving, unboosting, or deleting the post so it happens on next sync."),
                                  option("-c", "--clear").set(ret.queue_opt.to_do, queue_action::clear).doc("Remove everything in the specified queue."),
 								 option("-p", "--print").set(ret.queue_opt.to_do, queue_action::print).doc("Print everything in the specified queue. The first item is on top.")) %
@@ -78,7 +83,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
     auto universalOptions = ((option("-a", "--account") & value("account", ret.account)).doc("The account name to operate on."),
                              option("-v", "--verbose").set(verbose_logs).doc("Verbose mode. Program will be more chatty."));
 
-    auto cli = (newaccount | configMode | syncMode | queueMode | genMode | (command("help").set(ret.selected, mode::help)), universalOptions);
+	auto cli = (newaccount | configMode | syncMode | genMode | queueMode | (command("help").set(ret.selected, mode::help)), universalOptions);
 
     //skip the first result.
     //we do it this way because C++11 and later don't like it when you turn a string literal into a char*, so we have to use the iterator interface
@@ -91,7 +96,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 
         ret.selected = mode::help; //possible for, say, config to be set but still be a parse fail
 
-        // clipp::debug::print(cout, result);
+        //clipp::debug::print(cout, result);
     }
 
     ret.okay = static_cast<bool>(result);

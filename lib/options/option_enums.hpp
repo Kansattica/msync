@@ -1,7 +1,6 @@
 #ifndef _ENUM_NAMES_HPP_
 #define _ENUM_NAMES_HPP_
 #include <array>
-#include <string>
 
 template <typename ToParse>
 ToParse parse_enum(const char first);
@@ -13,8 +12,8 @@ enum class list_operations
     clear
 };
 
-const auto LIST_OPERATION_NAMES =
-    std::array<const std::string,
+constexpr auto LIST_OPERATION_NAMES =
+    std::array<const char*,
                static_cast<int>(list_operations::clear) + 1>(
         {"add", "remove", "clear"});
 
@@ -25,8 +24,8 @@ enum class sync_settings
     oldest_first
 };
 
-const auto SYNC_SETTING_NAMES =
-    std::array<const std::string,
+constexpr auto SYNC_SETTING_NAMES =
+    std::array<const char*,
                static_cast<int>(sync_settings::oldest_first) + 1>(
         {"dont_sync", "newest_first", "oldest_first"});
 
@@ -43,8 +42,8 @@ enum class user_option
     pull_notifications,
 };
 
-const auto USER_OPTION_NAMES =
-    std::array<const std::string,
+constexpr auto USER_OPTION_NAMES =
+    std::array<const char*,
                static_cast<int>(user_option::pull_notifications) + 1>(
         {"account_name", "instance_url", "auth_code", "access_token", "client_secret", "client_id",
          "pull_home", "pull_dms", "pull_notifications"});
