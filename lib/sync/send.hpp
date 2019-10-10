@@ -14,8 +14,6 @@
 #include "../queue/queues.hpp"
 #include "../util/util.hpp"
 
-
-
 template <post_request post>
 struct send_posts
 {
@@ -145,8 +143,6 @@ private:
 		toreturn.reserve(toreturn.size() + middle.size() + after.size());
 		return toreturn.append(middle).append(after);
 	}
-
-
 };
 
 #endif
