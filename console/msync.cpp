@@ -97,10 +97,14 @@ int main(int argc, const char* argv[])
 		break;
 		case mode::sync:
 			if (parsed.sync_opts.send)
+			{
+				send_posts<simple_post> send;
+				send.retries = parsed.sync_opts.retries;
 				if (user == nullptr)
-					send_all<network>(parsed.sync_opts.retries);
+					send.send_all();
 				else
-					send<network>(user->first, *user->second.get_option(user_option::instance_url), *user->second.get_option(user_option::access_token), parsed.sync_opts.retries);
+					send.send(user->first, *user->second.get_option(user_option::instance_url), *user->second.get_option(user_option::access_token));
+			}
 			break;
 		case mode::help:
 			break;
