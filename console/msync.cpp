@@ -12,10 +12,12 @@
 #include "../lib/postfile/outgoing_post.hpp"
 #include "../lib/queue/queues.hpp"
 #include "../lib/sync/send.hpp"
+#include "../lib/net/net.hpp"
 #include "newaccount.hpp"
 #include "optionparsing/parseoptions.hpp"
 
 std::pair<const std::string, user_options>& assume_account(std::pair<const std::string, user_options>* user);
+
 void print_stringptr(const std::string* toprint);
 
 template <typename T>
@@ -96,9 +98,9 @@ int main(int argc, const char* argv[])
 		case mode::sync:
 			if (parsed.sync_opts.send)
 				if (user == nullptr)
-					send_all(parsed.sync_opts.retries);
+					send_all<network>(parsed.sync_opts.retries);
 				else
-					send(user->first, *user->second.get_option(user_option::instance_url), *user->second.get_option(user_option::access_token), parsed.sync_opts.retries);
+					send<network>(user->first, *user->second.get_option(user_option::instance_url), *user->second.get_option(user_option::access_token), parsed.sync_opts.retries);
 			break;
 		case mode::help:
 			break;

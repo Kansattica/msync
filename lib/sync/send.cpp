@@ -1,6 +1,6 @@
 #include "send.hpp"
 
-#include "error_code_messages.hpp"
+#include "../net/net.hpp"
 
 #include <string>
 #include <string_view>
@@ -13,7 +13,6 @@
 
 #include <print_logger.hpp>
 
-#include <cpr/cpr.h>
 
 using std::string_view;
 
@@ -22,14 +21,13 @@ constexpr string_view statusroute = "/api/v1/statuses/";
 constexpr std::pair<string_view, string_view> favroutepost = { "/favourite", "/unfavourite" };
 constexpr std::pair<string_view, string_view> boostroutepost = { "/reblog", "/unreblog" };
 
-cpr::Response simple_post(const string_view url, const string_view access_token);
-
-template <queues toread>
-void process_queue(const string_view account, const string_view baseurl, const string_view access_token, int retries);
+template <queues toread, typename network>
+void process_queue(const string_view account, const string_view baseurl, const network& net, int retries);
 
 bool should_undo(string_view& id);
 
-void send(const string_view account, const string_view instanceurl, const string_view access_token, int retries)
+template <typename network>
+void send(const std::string& account, const std::string& instanceurl, const std::string& access_token, int retries)
 {
 	if (retries < 1)
 	{
@@ -39,20 +37,23 @@ void send(const string_view account, const string_view instanceurl, const string
 
 	std::string baseurl = make_api_url(instanceurl, statusroute);
 
+	network net;
+	net.access_token = access_token;
+
 	pl() << "Sending queued favorites for " << account << '\n';
-	process_queue<queues::fav>(account, baseurl, access_token, retries);
+	process_queue<queues::fav>(account, baseurl, net, retries);
 
 	pl() << "Sending queued boosts for " << account << '\n';
-	process_queue<queues::boost>(account, baseurl, access_token, retries);
+	process_queue<queues::boost>(account, baseurl, net, retries);
 }
 
+template <typename network>
 void send_all(int retries)
 {
 	for (auto& user : options.accounts)
 	{
-		send(user.first, *user.second.get_option(user_option::instance_url), *user.second.get_option(user_option::access_token), retries);
+		send<network>(user.first, *user.second.get_option(user_option::instance_url), *user.second.get_option(user_option::access_token), retries);
 	}
-
 }
 
 std::string paramaterize_url(const string_view before, const string_view middle, const string_view after)
@@ -62,22 +63,25 @@ std::string paramaterize_url(const string_view before, const string_view middle,
 	return toreturn.append(middle).append(after);
 }
 
-bool post_with_retries(const string_view requesturl, const string_view access_token, int retries)
+template <typename network>
+bool post_with_retries(const string_view requesturl, const network& net, int retries)
 {
 	for (int i = 0; i < retries; i++)
 	{
-		auto response = simple_post(requesturl, access_token);
+		auto response = net.simple_post(requesturl);
+
+		pl() << net.get_error_message(response.status_code, verbose_logs);
 
 		// later, handle what happens if we get rate limited
 
-		if (response.error.code == cpr::ErrorCode::OPERATION_TIMEDOUT || (response.status_code >= 500 && response.status_code < 600))
+		if (response.retryable_error)
 		{
 			// should retry
 			continue;
 		}
 
 		// some other error, assume unrecoverable
-		if (response.error)
+		if (!response.okay)
 		{
 			return false;
 		}
@@ -106,8 +110,8 @@ constexpr string_view route()
 
 }
 
-template <queues toread>
-void process_queue(const string_view account, const string_view baseurl, const string_view access_token, int retries)
+template <queues toread, typename network>
+void process_queue(const string_view account, const string_view baseurl, const network& net, int retries)
 {
 	auto queuefile = get(toread, account);
 
@@ -132,24 +136,6 @@ void process_queue(const string_view account, const string_view baseurl, const s
 
 	queuefile.parsed = failedids;
 }
-
-
-cpr::Response simple_post(const string_view url, const string_view access_token)
-{
-	static const std::string key_header{ "Idempotency-Key" };
-
-	auto response = cpr::Post(cpr::Url{ url }, cpr::Authentication{ "Bearer", access_token }, cpr::Header{ {key_header, std::string{url} } });
-
-	if (response.error)
-	{
-		pl() << response.error.message << '\n';
-	}
-
-	pl() << get_error_message(response.status_code, verbose_logs);
-
-	return response;
-}
-
 
 bool should_undo(string_view& id)
 {

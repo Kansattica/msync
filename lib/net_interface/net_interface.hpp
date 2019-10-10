@@ -1,7 +1,18 @@
-#ifndef _ERROR_CODE_MESSAGES_HPP_
-#define _ERROR_CODE_MESSAGES_HPP_
+#ifndef _MSYNC_NET_INTERFACE_HPP_
+#define _MSYNC_NET_INTERFACE_HPP_
 
-const char* get_error_message(int status_code, bool verbose)
+#include <string_view>
+
+struct net_response
+{
+	int status_code = 200;
+	bool retryable_error = false;
+	bool okay = true;
+};
+
+using post_request = net_response (const std::string_view url, const std::string_view access_token);
+
+inline constexpr const char* get_error_message(int status_code, bool verbose)
 {
 	switch (status_code)
 	{

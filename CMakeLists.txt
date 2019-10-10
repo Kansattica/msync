@@ -20,6 +20,8 @@ add_library(util STATIC "")
 add_library(optionparsing STATIC "")
 add_library(printlog STATIC "")
 add_library(postfile STATIC "")
+add_library(net STATIC "")
+add_library(netinterface INTERFACE)
 add_library(filebacked INTERFACE)
 add_library(constants INTERFACE)
 add_library(exception INTERFACE)
@@ -35,17 +37,23 @@ add_subdirectory(lib/sync)
 add_subdirectory(lib/filesystem)
 add_subdirectory(lib/options)
 add_subdirectory(lib/constants)
+add_subdirectory(lib/net)
 add_subdirectory(lib/postfile)
 add_subdirectory(lib/exception)
 add_subdirectory(lib/printlog)
 add_subdirectory(lib/util)
 
 
-target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json ${CPR_LIBRARIES} options printlog queue util)
+
+
+target_include_directories(netinterface INTERFACE lib/net_interface)
+
+target_link_libraries(net PRIVATE ${CPR_LIBRARIES} netinterface)
 
 target_include_directories(filebacked INTERFACE lib/filebacked)
 target_link_libraries(filebacked INTERFACE printlog filesystem)
 
+target_link_libraries(sync PRIVATE nlohmann_json::nlohmann_json options printlog queue util netinterface)
 
 target_link_libraries(options PRIVATE constants whereami printlog exception filebacked)
 target_link_libraries(options PUBLIC filesystem) 
@@ -56,7 +64,7 @@ target_link_libraries(queue PRIVATE constants printlog options filebacked except
 
 target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options queue postfile)
 
-target_link_libraries(msync PRIVATE options optionparsing printlog ${CPR_LIBRARIES} util nlohmann_json::nlohmann_json exception postfile queue sync)
+target_link_libraries(msync PRIVATE options optionparsing printlog ${CPR_LIBRARIES} util nlohmann_json::nlohmann_json exception postfile queue sync net netinterface)
 
 if (MSYNC_BUILD_TESTS)
 	add_subdirectory(tests)
