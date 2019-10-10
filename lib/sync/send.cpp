@@ -17,19 +17,19 @@
 
 using std::string_view;
 
-const std::string statusroute = "/api/v1/statuses/";
+constexpr char* statusroute = "/api/v1/statuses/";
 
 constexpr std::pair<string_view, string_view> favroutepost = { "/favourite", "/unfavourite" };
 constexpr std::pair<string_view, string_view> boostroutepost = { "/reblog", "/unreblog" };
 
-cpr::Response simple_post(const std::string& url, const std::string& access_token);
+cpr::Response simple_post(const string_view url, const string_view access_token);
 
 template <queues toread>
-void process_queue(const std::string& account, const std::string& baseurl, const std::string& access_token, int retries);
+void process_queue(const string_view account, const string_view baseurl, const string_view access_token, int retries);
 
 bool should_undo(string_view& id);
 
-void send(const std::string& account, const std::string& instanceurl, const std::string& access_token, int retries)
+void send(const string_view account, const string_view instanceurl, const string_view access_token, int retries)
 {
 	print_logger pl;
 
@@ -64,7 +64,7 @@ std::string paramaterize_url(const string_view before, const string_view middle,
 	return toreturn.append(middle).append(after);
 }
 
-bool post_with_retries(const std::string& requesturl, const std::string& access_token, int retries)
+bool post_with_retries(const string_view requesturl, const string_view access_token, int retries)
 {
 	for (int i = 0; i < retries; i++)
 	{
@@ -107,7 +107,7 @@ constexpr string_view route()
 }
 
 template <queues toread>
-void process_queue(const std::string& account, const std::string& baseurl, const std::string& access_token, int retries)
+void process_queue(const string_view account, const string_view baseurl, const string_view access_token, int retries)
 {
 	auto queuefile = get(toread, account);
 
@@ -115,7 +115,7 @@ void process_queue(const std::string& account, const std::string& baseurl, const
 
 	while (!queuefile.parsed.empty())
 	{
-		std::string_view id = queuefile.parsed.front();
+		string_view id = queuefile.parsed.front();
 
 		bool undo = should_undo(id);
 
@@ -134,7 +134,7 @@ void process_queue(const std::string& account, const std::string& baseurl, const
 }
 
 
-cpr::Response simple_post(const std::string& url, const std::string& access_token)
+cpr::Response simple_post(const string_view url, const string_view access_token)
 {
 	auto response = cpr::Post(cpr::Url{ url }, cpr::Authentication{ "Bearer", access_token }, cpr::Header{ {"Idempotency-Key", url} });
 
