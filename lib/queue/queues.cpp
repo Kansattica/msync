@@ -37,13 +37,13 @@ void queue_attachments(const fs::path& postfile)
 
 		if (err)
 		{
-			pl() << "Error finding file: " << attach << "\nError:\n" << err << "\nSkipping.";
+			pl() << "Error finding file: " << attach << "\nError:\n" << err << "\nSkipping.\n";
 			continue;
 		}
 
 		if (!fs::is_regular_file(attachpath))
 		{
-			pl() << attachpath << " is not a regular file. Skipping.";
+			pl() << attachpath << " is not a regular file. Skipping.\n";
 			continue;
 		}
 
@@ -88,6 +88,7 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 queue_list open_queue(const queues to_open, const std::string_view account)
 {
 	fs::path qfile = options.executable_location / Account_Directory / account;
+	fs::create_directories(qfile);
 	const std::string_view to_append = [to_open]() {
 		switch (to_open)
 		{
@@ -155,6 +156,7 @@ void dequeue(queues todequeue, const std::string_view account, std::vector<std::
 		auto inqueue = std::find(toremovefrom.parsed.begin(), toremovefrom.parsed.end(), *it);
 		if (inqueue != toremovefrom.parsed.end()) // if we found the thing in the queue, remove from both
 		{
+			plverb() << "Removing " << *it << " from queue.\n";
 			if (todequeue == queues::post)
 			{
 				dequeue_post(filequeuedir, *it);
@@ -173,6 +175,7 @@ void dequeue(queues todequeue, const std::string_view account, std::vector<std::
 
 	for (auto& queuedel : toremove)
 	{
+		plverb() << queuedel << " will be removed next time you sync.\n";
 		queuedel.push_back('-');
 		toremovefrom.parsed.emplace_back(std::move(queuedel));
 	}

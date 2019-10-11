@@ -19,7 +19,6 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 	{
 		test_file accountdir = options.executable_location / Account_Directory / account;
 		test_file allaccounts = options.executable_location / Account_Directory; //make sure this gets cleaned up, too
-		fs::create_directories(accountdir.filename);
 
 		WHEN("some items are enqueued")
 		{
@@ -108,7 +107,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 	const std::string account = "queueboy@website.egg";
 	test_file accountdir = options.executable_location / Account_Directory / account;
 	test_file allaccounts = options.executable_location / Account_Directory;
-	fs::create_directories(accountdir.filename);
+
 	GIVEN("Some posts to enqueue")
 	{
 		const test_file postfiles[]{ test_file{"postboy"}, test_file{"guy.extension"}, test_file{"../up.here"}, test_file{"yeeeeeeehaw"} };
