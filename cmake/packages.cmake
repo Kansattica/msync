@@ -63,6 +63,11 @@ option(USE_SYSTEM_CURL "" ON)
 option(BUILD_CPR_TESTS "" OFF)
 set (BUILD_TESTING OFF CACHE BOOL "If you must build curl from source, don't build the tests." FORCE)
 set (BUILD_SHARED_LIBS OFF CACHE BOOL "Build static libcurl and cpr." FORCE)
+
+if (NOT USE_SYSTEM_CURL AND UNIX)
+	# if we're building our own curl, statically link openssl
+	set (OPENSSL_USE_STATIC_LIBS TRUE)
+endif()
 # add_definitions(-DCURL_STATICLIB)
 if (MSVC)
 	set (CMAKE_USE_WINSSL ON CACHE BOOL "Use winssl" FORCE)
