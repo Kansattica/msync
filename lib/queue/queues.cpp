@@ -14,7 +14,7 @@ fs::path get_file_queue_directory(const std::string_view account, bool create)
 {
 	if (!create)
 		return "";
-	return options.executable_location / account / File_Queue_Directory;
+	return options.executable_location / Account_Directory / account / File_Queue_Directory;
 }
 
 void unique_file_name(fs::path& path)
@@ -87,7 +87,7 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 
 queue_list open_queue(const queues to_open, const std::string_view account)
 {
-	fs::path qfile = options.executable_location / account;
+	fs::path qfile = options.executable_location / Account_Directory / account;
 	const std::string_view to_append = [to_open]() {
 		switch (to_open)
 		{

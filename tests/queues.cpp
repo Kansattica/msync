@@ -17,8 +17,9 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 	const std::string account = "regularguy@internet.egg";
 	GIVEN("An empty queue")
 	{
-		test_file accountdir = options.executable_location / account;
-		fs::create_directory(accountdir.filename);
+		test_file accountdir = options.executable_location / Account_Directory / account;
+		test_file allaccounts = options.executable_location / Account_Directory; //make sure this gets cleaned up, too
+		fs::create_directories(accountdir.filename);
 
 		WHEN("some items are enqueued")
 		{
@@ -94,7 +95,7 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 void files_match(const std::string& account, const fs::path& original, const std::string& outfile)
 {
 	outgoing_post orig{ original };
-	outgoing_post newfile{ options.executable_location / account / File_Queue_Directory / outfile };
+	outgoing_post newfile{ options.executable_location / Account_Directory / account / File_Queue_Directory / outfile };
 
 	REQUIRE(orig.parsed.text == newfile.parsed.text);
 }
@@ -105,8 +106,9 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 	logs_off = true; //shut up the printlogger
 
 	const std::string account = "queueboy@website.egg";
-	test_file accountdir = options.executable_location / account;
-	fs::create_directory(accountdir.filename);
+	test_file accountdir = options.executable_location / Account_Directory / account;
+	test_file allaccounts = options.executable_location / Account_Directory;
+	fs::create_directories(accountdir.filename);
 	GIVEN("Some posts to enqueue")
 	{
 		const test_file postfiles[]{ test_file{"postboy"}, test_file{"guy.extension"}, test_file{"../up.here"}, test_file{"yeeeeeeehaw"} };
