@@ -34,7 +34,7 @@ public:
 
 	~file_backed()
 	{
-		if (backing == "")
+		if (backing.empty())
 			return; // we got moved from, so the new version will save it
 
 		fs::path backup(backing);
