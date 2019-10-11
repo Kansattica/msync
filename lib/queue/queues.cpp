@@ -2,17 +2,19 @@
 
 #include <constants.hpp>
 #include <filesystem.hpp>
+#include <system_error>
 #include <print_logger.hpp>
 #include "../options/global_options.hpp"
+#include "../postfile/outgoing_post.hpp"
 #include <algorithm>
 #include <msync_exception.hpp>
 
 
-fs::path get_file_queue_directory(const std::string& account, bool create)
+fs::path get_file_queue_directory(const std::string_view account, bool create)
 {
 	if (!create)
 		return "";
-	return options.executable_location / account / File_Queue_Directory;
+	return options.executable_location / Account_Directory / account / File_Queue_Directory;
 }
 
 void unique_file_name(fs::path& path)
@@ -23,6 +25,32 @@ void unique_file_name(fs::path& path)
 	{
 		path.replace_extension(std::to_string(extensionint++));
 	} while (fs::exists(path));
+}
+
+void queue_attachments(const fs::path& postfile)
+{
+	outgoing_post post{ postfile };
+	std::error_code err;
+	for (auto& attach : post.parsed.attachments)
+	{
+		auto attachpath = fs::canonical(attach, err);
+
+		if (err)
+		{
+			pl() << "Error finding file: " << attach << "\nError:\n" << err << "\nSkipping.";
+			continue;
+		}
+
+		if (!fs::is_regular_file(attachpath))
+		{
+			pl() << attachpath << " is not a regular file. Skipping.";
+			continue;
+		}
+
+		attach = attachpath.string();
+
+		err.clear();
+	}
 }
 
 std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
@@ -51,13 +79,16 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 	}
 
 	fs::copy(postfile, copyto);
+
+	queue_attachments(copyto);
+
 	return copyto.filename().string();
 }
 
-queue_list open_queue(const queues to_open, const std::string& account)
+queue_list open_queue(const queues to_open, const std::string_view account)
 {
-	fs::path qfile = options.executable_location / account;
-	const std::string& to_append = [to_open]() {
+	fs::path qfile = options.executable_location / Account_Directory / account;
+	const std::string_view to_append = [to_open]() {
 		switch (to_open)
 		{
 		case queues::fav:
@@ -77,7 +108,7 @@ queue_list open_queue(const queues to_open, const std::string& account)
 	return queue_list{ qfile / to_append };
 }
 
-void enqueue(const queues toenqueue, const std::string& account, const std::vector<std::string>& add)
+void enqueue(const queues toenqueue, const std::string_view account, const std::vector<std::string>& add)
 {
 	queue_list toaddto = open_queue(toenqueue, account);
 
@@ -109,7 +140,7 @@ void just_filename(std::string& path)
 	path = fs::path(path).filename().string();
 }
 
-void dequeue(queues todequeue, const std::string& account, std::vector<std::string>&& toremove)
+void dequeue(queues todequeue, const std::string_view account, std::vector<std::string>&& toremove)
 {
 	queue_list toremovefrom = open_queue(todequeue, account);
 
@@ -147,7 +178,7 @@ void dequeue(queues todequeue, const std::string& account, std::vector<std::stri
 	}
 }
 
-void clear(queues toclear, const std::string& account)
+void clear(queues toclear, const std::string_view account)
 {
 	queue_list clearthis = open_queue(toclear, account);
 
@@ -159,13 +190,14 @@ void clear(queues toclear, const std::string& account)
 	}
 }
 
-queue_list get(queues toget, const std::string& account)
+queue_list get(queues toget, const std::string_view account)
 {
 	return open_queue(toget, account);
 }
 
-std::vector<std::string> print(queues toprint, const std::string& account)
+std::vector<std::string> print(queues toprint, const std::string_view account)
 {
+	//prettyprint posts
 	const queue_list printthis = open_queue(toprint, account);
 	return std::vector<std::string> {printthis.parsed.begin(), printthis.parsed.end()};
 }

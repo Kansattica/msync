@@ -1,6 +1,5 @@
 #include "selection_types.hpp"
 #include <string>
-#include <vector>
 
 enum class mode
 {
@@ -18,14 +17,14 @@ enum class mode
 
 struct parse_result
 {
-    bool okay;
+    bool okay = false;
     mode selected = mode::help;
     user_option toset;
     // maybe later, do a union or variant for the mutually exclusive ones
     list_operations listops;
     sync_options sync_opts;
-    sync_settings sync_opt_mode;
     queue_options queue_opt;
+	gen_options gen_opt;
     std::string optionval;
     std::string account;
 };

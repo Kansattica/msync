@@ -2,6 +2,7 @@
 
 #include "test_helpers.hpp"
 #include <filesystem.hpp>
+#include <fstream>
 #include <vector>
 #include <string>
 
@@ -9,14 +10,16 @@
 #include "../lib/constants/constants.hpp"
 #include "../lib/options/global_options.hpp"
 #include "../lib/printlog/print_logger.hpp"
+#include "../postfile/outgoing_post.hpp"
 
 SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 {
 	const std::string account = "regularguy@internet.egg";
 	GIVEN("An empty queue")
 	{
-		test_file accountdir = options.executable_location / account;
-		fs::create_directory(accountdir.filename);
+		test_file accountdir = options.executable_location / Account_Directory / account;
+		test_file allaccounts = options.executable_location / Account_Directory; //make sure this gets cleaned up, too
+		fs::create_directories(accountdir.filename);
 
 		WHEN("some items are enqueued")
 		{
@@ -33,6 +36,11 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 				auto lines = print(totest.first, account);
 				REQUIRE(lines.size() == 5);
 				REQUIRE(lines == someids);
+			}
+
+			THEN("the file exists.")
+			{
+				REQUIRE(fs::exists(accountdir.filename / totest.second));
 			}
 
 			AND_WHEN("some of those are dequeued")
@@ -74,6 +82,7 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 				THEN("The file is empty, but exists.")
 				{
 					auto lines = print(totest.first, account);
+					REQUIRE(fs::exists(accountdir.filename / totest.second));
 					REQUIRE(lines.size() == 0);
 				}
 			}
@@ -85,7 +94,10 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 
 void files_match(const std::string& account, const fs::path& original, const std::string& outfile)
 {
-	REQUIRE(read_lines(original) == read_lines(options.executable_location / account / File_Queue_Directory / outfile));
+	outgoing_post orig{ original };
+	outgoing_post newfile{ options.executable_location / Account_Directory / account / File_Queue_Directory / outfile };
+
+	REQUIRE(orig.parsed.text == newfile.parsed.text);
 }
 
 
@@ -94,8 +106,9 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 	logs_off = true; //shut up the printlogger
 
 	const std::string account = "queueboy@website.egg";
-	test_file accountdir = options.executable_location / account;
-	fs::create_directory(accountdir.filename);
+	test_file accountdir = options.executable_location / Account_Directory / account;
+	test_file allaccounts = options.executable_location / Account_Directory;
+	fs::create_directories(accountdir.filename);
 	GIVEN("Some posts to enqueue")
 	{
 		const test_file postfiles[]{ test_file{"postboy"}, test_file{"guy.extension"}, test_file{"../up.here"}, test_file{"yeeeeeeehaw"} };
@@ -171,6 +184,45 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 		}
 	}
 
+	GIVEN("A post with attachments to enqueue")
+	{
+		const test_file files[]{ "somepost", "attachment.mp3", "filey.png" };
+
+		// make these files exist
+		for (int i = 1; i < 3; i++)
+		{
+			std::ofstream of{ files[i] };
+			of << "I'm file number " << i;
+		}
+
+		std::string expected_text = GENERATE(as<std::string>{}, "", "Hey, check this out");
+
+		{
+			outgoing_post op{ files[0].filename };
+			op.parsed.text = expected_text;
+			op.parsed.attachments = {"attachment.mp3", "filey.png" };
+		}
+
+		WHEN("the post is enqueued")
+		{
+			enqueue(queues::post, account, { "somepost" });
+
+			THEN("the text is as expected")
+			{
+				files_match(account, files[0].filename, "somepost");
+			}
+
+			THEN("the attachments are absolute paths")
+			{
+				outgoing_post post{ accountdir.filename / File_Queue_Directory / "somepost" };
+				REQUIRE(post.parsed.attachments.size() == 2);
+				REQUIRE(fs::path{ post.parsed.attachments[0] }.is_absolute());
+				REQUIRE(fs::path{ post.parsed.attachments[1] }.is_absolute());
+			}
+		}
+
+	}
+
 	GIVEN("Two different posts with the same name to enqueue")
 	{
 		const test_file testdir{ "somedir" };
@@ -199,13 +251,11 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 			THEN("the file contents are correct.")
 			{
-				auto unsuflines = read_lines(unsuffixedname);
-				REQUIRE(unsuflines.size() == 1);
-				REQUIRE(unsuflines[0] == "I'm number 1");
+				auto unsuflines = outgoing_post(unsuffixedname);
+				REQUIRE(unsuflines.parsed.text == "I'm number 1");
 
-				auto suflines = read_lines(suffixedname);
-				REQUIRE(suflines.size() == 1);
-				REQUIRE(suflines[0] == "I'm number 2");
+				auto suflines = outgoing_post(suffixedname);
+				REQUIRE(suflines.parsed.text == "I'm number 2");
 			}
 
 			THEN("the queue file is correct.")
