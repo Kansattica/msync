@@ -37,6 +37,11 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 				REQUIRE(lines == someids);
 			}
 
+			THEN("the file exists.")
+			{
+				REQUIRE(fs::exists(accountdir.filename / totest.second));
+			}
+
 			AND_WHEN("some of those are dequeued")
 			{
 				std::vector<std::string> removethese{ "12345", "longtextboy" };
@@ -76,6 +81,7 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 				THEN("The file is empty, but exists.")
 				{
 					auto lines = print(totest.first, account);
+					REQUIRE(fs::exists(accountdir.filename / totest.second));
 					REQUIRE(lines.size() == 0);
 				}
 			}
