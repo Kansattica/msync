@@ -23,6 +23,7 @@ SCENARIO("Can make SSL requests to a site.")
 
 			THEN("the body is not empty.")
 			{
+				REQUIRE_FALSE(response.text.empty());
 				REQUIRE(response.text.find("html") != std::string::npos);
 			}
 
