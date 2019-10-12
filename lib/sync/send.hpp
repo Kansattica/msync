@@ -69,10 +69,10 @@ private:
 
 			std::string requesturl = paramaterize_url(baseurl, id, undo ? route<toread, false>() : route<toread, true>());
 
-			if (post_with_retries(requesturl) == false)
-			{
+			if (post_with_retries(requesturl))
+				pl() << requesturl << " OK\n";
+			else
 				failedids.emplace_back(id);
-			}
 
 			// remove ID from this queue
 			queuefile.parsed.pop_front();
