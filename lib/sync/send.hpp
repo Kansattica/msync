@@ -117,6 +117,7 @@ private:
 			// some other error, assume unrecoverable
 			if (!response.okay)
 			{
+				pl() << response.message << '\n';
 				return false;
 			}
 

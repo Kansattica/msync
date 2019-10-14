@@ -8,6 +8,7 @@ struct net_response
 	int status_code = 200;
 	bool retryable_error = false;
 	bool okay = true;
+	std::string message;
 };
 
 using post_request = net_response (const std::string_view url, const std::string_view access_token);

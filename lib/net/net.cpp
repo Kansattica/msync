@@ -14,6 +14,10 @@ net_response simple_post(const std::string_view url, const std::string_view acce
 	toreturn.retryable_error = response.error.code == cpr::ErrorCode::OPERATION_TIMEDOUT || (response.status_code >= 500 && response.status_code < 600);
 	toreturn.okay = !response.error;
 
+	if (!toreturn.okay)
+		toreturn.message = response.error.message;
+	
+
 	return toreturn;
 }
 
