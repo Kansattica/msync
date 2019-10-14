@@ -154,8 +154,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("the queue is now empty.")
 			{
-				auto contents = print(queue.first, account);
-				REQUIRE(contents.empty());
+				REQUIRE(print(queue.first, account).empty());
 			}
 
 			THEN("one call per ID was made.")
@@ -219,8 +218,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("the queue is now empty.")
 			{
-				auto contents = print(queue.first, account);
-				REQUIRE(contents.empty());
+				REQUIRE(print(queue.first, account).empty());
 			}
 
 			THEN("each ID was tried the correct number of times.")
@@ -237,6 +235,69 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			{
 				auto repeated = repeat_each_element(testvect, retries.second);
 				REQUIRE(std::equal(mock.arguments.begin(), mock.arguments.end(), repeated.begin(), repeated.end(), [&](const auto& actual, const auto& expected)
+					{
+						return actual.url == make_expected_url(expected, queue.second, instanceurl);
+					}));
+
+			}
+		}
+	}
+
+	GIVEN("A queue where all the IDs fail")
+	{
+		auto queue = GENERATE(
+			std::make_pair(queues::fav, "/favourite"),
+			std::make_pair(queues::boost, "/reblog"));
+		std::vector<std::string> testvect = GENERATE( 
+			std::vector<std::string>{ "someid", "someotherid", "mrid" },
+			std::vector<std::string>{},
+			std::vector<std::string>{ "justone" });
+
+		// first is the number of retries to feed to send
+		// second is the number of retries to expect
+		// the last two test the "if retries less than 1, set to 3" behavior
+		auto retries = GENERATE(
+			std::make_pair(3, 3),
+			std::make_pair(5, 5),
+			std::make_pair(1, 1),
+			std::make_pair(0, 3),
+			std::make_pair(-1, 3));
+
+		constexpr std::string_view account = "someguy@cool.account";
+		constexpr std::string_view instanceurl = "cool.account";
+		constexpr std::string_view accesstoken = "sometoken";
+
+		enqueue(queue.first, account, testvect);
+
+		WHEN("the queue is sent")
+		{
+			mock_network mock;
+			mock.fatal_error = true;
+
+			send_posts send{ mock };
+
+			send.retries = retries.first;
+
+			send.send(account, instanceurl, accesstoken);
+
+			THEN("the queue hasn't changed.")
+			{
+				REQUIRE(print(queue.first, account) == testvect);
+			}
+
+			THEN("each ID was tried once.")
+			{
+				REQUIRE(mock.arguments.size() == testvect.size());
+			}
+
+			THEN("the access token was passed in.")
+			{
+				REQUIRE(std::all_of(mock.arguments.begin(), mock.arguments.end(), [&](const auto& actual) { return actual.access_token == accesstoken; }));
+			}
+
+			THEN("the URLs are as expected.")
+			{
+				REQUIRE(std::equal(mock.arguments.begin(), mock.arguments.end(), testvect.begin(), testvect.end(), [&](const auto& actual, const auto& expected)
 					{
 						return actual.url == make_expected_url(expected, queue.second, instanceurl);
 					}));
