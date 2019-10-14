@@ -14,15 +14,18 @@
 #include "../queue/queues.hpp"
 #include "../util/util.hpp"
 
-template <post_request post>
+template <typename post_request>
 struct send_posts
 {
 public:
 	int retries = 3;
 
+
+	send_posts(post_request& func) : post(func) { }
+
 	void send_all()
 	{
-		for (auto& user : options.accounts)
+		for (auto& user : options().accounts)
 		{
 			send(user.first, *user.second.get_option(user_option::instance_url), *user.second.get_option(user_option::access_token));
 		}
@@ -48,6 +51,7 @@ public:
 
 private:
 	std::string_view access_token;
+	post_request& post;
 
 	constexpr const std::string_view status_route() const { return "/api/v1/statuses/"; }
 
@@ -55,7 +59,7 @@ private:
 	constexpr const std::pair<std::string_view, std::string_view> boostroutepost() const { return { "/reblog", "/unreblog" }; }
 
 	template <queues toread>
-	void process_queue(const std::string_view account, const std::string_view baseurl) const
+	void process_queue(const std::string_view account, const std::string_view baseurl) 
 	{
 		auto queuefile = get(toread, account);
 
@@ -98,11 +102,11 @@ private:
 		return std::get<create ? 0 : 1>(toreturn);
 	}
 
-	bool post_with_retries(const std::string_view requesturl) const
+	bool post_with_retries(const std::string_view requesturl)
 	{
 		for (int i = 0; i < retries; i++)
 		{
-			auto response = post(requesturl, access_token);
+			net_response response = post(requesturl, access_token);
 
 			pl() << get_error_message(response.status_code, verbose_logs);
 
