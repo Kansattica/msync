@@ -9,6 +9,7 @@ using namespace std::string_literals;
 
 SCENARIO("Both paths we care about are directories.", "[global_options]")
 {
+	test_file acc = Account_Directory; //might not work, if working directory isn't the account directory, but might help
     GIVEN("A global_options object")
     {
         global_options opts;
@@ -25,6 +26,7 @@ SCENARIO("Both paths we care about are directories.", "[global_options]")
 
 SCENARIO("add_new_account correctly handles input.", "[global_options]")
 {
+	test_file acc = Account_Directory;
     GIVEN("A global_options object")
     {
         global_options opts;
@@ -69,6 +71,7 @@ SCENARIO("add_new_account correctly handles input.", "[global_options]")
 
 SCENARIO("read_accounts correctly fills global_options on construction.", "[global_options]")
 {
+	test_file acc = Account_Directory;
     GIVEN("A global_options with some values added to it, destroyed, and then a new one created.")
     {
         fs::path accountdir;
@@ -124,6 +127,7 @@ SCENARIO("read_accounts correctly fills global_options on construction.", "[glob
 
 SCENARIO("select_account selects exactly one account.", "[global_options]")
 {
+	test_file acc = Account_Directory;
     GIVEN("An empty accounts unordered_map")
     {
         global_options options;
