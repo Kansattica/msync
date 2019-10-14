@@ -32,7 +32,7 @@ int main(int argc, const char* argv[])
 
 	auto parsed = parse(argc, argv, false);
 
-    auto user = options.select_account(parsed.account);
+    auto user = options().select_account(parsed.account);
     try
     {
         switch (parsed.selected)
@@ -54,10 +54,10 @@ int main(int argc, const char* argv[])
 				pl() << '\n';
 			}
 			pl() << "Accounts registered: ";
-			for (auto it = options.accounts.begin(); it != options.accounts.end();)
+			for (auto it = options().accounts.begin(); it != options().accounts.end();)
 			{
 				pl() << it->first;
-				if (++it != options.accounts.end())
+				if (++it != options().accounts.end())
 					pl() << ", ";
 			}
             break;
@@ -98,7 +98,7 @@ int main(int argc, const char* argv[])
 		case mode::sync:
 			if (parsed.sync_opts.send)
 			{
-				send_posts<simple_post> send;
+				send_posts send{ simple_post };
 				send.retries = parsed.sync_opts.retries;
 				if (user == nullptr)
 					send.send_all();

@@ -22,7 +22,7 @@ const auto redirect_uri = "urn:ietf:wg:oauth:2.0:oob";
 
 void make_new_account(const std::string& accountname)
 {
-    auto useraccountpair = options.select_account(accountname);
+    auto useraccountpair = options().select_account(accountname);
 
     // see: https://docs.joinmastodon.org/api/authentication/
 
@@ -37,7 +37,7 @@ void make_new_account(const std::string& accountname)
             return;
         }
         // make a new account
-        useraccountpair = &options.add_new_account(accountname);
+        useraccountpair = &options().add_new_account(accountname);
         useraccountpair->second.set_option(user_option::account_name, parsed->username);
         useraccountpair->second.set_option(user_option::instance_url, parsed->instance);
     }

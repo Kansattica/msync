@@ -24,5 +24,5 @@ private:
     std::unordered_map<std::string, user_options> read_accounts();
 };
 
-extern global_options options;
+global_options& options();
 #endif

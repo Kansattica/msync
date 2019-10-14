@@ -10,7 +10,11 @@
 
 #include <cctype>
 
-global_options options;
+global_options& options()
+{
+	static global_options options;
+	return options;
+}
 
 using namespace std::string_literals;
 
