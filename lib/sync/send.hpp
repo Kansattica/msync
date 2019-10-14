@@ -28,7 +28,7 @@ public:
 		}
 	}
 
-	void send(const std::string& account, const std::string& instanceurl, const std::string_view access_token)
+	void send(const std::string_view account, const std::string_view instanceurl, const std::string_view access_token)
 	{
 		if (retries < 1)
 		{
