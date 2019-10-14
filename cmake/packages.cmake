@@ -67,6 +67,13 @@ set (BUILD_SHARED_LIBS OFF CACHE BOOL "Build static libcurl and cpr." FORCE)
 if (NOT USE_SYSTEM_CURL AND UNIX)
 	# if we're building our own curl, statically link openssl
 	set (OPENSSL_USE_STATIC_LIBS TRUE)
+
+	# static openssl has problems with finding the correct cert store
+	# someday, we'll be able to handle this in application code, but not today
+	# if you're building this yourself, I suggest either linking your system's libcurl with openssl (install from your package mangager if you can) or turning off OPENSSL_USE_STATIC_LIBS because the libraries that come with your system are more likely to know where the certs are
+	# this is for portability more than anything
+	set(CURL_CA_FALLBACK ON CACHE BOOL
+		    "Set ON to use built-in CA store of TLS backend. Defaults to OFF")
 endif()
 # add_definitions(-DCURL_STATICLIB)
 if (MSVC)
@@ -78,7 +85,7 @@ if(NOT libcpr_POPULATED)
 	message(STATUS "Configuring CPR...")
 	FetchContent_Populate(libcpr)
 	message(STATUS "BUILD_SHARED_LIBS IS ${BUILD_SHARED_LIBS}")
-	add_subdirectory(${libcpr_SOURCE_DIR})
+	add_subdirectory(${libcpr_SOURCE_DIR} ${libcpr_BINARY_DIR})
 	#message(STATUS "Descending into ${CPR_INCLUDE_DIRS}")
 	#include_directories(${CPR_INCLUDE_DIRS})
 	message(STATUS "Prepared CPR libraries ${CPR_LIBRARIES}")
