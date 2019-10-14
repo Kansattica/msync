@@ -9,7 +9,7 @@ SCENARIO("Can make SSL requests to a site.")
 
 	GIVEN("An HTTPS URL")
 	{
-		auto url = GENERATE(as<const char*>{}, "https://example.com", "https://wikipedia.org");
+		auto url = GENERATE(as<const char*>{}, "https://example.com", "https://wikipedia.org", "https://mastodon.social");
 
 		WHEN("a request is made")
 		{
