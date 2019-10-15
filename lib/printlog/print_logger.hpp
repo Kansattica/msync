@@ -12,14 +12,13 @@ enum class logtype
     verbose,
     fileonly
 };
-
 extern bool verbose_logs;
 extern bool logs_off;
 
 template <logtype isverbose = logtype::normal>
 struct print_logger
 {
-    print_logger() : logfile("msync.log", std::ios::out | std::ios::app) {}
+    print_logger(std::ofstream& file) : logfile(file) {}
 
     void flush()
     {
@@ -48,7 +47,7 @@ struct print_logger
     }
 
 private:
-    std::ofstream logfile;
+    std::ofstream& logfile;
 };
 
 print_logger<logtype::normal>& pl();
