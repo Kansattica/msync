@@ -2,6 +2,7 @@
 #define _MSYNC_NET_INTERFACE_HPP_
 
 #include <string_view>
+#include <string>
 
 struct net_response
 {
