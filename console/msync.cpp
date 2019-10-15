@@ -54,11 +54,14 @@ int main(int argc, const char* argv[])
 				pl() << '\n';
 			}
 			pl() << "Accounts registered: ";
-			for (auto it = options().accounts.begin(); it != options().accounts.end();)
 			{
-				pl() << it->first;
-				if (++it != options().accounts.end())
-					pl() << ", ";
+				auto accountnames = options().all_accounts();
+				for (auto it = accountnames.begin(); it != accountnames.end();)
+				{
+					pl() << *it;
+					if (++it != accountnames.end())
+						pl() << ", ";
+				}
 			}
             break;
         case mode::config:

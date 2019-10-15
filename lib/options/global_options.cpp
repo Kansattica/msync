@@ -28,7 +28,7 @@ std::pair<const std::string, user_options>& global_options::add_new_account(std:
 
     user_path /= User_Options_Filename;
 
-    const auto [it, inserted] = accounts.emplace(name, user_options{user_path});
+    const auto [it, inserted] = accounts.emplace(std::move(name), user_options{user_path});
 
     if (!inserted)
         plverb() << "Account already exists. Nothing changed.\n";
@@ -112,4 +112,14 @@ std::pair<const std::string, user_options>* global_options::select_account(const
         return candidate;
 
     return nullptr;
+}
+
+std::vector<std::string_view> global_options::all_accounts() const
+{
+	std::vector<std::string_view> toreturn(accounts.size());
+	std::transform(accounts.begin(), accounts.end(), toreturn.end(), [](const auto& pair)
+		{
+			return std::string_view{ pair.first };
+		});
+	return toreturn;
 }

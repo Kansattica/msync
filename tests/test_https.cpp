@@ -2,7 +2,6 @@
 
 #include <cpr/cpr.h>
 
-
 SCENARIO("Can make SSL requests to a site.")
 {
 

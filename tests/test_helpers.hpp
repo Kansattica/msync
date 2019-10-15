@@ -3,10 +3,12 @@
 
 #include <filesystem.hpp>
 
-#include <fstream>
 #include <string>
 #include <vector>
 #include <string_view>
+
+const fs::path& exe_location();
+std::vector<std::string> read_lines(fs::path toread);
 
 //ensures a file doesn't exist before and after each test run.
 struct test_file
@@ -37,16 +39,4 @@ private:
     fs::path filenamebak;
 };
 
-std::vector<std::string> inline read_lines(fs::path toread)
-{
-    std::ifstream fin(toread);
-    std::vector<std::string> toreturn;
-
-    for (std::string line; std::getline(fin, line);)
-    {
-        toreturn.push_back(line);
-    }
-
-    return toreturn;
-}
 #endif

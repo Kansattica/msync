@@ -20,15 +20,15 @@ struct send_posts
 public:
 	int retries = 3;
 
-
 	send_posts(post_request& func) : post(func) { }
 
 	void send_all()
 	{
-		for (auto& user : options().accounts)
-		{
-			send(user.first, *user.second.get_option(user_option::instance_url), *user.second.get_option(user_option::access_token));
-		}
+		options().foreach_account([](const auto& user)
+			{
+				send(user.first, *user.second.get_option(user_option::instance_url), *user.second.get_option(user_option::access_token));
+			});
+		
 	}
 
 	void send(const std::string_view account, const std::string_view instanceurl, const std::string_view access_token)
