@@ -19,7 +19,7 @@ fs::path _get_exe_location()
 
 const fs::path& exe_location()
 {
-	static fs::path _exeloc = _get_exe_location();
+	const static fs::path _exeloc = _get_exe_location();
 	return _exeloc;
 }
 
