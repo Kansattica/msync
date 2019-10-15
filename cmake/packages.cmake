@@ -59,10 +59,24 @@ FetchContent_Declare(
 	GIT_TAG			origin/master
 	GIT_SHALLOW		TRUE 	
 )
-option(USE_SYSTEM_CURL "" ON)
+option(USE_SYSTEM_CURL "Try to use the system's libcurl instead of downloading and statically linking." ON)
 option(BUILD_CPR_TESTS "" OFF)
 set (BUILD_TESTING OFF CACHE BOOL "If you must build curl from source, don't build the tests." FORCE)
 set (BUILD_SHARED_LIBS OFF CACHE BOOL "Build static libcurl and cpr." FORCE)
+
+if(USE_SYSTEM_CURL)
+       find_package(CURL)
+endif()
+
+if (NOT USE_SYSTEM_CURL OR NOT CURL_FOUND)
+       set (USE_SYSTEM_CURL OFF CACHE BOOL "Don't use system curl if we don't have it." FORCE)
+endif()
+
+#unset these because CPR's build will run its own find_package(CURL)
+UNSET(CURL_FOUND)
+UNSET(CURL_INCLUDE_DIRS)
+UNSET(CURL_LIBRARIES)
+UNSET(CURL_VERSION_STRING)
 
 if (NOT USE_SYSTEM_CURL AND UNIX)
 	# if we're building our own curl, statically link openssl
@@ -70,7 +84,9 @@ if (NOT USE_SYSTEM_CURL AND UNIX)
 
 	# static openssl has problems with finding the correct cert store
 	# someday, we'll be able to handle this in application code, but not today
-	# if you're building this yourself, I suggest either linking your system's libcurl with openssl (install from your package mangager if you can) or turning off OPENSSL_USE_STATIC_LIBS because the libraries that come with your system are more likely to know where the certs are
+	# if you're building this yourself, I suggest either dynamically linking your system's libcurl with openssl 
+	# (install from your package mangager if you can) or turning off OPENSSL_USE_STATIC_LIBS because the libraries that come with your system are 
+	# more likely to know where the certs are
 	# this is for portability more than anything
 	set(CURL_CA_FALLBACK ON CACHE BOOL
 		    "Set ON to use built-in CA store of TLS backend. Defaults to OFF")
