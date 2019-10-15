@@ -13,6 +13,7 @@
 #include <string>
 #include <utility>
 #include <algorithm>
+#include <print_logger.hpp>
 
 struct mock_args
 {
@@ -78,6 +79,7 @@ std::vector<std::string_view> repeat_each_element(const std::vector<std::string>
 SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.", "[send]")
 {
 	test_file fi{ options().executable_location / Account_Directory };
+	logs_off = true;
 	GIVEN("A queue with some ids to add and a good connection")
 	{
 		auto queue = GENERATE(
@@ -273,6 +275,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 		{
 			mock_network mock;
 			mock.fatal_error = true;
+			mock.status_code = 500;
 
 			send_posts send{ mock };
 
