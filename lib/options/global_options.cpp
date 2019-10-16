@@ -90,7 +90,6 @@ std::pair<const std::string, user_options>* global_options::select_account(const
 
     for (auto& entry : accounts)
     {
-
         // if name is longer than the entry, we'll step off the end of entry and segfault
         // since name can't possibly match something it's longer than, just skip this
         if (name.size() > entry.first.size())
@@ -104,6 +103,9 @@ std::pair<const std::string, user_options>* global_options::select_account(const
         {
             plverb() << "Matched account" << entry.first << "\n";
             matched++;
+
+			if (matched > 1) { return nullptr; }
+
             candidate = &entry;
         }
     }

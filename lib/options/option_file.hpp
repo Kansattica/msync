@@ -6,8 +6,6 @@
 
 #include "../filebacked/file_backed.hpp"
 
-using std::string;
-
 void Read(std::map<std::string, std::string>&, std::string&&);
 void Write(std::map<std::string, std::string>&&, std::ofstream&);
 

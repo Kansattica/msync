@@ -7,7 +7,7 @@ using std::getline;
 void Read(std::map<std::string, std::string>& parsed, std::string&& line)
 {
 	const auto equals = line.find_first_of('=');
-	parsed.emplace(std::make_pair(line.substr(0, equals), line.substr(equals + 1)));
+	parsed.emplace(line.substr(0, equals), line.substr(equals + 1));
 }
 
 void Write(std::map<std::string, std::string>&& map, std::ofstream& of)

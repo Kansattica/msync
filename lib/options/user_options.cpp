@@ -23,7 +23,7 @@ sync_settings user_options::get_sync_option(user_option toget) const
 {
     //only these guys have sync options
     assert(toget == user_option::pull_home || toget == user_option::pull_dms || toget == user_option::pull_notifications);
-    auto option = static_cast<size_t>(toget);
+    const auto option = static_cast<size_t>(toget);
     const auto val = backing.parsed.find(USER_OPTION_NAMES[option]);
     if (val == backing.parsed.end())
         return sync_setting_defaults[option - static_cast<size_t>(user_option::pull_home)];

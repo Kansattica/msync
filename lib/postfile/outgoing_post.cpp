@@ -90,7 +90,7 @@ void Write(post_content&& post, std::ofstream& of)
 	if (!post.attachments.empty())
 	{
 		of << "attach=";
-		for (auto& attach : post.attachments)
+		for (const auto& attach : post.attachments)
 		{
 			of << attach << ',';
 		}
@@ -180,12 +180,8 @@ void store_string(std::string& store_in, const std::string_view value)
 
 void store_vector(std::vector<std::string>& store_in, const std::string_view value)
 {
-	auto split = split_string(value, ',');
-	store_in.reserve(split.size());
-	for (auto& attachment : split)
-	{
-		store_in.emplace_back(attachment);
-	}
+	const auto split = split_string(value, ',');
+	store_in.insert(store_in.end(), split.begin(), split.end());
 }
 
 void parse_option(post_content& post, size_t option_index, const std::string_view value)

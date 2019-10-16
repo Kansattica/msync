@@ -39,7 +39,7 @@ public:
 			retries = 3;
 		}
 
-		std::string baseurl = make_api_url(instanceurl, status_route());
+		const std::string baseurl = make_api_url(instanceurl, status_route());
 
 		this->access_token = access_token;
 		pl() << "Sending queued favorites for " << account << '\n';
@@ -69,20 +69,20 @@ private:
 		{
 			std::string_view id = queuefile.parsed.front();
 
-			bool undo = should_undo(id);
+			const bool undo = should_undo(id);
 
-			std::string requesturl = paramaterize_url(baseurl, id, undo ? route<toread, false>() : route<toread, true>());
+			const std::string requesturl = paramaterize_url(baseurl, id, undo ? route<toread, false>() : route<toread, true>());
 
 			if (post_with_retries(requesturl))
 				pl() << requesturl << " OK\n";
 			else
-				failedids.emplace_back(id);
+				failedids.push_back(std::move(queuefile.parsed.front()));
 
 			// remove ID from this queue
 			queuefile.parsed.pop_front();
 		}
 
-		queuefile.parsed = failedids;
+		queuefile.parsed = std::move(failedids);
 	}
 
 	template <queues tosend, bool create>
@@ -106,7 +106,7 @@ private:
 	{
 		for (int i = 0; i < retries; i++)
 		{
-			net_response response = post(requesturl, access_token);
+			const net_response response = post(requesturl, access_token);
 
 			pl() << get_error_message(response.status_code, verbose_logs);
 

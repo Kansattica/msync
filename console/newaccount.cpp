@@ -30,7 +30,7 @@ void make_new_account(const std::string& accountname)
     if (useraccountpair == nullptr)
     {
         pl() << "Creating new account for " << accountname << "\n";
-        auto parsed = parse_account_name(accountname);
+        const auto parsed = parse_account_name(accountname);
         if (!parsed.has_value())
         {
             pl() << "Could not parse a username and instance name from: " << accountname << ". It should look like: username@instance.url\n";
@@ -50,13 +50,13 @@ void make_new_account(const std::string& accountname)
 
     // register the application with mastodon if needed
     auto client_id = useraccount.get_option(user_option::client_id);
-    auto client_secret = useraccount.get_option(user_option::client_secret);
+    const auto client_secret = useraccount.get_option(user_option::client_secret);
 
-    auto instanceurl = *useraccount.get_option(user_option::instance_url);
+    const auto instanceurl = *useraccount.get_option(user_option::instance_url);
     if (client_id == nullptr || client_secret == nullptr)
     {
         pl() << "Registering app with " << instanceurl << '\n';
-        auto r = cpr::Post(cpr::Url{make_api_url(instanceurl, "/api/v1/apps")},
+        const auto r = cpr::Post(cpr::Url{make_api_url(instanceurl, "/api/v1/apps")},
                            cpr::Parameters{{"client_name", "msync"}, {"redirect_uris", redirect_uri}, {"scopes", scopes}, {"website", "https://github.com/kansattica/msync"}});
 
         if (r.error)
@@ -66,7 +66,7 @@ void make_new_account(const std::string& accountname)
             return;
         }
 
-        json parsed = json::parse(r.text);
+        const json parsed = json::parse(r.text);
         useraccount.set_option(user_option::client_id, parsed["client_id"].get<std::string>());
         useraccount.set_option(user_option::client_secret, parsed["client_secret"].get<std::string>());
         pl() << "Registered!\n";
@@ -79,10 +79,10 @@ void make_new_account(const std::string& accountname)
     if (client_id == nullptr)
         client_id = useraccount.get_option(user_option::client_id);
 
-    auto authcode = useraccount.get_option(user_option::auth_code);
+    const auto authcode = useraccount.get_option(user_option::auth_code);
     if (authcode == nullptr)
     {
-        auto foundaccountname = *useraccount.get_option(user_option::account_name);
+        const auto foundaccountname = *useraccount.get_option(user_option::account_name);
         pl() << "Please open this URL in your browser:\n"
            << "https://" << instanceurl << "/oauth/authorize?response_type=code&client_id=" << *client_id
            << "&redirect_uri=" << redirect_uri << "&scope=" << urlscopes << '\n'
@@ -95,7 +95,7 @@ void make_new_account(const std::string& accountname)
         return;
     }
 
-    auto access_token = useraccount.get_option(user_option::access_token);
+    const auto access_token = useraccount.get_option(user_option::access_token);
     if (access_token != nullptr)
     {
         pl() << "Your account is already registered! You're done!\n";
@@ -103,14 +103,14 @@ void make_new_account(const std::string& accountname)
     }
 
     pl() << "Getting access token from server with authorization code.\n";
-    auto response = cpr::Post(cpr::Url{make_api_url(instanceurl, "/oauth/token")}, 
+    const auto response = cpr::Post(cpr::Url{make_api_url(instanceurl, "/oauth/token")}, 
         cpr::Parameters{{"client_id", *client_id}, {"client_secret", *client_secret}, {"grant_type", "authorization_code"}, 
         {"code", *authcode}, {"redirect_uri", redirect_uri}});
 
     useraccount.set_option(user_option::auth_code, "");
     if (response.error)
     {
-        auto foundaccountname = *useraccount.get_option(user_option::account_name);
+        const auto foundaccountname = *useraccount.get_option(user_option::account_name);
         pl() << "Could not get access token from server. Authorization codes can only be used once, so it's been deleted and you should get another one.\n"
            << "Please open this URL in your browser:\n"
            << "https://" << instanceurl << "/oauth/authorize?response_type=code&client_id=" << *client_id
@@ -122,7 +122,7 @@ void make_new_account(const std::string& accountname)
         return;
     }
 
-    json parsed = json::parse(response.text);
+    const json parsed = json::parse(response.text);
     useraccount.set_option(user_option::access_token, parsed["access_token"].get<std::string>());
     pl() << "Done! You're ready to start using this account.\n";
 

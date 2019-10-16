@@ -55,7 +55,7 @@ int main(int argc, const char* argv[])
 			}
 			pl() << "Accounts registered: ";
 			{
-				auto accountnames = options().all_accounts();
+				const auto accountnames = options().all_accounts();
 				for (auto it = accountnames.begin(); it != accountnames.end();)
 				{
 					pl() << *it;
@@ -94,7 +94,7 @@ int main(int argc, const char* argv[])
 		case mode::gen:
 		{ //notice the braces- this is a scope
 			outgoing_post post(parsed.gen_opt.filename);
-			post.parsed = parsed.gen_opt.post;
+			post.parsed = std::move(parsed.gen_opt.post);
 		}
 		pl() << "Wrote post template to " << parsed.gen_opt.filename;
 		break;
@@ -129,7 +129,7 @@ int main(int argc, const char* argv[])
 template <typename T>
 void uniqueify(T& toprint)
 {
-	auto last = std::unique(toprint.begin(), toprint.end());
+	const auto last = std::unique(toprint.begin(), toprint.end());
 	toprint.erase(last, toprint.end());
 }
 

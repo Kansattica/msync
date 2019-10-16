@@ -5,7 +5,7 @@
 net_response simple_post(const std::string_view url, const std::string_view access_token)
 {
 	static const std::string key_header{ "Idempotency-Key" };
-	auto response = cpr::Post(cpr::Url{ url }, cpr::Authentication{ "Bearer", access_token }, cpr::Header{ {key_header, std::string{url} } });
+	const auto response = cpr::Post(cpr::Url{ url }, cpr::Authentication{ "Bearer", access_token }, cpr::Header{ {key_header, std::string{url} } });
 
 	// add rate limiting handling later
 
