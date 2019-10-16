@@ -24,9 +24,9 @@ public:
 
 	void send_all()
 	{
-		options().foreach_account([](const auto& user)
+		options().foreach_account([this](const auto& user)
 			{
-				send(user.first, *user.second.get_option(user_option::instance_url), *user.second.get_option(user_option::access_token));
+				this->send(user.first, *user.second.get_option(user_option::instance_url), *user.second.get_option(user_option::access_token));
 			});
 		
 	}
