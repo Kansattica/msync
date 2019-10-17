@@ -17,7 +17,5 @@ net_response simple_post(const std::string_view url, const std::string_view acce
 	if (!toreturn.okay)
 		toreturn.message = response.error.message;
 	
-
 	return toreturn;
 }
-

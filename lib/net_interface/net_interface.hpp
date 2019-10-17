@@ -12,9 +12,9 @@ struct net_response
 	std::string message;
 };
 
-using post_request = net_response (const std::string_view url, const std::string_view access_token);
+using post_request = net_response (std::string_view url, std::string_view access_token);
 
-inline constexpr const char* get_error_message(int status_code, bool verbose)
+inline constexpr const char* get_error_message(const int status_code, const bool verbose)
 {
 	switch (status_code)
 	{
