@@ -14,13 +14,14 @@ constexpr std::array<std::array<std::string_view, 2>, 4> VISIBILITIES = { {
 	{"direct", "dm"}
 } };
 
-constexpr std::array<std::string_view, 4> OPTIONS = {
-	"visibility", "cw", "reply_to", "attach"
+constexpr std::array<std::string_view, 5> OPTIONS = {
+	"visibility", "cw", "reply_to", "attach", "descriptions"
 };
 
 size_t is_option(const std::string_view line, size_t equals_sign);
 bool is_snip(const std::string_view line);
 void parse_option(post_content& post, size_t option_index, const std::string_view value);
+void fix_descriptions(post_content& post);
 
 void Read(post_content& post, std::string&& line)
 {
@@ -66,11 +67,13 @@ void Read(post_content& post, std::string&& line)
 	if (is_snip(line))
 	{
 		post.is_raw = raw_text_mode::raw;
+		fix_descriptions(post);
 		return;
 	}
 
 	// if it's anything else, must be raw, including this line
 	post.is_raw = raw_text_mode::raw;
+	fix_descriptions(post);
 	Read(post, std::move(line));
 	return;
 }
@@ -87,13 +90,18 @@ void Write(post_content&& post, std::ofstream& of)
 		of << "reply_to=" << post.reply_to_id << '\n';
 	}
 
+	fix_descriptions(post);
 	if (!post.attachments.empty())
 	{
 		of << "attach=";
-		for (const auto& attach : post.attachments)
-		{
-			of << attach << ',';
-		}
+		join_iterable(post.attachments.begin(), post.attachments.end(), ',', of);
+		of << '\n';
+	}
+
+	if (!post.descriptions.empty())
+	{
+		of << "descriptions=";
+		join_iterable(post.descriptions.begin(), post.descriptions.end(), ',', of);
 		of << '\n';
 	}
 
@@ -178,11 +186,12 @@ void store_vector(std::vector<std::string>& store_in, const std::string_view val
 
 void parse_option(post_content& post, size_t option_index, const std::string_view value)
 {
-	static_assert(OPTIONS.size() == 4);
+	static_assert(OPTIONS.size() == 5);
 	static_assert(OPTIONS[0] == "visibility");
 	static_assert(OPTIONS[1] == "cw");
 	static_assert(OPTIONS[2] == "reply_to");
 	static_assert(OPTIONS[3] == "attach");
+	static_assert(OPTIONS[4] == "descriptions");
 
 	switch (option_index)
 	{
@@ -200,6 +209,21 @@ void parse_option(post_content& post, size_t option_index, const std::string_vie
 		// attachments are a comma-separated list
 		store_vector(post.attachments, value);
 		break;
+	case 4:
+		// so are descriptions
+		store_vector(post.descriptions, value);
+		break;
 	}
+}
+
+void fix_descriptions(post_content& post)
+{
+	if (post.attachments.size() >= post.descriptions.size())
+		return;
+	
+	pl() << "Detected " << post.attachments.size() << " attachments and " << post.descriptions.size() << " descriptions. Removing extra descriptions.\n";
+
+	// if we have too many descriptions, chop them off
+	post.descriptions.resize(post.attachments.size());
 
 }

@@ -184,6 +184,7 @@ SCENARIO("join_iterable correctly does that.")
 			std::make_tuple(std::vector<std::string_view>{"this","is","some","stuff"}, ";"sv, "this;is;some;stuff"sv),
 			std::make_tuple(std::vector<std::string_view>{"this","is","some","stuff"}, "_"sv, "this_is_some_stuff"sv),
 			std::make_tuple(std::vector<std::string_view>{"this","is","not","some","other","stuff"}, " or "sv, "this or is or not or some or other or stuff"sv),
+			std::make_tuple(std::vector<std::string_view>{"includes", "anempty", "", "string"}, "!"sv, "includes!anempty!!string"sv),
 			std::make_tuple(std::vector<std::string_view>{}, "_"sv, ""sv),
 			std::make_tuple(std::vector<std::string_view>{"hello"}, "_"sv, "hello"sv)
 		);

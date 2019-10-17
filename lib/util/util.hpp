@@ -17,8 +17,8 @@ std::optional<parsed_account> parse_account_name(const std::string& name);
 
 std::vector<std::string_view> split_string(std::string_view str, char on);
 
-template <typename Iterator, typename Stream>
-void join_iterable(Iterator begin, Iterator end, const std::string_view sep, Stream& stream)
+template <typename Iterator, typename Stream, typename Sep>
+void join_iterable(Iterator begin, Iterator end, const Sep& sep, Stream& stream)
 {
 	for (auto it = begin; it != end;)
 	{

@@ -22,6 +22,7 @@ struct post_content
 	std::string reply_to_id;
 	std::string content_warning;
 	std::vector<std::string> attachments;
+	std::vector<std::string> descriptions;
 	visibility vis = visibility::pub;
 	raw_text_mode is_raw = raw_text_mode::unset;
 };

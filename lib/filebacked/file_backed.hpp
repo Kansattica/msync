@@ -46,8 +46,7 @@ public:
 			plverb() << "Saved backup to " << backup << '\n';
 		}
 
-		std::ofstream of(backing);
-		Write(std::move(parsed), of);
+		Write(std::move(parsed), std::ofstream{ backing });
 
 		plverb() << "Saved " << backing << '\n';
 	}
@@ -60,8 +59,8 @@ public:
 
 	file_backed& operator=(file_backed&& other) noexcept // move assignment
 	{
-		std::swap(parsed, other.parsed);
-		std::swap(backing, other.backing);
+		parsed = std::move(other.parsed);
+		backing = std::move(other.backing);
 		return *this;
 	}
 
