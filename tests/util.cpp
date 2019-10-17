@@ -2,9 +2,13 @@
 #include <catch2/catch.hpp>
 
 #include <string>
+#include <string_view>
+#include <vector>
 #include <tuple>
+#include <sstream>
 
 using namespace std::string_literals;
+using namespace std::string_view_literals;
 
 SCENARIO("make_api_url correctly concatenates URLs and paths.")
 {
@@ -167,6 +171,31 @@ SCENARIO("split_string correctly splits strings")
 			THEN("we get an empty vector back.")
 			{
 				REQUIRE(result.size() == 0);
+			}
+		}
+	}
+}
+
+SCENARIO("join_iterable correctly does that.")
+{
+	GIVEN("An iterable to join")
+	{
+		auto testcase = GENERATE(
+			std::make_tuple(std::vector<std::string_view>{"this","is","some","stuff"}, ";"sv, "this;is;some;stuff"sv),
+			std::make_tuple(std::vector<std::string_view>{"this","is","some","stuff"}, "_"sv, "this_is_some_stuff"sv),
+			std::make_tuple(std::vector<std::string_view>{"this","is","not","some","other","stuff"}, " or "sv, "this or is or not or some or other or stuff"sv),
+			std::make_tuple(std::vector<std::string_view>{}, "_"sv, ""sv),
+			std::make_tuple(std::vector<std::string_view>{"hello"}, "_"sv, "hello"sv)
+		);
+
+		WHEN("the iterable is joined")
+		{
+			std::stringstream ss;
+			join_iterable(std::get<0>(testcase).begin(), std::get<0>(testcase).end(), std::get<1>(testcase), ss);
+
+			THEN("the result is as expected.")
+			{
+				REQUIRE(ss.str() == std::get<2>(testcase));
 			}
 		}
 	}

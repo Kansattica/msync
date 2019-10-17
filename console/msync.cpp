@@ -13,6 +13,7 @@
 #include "../lib/queue/queues.hpp"
 #include "../lib/sync/send.hpp"
 #include "../lib/net/net.hpp"
+#include "../lib/util/util.hpp"
 #include "newaccount.hpp"
 #include "optionparsing/parseoptions.hpp"
 
@@ -56,12 +57,7 @@ int main(int argc, const char* argv[])
 			pl() << "Accounts registered: ";
 			{
 				const auto accountnames = options().all_accounts();
-				for (auto it = accountnames.begin(); it != accountnames.end();)
-				{
-					pl() << *it;
-					if (++it != accountnames.end())
-						pl() << ", ";
-				}
+				join_iterable(accountnames.begin(), accountnames.end(), ", ", pl());
 			}
             break;
         case mode::config:
