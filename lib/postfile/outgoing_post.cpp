@@ -130,15 +130,7 @@ bool is_snip(const std::string_view line)
 		return false;
 	}
 
-	for (size_t i = 0; i < 3; i++)
-	{
-		if (line[i] != '-')
-		{
-			return false;
-		}
-	}
-
-	return true;
+	return std::all_of(line.begin(), line.begin() + 3, [](char c) { return c == '-'; });
 }
 
 visibility parse_visibility(const std::string_view value)

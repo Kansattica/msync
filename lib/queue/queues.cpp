@@ -177,7 +177,7 @@ void dequeue(queues todequeue, const std::string_view account, std::vector<std::
 	{
 		plverb() << queuedel << " will be removed next time you sync.\n";
 		queuedel.push_back('-');
-		toremovefrom.parsed.emplace_back(std::move(queuedel));
+		toremovefrom.parsed.push_back(std::move(queuedel));
 	}
 }
 

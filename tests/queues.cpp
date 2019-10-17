@@ -120,7 +120,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 		WHEN("a post is enqueued")
 		{
 			auto idx = GENERATE(0, 1, 2, 3);
-			std::vector<std::string> toq { postfiles[idx].filename.string() };
+			std::vector<std::string> toq{ postfiles[idx].filename.string() };
 			std::string justfilename = postfiles[idx].filename.filename().string();
 
 			enqueue(queues::post, account, toq);
@@ -199,7 +199,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 		{
 			outgoing_post op{ files[0].filename };
 			op.parsed.text = expected_text;
-			op.parsed.attachments = {"attachment.mp3", "filey.png" };
+			op.parsed.attachments = { "attachment.mp3", "filey.png" };
 		}
 
 		WHEN("the post is enqueued")
