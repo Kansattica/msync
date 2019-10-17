@@ -125,8 +125,7 @@ int main(int argc, const char* argv[])
 template <typename T>
 void uniqueify(T& toprint)
 {
-	const auto last = std::unique(toprint.begin(), toprint.end());
-	toprint.erase(last, toprint.end());
+	toprint.erase(std::unique(toprint.begin(), toprint.end()), toprint.end());
 }
 
 std::pair<const std::string, user_options>& assume_account(std::pair<const std::string, user_options>* user)
