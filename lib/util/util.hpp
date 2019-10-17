@@ -5,7 +5,7 @@
 #include <optional>
 #include <vector>
 
-std::string make_api_url(const std::string_view instance_url, const std::string_view api_route);
+std::string make_api_url(std::string_view instance_url, std::string_view api_route);
 
 struct parsed_account
 {
@@ -15,7 +15,7 @@ struct parsed_account
 
 std::optional<parsed_account> parse_account_name(const std::string& name);
 
-std::vector<std::string_view> split_string(const std::string_view str, char on);
+std::vector<std::string_view> split_string(std::string_view str, char on);
 
 template <typename Iterator, typename Stream>
 void join_iterable(Iterator begin, Iterator end, const std::string_view sep, Stream& stream)

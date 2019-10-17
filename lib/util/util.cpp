@@ -23,7 +23,7 @@ std::optional<parsed_account> parse_account_name(const std::string& name)
     return {};
 }
 
-std::vector<std::string_view> split_string(const std::string_view tosplit, char on)
+std::vector<std::string_view> split_string(const std::string_view tosplit, const char on)
 {
 	size_t start = 0;
 	std::vector<std::string_view> toreturn;
