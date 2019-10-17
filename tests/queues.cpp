@@ -14,6 +14,7 @@
 
 SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 {
+	logs_off = true;
 	const std::string account = "regularguy@internet.egg";
 	GIVEN("An empty queue")
 	{

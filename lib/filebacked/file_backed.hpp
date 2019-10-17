@@ -59,8 +59,8 @@ public:
 
 	file_backed& operator=(file_backed&& other) noexcept // move assignment
 	{
-		parsed = std::move(other.parsed);
-		backing = std::move(other.backing);
+		std::swap(parsed, other.parsed);
+		std::swap(backing, other.backing);
 		return *this;
 	}
 
