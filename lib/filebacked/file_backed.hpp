@@ -46,7 +46,8 @@ public:
 			plverb() << "Saved backup to " << backup << '\n';
 		}
 
-		Write(std::move(parsed), std::ofstream{ backing });
+		std::ofstream of{ backing };
+		Write(std::move(parsed), of);
 
 		plverb() << "Saved " << backing << '\n';
 	}
