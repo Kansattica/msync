@@ -1,4 +1,4 @@
-if((CMAKE_BUILD_TYPE MATCHES Release) OR (CMAKE_BUILD_TYPE MATCHES MinSizeRel))
+if((CMAKE_BUILD_TYPE MATCHES Release) OR (CMAKE_BUILD_TYPE MATCHES MinSizeRel) OR (CMAKE_BUILD_TYPE MATCHES RelWithDebInfo))
 	message("Testing for IPO / LTO support...")
 	include(CheckIPOSupported)
 	check_ipo_supported(RESULT ipo_is_supported OUTPUT error)
