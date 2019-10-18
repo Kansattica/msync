@@ -37,11 +37,15 @@ public:
 		if (backing.empty())
 			return; // we got moved from, so the new version will save it
 
-		fs::path backup(backing);
-		backup += ".bak";
-
 		if (fs::exists(backing))
 		{
+			// gotta make a copy here
+			const fs::path backup = fs::path{ backing }.concat(".bak");
+#ifdef _WIN32
+			// sometimes, Windows doesn't do the rename correctly and throws an "access denied" error when
+			// renaming over an existing file.
+			fs::remove(backup);
+#endif
 			fs::rename(backing, backup);
 			plverb() << "Saved backup to " << backup << '\n';
 		}

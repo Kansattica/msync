@@ -17,21 +17,21 @@ fs::path _get_exe_location()
     return fs::path(path.get(), path.get() + dirname_length);
 }
 
+const fs::path _exeloc = _get_exe_location();
 const fs::path& exe_location()
 {
-	const static fs::path _exeloc = _get_exe_location();
 	return _exeloc;
 }
 
 std::vector<std::string> read_lines(fs::path toread)
 {
-    std::ifstream fin(toread);
-    std::vector<std::string> toreturn;
+	std::ifstream fin(toread);
+	std::vector<std::string> toreturn;
 
-    for (std::string line; std::getline(fin, line);)
-    {
-        toreturn.push_back(line);
-    }
+	for (std::string line; std::getline(fin, line);)
+	{
+		toreturn.push_back(line);
+	}
 
-    return toreturn;
+	return toreturn;
 }

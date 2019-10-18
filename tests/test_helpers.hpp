@@ -16,27 +16,22 @@ struct test_file
 public:
 	test_file(const char* name) : test_file(fs::path(name)) {};
 	test_file(const std::string_view name) : test_file(fs::path(name)) {};
-    test_file(fs::path name) : filename(name), filenamebak(name)
-    {
-        filenamebak += ".bak";
-        if (fs::exists(filename))
-            fs::remove_all(filename);
-        if (fs::exists(filenamebak))
-            fs::remove_all(filenamebak);
-    };
+	test_file(fs::path name) : filename(name), filenamebak(fs::path{ name }.concat(".bak"))
+	{
+		fs::remove_all(filename);
+		fs::remove(filenamebak);
+	};
 
-    ~test_file()
-    {
-        if (fs::exists(filename))
-            fs::remove_all(filename);
-        if (fs::exists(filenamebak))
-            fs::remove_all(filenamebak);
-    };
+	~test_file()
+	{
+		fs::remove_all(filename);
+		fs::remove(filenamebak);
+	};
 
 	operator std::string() const { return filename.string(); }
-    const fs::path filename;
+	const fs::path filename;
 private:
-    fs::path filenamebak;
+	const fs::path filenamebak;
 };
 
 #endif
