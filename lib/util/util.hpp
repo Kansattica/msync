@@ -15,7 +15,38 @@ struct parsed_account
 
 std::optional<parsed_account> parse_account_name(const std::string& name);
 
-std::vector<std::string_view> split_string(std::string_view str, char on);
+template <bool allowEmpty = false>
+std::vector<std::string_view> split_string(const std::string_view tosplit, const char on)
+{
+	size_t start = 0;
+	std::vector<std::string_view> toreturn;
+	for (size_t i = 0; i < tosplit.size(); i++)
+	{
+		if (tosplit[i] == on)
+		{
+			if constexpr (!allowEmpty)
+			{
+				if (i > start)
+					toreturn.push_back(tosplit.substr(start, (i - start)));
+			}
+			else
+			{
+				toreturn.push_back(tosplit.substr(start, (i - start)));
+			}
+			start = i + 1;
+		}
+	}
+
+	// if we have stuff left over at the end
+	auto end = tosplit.substr(start);
+
+	if (!end.empty())
+	{
+		toreturn.push_back(std::move(end));
+	}
+
+	return toreturn;
+}
 
 template <typename Iterator, typename Stream, typename Sep>
 void join_iterable(Iterator begin, Iterator end, const Sep& sep, Stream& stream)

@@ -15,9 +15,9 @@ SCENARIO("make_api_url correctly concatenates URLs and paths.")
     GIVEN("An instance URL and API route")
     {
         auto input = GENERATE(
-            std::make_tuple("coolinstance.social"s, "/api/v1/register"s, "https://coolinstance.social/api/v1/register"s),
-            std::make_tuple("aplace.egg"s, "/api/v1/howdy"s, "https://aplace.egg/api/v1/howdy"s),
-            std::make_tuple("instance.place", "/api/v1/yes", "https://instance.place/api/v1/yes"s));
+            std::make_tuple("coolinstance.social"sv, "/api/v1/register"sv, "https://coolinstance.social/api/v1/register"sv),
+            std::make_tuple("aplace.egg"sv, "/api/v1/howdy"sv, "https://aplace.egg/api/v1/howdy"sv),
+            std::make_tuple("instance.place"sv, "/api/v1/yes"sv, "https://instance.place/api/v1/yes"sv));
 
         WHEN("they're passed to make_api_url")
         {
@@ -94,7 +94,7 @@ SCENARIO("parse_account_name correctly parses account names into a username and 
     }
 }
 
-SCENARIO("split_string correctly splits strings")
+SCENARIO("split_string correctly splits strings", "[problem]")
 {
 	GIVEN("Some strings with the delimiter and nothing extra at the end.")
 	{
@@ -105,9 +105,19 @@ SCENARIO("split_string correctly splits strings")
 			std::make_tuple("just;one", ';', std::vector<std::string_view>{"just", "one"}),
 			std::make_tuple("what,about,a,really,long,one;huh", ',', std::vector<std::string_view>{"what", "about", "a", "really", "long", "one;huh"}));
 
-		WHEN("the string is split")
+		WHEN("the string is split, ignoring empty splits.")
 		{
-			auto result = split_string(std::get<0>(input), std::get<1>(input));
+			auto result = split_string<false>(std::get<0>(input), std::get<1>(input));
+
+			THEN("the result is what we expected.")
+			{
+				REQUIRE(result == std::get<2>(input));
+			}
+		}
+
+		WHEN("the string is split, including empty splits.")
+		{
+			auto result = split_string<true>(std::get<0>(input), std::get<1>(input));
 
 			THEN("the result is what we expected.")
 			{
@@ -127,7 +137,7 @@ SCENARIO("split_string correctly splits strings")
 			std::make_tuple("just;one;", ';', std::vector<std::string_view>{"just", "one"}),
 			std::make_tuple("what,about,a,really,long,one;huh,", ',', std::vector<std::string_view>{"what", "about", "a", "really", "long", "one;huh"}));
 
-		WHEN("the string is split")
+		WHEN("the string is split with empty strings turned off.")
 		{
 			auto result = split_string(std::get<0>(input), std::get<1>(input));
 
@@ -141,21 +151,32 @@ SCENARIO("split_string correctly splits strings")
 	GIVEN("Some strings with multiple consecutive delimiters.")
 	{
 		auto input = GENERATE(
-			std::make_tuple("a,,,delimited,,string,", ',', std::vector<std::string_view>{"a", "delimited", "string"}),
-			std::make_tuple("a,del,,imited,,string,,,", ',', std::vector<std::string_view>{"a", "del", "imited", "string"}),
-			std::make_tuple(",,,,", ',', std::vector<std::string_view>{}),
-			std::make_tuple(";a,delimited,string;;", ';', std::vector<std::string_view>{"a,delimited,string"}),
-			std::make_tuple("a;;;;delimited;;;string;;;;;", ';', std::vector<std::string_view>{"a", "delimited", "string"}),
-			std::make_tuple("just;;one;", ';', std::vector<std::string_view>{"just", "one"}),
-			std::make_tuple("what,about,,,,a,,really,,long,,,,,one;huh,", ',', std::vector<std::string_view>{"what", "about", "a", "really", "long", "one;huh"}));
+			std::make_tuple("a,,,delimited,,string,", ',', std::vector<std::string_view>{"a", "delimited", "string"}, std::vector<std::string_view>{"a", "", "", "delimited", "", "string"}),
+			std::make_tuple("a,del,,imited,,string,,,", ',', std::vector<std::string_view>{"a", "del", "imited", "string"}, std::vector<std::string_view>{"a", "del", "", "imited", "", "string", "", ""}),
+			std::make_tuple(",,,,", ',', std::vector<std::string_view>{}, std::vector<std::string_view>{"", "", "", ""}),
+			std::make_tuple(";a,delimited,string;;", ';', std::vector<std::string_view>{"a,delimited,string"}, std::vector<std::string_view>{"", "a,delimited,string", ""}),
+			std::make_tuple("a;;;;delimited;;;string;;;;;", ';', std::vector<std::string_view>{"a", "delimited", "string"}, std::vector<std::string_view>{"a", "","","", "delimited", "","", "string", "","","",""}),
+			std::make_tuple("just;;one;", ';', std::vector<std::string_view>{"just", "one"}, std::vector<std::string_view>{"just", "", "one"}),
+			std::make_tuple("what,about,,,,a,,really,,long,,,,,one;huh,", ',', std::vector<std::string_view>{"what", "about", "a", "really", "long", "one;huh"}, std::vector<std::string_view>{"what", "about", "", "", "", "a", "", "really", "", "long", "", "", "", "", "one;huh"})
+		);
 
-		WHEN("the string is split")
+		WHEN("the string is split with empty strings turned off.")
 		{
-			auto result = split_string(std::get<0>(input), std::get<1>(input));
+			auto result = split_string<false>(std::get<0>(input), std::get<1>(input));
 
 			THEN("the result is what we expected.")
 			{
 				REQUIRE(result == std::get<2>(input));
+			}
+		}
+
+		WHEN("the string is split with empty strings turned on.")
+		{
+			auto result = split_string<true>(std::get<0>(input), std::get<1>(input));
+
+			THEN("the result is what we expected.")
+			{
+				REQUIRE(result == std::get<3>(input));
 			}
 		}
 	}
@@ -164,9 +185,19 @@ SCENARIO("split_string correctly splits strings")
 	{
 		auto input = "";
 
-		WHEN("the empty string is split")
+		WHEN("the empty string is split, ignoring empty splits")
 		{
 			auto result = split_string(input, ',');
+
+			THEN("we get an empty vector back.")
+			{
+				REQUIRE(result.size() == 0);
+			}
+		}
+
+		WHEN("the empty string is split, not ignoring empty splits")
+		{
+			auto result = split_string<true>(input, ',');
 
 			THEN("we get an empty vector back.")
 			{
@@ -197,6 +228,61 @@ SCENARIO("join_iterable correctly does that.")
 			THEN("the result is as expected.")
 			{
 				REQUIRE(ss.str() == std::get<2>(testcase));
+			}
+		}
+	}
+}
+
+SCENARIO("split_string and join_iterable are inverses.")
+{
+	GIVEN("A string to split and then join on a char")
+	{
+		auto testcase = GENERATE(
+			std::make_tuple("this,is,a,string", ','),
+			std::make_tuple("ladies:hello", ':'),
+			std::make_tuple("what,about;this,one", ','),
+			std::make_tuple("what,about;this,,one", ','),
+			std::make_tuple("what,about;this,one", ';'),
+			std::make_tuple("", ';')
+		);
+
+		WHEN("the string is split and then joined")
+		{
+			auto split = split_string<true>(std::get<0>(testcase), std::get<1>(testcase));
+			
+			std::stringstream ss;
+			join_iterable(split.begin(), split.end(), std::get<1>(testcase), ss);
+
+			THEN("the result is as expected.")
+			{
+				REQUIRE(ss.str() == std::get<0>(testcase));
+			}
+		}
+	}
+
+	GIVEN("A string to join and then split on a char")
+	{
+		auto testcase = GENERATE(
+			std::make_tuple(std::vector<std::string_view>{"this","is","some","stuff"}, ';'),
+			std::make_tuple(std::vector<std::string_view>{"this","is","some","stuff"}, '_'),
+			std::make_tuple(std::vector<std::string_view>{"includes", "anempty", "", "string"}, '!'),
+			std::make_tuple(std::vector<std::string_view>{}, '_'),
+			std::make_tuple(std::vector<std::string_view>{"hello"}, '_')
+		);
+
+		WHEN("the iterable is joined and then split")
+		{
+			std::stringstream ss;
+			join_iterable(std::get<0>(testcase).begin(), std::get<0>(testcase).end(), std::get<1>(testcase), ss);
+			
+			// can't return stringviews into ss.str(), it stops existing after the call
+			auto joined = std::string{ ss.str() };
+
+			auto split = split_string<true>(joined, std::get<1>(testcase));
+
+			THEN("the result is as expected.")
+			{
+				REQUIRE(split == std::get<0>(testcase));
 			}
 		}
 	}

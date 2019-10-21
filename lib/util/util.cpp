@@ -22,28 +22,3 @@ std::optional<parsed_account> parse_account_name(const std::string& name)
 
     return {};
 }
-
-std::vector<std::string_view> split_string(const std::string_view tosplit, const char on)
-{
-	size_t start = 0;
-	std::vector<std::string_view> toreturn;
-	for (size_t i = 0; i < tosplit.size(); i++)
-	{
-		if (tosplit[i] == on)
-		{
-			if (i > start)
-				toreturn.push_back(tosplit.substr(start, (i - start)));
-			start = i + 1;
-		}
-	}
-
-	// if we have stuff left over at the end
-	auto end = tosplit.substr(start);
-
-	if (!end.empty())
-	{
-		toreturn.emplace_back(std::move(end));
-	}
-
-	return toreturn;
-}
