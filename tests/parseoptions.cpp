@@ -867,6 +867,46 @@ command_line_option pick_attachment(int number, gen_options& expected)
 	return opt;
 }
 
+command_line_option pick_description(int number, gen_options& expected)
+{
+	command_line_option opt;
+
+	switch (number)
+	{
+	case 0:
+		opt.order = 7;
+		opt.options.emplace_back("-d");
+		opt.options.emplace_back("somedescrip");
+		expected.post.descriptions.emplace_back("somedescrip");
+		break;
+	case 1:
+		opt.order = 8;
+		opt.options.emplace_back("-d");
+		opt.options.emplace_back("some other description");
+		opt.options.emplace_back("thirddescrip");
+		expected.post.descriptions.emplace_back("some other description");
+		expected.post.descriptions.emplace_back("thirddescrip");
+		break;
+	case 2:
+		opt.order = 9;
+		opt.options.emplace_back("--description");
+		opt.options.emplace_back("describer");
+		opt.options.emplace_back("some file!");
+		expected.post.descriptions.emplace_back("describer");
+		expected.post.descriptions.emplace_back("some file!");
+		break;
+	case 3:
+		opt.order = 10;
+		opt.options.emplace_back("--description");
+		opt.options.emplace_back("some jerk doing a thing.");
+		expected.post.descriptions.emplace_back("some jerk doing a thing.");
+		break;
+	case 4:
+		break;
+	}
+	return opt;
+}
+
 
 SCENARIO("The command line parser recognizes when the user wants to generate a file.")
 {
@@ -876,17 +916,19 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		auto combination = GENERATE(range(0, 0b111 + 1));
 		auto longopt = GENERATE(range(0, 0b1111 + 1));
 		auto attach = GENERATE(0, 1, 2, 3, 4);
+		auto description = GENERATE(0, 1, 2, 3, 4);
 
 		gen_options expected;
 		std::vector<command_line_option> options;
 
-		// pick one of the attachment guys
+		if (attach != 4)
 		{
-			auto attachopt = pick_attachment(attach, expected);
-			if (attachopt.order != -1)
-			{
-				options.push_back(std::move(attachopt));
-			}
+			options.push_back(pick_attachment(attach, expected));
+		}
+
+		if (description != 4)
+		{
+			options.push_back(pick_description(description, expected));
 		}
 
 		if (flag_set(combination, 0))
