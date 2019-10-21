@@ -10,6 +10,7 @@
 
 SCENARIO("outgoing_post correctly reads and writes posts.")
 {
+	logs_off = true;
 	test_file fi{ "outfile" };
 	GIVEN("An outgoing_post with only text is filled and destroyed")
 	{
@@ -142,7 +143,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.")
 			std::vector<std::string_view>{},
 			std::vector<std::string_view>{"describing: an attachment"},
 			std::vector<std::string_view>{"describing: hi", "describing: there"},
-			std::vector<std::string_view>{"describing: four", "describing: entire", "describing: attachments", "describing: foryou"}
+			std::vector<std::string_view>{"describing: four", "", "describing: attachments", "describing: foryou"}
 			);
 
 		{
@@ -224,6 +225,12 @@ SCENARIO("outgoing_post correctly reads and writes posts.")
 
 				if (attachments.size() < descriptions.size())
 					descriptions.resize(attachments.size());
+
+				// if the last description is empty, that's okay, just remove it
+				// an attachment with an empty description is the same as an attachment with no description
+				// but we want to honor empty descriptions in the middle in case some attachments have descriptions and some don't.
+				if (!descriptions.empty() && descriptions.back().empty())
+					descriptions.pop_back();
 
 				REQUIRE(std::equal(result.parsed.descriptions.begin(), result.parsed.descriptions.end(), descriptions.begin(), descriptions.end()));
 

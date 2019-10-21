@@ -178,9 +178,10 @@ void store_string(std::string& store_in, const std::string_view value)
 	store_in = std::string{ value };
 }
 
+template <bool keepEmpty>
 void store_vector(std::vector<std::string>& store_in, const std::string_view value)
 {
-	const auto split = split_string(value, ',');
+	const auto split = split_string<keepEmpty>(value, ',');
 	store_in.insert(store_in.end(), split.begin(), split.end());
 }
 
@@ -207,11 +208,12 @@ void parse_option(post_content& post, size_t option_index, const std::string_vie
 		break;
 	case 3:
 		// attachments are a comma-separated list
-		store_vector(post.attachments, value);
+		store_vector<false>(post.attachments, value);
 		break;
 	case 4:
 		// so are descriptions
-		store_vector(post.descriptions, value);
+		// note that it's okay to have an empty description, but not an empty attachment
+		store_vector<true>(post.descriptions, value);
 		break;
 	}
 }
