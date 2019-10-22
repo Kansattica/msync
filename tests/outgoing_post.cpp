@@ -241,3 +241,11 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 
 	}
 }
+
+SCENARIO("outgoing_post is nothrow move constructible and assignable.")
+{
+	static_assert(std::is_nothrow_move_constructible<outgoing_post>::value, "outgoing_posts should be nothrow move constructible.");
+	static_assert(std::is_nothrow_move_assignable<outgoing_post>::value, "outgoing_posts should be nothrow move assignable.");
+	static_assert(std::is_copy_constructible<outgoing_post>::value == false, "outgoing_posts should not be copy constructible.");
+	static_assert(std::is_copy_assignable<outgoing_post>::value == false, "outgoing_posts should not be copy assignable.");
+}

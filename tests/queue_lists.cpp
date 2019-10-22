@@ -153,3 +153,11 @@ SCENARIO("queue_lists read data when created.")
         }
     }
 }
+
+SCENARIO("queue_list is a move-only type.")
+{
+	static_assert(std::is_nothrow_move_constructible<queue_list>::value, "queue_lists should be nothrow move constructible.");
+	static_assert(std::is_nothrow_move_assignable<queue_list>::value, "queue_lists should be nothrow move assignable.");
+	static_assert(std::is_copy_constructible<queue_list>::value == false, "queue_lists should not be copy constructable.");
+	static_assert(std::is_copy_assignable<queue_list>::value == false, "queue_lists should not be copy assignable.");
+}
