@@ -46,6 +46,8 @@ void Read(post_content& post, std::string&& line)
 
 	const auto equals = line.find('=');
 
+	// size_t is unsigned, so this is actually some gigantic number
+	// should be fine unless msync has billions of options some day
 	size_t option_index = -1;
 
 	if (equals != std::string::npos)
@@ -114,18 +116,22 @@ void Write(post_content&& post, std::ofstream& of)
 
 size_t is_option(const std::string_view line, size_t equals_sign)
 {
-	for (size_t i = 0; i < OPTIONS.size(); i++)
+	size_t idx = 0;
+	for (const auto& option : OPTIONS)
 	{
-		if (OPTIONS[i].size() != equals_sign)
+		if (option.size() != equals_sign)
 		{
 			// if the option is the wrong length, can't be it
+			idx++;
 			continue;
 		}
 
-		if (std::equal(line.begin(), line.begin() + equals_sign, OPTIONS[i].begin(), OPTIONS[i].end()))
+		if (std::equal(line.begin(), line.begin() + equals_sign, option.begin(), option.end()))
 		{
-			return i;
+			return idx;
 		}
+
+		idx++;
 	}
 
 	return -1;

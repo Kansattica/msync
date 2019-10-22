@@ -28,7 +28,7 @@ std::pair<const std::string, user_options>& global_options::add_new_account(std:
 
     user_path /= User_Options_Filename;
 
-    const auto [it, inserted] = accounts.emplace(std::move(name), user_options{user_path});
+	const auto [it, inserted] = accounts.emplace(std::move(name), user_options{ std::move(user_path) });
 
     if (!inserted)
         plverb() << "Account already exists. Nothing changed.\n";
@@ -41,7 +41,7 @@ fs::path global_options::get_exe_location()
     // see https://github.com/gpakosz/whereami
     const int length = wai_getModulePath(nullptr, 0, nullptr);
 
-    auto path = std::make_unique<char[]>(length + 1);
+    auto path = std::make_unique<char[]>(static_cast<size_t>(length) + 1);
 
     int dirname_length;
     wai_getExecutablePath(path.get(), length, &dirname_length);
@@ -74,10 +74,7 @@ std::unordered_map<std::string, user_options> global_options::read_accounts()
             throw msync_exception("Expected to find a config file and didn't find it. Try deleting the folder and running new again: "s + userfolder.path().string());
         }
 
-        auto accountname = userfolder.path().filename().string();
-        user_options config_file{configfile};
-
-        toreturn.emplace(accountname, std::move(config_file));
+		toreturn.emplace(userfolder.path().filename().string(), user_options{ std::move(configfile) });
     }
 
     return toreturn;

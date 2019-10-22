@@ -114,14 +114,14 @@ void enqueue(const queues toenqueue, const std::string_view account, const std::
 	queue_list toaddto = open_queue(toenqueue, account);
 
 	const fs::path filequeuedir = get_file_queue_directory(account, toenqueue == queues::post);
-	for (auto& id : add)
+	for (const auto& id : add)
 	{
 		std::string queuethis = id;
 		if (toenqueue == queues::post)
 		{
 			queuethis = queue_post(filequeuedir, id);
 		}
-		toaddto.parsed.emplace_back(std::move(queuethis));
+		toaddto.parsed.push_back(std::move(queuethis));
 	}
 
 	// consider looking for those "delete" guys, the ones with the - at the end, and having this cancel them out, 

@@ -10,7 +10,7 @@ fs::path _get_exe_location()
     // see https://github.com/gpakosz/whereami
     const int length = wai_getModulePath(nullptr, 0, nullptr);
 
-    auto path = std::make_unique<char[]>(length + 1);
+    auto path = std::make_unique<char[]>(static_cast<size_t>(length) + 1);
 
     int dirname_length;
     wai_getExecutablePath(path.get(), length, &dirname_length);

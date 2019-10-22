@@ -35,7 +35,7 @@ struct mock_network
 	
 	net_response mock_post(const std::string_view url, const std::string_view access_token)
 	{
-		arguments.emplace_back(mock_args{ std::string {url}, std::string {access_token } });
+		arguments.push_back(mock_args{ std::string {url}, std::string { access_token } });
 
 		net_response toreturn;
 		toreturn.retryable_error = (--succeed_after > 0);
@@ -78,7 +78,7 @@ std::vector<std::string_view> repeat_each_element(const std::vector<std::string>
 
 SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.")
 {
-	test_file fi{ options().executable_location / Account_Directory };
+	const test_file fi{ options().executable_location / Account_Directory };
 	logs_off = true;
 	GIVEN("A queue with some ids to add and a good connection")
 	{
