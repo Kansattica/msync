@@ -19,26 +19,20 @@ fs::path _get_exe_location()
     return fs::path(path.get(), path.get() + dirname_length);
 }
 
-const fs::path _exeloc = _get_exe_location();
-const fs::path& exe_location()
-{
-	return _exeloc;
-}
-
-const fs::path _accountdir = exe_location() / Account_Directory;
+const static fs::path _accountdir = _get_exe_location() / Account_Directory;
 test_file account_directory()
 {
 	return test_file{ _accountdir };
 }
 
-std::vector<std::string> read_lines(fs::path toread)
+std::vector<std::string> read_lines(const fs::path& toread)
 {
 	std::ifstream fin(toread);
 	std::vector<std::string> toreturn;
 
 	for (std::string line; std::getline(fin, line);)
 	{
-		toreturn.push_back(line);
+		toreturn.push_back(std::move(line));
 	}
 
 	return toreturn;

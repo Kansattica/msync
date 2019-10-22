@@ -109,6 +109,9 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 	constexpr static std::string_view account = "queueboy@website.egg";
 	test_file allaccounts = account_directory(); //make sure this gets cleaned up, too
 	test_file accountdir = allaccounts.filename / account;
+	
+	const fs::path file_queue_dir = accountdir.filename / File_Queue_Directory;
+	const fs::path post_queue_file = accountdir.filename / Post_Queue_Filename;
 
 	GIVEN("Some posts to enqueue")
 	{
@@ -145,7 +148,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 				THEN("msync's copy of the post is deleted")
 				{
-					REQUIRE_FALSE(fs::exists(accountdir.filename / File_Queue_Directory / justfilename));
+					REQUIRE_FALSE(fs::exists(file_queue_dir / justfilename));
 				}
 
 				THEN("the original copy of the post is fine")
@@ -162,7 +165,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 				THEN("the queue post file is emptied.")
 				{
-					auto lines = read_lines(accountdir.filename / Post_Queue_Filename);
+					auto lines = read_lines(post_queue_file);
 					REQUIRE(lines.size() == 0);
 				}
 			}
@@ -173,13 +176,13 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 				THEN("the queue file is empty.")
 				{
-					auto lines = read_lines(accountdir.filename / Post_Queue_Filename);
+					auto lines = read_lines(post_queue_file);
 					REQUIRE(lines.size() == 0);
 				}
 
 				THEN("the queue directory has been erased.")
 				{
-					REQUIRE_FALSE(fs::exists(accountdir.filename / File_Queue_Directory));
+					REQUIRE_FALSE(fs::exists(file_queue_dir));
 				}
 			}
 		}
@@ -215,7 +218,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 			THEN("the attachments are absolute paths")
 			{
-				outgoing_post post{ accountdir.filename / File_Queue_Directory / "somepost" };
+				outgoing_post post{ file_queue_dir / "somepost" };
 				REQUIRE(post.parsed.attachments.size() == 2);
 				REQUIRE(fs::path{ post.parsed.attachments[0] }.is_absolute());
 				REQUIRE(fs::path{ post.parsed.attachments[1] }.is_absolute());
@@ -241,8 +244,8 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 		{
 			enqueue(queues::post, account, std::vector<std::string>{ postfiles, postfiles + 2 });
 
-			const fs::path unsuffixedname = accountdir.filename / File_Queue_Directory / "thisisapost.hi";
-			const fs::path suffixedname = accountdir.filename / File_Queue_Directory / "thisisapost.hi.1";
+			const fs::path unsuffixedname = file_queue_dir / "thisisapost.hi";
+			const fs::path suffixedname = file_queue_dir / "thisisapost.hi.1";
 
 			THEN("one file goes in with the original name, one goes in with a new suffix.")
 			{
@@ -261,7 +264,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 			THEN("the queue file is correct.")
 			{
-				auto lines = read_lines(accountdir.filename / Post_Queue_Filename);
+				auto lines = read_lines(post_queue_file);
 				REQUIRE(lines.size() == 2);
 				REQUIRE(lines[0] == "thisisapost.hi");
 				REQUIRE(lines[1] == "thisisapost.hi.1");
@@ -286,17 +289,17 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 				THEN("msync's copy of the dequeued file is deleted.")
 				{
-					REQUIRE_FALSE(fs::exists(accountdir.filename / File_Queue_Directory / thisfile));
+					REQUIRE_FALSE(fs::exists(file_queue_dir / thisfile));
 				}
 
 				THEN("msync's copy of the other file is still there.")
 				{
-					REQUIRE(fs::exists(accountdir.filename / File_Queue_Directory / otherfile));
+					REQUIRE(fs::exists(file_queue_dir / otherfile));
 				}
 
 				THEN("the queue file is updated correctly.")
 				{
-					auto lines = read_lines(accountdir.filename / Post_Queue_Filename);
+					auto lines = read_lines(post_queue_file);
 					REQUIRE(lines.size() == 1);
 					REQUIRE(lines[0] == otherfile);
 				}
@@ -314,13 +317,13 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 				THEN("the queue file is empty.")
 				{
-					auto lines = read_lines(accountdir.filename / Post_Queue_Filename);
+					auto lines = read_lines(post_queue_file);
 					REQUIRE(lines.size() == 0);
 				}
 
 				THEN("the queue directory has been erased.")
 				{
-					REQUIRE_FALSE(fs::exists(accountdir.filename / File_Queue_Directory));
+					REQUIRE_FALSE(fs::exists(file_queue_dir));
 				}
 			}
 		}
