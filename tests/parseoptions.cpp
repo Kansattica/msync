@@ -908,7 +908,7 @@ command_line_option pick_description(int number, gen_options& expected)
 }
 
 
-SCENARIO("The command line parser recognizes when the user wants to generate a file.")
+SCENARIO("The command line parser recognizes when the user wants to generate a file.", "[long_run]")
 {
 	GIVEN("A combination of options for the file generator")
 	{

@@ -8,7 +8,7 @@
 #include <fstream>
 #include <string>
 
-SCENARIO("option_files save their data when destroyed.", "[option_file]")
+SCENARIO("option_files save their data when destroyed.")
 {
     GIVEN("An option_file with some values.")
     {
@@ -88,7 +88,7 @@ SCENARIO("option_files save their data when destroyed.", "[option_file]")
     }
 }
 
-SCENARIO("option_files read data when created.", "[option_file]")
+SCENARIO("option_files read data when created.")
 {
     GIVEN("An option file on disk with some data.")
     {

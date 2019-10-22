@@ -5,7 +5,7 @@
 
 #include "../lib/options/user_options.hpp"
 
-SCENARIO("User_options reads from a file when created", "[user_options]")
+SCENARIO("User_options reads from a file when created")
 {
     GIVEN("A file on disk with some properly formatted data")
     {
@@ -43,7 +43,7 @@ SCENARIO("User_options reads from a file when created", "[user_options]")
     }
 }
 
-SCENARIO("User_options saves changes back to its file", "[user_options]")
+SCENARIO("User_options saves changes back to its file")
 {
     GIVEN("A file on disk with some properly formatted data")
     {
@@ -89,7 +89,7 @@ SCENARIO("User_options saves changes back to its file", "[user_options]")
     }
 }
 
-SCENARIO("An empty user_options writes to a file when destroyed", "[user_options]")
+SCENARIO("An empty user_options writes to a file when destroyed")
 {
     GIVEN("A path with no file on disk")
     {
@@ -133,7 +133,7 @@ SCENARIO("An empty user_options writes to a file when destroyed", "[user_options
     }
 }
 
-SCENARIO("Get and set options manage string references correctly.", "[user_options]")
+SCENARIO("Get and set options manage string references correctly.")
 {
     GIVEN("A file on disk with some properly formatted data")
     {
@@ -177,7 +177,7 @@ SCENARIO("Get and set options manage string references correctly.", "[user_optio
 
 CATCH_REGISTER_ENUM(sync_settings, sync_settings::dont_sync, sync_settings::newest_first, sync_settings::oldest_first);
 
-SCENARIO("The enum overload for get_option works.", "[user_options]")
+SCENARIO("The enum overload for get_option works.")
 {
     GIVEN("An empty user_options")
     {

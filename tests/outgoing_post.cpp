@@ -8,7 +8,7 @@
 #include "test_helpers.hpp"
 #include "../postfile/outgoing_post.hpp"
 
-SCENARIO("outgoing_post correctly reads and writes posts.")
+SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 {
 	logs_off = true;
 	test_file fi{ "outfile" };

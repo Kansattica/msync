@@ -4,7 +4,7 @@
 
 CATCH_REGISTER_ENUM(list_operations, list_operations::add, list_operations::remove, list_operations::clear)
 
-SCENARIO("list_operations stringify and parse properly.", "[option_enums]")
+SCENARIO("list_operations stringify and parse properly.")
 {
     Catch::StringMaker<list_operations> sm;
     GIVEN("A list_operation")
@@ -41,7 +41,7 @@ SCENARIO("list_operations stringify and parse properly.", "[option_enums]")
 
 CATCH_REGISTER_ENUM(sync_settings, sync_settings::dont_sync, sync_settings::newest_first, sync_settings::oldest_first)
 
-SCENARIO("sync_settings stringify properly.", "[option_enums]")
+SCENARIO("sync_settings stringify properly.")
 {
     Catch::StringMaker<sync_settings> sm;
     GIVEN("A sync_setting")
@@ -79,7 +79,7 @@ SCENARIO("sync_settings stringify properly.", "[option_enums]")
 CATCH_REGISTER_ENUM(user_option, user_option::account_name, user_option::instance_url, user_option::auth_code,
                     user_option::access_token, user_option::client_secret, user_option::client_id, user_option::pull_home, user_option::pull_dms, user_option::pull_notifications)
 
-SCENARIO("user_option values stringify properly.", "[option_enums]")
+SCENARIO("user_option values stringify properly.")
 {
     Catch::StringMaker<user_option> sm;
     GIVEN("A user_option")

@@ -4,7 +4,6 @@
 
 SCENARIO("Can make SSL requests to a site.")
 {
-
 	GIVEN("An HTTPS URL")
 	{
 		auto url = GENERATE(as<const char*>{}, "https://example.com", "https://wikipedia.org", "https://mastodon.social");

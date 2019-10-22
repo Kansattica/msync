@@ -9,7 +9,7 @@
 #include <fstream>
 #include <string>
 
-SCENARIO("queue_lists save their data when destroyed.", "[queue_list]")
+SCENARIO("queue_lists save their data when destroyed.")
 {
     GIVEN("An queue_list with some values.")
     {
@@ -89,7 +89,7 @@ SCENARIO("queue_lists save their data when destroyed.", "[queue_list]")
     }
 }
 
-SCENARIO("queue_lists read data when created.", "[queue_list]")
+SCENARIO("queue_lists read data when created.")
 {
     GIVEN("An queue_list on disk with some data.")
     {

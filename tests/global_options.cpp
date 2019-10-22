@@ -7,7 +7,7 @@
 #include <string>
 using namespace std::string_literals;
 
-SCENARIO("Both paths we care about are directories.", "[global_options]")
+SCENARIO("Both paths we care about are directories.")
 {
 	test_file acc = exe_location() / Account_Directory;
 	GIVEN("A global_options object")
@@ -24,7 +24,7 @@ SCENARIO("Both paths we care about are directories.", "[global_options]")
 	}
 }
 
-SCENARIO("add_new_account correctly handles input.", "[global_options]")
+SCENARIO("add_new_account correctly handles input.")
 {
 	test_file acc = exe_location() / Account_Directory;
 	GIVEN("A global_options object")
@@ -65,7 +65,7 @@ SCENARIO("add_new_account correctly handles input.", "[global_options]")
 	}
 }
 
-SCENARIO("read_accounts correctly fills global_options on construction.", "[global_options]")
+SCENARIO("read_accounts correctly fills global_options on construction.")
 {
 	test_file acc = exe_location() / Account_Directory;
 	GIVEN("A global_options with some values added to it, destroyed, and then a new one created.")
@@ -118,7 +118,7 @@ SCENARIO("read_accounts correctly fills global_options on construction.", "[glob
 	}
 }
 
-SCENARIO("select_account selects exactly one account.", "[global_options]")
+SCENARIO("select_account selects exactly one account.")
 {
 	// this should make sure the accounts are empty
 	test_file acc = exe_location() / Account_Directory;
