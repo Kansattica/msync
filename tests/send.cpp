@@ -78,8 +78,9 @@ std::vector<std::string_view> repeat_each_element(const std::vector<std::string>
 
 SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.")
 {
-	const test_file fi{ options().executable_location / Account_Directory };
 	logs_off = true;
+
+	const test_file fi = account_directory();
 	GIVEN("A queue with some ids to add and a good connection")
 	{
 		auto queue = GENERATE(

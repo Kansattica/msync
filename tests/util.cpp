@@ -94,7 +94,7 @@ SCENARIO("parse_account_name correctly parses account names into a username and 
     }
 }
 
-SCENARIO("split_string correctly splits strings", "[problem]")
+SCENARIO("split_string correctly splits strings")
 {
 	GIVEN("Some strings with the delimiter and nothing extra at the end.")
 	{

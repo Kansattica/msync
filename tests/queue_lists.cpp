@@ -13,10 +13,9 @@ SCENARIO("queue_lists save their data when destroyed.")
 {
     GIVEN("An queue_list with some values.")
     {
-        const fs::path testfilename = "testfileopt";
-        test_file tf(testfilename);
+        test_file tf("testfileopt");
 
-        queue_list opts(testfilename);
+        queue_list opts(tf.filename);
         opts.parsed.emplace_back("thingone");
         opts.parsed.emplace_back("thingtwo");
 
@@ -28,7 +27,7 @@ SCENARIO("queue_lists save their data when destroyed.")
 
             THEN("no file is written")
             {
-                REQUIRE_FALSE(fs::exists(testfilename));
+                REQUIRE_FALSE(fs::exists(tf.filename));
             }
         }
 
@@ -40,9 +39,9 @@ SCENARIO("queue_lists save their data when destroyed.")
 
             THEN("the file is written")
             {
-                REQUIRE(fs::exists(testfilename));
+                REQUIRE(fs::exists(tf.filename));
 
-                auto lines = read_lines(testfilename);
+                auto lines = read_lines(tf.filename);
 
                 REQUIRE(lines.size() == 2);
                 REQUIRE(lines[0] == "thingone");
@@ -58,9 +57,9 @@ SCENARIO("queue_lists save their data when destroyed.")
 
             THEN("the file gets written")
             {
-                REQUIRE(fs::exists(testfilename));
+                REQUIRE(fs::exists(tf.filename));
 
-                auto lines = read_lines(testfilename);
+                auto lines = read_lines(tf.filename);
 
                 REQUIRE(lines.size() == 2);
                 REQUIRE(lines[0] == "thingone");
@@ -78,9 +77,9 @@ SCENARIO("queue_lists save their data when destroyed.")
 
             THEN("the file gets written without the deleted options.")
             {
-                REQUIRE(fs::exists(testfilename));
+                REQUIRE(fs::exists(tf.filename));
 
-                auto lines = read_lines(testfilename);
+                auto lines = read_lines(tf.filename);
 
                 REQUIRE(lines.size() == 1);
                 REQUIRE(lines[0] == "thingtwo");
@@ -93,13 +92,10 @@ SCENARIO("queue_lists read data when created.")
 {
     GIVEN("An queue_list on disk with some data.")
     {
-        const fs::path testfilename = "testfileoptread";
-        fs::path backupfilename(testfilename);
-        backupfilename += ".bak";
-        test_file tf(testfilename);
+		test_file tf("testfileoptread");
 
         {
-            std::ofstream fout(testfilename);
+            std::ofstream fout(tf.filename);
             fout << "firsthing\n";
             fout << "secondthing\n";
             fout << "thirdthing\n";
@@ -107,7 +103,7 @@ SCENARIO("queue_lists read data when created.")
 
         WHEN("an queue_list is created")
         {
-            queue_list testfi(testfilename);
+            queue_list testfi(tf.filename);
 
             THEN("it has the parsed information from the file.")
             {
@@ -124,7 +120,7 @@ SCENARIO("queue_lists read data when created.")
         WHEN("an queue_list is opened and modified")
         {
             {
-                queue_list testfi(testfilename);
+                queue_list testfi(tf.filename);
 
                 testfi.parsed.pop_front();
                 testfi.parsed.emplace_back(":) :)");
@@ -134,7 +130,7 @@ SCENARIO("queue_lists read data when created.")
 
             THEN("it saves the new information back to the file.")
             {
-                auto lines = read_lines(testfilename);
+                auto lines = read_lines(tf.filename);
 
                 REQUIRE(lines.size() == 4);
                 REQUIRE(lines[0] == "secondthing");
@@ -144,9 +140,9 @@ SCENARIO("queue_lists read data when created.")
 
                 AND_THEN("The original file is backed up.")
                 {
-                    REQUIRE(fs::exists(backupfilename));
+                    REQUIRE(fs::exists(tf.filenamebak));
 
-                    auto linesbak = read_lines(backupfilename);
+                    auto linesbak = read_lines(tf.filenamebak);
 
                     REQUIRE(linesbak.size() == 3);
                     REQUIRE(linesbak[0] == "firsthing");

@@ -5,6 +5,8 @@
 
 #include <fstream>
 
+#include "../lib/constants/constants.hpp"
+
 fs::path _get_exe_location()
 {
     // see https://github.com/gpakosz/whereami
@@ -21,6 +23,12 @@ const fs::path _exeloc = _get_exe_location();
 const fs::path& exe_location()
 {
 	return _exeloc;
+}
+
+const fs::path _accountdir = exe_location() / Account_Directory;
+test_file account_directory()
+{
+	return test_file{ _accountdir };
 }
 
 std::vector<std::string> read_lines(fs::path toread)

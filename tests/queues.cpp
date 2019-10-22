@@ -5,6 +5,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <string_view>
 
 #include "../lib/queue/queues.hpp"
 #include "../lib/constants/constants.hpp"
@@ -15,11 +16,11 @@
 SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 {
 	logs_off = true;
-	const std::string account = "regularguy@internet.egg";
+	static constexpr std::string_view account = "regularguy@internet.egg";
 	GIVEN("An empty queue")
 	{
-		test_file allaccounts = options().executable_location / Account_Directory; //make sure this gets cleaned up, too
-		test_file accountdir = options().executable_location / Account_Directory / account;
+		test_file allaccounts = account_directory(); //make sure this gets cleaned up, too
+		test_file accountdir = allaccounts.filename / account;
 
 		WHEN("some items are enqueued")
 		{
@@ -92,7 +93,7 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 
 }
 
-void files_match(const std::string& account, const fs::path& original, const std::string& outfile)
+void files_match(const std::string_view account, const fs::path& original, const std::string_view outfile)
 {
 	outgoing_post orig{ original };
 	outgoing_post newfile{ options().executable_location / Account_Directory / account / File_Queue_Directory / outfile };
@@ -105,13 +106,13 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 {
 	logs_off = true; //shut up the printlogger
 
-	const std::string account = "queueboy@website.egg";
-	test_file accountdir = options().executable_location / Account_Directory / account;
-	test_file allaccounts = options().executable_location / Account_Directory;
+	constexpr static std::string_view account = "queueboy@website.egg";
+	test_file allaccounts = account_directory(); //make sure this gets cleaned up, too
+	test_file accountdir = allaccounts.filename / account;
 
 	GIVEN("Some posts to enqueue")
 	{
-		const test_file postfiles[]{ test_file{"postboy"}, test_file{"guy.extension"}, test_file{"../up.here"}, test_file{"yeeeeeeehaw"} };
+		const test_file postfiles[]{ "postboy", "guy.extension", "../up.here", "yeeeeeeehaw" };
 		for (auto& file : postfiles)
 		{
 			std::ofstream of{ file.filename };
@@ -226,7 +227,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 	GIVEN("Two different posts with the same name to enqueue")
 	{
 		const test_file testdir{ "somedir" };
-		const test_file postfiles[]{ test_file{"thisisapost.hi"}, test_file{"somedir/thisisapost.hi"} };
+		const test_file postfiles[]{ "thisisapost.hi", "somedir/thisisapost.hi" };
 		fs::create_directory(testdir.filename);
 
 		int postno = 1;
