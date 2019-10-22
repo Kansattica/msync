@@ -57,8 +57,17 @@ public:
 	}
 
 	// can be moved
-	file_backed(file_backed&& other) = default; // move constructor
-	file_backed& operator=(file_backed&& other) = default; // move assignment
+	file_backed(file_backed&& other) noexcept // move constructor
+		: backing(std::move(other.backing)), parsed(std::move(other.parsed))
+	{
+	}
+
+	file_backed& operator=(file_backed&& other) noexcept // move assignment
+	{
+		std::swap(parsed, other.parsed);
+		std::swap(backing, other.backing);
+		return *this;
+	}
 
 	// backedfiles can't be copied
 	file_backed(const file_backed& other) = delete;            // copy constructor
