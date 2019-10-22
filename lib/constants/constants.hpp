@@ -4,7 +4,7 @@
 #include <string_view>
 
 // inline should make sure there's only one between all the files
-inline constexpr std::string_view Account_Directory{"accounts"};
+inline constexpr std::string_view Account_Directory{"msync_accounts"};
 
 inline constexpr std::string_view User_Options_Filename{"user.config"};
 inline constexpr std::string_view List_Options_Filename{"lists.config"};
