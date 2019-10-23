@@ -22,7 +22,9 @@ net_response simple_post(const std::string_view url, const std::string_view acce
 	net_response toreturn;
 
 	toreturn.retryable_error = response.error.code == cpr::ErrorCode::OPERATION_TIMEDOUT || (response.status_code >= 500 && response.status_code < 600);
-	toreturn.okay = !response.error;
+
+	// I don't think we can trust response.error, it says OK even if the status code is 400 something
+	toreturn.okay = response.status_code >= 200 && response.status_code < 300;
 
 	if (!toreturn.okay)
 		toreturn.message = std::move(response.error.message);
