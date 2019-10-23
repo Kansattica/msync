@@ -17,8 +17,8 @@ matrix:
     #env: BUILDTYPE=MinSizeRel 
   
 before_install:
-  - if [ "$TRAVIS_COMPILER" = "gcc" ]; then sudo -E apt-get -yq --no-install-suggests --no-install-recommends install g++-8 && CC=gcc-8 && CXX=g++-8; fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt -yq install libcurl4-openssl-dev ; fi
+  - if [ "$TRAVIS_COMPILER" = "gcc" ]; then sudo -E apt-get -yqq --no-install-suggests --no-install-recommends install g++-8 && CC=gcc-8 && CXX=g++-8; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt -yqq install libcurl4-openssl-dev ; fi
 
 script:
   - mkdir build
