@@ -9,6 +9,7 @@ std::string_view ensure_small_string(const std::string_view sv)
 	// I believe gcc, clang, and vs will all short string optimize a string that's 20 characters or less
 	// this is fine for the idempotency header, which only need be unique per type of request
 	// this only works for urls that end in the post ID, gotta do something else for statuses.
+	// also, we want to take the end because that's where the status and post ID are
 	int start_at = sv.size() < 20 ? 0 : sv.size() - 20;
 	return sv.substr(start_at);
 }
