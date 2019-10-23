@@ -37,6 +37,6 @@ after_success:
   - echo "Binary size:"
   - du -h $EXELOCATION
   - $EXELOCATION help
-  - time $TESTLOCATION
+  - $TESTLOCATION
   - $NETTESTLOCATION
   
