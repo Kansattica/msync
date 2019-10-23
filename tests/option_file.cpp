@@ -40,7 +40,7 @@ SCENARIO("option_files save their data when destroyed.")
             {
                 REQUIRE(fs::exists(tf.filename));
 
-                auto lines = read_lines(tf.filename);
+                const auto lines = read_lines(tf.filename);
 
                 REQUIRE(lines.size() == 2);
                 REQUIRE(lines[0] == "atestoption=coolstuff");
@@ -58,7 +58,7 @@ SCENARIO("option_files save their data when destroyed.")
             {
                 REQUIRE(fs::exists(tf.filename));
 
-                auto lines = read_lines(tf.filename);
+                const auto lines = read_lines(tf.filename);
 
                 REQUIRE(lines.size() == 2);
                 REQUIRE(lines[0] == "atestoption=coolstuff");
@@ -78,7 +78,7 @@ SCENARIO("option_files save their data when destroyed.")
             {
                 REQUIRE(fs::exists(tf.filename));
 
-                auto lines = read_lines(tf.filename);
+                const auto lines = read_lines(tf.filename);
 
                 REQUIRE(lines.size() == 1);
                 REQUIRE(lines[0] == "atestoption=coolstuff");
@@ -91,7 +91,7 @@ SCENARIO("option_files read data when created.")
 {
     GIVEN("An option file on disk with some data.")
     {
-        test_file tf("testfileoptread");
+        const test_file tf("testfileoptread");
 
         {
             std::ofstream fout(tf.filename);
@@ -127,7 +127,7 @@ SCENARIO("option_files read data when created.")
 
             THEN("it saves the new information back to the file.")
             {
-                auto lines = read_lines(tf.filename);
+                const auto lines = read_lines(tf.filename);
 
                 REQUIRE(lines.size() == 3);
                 REQUIRE(lines[0] == "anotherentry=foryou");
@@ -138,12 +138,76 @@ SCENARIO("option_files read data when created.")
                 {
                     REQUIRE(fs::exists(tf.filenamebak));
 
-                    auto linesbak = read_lines(tf.filenamebak);
+                    const auto linesbak = read_lines(tf.filenamebak);
 
                     REQUIRE(linesbak.size() == 3);
                     REQUIRE(linesbak[0] == "somecool=teststuff");
                     REQUIRE(linesbak[1] == "different=tests");
                     REQUIRE(linesbak[2] == "imgetting=testy");
+                }
+            }
+        }
+    }
+
+    GIVEN("An option file on disk with some data, blank lines, and comments.")
+    {
+        const test_file tf("testfileoptread");
+
+        {
+            std::ofstream fout(tf.filename);
+            fout << "somecool=teststuff\n";
+            fout << '\n';
+            fout << "different=tests\n";
+            fout << "#this is a comment\n";
+            fout << "imgetting=testy\n";
+        }
+
+        WHEN("an option_file is created")
+        {
+            option_file testfi(tf.filename);
+
+            THEN("it has the parsed information from the file.")
+            {
+                REQUIRE(testfi.parsed.size() == 3);
+                REQUIRE(testfi.parsed["somecool"] == "teststuff");
+                REQUIRE(testfi.parsed["different"] == "tests");
+                REQUIRE(testfi.parsed["imgetting"] == "testy");
+            }
+        }
+
+        WHEN("an option_file is opened and modified")
+        {
+            {
+                option_file testfi(tf.filename);
+
+                testfi.parsed["anotherentry"] = "foryou";
+                testfi.parsed["somecool"] = "isnowthis";
+                testfi.parsed.erase("imgetting");
+
+                REQUIRE(testfi.parsed.size() == 3);
+            }
+
+            THEN("it saves the new information back to the file.")
+            {
+                const auto lines = read_lines(tf.filename);
+
+                REQUIRE(lines.size() == 3);
+                REQUIRE(lines[0] == "anotherentry=foryou");
+                REQUIRE(lines[1] == "different=tests");
+                REQUIRE(lines[2] == "somecool=isnowthis");
+
+                AND_THEN("The original file is backed up.")
+                {
+                    REQUIRE(fs::exists(tf.filenamebak));
+
+                    const auto linesbak = read_lines(tf.filenamebak);
+
+                    REQUIRE(linesbak.size() == 5);
+                    REQUIRE(linesbak[0] == "somecool=teststuff");
+                    REQUIRE(linesbak[1] == "");
+                    REQUIRE(linesbak[2] == "different=tests");
+                    REQUIRE(linesbak[3] == "#this is a comment");
+                    REQUIRE(linesbak[4] == "imgetting=testy");
                 }
             }
         }

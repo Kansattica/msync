@@ -13,11 +13,11 @@ SCENARIO("queue_lists save their data when destroyed.")
 {
     GIVEN("An queue_list with some values.")
     {
-        test_file tf("testfileopt");
+        const test_file tf("testfileopt");
 
         queue_list opts(tf.filename);
-        opts.parsed.emplace_back("thingone");
-        opts.parsed.emplace_back("thingtwo");
+        opts.parsed.push_back("thingone");
+        opts.parsed.push_back("thingtwo");
 
         REQUIRE(opts.parsed.size() == 2);
 
@@ -92,7 +92,7 @@ SCENARIO("queue_lists read data when created.")
 {
     GIVEN("An queue_list on disk with some data.")
     {
-		test_file tf("testfileoptread");
+		const test_file tf("testfileoptread");
 
         {
             std::ofstream fout(tf.filename);
@@ -148,6 +148,73 @@ SCENARIO("queue_lists read data when created.")
                     REQUIRE(linesbak[0] == "firsthing");
                     REQUIRE(linesbak[1] == "secondthing");
                     REQUIRE(linesbak[2] == "thirdthing");
+                }
+            }
+        }
+    }
+
+    GIVEN("An queue_list on disk with some data and some stuff to skip.")
+    {
+		const test_file tf("testfileoptread");
+
+        {
+            std::ofstream fout(tf.filename);
+            fout << "firsthing\n";
+            fout << '\n';
+            fout << "secondthing\n";
+            fout << "# some comment for you\n";
+            fout << "thirdthing\n";
+        }
+
+        WHEN("an queue_list is created")
+        {
+            queue_list testfi(tf.filename);
+
+            THEN("it has the parsed information from the file.")
+            {
+                REQUIRE(testfi.parsed.size() == 3);
+                REQUIRE(testfi.parsed.front() == "firsthing");
+                testfi.parsed.pop_front();
+                REQUIRE(testfi.parsed.front() == "secondthing");
+                testfi.parsed.pop_front();
+                REQUIRE(testfi.parsed.front() == "thirdthing");
+                testfi.parsed.pop_front();
+            }
+        }
+
+        WHEN("an queue_list is opened and modified")
+        {
+            {
+                queue_list testfi(tf.filename);
+
+                testfi.parsed.pop_front();
+                testfi.parsed.push_back(":) :)");
+                testfi.parsed.push_back(":) :4");
+                REQUIRE(testfi.parsed.size() == 4);
+            }
+
+            THEN("it saves the new information back to the file.")
+            {
+                const auto lines = read_lines(tf.filename);
+
+                REQUIRE(lines.size() == 4);
+                REQUIRE(lines[0] == "secondthing");
+                REQUIRE(lines[1] == "thirdthing");
+                REQUIRE(lines[2] == ":) :)");
+                REQUIRE(lines[3] == ":) :4");
+
+                AND_THEN("The original file is backed up.")
+                {
+                    REQUIRE(fs::exists(tf.filenamebak));
+
+                    const auto linesbak = read_lines(tf.filenamebak);
+
+                    REQUIRE(linesbak.size() == 5);
+                    REQUIRE(linesbak[0] == "firsthing");
+                    REQUIRE(linesbak[1] == "");
+                    REQUIRE(linesbak[2] == "secondthing");
+                    REQUIRE(linesbak[3] == "# some comment for you");
+                    REQUIRE(linesbak[4] == "thirdthing");
                 }
             }
         }
