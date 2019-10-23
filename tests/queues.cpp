@@ -19,22 +19,22 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 	static constexpr std::string_view account = "regularguy@internet.egg";
 	GIVEN("An empty queue")
 	{
-		test_file allaccounts = account_directory(); //make sure this gets cleaned up, too
-		test_file accountdir = allaccounts.filename / account;
+		const test_file allaccounts = account_directory(); //make sure this gets cleaned up, too
+		const test_file accountdir = allaccounts.filename / account;
 
 		WHEN("some items are enqueued")
 		{
-			auto totest = GENERATE(
+			const auto totest = GENERATE(
 				std::make_pair(queues::boost, Boost_Queue_Filename),
 				std::make_pair(queues::fav, Fav_Queue_Filename)
 			);
 
-			std::vector<std::string> someids{ "12345", "67890", "123123123123123123123", "longtextboy", "friend" };
+			const std::vector<std::string> someids{ "12345", "67890", "123123123123123123123", "longtextboy", "friend" };
 			enqueue(totest.first, account, someids);
 
 			THEN("the items are written immediately.")
 			{
-				auto lines = print(totest.first, account);
+				const auto lines = print(totest.first, account);
 				REQUIRE(lines.size() == 5);
 				REQUIRE(lines == someids);
 			}
@@ -46,12 +46,11 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 
 			AND_WHEN("some of those are dequeued")
 			{
-				std::vector<std::string> removethese{ "12345", "longtextboy" };
-				dequeue(totest.first, account, std::move(removethese));
+				dequeue(totest.first, account, std::vector<std::string>{ "12345", "longtextboy" });
 
 				THEN("they're removed from the file.")
 				{
-					auto lines = print(totest.first, account);
+					const auto lines = print(totest.first, account);
 					REQUIRE(lines.size() == 3);
 					REQUIRE(lines[0] == "67890");
 					REQUIRE(lines[1] == "123123123123123123123");
@@ -61,12 +60,11 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 
 			AND_WHEN("some of those are dequeued and some aren't in the queue")
 			{
-				std::vector<std::string> removethese{ "12345", "longtextboy", "not in the queue", "other" };
-				dequeue(totest.first, account, std::move(removethese));
+				dequeue(totest.first, account, std::vector<std::string>{ "12345", "longtextboy", "not in the queue", "other" });
 
 				THEN("the ones in the queue are removed from the file, the ones not in the queue are appended.")
 				{
-					auto lines = print(totest.first, account);
+					const auto lines = print(totest.first, account);
 					REQUIRE(lines.size() == 5);
 					REQUIRE(lines[0] == "67890");
 					REQUIRE(lines[1] == "123123123123123123123");
@@ -82,7 +80,7 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 
 				THEN("The file is empty, but exists.")
 				{
-					auto lines = print(totest.first, account);
+					const auto lines = print(totest.first, account);
 					REQUIRE(fs::exists(accountdir.filename / totest.second));
 					REQUIRE(lines.size() == 0);
 				}
@@ -95,8 +93,8 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 
 void files_match(const std::string_view account, const fs::path& original, const std::string_view outfile)
 {
-	outgoing_post orig{ original };
-	outgoing_post newfile{ options().executable_location / Account_Directory / account / File_Queue_Directory / outfile };
+	const outgoing_post orig{ original };
+	const outgoing_post newfile{ options().executable_location / Account_Directory / account / File_Queue_Directory / outfile };
 
 	REQUIRE(orig.parsed.text == newfile.parsed.text);
 }
@@ -124,7 +122,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 		WHEN("a post is enqueued")
 		{
-			auto idx = GENERATE(0, 1, 2, 3);
+			const auto idx = GENERATE(0, 1, 2, 3);
 			std::vector<std::string> toq{ postfiles[idx].filename.string() };
 			std::string justfilename = postfiles[idx].filename.filename().string();
 
@@ -137,7 +135,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 			THEN("the queue post file is filled correctly")
 			{
-				auto lines = print(queues::post, account);
+				const auto lines = print(queues::post, account);
 				REQUIRE(lines.size() == 1);
 				REQUIRE(lines[0] == justfilename);
 			}
@@ -154,7 +152,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 				THEN("the original copy of the post is fine")
 				{
 					REQUIRE(fs::exists(postfiles[idx].filename));
-					auto lines = read_lines(postfiles[idx].filename);
+					const auto lines = read_lines(postfiles[idx].filename);
 					REQUIRE(lines.size() == 1);
 
 					std::string compareto{ "My name is \"" };
@@ -165,7 +163,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 				THEN("the queue post file is emptied.")
 				{
-					auto lines = read_lines(post_queue_file);
+					const auto lines = read_lines(post_queue_file);
 					REQUIRE(lines.size() == 0);
 				}
 			}
@@ -176,7 +174,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 				THEN("the queue file is empty.")
 				{
-					auto lines = read_lines(post_queue_file);
+					const auto lines = read_lines(post_queue_file);
 					REQUIRE(lines.size() == 0);
 				}
 
@@ -199,7 +197,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 			of << "I'm file number " << i;
 		}
 
-		std::string expected_text = GENERATE(as<std::string>{}, "", "Hey, check this out");
+		const std::string expected_text = GENERATE(as<std::string>{}, "", "Hey, check this out");
 
 		{
 			outgoing_post op{ files[0].filename };
@@ -255,16 +253,16 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 			THEN("the file contents are correct.")
 			{
-				auto unsuflines = outgoing_post(unsuffixedname);
+				const auto unsuflines = outgoing_post(unsuffixedname);
 				REQUIRE(unsuflines.parsed.text == "I'm number 1");
 
-				auto suflines = outgoing_post(suffixedname);
+				const auto suflines = outgoing_post(suffixedname);
 				REQUIRE(suflines.parsed.text == "I'm number 2");
 			}
 
 			THEN("the queue file is correct.")
 			{
-				auto lines = read_lines(post_queue_file);
+				const auto lines = read_lines(post_queue_file);
 				REQUIRE(lines.size() == 2);
 				REQUIRE(lines[0] == "thisisapost.hi");
 				REQUIRE(lines[1] == "thisisapost.hi.1");
@@ -272,7 +270,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 			THEN("print returns the correct output.")
 			{
-				auto lines = print(queues::post, account);
+				const auto lines = print(queues::post, account);
 				REQUIRE(lines.size() == 2);
 				REQUIRE(lines[0] == "thisisapost.hi");
 				REQUIRE(lines[1] == "thisisapost.hi.1");
@@ -280,7 +278,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 			AND_WHEN("one is removed")
 			{
-				auto idx = GENERATE(0, 1);
+				const auto idx = GENERATE(0, 1);
 
 				std::string thisfile = idx == 0 ? "thisisapost.hi" : "thisisapost.hi.1";
 				std::string otherfile = idx == 1 ? "thisisapost.hi" : "thisisapost.hi.1";
@@ -299,7 +297,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 				THEN("the queue file is updated correctly.")
 				{
-					auto lines = read_lines(post_queue_file);
+					const auto lines = read_lines(post_queue_file);
 					REQUIRE(lines.size() == 1);
 					REQUIRE(lines[0] == otherfile);
 				}
@@ -317,7 +315,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 				THEN("the queue file is empty.")
 				{
-					auto lines = read_lines(post_queue_file);
+					const auto lines = read_lines(post_queue_file);
 					REQUIRE(lines.size() == 0);
 				}
 
