@@ -160,7 +160,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 			if (!attachments.empty())
 			{
 				of << "attach=";
-				for (auto& attach : attachments)
+				for (const auto& attach : attachments)
 				{
 					of << attach << ',';
 				}
@@ -170,7 +170,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 			if (!descriptions.empty())
 			{
 				of << "descriptions=";
-				for (auto& describe : descriptions)
+				for (const auto& describe : descriptions)
 				{
 					of << describe << ',';
 				}
@@ -186,58 +186,56 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 
 		WHEN("A new outgoing_post is made from the same file")
 		{
-			outgoing_post result{ fi.filename };
-
-			THEN("everything is as expected.")
 			{
-				REQUIRE(result.parsed.text == testtext);
-				REQUIRE(result.parsed.vis == visibility.second);
-				REQUIRE(std::equal(result.parsed.attachments.begin(), result.parsed.attachments.end(), attachments.begin(), attachments.end()));
+				outgoing_post result{ fi.filename };
 
-				REQUIRE(result.parsed.descriptions.size() <= result.parsed.attachments.size());
+				THEN("everything is as expected.")
+				{
+					REQUIRE(result.parsed.text == testtext);
+					REQUIRE(result.parsed.vis == visibility.second);
+					REQUIRE(std::equal(result.parsed.attachments.begin(), result.parsed.attachments.end(), attachments.begin(), attachments.end()));
 
-				if (attachments.size() < descriptions.size())
-					descriptions.resize(attachments.size());
+					REQUIRE(result.parsed.descriptions.size() <= result.parsed.attachments.size());
 
-				REQUIRE(std::equal(result.parsed.descriptions.begin(), result.parsed.descriptions.end(), descriptions.begin(), descriptions.end()));
+					if (attachments.size() < descriptions.size())
+						descriptions.resize(attachments.size());
 
-				REQUIRE(result.parsed.content_warning == content_warning);
-				REQUIRE(result.parsed.reply_to_id == reply_to);
+					REQUIRE(std::equal(result.parsed.descriptions.begin(), result.parsed.descriptions.end(), descriptions.begin(), descriptions.end()));
+
+					REQUIRE(result.parsed.content_warning == content_warning);
+					REQUIRE(result.parsed.reply_to_id == reply_to);
+				}
 			}
 
-		}
-
-		WHEN("An outgoing_post is created, destroyed, and a new one created")
-		{
+			AND_WHEN("That post is destroyed and a new one is created")
 			{
-				outgoing_post temp{ fi.filename };
-			}
+				outgoing_post result{ fi.filename };
 
-			outgoing_post result{ fi.filename };
+				THEN("everything is as expected.")
+				{
+					REQUIRE(result.parsed.text == testtext);
+					REQUIRE(result.parsed.vis == visibility.second);
+					REQUIRE(std::equal(result.parsed.attachments.begin(), result.parsed.attachments.end(), attachments.begin(), attachments.end()));
 
-			THEN("everything is as expected.")
-			{
-				REQUIRE(result.parsed.text == testtext);
-				REQUIRE(result.parsed.vis == visibility.second);
-				REQUIRE(std::equal(result.parsed.attachments.begin(), result.parsed.attachments.end(), attachments.begin(), attachments.end()));
+					REQUIRE(result.parsed.descriptions.size() <= result.parsed.attachments.size());
 
-				REQUIRE(result.parsed.descriptions.size() <= result.parsed.attachments.size());
+					if (attachments.size() < descriptions.size())
+						descriptions.resize(attachments.size());
 
-				if (attachments.size() < descriptions.size())
-					descriptions.resize(attachments.size());
+					// if the last description is empty, that's okay, just remove it
+					// an attachment with an empty description is the same as an attachment with no description
+					// but we want to honor empty descriptions in the middle in case some attachments have descriptions and some don't.
+					if (!descriptions.empty() && descriptions.back().empty())
+						descriptions.pop_back();
 
-				// if the last description is empty, that's okay, just remove it
-				// an attachment with an empty description is the same as an attachment with no description
-				// but we want to honor empty descriptions in the middle in case some attachments have descriptions and some don't.
-				if (!descriptions.empty() && descriptions.back().empty())
-					descriptions.pop_back();
+					REQUIRE(std::equal(result.parsed.descriptions.begin(), result.parsed.descriptions.end(), descriptions.begin(), descriptions.end()));
 
-				REQUIRE(std::equal(result.parsed.descriptions.begin(), result.parsed.descriptions.end(), descriptions.begin(), descriptions.end()));
-
-				REQUIRE(result.parsed.content_warning == content_warning);
-				REQUIRE(result.parsed.reply_to_id == reply_to);
+					REQUIRE(result.parsed.content_warning == content_warning);
+					REQUIRE(result.parsed.reply_to_id == reply_to);
+				}
 			}
 		}
+
 
 	}
 }
