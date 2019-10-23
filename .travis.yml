@@ -5,8 +5,8 @@ env:
 os: linux
 dist: bionic
 compiler:
-#  - clang # travis clang builds are failing with this weird 'undefined reference to pthread_atfork'
   - gcc
+#  - clang # travis clang builds are failing with this weird 'undefined reference to pthread_atfork'
 matrix:
   include:
   - os: windows
