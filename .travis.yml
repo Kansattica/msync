@@ -2,15 +2,19 @@ language: cpp
 env:
   - BUILDTYPE=Release
   #- BUILDTYPE=MinSizeRel
-os: linux
-dist: bionic
-compiler:
-  - gcc
+# os: linux
+#dist: bionic
+#compiler:
+#  - gcc
 #  - clang # travis clang builds are failing with this weird 'undefined reference to pthread_atfork'
 matrix:
   include:
   - os: windows
     compiler: msvc
+    env: BUILDTYPE=Release 
+  - os: linux
+    dist: bionic
+    compiler: gcc
     env: BUILDTYPE=Release 
   #- os: windows
     #compiler: msvc
