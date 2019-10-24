@@ -4,10 +4,10 @@
 
 std::string make_api_url(const std::string_view instance_url, const std::string_view api_route)
 {
-    std::string toreturn{"https://"};
-    toreturn.reserve(instance_url.size() + api_route.size() + toreturn.size());
-    toreturn.append(instance_url).append(api_route);
-    return toreturn;
+    std::string to_return{"https://"};
+    to_return.reserve(instance_url.size() + api_route.size() + to_return.size());
+    to_return.append(instance_url).append(api_route);
+    return to_return;
 }
 
 std::optional<parsed_account> parse_account_name(const std::string& name)
@@ -21,4 +21,11 @@ std::optional<parsed_account> parse_account_name(const std::string& name)
     }
 
     return {};
+}
+
+std::string strip_html_tags(const std::string& to_strip)
+{
+	const static std::regex remove_tags{ "<[^<]*>" };
+
+	return std::regex_replace(to_strip, remove_tags, "");
 }

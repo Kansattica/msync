@@ -287,3 +287,49 @@ SCENARIO("split_string and join_iterable are inverses.")
 		}
 	}
 }
+
+SCENARIO("strip_html_tags does that.")
+{
+	GIVEN("A string with some HTML tags in it.")
+	{
+		const auto tostrip = GENERATE(
+			std::make_tuple("<p>hello there</p>", "hello there"),
+			std::make_tuple("<p>I'm here</p><div> for you</dove>", "I'm here for you"),
+			std::make_tuple(" i am com</p>u<to>r", " i am comur"),
+			std::make_tuple("<tr class=\"t - nv\"><td colspan=\"5\">Language</a> </td></tr>", "Language ")
+		);
+
+		WHEN("the HTML is stripped")
+		{
+			const auto stripped = strip_html_tags(std::get<0>(tostrip));
+
+			THEN("the result is as expected and has no HTML tags.")
+			{
+				REQUIRE(stripped == std::get<1>(tostrip));
+			}
+		}
+	}
+
+	GIVEN("A string with no HTML tags in it.")
+	{
+		const auto tostrip = GENERATE(as<const char*>{}, //msvc won't build without this
+			"hello",
+			"<:)",
+			">:(",
+			">:3",
+			"This is a regular sentence.      \t\n",
+			";>",
+			"<hatml  /"
+		);
+
+		WHEN("the HTML is stripped")
+		{
+			const auto stripped = strip_html_tags(tostrip);
+
+			THEN("the result is unchanged.")
+			{
+				REQUIRE(stripped == tostrip);
+			}
+		}
+	}
+}
