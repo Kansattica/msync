@@ -34,7 +34,9 @@ net_response simple_post(const std::string_view url, const std::string_view acce
 	// I don't think we can trust response.error, it says OK even if the status code is 400 something
 	toreturn.okay = !response.error && response.status_code >= 200 && response.status_code < 300;
 
-	if (!toreturn.okay)
+	if (toreturn.okay)
+		toreturn.message = std::move(response.text);
+	else
 		toreturn.message = std::move(response.error.message);
 
 	return toreturn;
