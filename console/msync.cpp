@@ -97,7 +97,7 @@ int main(int argc, const char* argv[])
 		case mode::sync:
 			if (parsed.sync_opts.send)
 			{
-				send_posts send{ simple_post };
+				send_posts<post_request, delete_request, post_new_status> send{ simple_post };
 				send.retries = parsed.sync_opts.retries;
 				if (user == nullptr)
 					send.send_all();

@@ -14,7 +14,7 @@
 #include "../queue/queues.hpp"
 #include "../util/util.hpp"
 
-template <typename post_request>
+template <typename post_request, typename delete_request, typename post_new_status>
 struct send_posts
 {
 public:
@@ -73,7 +73,9 @@ private:
 
 			const std::string requesturl = paramaterize_url(baseurl, id, undo ? route<toread, false>() : route<toread, true>());
 
-			if (post_with_retries(requesturl))
+			auto send_request = [&]() { return post(requesturl, access_token); };
+
+			if (request_with_retries(send_request))
 				pl() << requesturl << " OK\n";
 			else
 				failedids.push_back(std::move(queuefile.parsed.front()));
@@ -84,6 +86,35 @@ private:
 
 		queuefile.parsed = std::move(failedids);
 	}
+
+	void process_posts(const std::string_view account, const std::string_view baseurl) 
+	{
+		auto queuefile = get(queues::post, account);
+
+		std::deque<std::string> failed;
+
+		while (!queuefile.parsed.empty())
+		{
+			std::string_view id = queuefile.parsed.front();
+
+			// this is either a file path OR a post ID with a minus sign at the end
+			// if it has a minus sign at the end, assume it's an ID to be deleted.
+			const bool undo = should_undo(id);
+
+//			const std::string requesturl = undo ? paramaterize_url(baseurl, id, "") : ;
+
+			//if (request_with_retries())
+			//	pl() << requesturl << " OK\n";
+			//else
+			//	failed.push_back(std::move(queuefile.parsed.front()));
+
+			// remove ID from this queue
+			queuefile.parsed.pop_front();
+		}
+
+		queuefile.parsed = std::move(failed);
+	}
+
 
 	template <queues tosend, bool create>
 	constexpr std::string_view route() const
@@ -102,11 +133,12 @@ private:
 		return std::get<create ? 0 : 1>(toreturn);
 	}
 
-	bool post_with_retries(const std::string_view requesturl)
+	template <typename make_request>
+	bool request_with_retries(make_request req)
 	{
 		for (int i = 0; i < retries; i++)
 		{
-			const net_response response = post(requesturl, access_token);
+			const net_response response = req();
 
 			pl() << get_error_message(response.status_code, verbose_logs);
 

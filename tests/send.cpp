@@ -101,7 +101,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 		{
 			mock_network mock;
 
-			send_posts send{ mock };
+			send_posts<mock_network, void, void> send{ mock };
 
 			send.send(account, instanceurl, accesstoken);
 
@@ -151,7 +151,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 		{
 			mock_network mock;
 
-			send_posts send{ mock };
+			send_posts<mock_network, void, void> send{ mock };
 
 			send.send(account, instanceurl, accesstoken);
 
@@ -213,7 +213,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			mock_network mock;
 			mock.set_succeed_after(retries.second);
 
-			send_posts send{ mock };
+			send_posts<mock_network, void, void> send{ mock };
 
 			send.retries = retries.first;
 
@@ -278,7 +278,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			mock.fatal_error = true;
 			mock.status_code = 500;
 
-			send_posts send{ mock };
+			send_posts<mock_network, void, void> send{ mock };
 
 			send.retries = retries.first;
 

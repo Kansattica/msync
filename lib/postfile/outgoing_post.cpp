@@ -9,7 +9,7 @@
 
 constexpr std::array<std::array<std::string_view, 2>, 4> VISIBILITIES = { {
 	{"public", ""},
-	{"followersonly", "private"},
+	{"private", "followersonly"},
 	{"unlisted", ""},
 	{"direct", "dm"}
 } };
@@ -151,7 +151,7 @@ visibility parse_visibility(const std::string_view value)
 {
 	static_assert(VISIBILITIES.size() == 4);
 	static_assert(VISIBILITIES[static_cast<int>(visibility::pub)][0] == "public");
-	static_assert(VISIBILITIES[static_cast<int>(visibility::priv)][0] == "followersonly");
+	static_assert(VISIBILITIES[static_cast<int>(visibility::priv)][0] == "private");
 	static_assert(VISIBILITIES[static_cast<int>(visibility::unlisted)][0] == "unlisted");
 	static_assert(VISIBILITIES[static_cast<int>(visibility::direct)][0] == "direct");
 
