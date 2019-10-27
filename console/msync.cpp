@@ -36,6 +36,7 @@ int main(int argc, const char* argv[])
 	auto parsed = parse(argc, argv, false);
 
 	auto user = options().select_account(parsed.account);
+	bool should_print_newline = true;
 	try
 	{
 		switch (parsed.selected)
@@ -66,7 +67,6 @@ int main(int argc, const char* argv[])
 				else
 				{
 					pl() << SYNC_SETTING_NAMES[static_cast<int>(assume_account(user).second.get_sync_option(opt))];
-
 				}
 				pl() << '\n';
 			}
@@ -102,6 +102,7 @@ int main(int argc, const char* argv[])
 				print_iterable(print(parsed.queue_opt.selected, assume_account(user).first));
 				break;
 			}
+			should_print_newline = false;
 			break;
 		case mode::gen:
 		{ //notice the braces- this is a scope
@@ -122,6 +123,7 @@ int main(int argc, const char* argv[])
 			}
 			break;
 		case mode::help:
+			should_print_newline = false;
 			break;
 		default:
 			pl() << "[option not implemented]";
@@ -133,7 +135,8 @@ int main(int argc, const char* argv[])
 		pl() << "\nFor account: " << parsed.account;
 	}
 
-	pl() << '\n';
+	if (should_print_newline)
+		pl() << '\n';
 
 	plfile() << "--- msync finished normally ---\n";
 }
@@ -163,14 +166,13 @@ template <typename T>
 void print_iterable(const T& vec)
 {
 	bool minushelp = false;
-	for (auto& item : vec)
+	for (const auto& item : vec)
 	{
 		pl() << item << '\n';
 		minushelp = minushelp || (item.back() == '-');
 	}
 	if (minushelp)
 		pl() << "IDs followed by a - will be deleted next time you sync.\n";
-
 }
 
 bool is_sensitive(user_option opt)
