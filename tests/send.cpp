@@ -125,20 +125,22 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 	logs_off = true;
 
 	const test_file fi = account_directory();
+
+	const auto queue = GENERATE(
+		std::make_pair(queues::fav, "/favourite"),
+		std::make_pair(queues::boost, "/reblog"));
+
+	std::vector<std::string> testvect = GENERATE(
+		std::vector<std::string>{ "someid", "someotherid", "mrid" },
+		std::vector<std::string>{},
+		std::vector<std::string>{ "justone" });
+
+	constexpr std::string_view account = "someguy@cool.account";
+	constexpr std::string_view instanceurl = "cool.account";
+	constexpr std::string_view accesstoken = "sometoken";
+
 	GIVEN("A queue with some ids to add and a good connection")
 	{
-		const auto queue = GENERATE(
-			std::make_pair(queues::fav, "/favourite"),
-			std::make_pair(queues::boost, "/reblog"));
-		const std::vector<std::string> testvect = GENERATE( 
-			std::vector<std::string>{ "someid", "someotherid", "mrid" },
-			std::vector<std::string>{},
-			std::vector<std::string>{ "justone" });
-
-		constexpr std::string_view account = "someguy@cool.account";
-		constexpr std::string_view instanceurl = "cool.account";
-		constexpr std::string_view accesstoken = "sometoken";
-
 		enqueue(queue.first, account, testvect);
 
 		WHEN("the queue is sent")
@@ -185,18 +187,6 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 	GIVEN("A queue with some ids to remove and a good connection")
 	{
-		const auto queue = GENERATE(
-			std::make_pair(queues::fav, "/unfavourite"),
-			std::make_pair(queues::boost, "/unreblog"));
-		std::vector<std::string> testvect = GENERATE( 
-			std::vector<std::string>{ "someid-", "someotherid-", "mrid-" },
-			std::vector<std::string>{},
-			std::vector<std::string>{ "justone-" });
-
-		constexpr std::string_view account = "someguy@cool.account";
-		constexpr std::string_view instanceurl = "cool.account";
-		constexpr std::string_view accesstoken = "sometoken";
-
 		enqueue(queue.first, account, testvect);
 
 		WHEN("the queue is sent")
@@ -244,14 +234,6 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 	GIVEN("A queue with some ids to add and retryable errors that ultimately succeed")
 	{
-		const auto queue = GENERATE(
-			std::make_pair(queues::fav, "/favourite"),
-			std::make_pair(queues::boost, "/reblog"));
-		const std::vector<std::string> testvect = GENERATE( 
-			std::vector<std::string>{ "someid", "someotherid", "mrid" },
-			std::vector<std::string>{},
-			std::vector<std::string>{ "justone" });
-
 		// first is the number of retries to feed to send
 		// second is the number of retries to expect
 		// the last two test the "if retries less than 1, set to 3" behavior
@@ -261,10 +243,6 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			std::make_pair(1, 1),
 			std::make_pair(0, 3),
 			std::make_pair(-1, 3));
-
-		constexpr std::string_view account = "someguy@cool.account";
-		constexpr std::string_view instanceurl = "cool.account";
-		constexpr std::string_view accesstoken = "sometoken";
 
 		enqueue(queue.first, account, testvect);
 
@@ -317,14 +295,6 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 	GIVEN("A queue where all the IDs fail")
 	{
-		const auto queue = GENERATE(
-			std::make_pair(queues::fav, "/favourite"),
-			std::make_pair(queues::boost, "/reblog"));
-		const std::vector<std::string> testvect = GENERATE( 
-			std::vector<std::string>{ "someid", "someotherid", "mrid" },
-			std::vector<std::string>{},
-			std::vector<std::string>{ "justone" });
-
 		// first is the number of retries to feed to send
 		// second is the number of retries to expect
 		// the last two test the "if retries less than 1, set to 3" behavior
@@ -335,9 +305,6 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			std::make_pair(0, 3),
 			std::make_pair(-1, 3));
 
-		constexpr std::string_view account = "someguy@cool.account";
-		constexpr std::string_view instanceurl = "cool.account";
-		constexpr std::string_view accesstoken = "sometoken";
 
 		enqueue(queue.first, account, testvect);
 
@@ -389,4 +356,3 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 		}
 	}
 }
-
