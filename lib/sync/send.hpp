@@ -14,6 +14,7 @@
 #include "../queue/queues.hpp"
 #include "../util/util.hpp"
 #include "../postfile/outgoing_post.hpp"
+#include "../constants/constants.hpp"
 
 template <typename post_request, typename delete_request, typename post_new_status>
 struct send_posts
@@ -89,6 +90,24 @@ private:
 		queuefile.parsed = std::move(failedids);
 	}
 
+	status_params read_params(const fs::path& path)
+	{
+		static int idempotency_id = 1;
+
+		const outgoing_post post{ path };
+
+		status_params toreturn;
+		toreturn.attachments = post.parsed.attachments;
+		toreturn.body = post.parsed.text;
+		toreturn.content_warning = post.parsed.content_warning;
+		toreturn.descriptions = post.parsed.descriptions;
+		toreturn.idempotency_id = idempotency_id++;
+		toreturn.reply_to = post.parsed.reply_to_id;
+		toreturn.visibility = post.parsed.vis;
+
+		return toreturn;
+	}
+
 	void process_posts(const std::string_view account, const std::string_view baseurl) 
 	{
 		auto queuefile = get(queues::post, account);
@@ -111,14 +130,18 @@ private:
 			}
 			else
 			{
-				status_params params;
+				const static fs::path base = options().executable_location / File_Queue_Directory;
+				const fs::path file_to_send = base / id;
+				status_params params = read_params(file_to_send);
 				succeeded = request_with_retries([&]() { return new_status(baseurl, access_token, params); });
+				if (succeeded)
+					fs::remove(file_to_send);
 			}
 
-			//if (request_with_retries())
-			//	pl() << requesturl << " OK\n";
-			//else
-			//	failed.push_back(std::move(queuefile.parsed.front()));
+			if (succeeded)
+				pl() << requesturl << " OK\n";
+			else
+				failed.push_back(std::move(queuefile.parsed.front()));
 
 			// remove ID from this queue
 			queuefile.parsed.pop_front();

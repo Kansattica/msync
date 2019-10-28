@@ -11,7 +11,7 @@ std::string_view ensure_small_string(const std::string_view sv)
 	// this is fine for the idempotency header, which only need be unique per type of request
 	// this only works for urls that end in the post ID, gotta do something else for statuses.
 	// also, we want to take the end because that's where the status and post ID are
-	int start_at = sv.size() < 20 ? 0 : sv.size() - 20;
+	const size_t start_at = sv.size() < 20 ? 0 : sv.size() - 20;
 	return sv.substr(start_at);
 }
 std::string make_bearer(const std::string_view access_token)
@@ -69,6 +69,8 @@ net_response new_status(std::string_view url, std::string_view access_token, sta
 	add_if_value(post_params, "spoiler_text", std::move(params.content_warning));
 	add_if_value(post_params, "visibility", std::move(params.visibility));
 	add_if_value(post_params, "in_reply_to_id", std::move(params.reply_to));
+
+	// gotta handle attachments
 
 	return handle_response(
 		cpr::Post(cpr::Url{ url },
