@@ -127,10 +127,10 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 	const test_file fi = account_directory();
 
 	const auto queue = GENERATE(
-		std::make_pair(queues::fav, "/favourite"),
-		std::make_pair(queues::boost, "/reblog"));
+		std::make_tuple(queues::fav, "/favourite", "/unfavourite"),
+		std::make_tuple(queues::boost, "/reblog", "/unreblog"));
 
-	std::vector<std::string> testvect = GENERATE(
+	const std::vector<std::string> testvect = GENERATE(
 		std::vector<std::string>{ "someid", "someotherid", "mrid" },
 		std::vector<std::string>{},
 		std::vector<std::string>{ "justone" });
@@ -141,7 +141,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 	GIVEN("A queue with some ids to add and a good connection")
 	{
-		enqueue(queue.first, account, testvect);
+		enqueue(std::get<0>(queue), account, testvect);
 
 		WHEN("the queue is sent")
 		{
@@ -155,7 +155,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("the queue is now empty.")
 			{
-				REQUIRE(print(queue.first, account).empty());
+				REQUIRE(print(std::get<0>(queue), account).empty());
 			}
 
 			THEN("one call per ID was made.")
@@ -172,7 +172,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			{
 				REQUIRE(std::equal(mockpost.arguments.begin(), mockpost.arguments.end(), testvect.begin(), testvect.end(), [&](const auto& actual, const auto& expected)
 					{
-						return actual.url == make_expected_url(expected, queue.second, instanceurl);
+						return actual.url == make_expected_url(expected, std::get<1>(queue), instanceurl);
 					}));
 
 			}
@@ -187,7 +187,10 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 	GIVEN("A queue with some ids to remove and a good connection")
 	{
-		enqueue(queue.first, account, testvect);
+		std::vector<std::string> toremove{ testvect };
+		std::for_each(toremove.begin(), toremove.end(), [](auto& str) { str.push_back('-'); });
+
+		enqueue(std::get<0>(queue), account, toremove);
 
 		WHEN("the queue is sent")
 		{
@@ -201,12 +204,12 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("the queue is now empty.")
 			{
-				REQUIRE(print(queue.first, account).empty());
+				REQUIRE(print(std::get<0>(queue), account).empty());
 			}
 
 			THEN("one call per ID was made.")
 			{
-				REQUIRE(mockpost.arguments.size() == testvect.size());
+				REQUIRE(mockpost.arguments.size() == toremove.size());
 			}
 
 			THEN("the access token was passed in.")
@@ -216,10 +219,10 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("the URLs are as expected.")
 			{
-				REQUIRE(std::equal(mockpost.arguments.begin(), mockpost.arguments.end(), testvect.begin(), testvect.end(), [&](const auto& actual, auto& expected)
+				//testvect doesn't have the trailing minus signs, which is what we want for this test.
+				REQUIRE(std::equal(mockpost.arguments.begin(), mockpost.arguments.end(), testvect.begin(), testvect.end(), [&](const auto& actual, const auto& expected)
 					{
-						expected.pop_back(); //remove that minus sign
-						return actual.url == make_expected_url(expected, queue.second, instanceurl);
+						return actual.url == make_expected_url(expected, std::get<2>(queue), instanceurl);
 					}));
 
 			}
@@ -244,7 +247,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			std::make_pair(0, 3),
 			std::make_pair(-1, 3));
 
-		enqueue(queue.first, account, testvect);
+		enqueue(std::get<0>(queue), account, testvect);
 
 		WHEN("the queue is sent")
 		{
@@ -262,7 +265,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("the queue is now empty.")
 			{
-				REQUIRE(print(queue.first, account).empty());
+				REQUIRE(print(std::get<0>(queue), account).empty());
 			}
 
 			THEN("each ID was tried the correct number of times.")
@@ -280,7 +283,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 				auto repeated = repeat_each_element(testvect, retries.second);
 				REQUIRE(std::equal(mockpost.arguments.begin(), mockpost.arguments.end(), repeated.begin(), repeated.end(), [&](const auto& actual, const auto& expected)
 					{
-						return actual.url == make_expected_url(expected, queue.second, instanceurl);
+						return actual.url == make_expected_url(expected, std::get<1>(queue), instanceurl);
 					}));
 
 			}
@@ -306,7 +309,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			std::make_pair(-1, 3));
 
 
-		enqueue(queue.first, account, testvect);
+		enqueue(std::get<0>(queue), account, testvect);
 
 		WHEN("the queue is sent")
 		{
@@ -326,7 +329,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("the queue hasn't changed.")
 			{
-				REQUIRE(print(queue.first, account) == testvect);
+				REQUIRE(print(std::get<0>(queue), account) == testvect);
 			}
 
 			THEN("each ID was tried once.")
@@ -343,7 +346,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			{
 				REQUIRE(std::equal(mockpost.arguments.begin(), mockpost.arguments.end(), testvect.begin(), testvect.end(), [&](const auto& actual, const auto& expected)
 					{
-						return actual.url == make_expected_url(expected, queue.second, instanceurl);
+						return actual.url == make_expected_url(expected, std::get<1>(queue), instanceurl);
 					}));
 
 			}
@@ -355,4 +358,13 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			}
 		}
 	}
+}
+
+SCENARIO("Send correctly sends new posts and deletes existing ones.")
+{
+	GIVEN("A queue with some post filenames to send.")
+	{
+
+	}
+
 }
