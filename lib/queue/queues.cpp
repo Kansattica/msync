@@ -153,7 +153,7 @@ void dequeue(queues todequeue, const std::string_view account, std::vector<std::
 		
 		// if the item is in the queue, remove it form the queue and from the toremove vector
 		// if this gets to be a performance bottleneck (since it's an n^2 algorithm), make an unordered_set from toremove or sort and do a binary search
-		auto inqueue = std::find(toremovefrom.parsed.begin(), toremovefrom.parsed.end(), *it);
+		const auto inqueue = std::find(toremovefrom.parsed.begin(), toremovefrom.parsed.end(), *it);
 		if (inqueue != toremovefrom.parsed.end()) // if we found the thing in the queue, remove from both
 		{
 			plverb() << "Removing " << *it << " from queue.\n";
