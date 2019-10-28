@@ -15,14 +15,8 @@
 #include <algorithm>
 #include <print_logger.hpp>
 
-enum class call_type
-{
-	post, del, status
-};
-
 struct mock_args
 {
-	call_type call;
 	std::string url;
 	std::string access_token;
 	status_params params;
@@ -42,7 +36,7 @@ struct mock_network
 	
 	net_response mock_post(std::string_view url, std::string_view access_token)
 	{
-		arguments.push_back(mock_args{ call_type::post, std::string {url}, std::string { access_token } });
+		arguments.push_back(mock_args{ std::string {url}, std::string { access_token } });
 
 		net_response toreturn;
 		toreturn.retryable_error = (--succeed_after > 0);
@@ -54,7 +48,7 @@ struct mock_network
 
 	net_response mock_delete(std::string_view url, std::string_view access_token)
 	{
-		arguments.push_back(mock_args{ call_type::del, std::string {url}, std::string { access_token } });
+		arguments.push_back(mock_args{ std::string {url}, std::string { access_token } });
 
 		net_response toreturn;
 		toreturn.retryable_error = (--succeed_after > 0);
@@ -66,7 +60,7 @@ struct mock_network
 
 	net_response mock_new_status(std::string_view url, std::string_view access_token, status_params params)
 	{
-		arguments.push_back(mock_args{ call_type::del, std::string {url}, std::string { access_token }, std::move(params) });
+		arguments.push_back(mock_args{ std::string {url}, std::string { access_token }, std::move(params) });
 
 		net_response toreturn;
 		toreturn.retryable_error = (--succeed_after > 0);
@@ -79,6 +73,30 @@ struct mock_network
 private:
 	size_t succeed_after_n = 1;
 	size_t succeed_after = succeed_after_n;
+};
+
+struct mock_network_post : public mock_network
+{
+	net_response operator()(std::string_view url, std::string_view access_token)
+	{
+		return mock_post(url, access_token);
+	}
+};
+
+struct mock_network_delete : public mock_network
+{
+	net_response operator()(std::string_view url, std::string_view access_token)
+	{
+		return mock_delete(url, access_token);
+	}
+};
+
+struct mock_network_new_status : public mock_network
+{
+	net_response operator()(std::string_view url, std::string_view access_token, status_params params)
+	{
+		return mock_new_status(url, access_token, std::move(params));
+	}
 };
 
 std::string make_expected_url(const std::string_view id, const std::string_view route, const std::string_view instance_url)
@@ -101,25 +119,6 @@ std::vector<std::string_view> repeat_each_element(const std::vector<std::string>
 	return toreturn;
 }
 
-auto make_mock_post(mock_network& mock)
-{
-	return [&mock](auto url, auto access_token) { return mock.mock_post(url, access_token); };
-}
-
-auto make_mock_delete(mock_network& mock)
-{
-	return [&mock](auto url, auto access_token) { return mock.mock_delete(url, access_token); };
-}
-
-auto make_mock_status(mock_network& mock)
-{
-	return [&mock](auto url, auto access_token, auto& params) { return mock.mock_new_status(url, access_token, params); };
-}
-
-auto mocked_send(mock_network& mock)
-{
-	return send_posts{ make_mock_post(mock), make_mock_delete(mock), make_mock_status(mock) };
-}
 
 SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.")
 {
@@ -128,10 +127,10 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 	const test_file fi = account_directory();
 	GIVEN("A queue with some ids to add and a good connection")
 	{
-		auto queue = GENERATE(
+		const auto queue = GENERATE(
 			std::make_pair(queues::fav, "/favourite"),
 			std::make_pair(queues::boost, "/reblog"));
-		std::vector<std::string> testvect = GENERATE( 
+		const std::vector<std::string> testvect = GENERATE( 
 			std::vector<std::string>{ "someid", "someotherid", "mrid" },
 			std::vector<std::string>{},
 			std::vector<std::string>{ "justone" });
@@ -144,9 +143,11 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 		WHEN("the queue is sent")
 		{
-			mock_network mock;
+			mock_network_post mockpost;
+			mock_network_delete mockdel;
+			mock_network_new_status mocknew;
 
-			auto send = mocked_send(mock);
+			auto send = send_posts{ mockpost, mockdel, mocknew };
 
 			send.send(account, instanceurl, accesstoken);
 
@@ -157,17 +158,17 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("one call per ID was made.")
 			{
-				REQUIRE(mock.arguments.size() == testvect.size());
+				REQUIRE(mockpost.arguments.size() == testvect.size());
 			}
 
 			THEN("the access token was passed in.")
 			{
-				REQUIRE(std::all_of(mock.arguments.begin(), mock.arguments.end(), [&](const auto& actual) { return actual.access_token == accesstoken; }));
+				REQUIRE(std::all_of(mockpost.arguments.begin(), mockpost.arguments.end(), [&](const auto& actual) { return actual.access_token == accesstoken; }));
 			}
 
 			THEN("the URLs are as expected.")
 			{
-				REQUIRE(std::equal(mock.arguments.begin(), mock.arguments.end(), testvect.begin(), testvect.end(), [&](const auto& actual, const auto& expected)
+				REQUIRE(std::equal(mockpost.arguments.begin(), mockpost.arguments.end(), testvect.begin(), testvect.end(), [&](const auto& actual, const auto& expected)
 					{
 						return actual.url == make_expected_url(expected, queue.second, instanceurl);
 					}));
@@ -176,14 +177,15 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("only the post function was called.")
 			{
-				REQUIRE(std::all_of(mock.arguments.begin(), mock.arguments.end(), [&](const auto& actual) { return actual.call == call_type::post; }));
+				REQUIRE(mockdel.arguments.empty());
+				REQUIRE(mocknew.arguments.empty());
 			}
 		}
 	}
 
 	GIVEN("A queue with some ids to remove and a good connection")
 	{
-		auto queue = GENERATE(
+		const auto queue = GENERATE(
 			std::make_pair(queues::fav, "/unfavourite"),
 			std::make_pair(queues::boost, "/unreblog"));
 		std::vector<std::string> testvect = GENERATE( 
@@ -199,9 +201,11 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 		WHEN("the queue is sent")
 		{
-			mock_network mock;
+			mock_network_post mockpost;
+			mock_network_delete mockdel;
+			mock_network_new_status mocknew;
 
-			auto send = mocked_send(mock);
+			auto send = send_posts{ mockpost, mockdel, mocknew };
 
 			send.send(account, instanceurl, accesstoken);
 
@@ -212,17 +216,17 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("one call per ID was made.")
 			{
-				REQUIRE(mock.arguments.size() == testvect.size());
+				REQUIRE(mockpost.arguments.size() == testvect.size());
 			}
 
 			THEN("the access token was passed in.")
 			{
-				REQUIRE(std::all_of(mock.arguments.begin(), mock.arguments.end(), [&](const auto& actual) { return actual.access_token == accesstoken; }));
+				REQUIRE(std::all_of(mockpost.arguments.begin(), mockpost.arguments.end(), [&](const auto& actual) { return actual.access_token == accesstoken; }));
 			}
 
 			THEN("the URLs are as expected.")
 			{
-				REQUIRE(std::equal(mock.arguments.begin(), mock.arguments.end(), testvect.begin(), testvect.end(), [&](const auto& actual, auto& expected)
+				REQUIRE(std::equal(mockpost.arguments.begin(), mockpost.arguments.end(), testvect.begin(), testvect.end(), [&](const auto& actual, auto& expected)
 					{
 						expected.pop_back(); //remove that minus sign
 						return actual.url == make_expected_url(expected, queue.second, instanceurl);
@@ -232,17 +236,18 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("only the post function was called.")
 			{
-				REQUIRE(std::all_of(mock.arguments.begin(), mock.arguments.end(), [&](const auto& actual) { return actual.call == call_type::post; }));
+				REQUIRE(mockdel.arguments.empty());
+				REQUIRE(mocknew.arguments.empty());
 			}
 		}
 	}
 
 	GIVEN("A queue with some ids to add and retryable errors that ultimately succeed")
 	{
-		auto queue = GENERATE(
+		const auto queue = GENERATE(
 			std::make_pair(queues::fav, "/favourite"),
 			std::make_pair(queues::boost, "/reblog"));
-		std::vector<std::string> testvect = GENERATE( 
+		const std::vector<std::string> testvect = GENERATE( 
 			std::vector<std::string>{ "someid", "someotherid", "mrid" },
 			std::vector<std::string>{},
 			std::vector<std::string>{ "justone" });
@@ -250,7 +255,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 		// first is the number of retries to feed to send
 		// second is the number of retries to expect
 		// the last two test the "if retries less than 1, set to 3" behavior
-		auto retries = GENERATE(
+		const auto retries = GENERATE(
 			std::make_pair(3, 3),
 			std::make_pair(5, 5),
 			std::make_pair(1, 1),
@@ -265,10 +270,13 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 		WHEN("the queue is sent")
 		{
-			mock_network mock;
-			mock.set_succeed_after(retries.second);
+			mock_network_post mockpost;
+			mockpost.set_succeed_after(retries.second);
 
-			auto send = mocked_send(mock);
+			mock_network_delete mockdel;
+			mock_network_new_status mocknew;
+
+			auto send = send_posts{ mockpost, mockdel, mocknew };
 
 			send.retries = retries.first;
 
@@ -281,18 +289,18 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("each ID was tried the correct number of times.")
 			{
-				REQUIRE(mock.arguments.size() == testvect.size() * retries.second);
+				REQUIRE(mockpost.arguments.size() == testvect.size() * retries.second);
 			}
 
 			THEN("the access token was passed in.")
 			{
-				REQUIRE(std::all_of(mock.arguments.begin(), mock.arguments.end(), [&](const auto& actual) { return actual.access_token == accesstoken; }));
+				REQUIRE(std::all_of(mockpost.arguments.begin(), mockpost.arguments.end(), [&](const auto& actual) { return actual.access_token == accesstoken; }));
 			}
 
 			THEN("the URLs are as expected.")
 			{
 				auto repeated = repeat_each_element(testvect, retries.second);
-				REQUIRE(std::equal(mock.arguments.begin(), mock.arguments.end(), repeated.begin(), repeated.end(), [&](const auto& actual, const auto& expected)
+				REQUIRE(std::equal(mockpost.arguments.begin(), mockpost.arguments.end(), repeated.begin(), repeated.end(), [&](const auto& actual, const auto& expected)
 					{
 						return actual.url == make_expected_url(expected, queue.second, instanceurl);
 					}));
@@ -301,17 +309,18 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("only the post function was called.")
 			{
-				REQUIRE(std::all_of(mock.arguments.begin(), mock.arguments.end(), [&](const auto& actual) { return actual.call == call_type::post; }));
+				REQUIRE(mockdel.arguments.empty());
+				REQUIRE(mocknew.arguments.empty());
 			}
 		}
 	}
 
 	GIVEN("A queue where all the IDs fail")
 	{
-		auto queue = GENERATE(
+		const auto queue = GENERATE(
 			std::make_pair(queues::fav, "/favourite"),
 			std::make_pair(queues::boost, "/reblog"));
-		std::vector<std::string> testvect = GENERATE( 
+		const std::vector<std::string> testvect = GENERATE( 
 			std::vector<std::string>{ "someid", "someotherid", "mrid" },
 			std::vector<std::string>{},
 			std::vector<std::string>{ "justone" });
@@ -319,7 +328,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 		// first is the number of retries to feed to send
 		// second is the number of retries to expect
 		// the last two test the "if retries less than 1, set to 3" behavior
-		auto retries = GENERATE(
+		const auto retries = GENERATE(
 			std::make_pair(3, 3),
 			std::make_pair(5, 5),
 			std::make_pair(1, 1),
@@ -334,11 +343,15 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 		WHEN("the queue is sent")
 		{
-			mock_network mock;
-			mock.fatal_error = true;
-			mock.status_code = 500;
 
-			auto send = mocked_send(mock);
+			mock_network_post mockpost;
+			mockpost.fatal_error = true;
+			mockpost.status_code = 500;
+
+			mock_network_delete mockdel;
+			mock_network_new_status mocknew;
+
+			auto send = send_posts{ mockpost, mockdel, mocknew };
 
 			send.retries = retries.first;
 
@@ -351,17 +364,17 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("each ID was tried once.")
 			{
-				REQUIRE(mock.arguments.size() == testvect.size());
+				REQUIRE(mockpost.arguments.size() == testvect.size());
 			}
 
 			THEN("the access token was passed in.")
 			{
-				REQUIRE(std::all_of(mock.arguments.begin(), mock.arguments.end(), [&](const auto& actual) { return actual.access_token == accesstoken; }));
+				REQUIRE(std::all_of(mockpost.arguments.begin(), mockpost.arguments.end(), [&](const auto& actual) { return actual.access_token == accesstoken; }));
 			}
 
 			THEN("the URLs are as expected.")
 			{
-				REQUIRE(std::equal(mock.arguments.begin(), mock.arguments.end(), testvect.begin(), testvect.end(), [&](const auto& actual, const auto& expected)
+				REQUIRE(std::equal(mockpost.arguments.begin(), mockpost.arguments.end(), testvect.begin(), testvect.end(), [&](const auto& actual, const auto& expected)
 					{
 						return actual.url == make_expected_url(expected, queue.second, instanceurl);
 					}));
@@ -370,7 +383,8 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("only the post function was called.")
 			{
-				REQUIRE(std::all_of(mock.arguments.begin(), mock.arguments.end(), [&](const auto& actual) { return actual.call == call_type::post; }));
+				REQUIRE(mockdel.arguments.empty());
+				REQUIRE(mocknew.arguments.empty());
 			}
 		}
 	}
