@@ -20,6 +20,8 @@
 std::pair<const std::string, user_options>& assume_account(std::pair<const std::string, user_options>* user);
 
 void print_stringptr(const std::string* toprint);
+bool is_sensitive(user_option opt);
+void print_sensitive(const char* name, const std::string* value);
 
 template <typename T>
 void uniqueify(T& toprint);
@@ -34,6 +36,7 @@ int main(int argc, const char* argv[])
 	auto parsed = parse(argc, argv, false);
 
 	auto user = options().select_account(parsed.account);
+	bool should_print_newline = true;
 	try
 	{
 		switch (parsed.selected)
@@ -47,11 +50,24 @@ int main(int argc, const char* argv[])
 		case mode::showallopt:
 			for (auto opt = user_option(0); opt <= user_option::pull_notifications; opt = user_option(static_cast<int>(opt) + 1))
 			{
-				pl() << USER_OPTION_NAMES[static_cast<int>(opt)] << ": ";
+				const auto option_name = USER_OPTION_NAMES[static_cast<int>(opt)];
+				const auto option_value = assume_account(user).second.get_option(opt);
 				if (opt < user_option::pull_home)
-					print_stringptr(assume_account(user).second.get_option(opt));
+				{
+					if (is_sensitive(opt))
+					{
+						print_sensitive(option_name, option_value);
+					}
+					else
+					{
+						pl() << option_name << ": ";
+						print_stringptr(option_value);
+					}
+				}
 				else
+				{
 					pl() << SYNC_SETTING_NAMES[static_cast<int>(assume_account(user).second.get_sync_option(opt))];
+				}
 				pl() << '\n';
 			}
 			pl() << "Accounts registered: ";
@@ -86,6 +102,7 @@ int main(int argc, const char* argv[])
 				print_iterable(print(parsed.queue_opt.selected, assume_account(user).first));
 				break;
 			}
+			should_print_newline = false;
 			break;
 		case mode::gen:
 		{ //notice the braces- this is a scope
@@ -106,6 +123,7 @@ int main(int argc, const char* argv[])
 			}
 			break;
 		case mode::help:
+			should_print_newline = false;
 			break;
 		default:
 			pl() << "[option not implemented]";
@@ -117,7 +135,8 @@ int main(int argc, const char* argv[])
 		pl() << "\nFor account: " << parsed.account;
 	}
 
-	pl() << '\n';
+	if (should_print_newline)
+		pl() << '\n';
 
 	plfile() << "--- msync finished normally ---\n";
 }
@@ -147,12 +166,31 @@ template <typename T>
 void print_iterable(const T& vec)
 {
 	bool minushelp = false;
-	for (auto& item : vec)
+	for (const auto& item : vec)
 	{
 		pl() << item << '\n';
 		minushelp = minushelp || (item.back() == '-');
 	}
 	if (minushelp)
 		pl() << "IDs followed by a - will be deleted next time you sync.\n";
+}
+
+bool is_sensitive(user_option opt)
+{
+	for (const user_option sensitive : {user_option::access_token, user_option::auth_code, user_option::client_id, user_option::client_secret})
+	{
+		if (opt == sensitive)
+			return true;
+	}
+
+	return false;
+}
+
+void print_sensitive(const char* name, const std::string* value)
+{
+	if (value == nullptr)
+		return;
+
+	pl() << name << ": [set, not shown for security]\n";
 
 }

@@ -9,7 +9,7 @@ using namespace std::string_literals;
 
 SCENARIO("Both paths we care about are directories.")
 {
-	test_file acc = account_directory();
+	const test_file acc = account_directory();
 	GIVEN("A global_options object")
 	{
 		global_options opts;
@@ -26,7 +26,7 @@ SCENARIO("Both paths we care about are directories.")
 
 SCENARIO("add_new_account correctly handles input.")
 {
-	test_file acc = account_directory();
+	const test_file acc = account_directory();
 	GIVEN("A global_options object")
 	{
 		global_options opts;
@@ -37,7 +37,7 @@ SCENARIO("add_new_account correctly handles input.")
 			userfile /= "coolguy@website.com";
 			userfile /= User_Options_Filename;
 
-			auto& added = opts.add_new_account("coolguy@website.com");
+			const auto& added = opts.add_new_account("coolguy@website.com");
 
 			THEN("the accounts directory is created.")
 			{
@@ -48,6 +48,13 @@ SCENARIO("add_new_account correctly handles input.")
 			THEN("no file is created immediately.")
 			{
 				REQUIRE_FALSE(fs::exists(userfile));
+			}
+
+			THEN("it shows up in all_accounts.")
+			{
+				const auto accounts = opts.all_accounts();
+				REQUIRE(accounts.size() == 1);
+				REQUIRE(accounts[0] == "coolguy@website.com");
 			}
 
 			AND_WHEN("the options are moved from and destroyed.")
@@ -67,7 +74,7 @@ SCENARIO("add_new_account correctly handles input.")
 
 SCENARIO("read_accounts correctly fills global_options on construction.")
 {
-	test_file acc = account_directory();
+	const test_file acc = account_directory();
 	GIVEN("A global_options with some values added to it, destroyed, and then a new one created.")
 	{
 		{
@@ -91,7 +98,7 @@ SCENARIO("read_accounts correctly fills global_options on construction.")
 
 		WHEN("a given account is looked up")
 		{
-			auto found = opt.select_account("coolaccount@website.com");
+			const auto found = opt.select_account("coolaccount@website.com");
 
 			THEN("something was found")
 			{
@@ -108,11 +115,22 @@ SCENARIO("read_accounts correctly fills global_options on construction.")
 
 		WHEN("an incorrect account is looked up")
 		{
-			auto found = opt.select_account("boringaccount@badsize.pling");
+			const auto found = opt.select_account("boringaccount@badsize.pling");
 
 			THEN("nothing was found")
 			{
 				REQUIRE(found == nullptr);
+			}
+		}
+
+		WHEN("all_accounts is called")
+		{
+			const auto accounts = opt.all_accounts();
+
+			THEN("both accounts show up.")
+			{
+				using Catch::Matchers::UnorderedEquals;
+				REQUIRE_THAT(accounts, Catch::UnorderedEquals(std::vector<std::string_view> {"coolaccount@website.com", "evencooleraccount@wedsize.egg"}));
 			}
 		}
 	}
@@ -121,7 +139,7 @@ SCENARIO("read_accounts correctly fills global_options on construction.")
 SCENARIO("select_account selects exactly one account.")
 {
 	// this should make sure the accounts are empty
-	test_file acc = account_directory();
+	const test_file acc = account_directory();
 	GIVEN("An empty accounts unordered_map")
 	{
 		global_options options;
@@ -145,11 +163,21 @@ SCENARIO("select_account selects exactly one account.")
 				REQUIRE(account == nullptr);
 			}
 		}
+
+		WHEN("all_accounts is called")
+		{
+			const auto accounts = options.all_accounts();
+
+			THEN("no accounts show up.")
+			{
+				REQUIRE(accounts.empty());
+			}
+		}
 	}
 
 	GIVEN("An accounts unordered_map with one entry")
 	{
-		test_file fi = acc.filename / "someaccount@website.com";
+		const test_file fi = acc.filename / "someaccount@website.com";
 
 		global_options options;
 		options.add_new_account("someaccount@website.com");
@@ -194,12 +222,23 @@ SCENARIO("select_account selects exactly one account.")
 				REQUIRE(account == nullptr);
 			}
 		}
+
+		WHEN("all_accounts is called")
+		{
+			const auto accounts = options.all_accounts();
+
+			THEN("the account shows up.")
+			{
+				REQUIRE(accounts.size() == 1);
+				REQUIRE(accounts[0] == "someaccount@website.com");
+			}
+		}
 	}
 
 	GIVEN("An accounts unordered_map with two entries")
 	{
-		test_file fi = acc.filename / "someaccount@website.com";
-		test_file anotherfi = acc.filename / "someotheraccount@place2.egg";
+		const test_file fi = acc.filename / "someaccount@website.com";
+		const test_file anotherfi = acc.filename / "someotheraccount@place2.egg";
 
 		global_options options;
 
@@ -211,7 +250,7 @@ SCENARIO("select_account selects exactly one account.")
 
 		WHEN("select_account is given an empty string to search on")
 		{
-			auto account = options.select_account("");
+			const auto account = options.select_account("");
 
 			THEN("a nullptr is returned")
 			{
@@ -221,7 +260,7 @@ SCENARIO("select_account selects exactly one account.")
 
 		WHEN("select_account is given a non-empty string to search on that's an ambiguous prefix")
 		{
-			auto account = options.select_account("some");
+			const auto account = options.select_account("some");
 
 			THEN("a nullptr is returned")
 			{
@@ -231,7 +270,7 @@ SCENARIO("select_account selects exactly one account.")
 
 		WHEN("select_account is given a non-empty string to search on that's an unambiguous prefix")
 		{
-			auto account = options.select_account("someother");
+			const auto account = options.select_account("someother");
 
 			THEN("a user_options is returned.")
 			{
@@ -247,8 +286,8 @@ SCENARIO("select_account selects exactly one account.")
 
 		WHEN("select_account is given a non-empty string to search on that's an unambiguous prefix, but capitalized differently")
 		{
-			auto searchon = GENERATE("someotheR"s, "SomEOThEr", "SoMeOtHeR", "Someother");
-			auto account = options.select_account(searchon);
+			const auto searchon = GENERATE("someotheR"s, "SomEOThEr", "SoMeOtHeR", "Someother");
+			const auto account = options.select_account(searchon);
 
 			THEN("a user_options is returned.")
 			{
@@ -257,14 +296,13 @@ SCENARIO("select_account selects exactly one account.")
 
 			THEN("the user_options is the correct one.")
 			{
-				const std::string account_name = *account->second.get_option(user_option::account_name);
-				REQUIRE(account_name == "someotheraccount@place2.egg");
+				REQUIRE(*account->second.get_option(user_option::account_name) == "someotheraccount@place2.egg");
 			}
 		}
 
 		WHEN("select_account is given a non-empty string to search on that's not a valid prefix")
 		{
-			auto account = options.select_account("bad");
+			const auto account = options.select_account("bad");
 
 			THEN("a nullptr is returned")
 			{
@@ -274,7 +312,7 @@ SCENARIO("select_account selects exactly one account.")
 
 		WHEN("select_account is given a non-empty string to search on that's longer than the account names")
 		{
-			auto account = options.select_account(std::string(100, 'b'));
+			const auto account = options.select_account(std::string(100, 'b'));
 
 			THEN("a nullptr is returned.")
 			{
@@ -293,5 +331,15 @@ SCENARIO("select_account selects exactly one account.")
 			}
 		}
 
+		WHEN("all_accounts is called")
+		{
+			const auto accounts = options.all_accounts();
+
+			THEN("both accounts show up.")
+			{
+				using Catch::Matchers::UnorderedEquals;
+				REQUIRE_THAT(accounts, Catch::UnorderedEquals(std::vector<std::string_view> {"someaccount@website.com", "someotheraccount@place2.egg" }));
+			}
+		}
 	}
 }

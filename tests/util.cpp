@@ -7,21 +7,20 @@
 #include <tuple>
 #include <sstream>
 
-using namespace std::string_literals;
 using namespace std::string_view_literals;
 
 SCENARIO("make_api_url correctly concatenates URLs and paths.")
 {
     GIVEN("An instance URL and API route")
     {
-        auto input = GENERATE(
-            std::make_tuple("coolinstance.social"sv, "/api/v1/register"sv, "https://coolinstance.social/api/v1/register"sv),
-            std::make_tuple("aplace.egg"sv, "/api/v1/howdy"sv, "https://aplace.egg/api/v1/howdy"sv),
-            std::make_tuple("instance.place"sv, "/api/v1/yes"sv, "https://instance.place/api/v1/yes"sv));
+        const auto input = GENERATE(
+            std::make_tuple("coolinstance.social", "/api/v1/register", "https://coolinstance.social/api/v1/register"),
+            std::make_tuple("aplace.egg", "/api/v1/howdy", "https://aplace.egg/api/v1/howdy"),
+            std::make_tuple("instance.place", "/api/v1/yes", "https://instance.place/api/v1/yes"));
 
         WHEN("they're passed to make_api_url")
         {
-            std::string result = make_api_url(std::get<0>(input), std::get<1>(input));
+            const std::string result = make_api_url(std::get<0>(input), std::get<1>(input));
 
             THEN("they're correctly concatenated with the prefix.")
             {
@@ -35,22 +34,22 @@ SCENARIO("parse_account_name correctly parses account names into a username and 
 {
     GIVEN("A correct account name")
     {
-        auto input = GENERATE(
-            std::make_tuple("GoddessGrace@goodchristian.website"s, "GoddessGrace"s, "goodchristian.website"s),
-            std::make_tuple("BestGirl102@good.time.website"s, "BestGirl102"s, "good.time.website"s),
-            std::make_tuple("hey_its_m3@internet12.for.egg"s, "hey_its_m3"s, "internet12.for.egg"s),
-            std::make_tuple("_@some-website.comb"s, "_"s, "some-website.comb"s),
-            std::make_tuple("@_@some-website.comb"s, "_"s, "some-website.comb"s),
-            std::make_tuple("@_@some-website.comb/"s, "_"s, "some-website.comb"s),
-            std::make_tuple("@_@some-website.comb\\"s, "_"s, "some-website.comb"s),
-            std::make_tuple("@_@some-website.comb?"s, "_"s, "some-website.comb"s),
-            std::make_tuple("@leadingat@boringplace.comb"s, "leadingat"s, "boringplace.comb"s),
-            std::make_tuple("@leadingat@http://boringplace.comb"s, "leadingat"s, "boringplace.comb"s),
-            std::make_tuple("@leadingat@https://boringplace.comb"s, "leadingat"s, "boringplace.comb"s));
+        const auto input = GENERATE(
+            std::make_tuple("GoddessGrace@goodchristian.website", "GoddessGrace", "goodchristian.website"),
+            std::make_tuple("BestGirl102@good.time.website", "BestGirl102", "good.time.website"),
+            std::make_tuple("hey_its_m3@internet12.for.egg", "hey_its_m3", "internet12.for.egg"),
+            std::make_tuple("_@some-website.comb", "_", "some-website.comb"),
+            std::make_tuple("@_@some-website.comb", "_", "some-website.comb"),
+            std::make_tuple("@_@some-website.comb/", "_", "some-website.comb"),
+            std::make_tuple("@_@some-website.comb\\", "_", "some-website.comb"),
+            std::make_tuple("@_@some-website.comb?", "_", "some-website.comb"),
+            std::make_tuple("@leadingat@boringplace.comb", "leadingat", "boringplace.comb"),
+            std::make_tuple("@leadingat@http://boringplace.comb", "leadingat", "boringplace.comb"),
+            std::make_tuple("@leadingat@https://boringplace.comb", "leadingat", "boringplace.comb"));
 
-        WHEN(std::get<0>(input) + " is parsed by parse_account_name")
+        WHEN("an account name is parsed by parse_account_name")
         {
-            auto result = parse_account_name(std::get<0>(input));
+            const auto result = parse_account_name(std::get<0>(input));
 
             THEN("the parse is good")
             {
@@ -71,20 +70,20 @@ SCENARIO("parse_account_name correctly parses account names into a username and 
 
     GIVEN("A bad account name")
     {
-        auto input = GENERATE(
-            "as;dfhasldfasd"s,
-            "badcharacter**@website.com"s,
-            "knockitoff@too.dang.many.subdomains"s,
-            "noinstance@"s,
-            "@nousername"s,
-            "what"s,
-            "|pipekateer"s,
-            ""s,
-            ":3@:33.:4"s);
+		const auto input = GENERATE(as<const char*>{}, //msvc won't build without this
+            "as;dfhasldfasd",
+            "badcharacter**@website.com",
+            "knockitoff@too.dang.many.subdomains",
+            "noinstance@",
+            "@nousername",
+            "what",
+            "|pipekateer",
+            "",
+            ":3@:33.:4");
 
         WHEN("it's parsed by parse_account_name")
         {
-            auto result = parse_account_name(input);
+            const auto result = parse_account_name(input);
 
             THEN("the parse is bad")
             {
@@ -98,7 +97,7 @@ SCENARIO("split_string correctly splits strings")
 {
 	GIVEN("Some strings with the delimiter and nothing extra at the end.")
 	{
-		auto input = GENERATE(
+		const auto input = GENERATE(
 			std::make_tuple("a,delimited,string", ',', std::vector<std::string_view>{"a", "delimited", "string"}),
 			std::make_tuple("a,delimited,string", ';', std::vector<std::string_view>{"a,delimited,string"}),
 			std::make_tuple("a;delimited;string", ';', std::vector<std::string_view>{"a", "delimited", "string"}),
@@ -107,7 +106,7 @@ SCENARIO("split_string correctly splits strings")
 
 		WHEN("the string is split, ignoring empty splits.")
 		{
-			auto result = split_string<false>(std::get<0>(input), std::get<1>(input));
+			const auto result = split_string<false>(std::get<0>(input), std::get<1>(input));
 
 			THEN("the result is what we expected.")
 			{
@@ -117,7 +116,7 @@ SCENARIO("split_string correctly splits strings")
 
 		WHEN("the string is split, including empty splits.")
 		{
-			auto result = split_string<true>(std::get<0>(input), std::get<1>(input));
+			const auto result = split_string<true>(std::get<0>(input), std::get<1>(input));
 
 			THEN("the result is what we expected.")
 			{
@@ -128,7 +127,7 @@ SCENARIO("split_string correctly splits strings")
 
 	GIVEN("Some strings with the delimiter at the end.")
 	{
-		auto input = GENERATE(
+		const auto input = GENERATE(
 			std::make_tuple("a,delimited,string,", ',', std::vector<std::string_view>{"a", "delimited", "string"}),
 			std::make_tuple("a,delimited,string,,,", ',', std::vector<std::string_view>{"a", "delimited", "string"}),
 			std::make_tuple(",", ',', std::vector<std::string_view>{}),
@@ -139,7 +138,7 @@ SCENARIO("split_string correctly splits strings")
 
 		WHEN("the string is split with empty strings turned off.")
 		{
-			auto result = split_string(std::get<0>(input), std::get<1>(input));
+			const auto result = split_string(std::get<0>(input), std::get<1>(input));
 
 			THEN("the result is what we expected.")
 			{
@@ -150,7 +149,7 @@ SCENARIO("split_string correctly splits strings")
 
 	GIVEN("Some strings with multiple consecutive delimiters.")
 	{
-		auto input = GENERATE(
+		const auto input = GENERATE(
 			std::make_tuple("a,,,delimited,,string,", ',', std::vector<std::string_view>{"a", "delimited", "string"}, std::vector<std::string_view>{"a", "", "", "delimited", "", "string"}),
 			std::make_tuple("a,del,,imited,,string,,,", ',', std::vector<std::string_view>{"a", "del", "imited", "string"}, std::vector<std::string_view>{"a", "del", "", "imited", "", "string", "", ""}),
 			std::make_tuple(",,,,", ',', std::vector<std::string_view>{}, std::vector<std::string_view>{"", "", "", ""}),
@@ -162,7 +161,7 @@ SCENARIO("split_string correctly splits strings")
 
 		WHEN("the string is split with empty strings turned off.")
 		{
-			auto result = split_string<false>(std::get<0>(input), std::get<1>(input));
+			const auto result = split_string<false>(std::get<0>(input), std::get<1>(input));
 
 			THEN("the result is what we expected.")
 			{
@@ -172,7 +171,7 @@ SCENARIO("split_string correctly splits strings")
 
 		WHEN("the string is split with empty strings turned on.")
 		{
-			auto result = split_string<true>(std::get<0>(input), std::get<1>(input));
+			const auto result = split_string<true>(std::get<0>(input), std::get<1>(input));
 
 			THEN("the result is what we expected.")
 			{
@@ -183,11 +182,11 @@ SCENARIO("split_string correctly splits strings")
 
 	GIVEN("The empty string")
 	{
-		auto input = "";
+		const auto input = "";
 
 		WHEN("the empty string is split, ignoring empty splits")
 		{
-			auto result = split_string(input, ',');
+			const auto result = split_string(input, ',');
 
 			THEN("we get an empty vector back.")
 			{
@@ -197,7 +196,7 @@ SCENARIO("split_string correctly splits strings")
 
 		WHEN("the empty string is split, not ignoring empty splits")
 		{
-			auto result = split_string<true>(input, ',');
+			const auto result = split_string<true>(input, ',');
 
 			THEN("we get an empty vector back.")
 			{
@@ -211,7 +210,7 @@ SCENARIO("join_iterable correctly does that.")
 {
 	GIVEN("An iterable to join")
 	{
-		auto testcase = GENERATE(
+		const auto testcase = GENERATE(
 			std::make_tuple(std::vector<std::string_view>{"this","is","some","stuff"}, ";"sv, "this;is;some;stuff"sv),
 			std::make_tuple(std::vector<std::string_view>{"this","is","some","stuff"}, "_"sv, "this_is_some_stuff"sv),
 			std::make_tuple(std::vector<std::string_view>{"this","is","not","some","other","stuff"}, " or "sv, "this or is or not or some or other or stuff"sv),
@@ -237,7 +236,7 @@ SCENARIO("split_string and join_iterable are inverses.")
 {
 	GIVEN("A string to split and then join on a char")
 	{
-		auto testcase = GENERATE(
+		const auto testcase = GENERATE(
 			std::make_tuple("this,is,a,string", ','),
 			std::make_tuple("ladies:hello", ':'),
 			std::make_tuple("what,about;this,one", ','),
@@ -248,7 +247,7 @@ SCENARIO("split_string and join_iterable are inverses.")
 
 		WHEN("the string is split and then joined")
 		{
-			auto split = split_string<true>(std::get<0>(testcase), std::get<1>(testcase));
+			const auto split = split_string<true>(std::get<0>(testcase), std::get<1>(testcase));
 			
 			std::stringstream ss;
 			join_iterable(split.begin(), split.end(), std::get<1>(testcase), ss);
@@ -262,7 +261,7 @@ SCENARIO("split_string and join_iterable are inverses.")
 
 	GIVEN("A string to join and then split on a char")
 	{
-		auto testcase = GENERATE(
+		const auto testcase = GENERATE(
 			std::make_tuple(std::vector<std::string_view>{"this","is","some","stuff"}, ';'),
 			std::make_tuple(std::vector<std::string_view>{"this","is","some","stuff"}, '_'),
 			std::make_tuple(std::vector<std::string_view>{"includes", "anempty", "", "string"}, '!'),
@@ -276,9 +275,9 @@ SCENARIO("split_string and join_iterable are inverses.")
 			join_iterable(std::get<0>(testcase).begin(), std::get<0>(testcase).end(), std::get<1>(testcase), ss);
 			
 			// can't return stringviews into ss.str(), it stops existing after the call
-			auto joined = std::string{ ss.str() };
+			const auto joined = std::string{ ss.str() };
 
-			auto split = split_string<true>(joined, std::get<1>(testcase));
+			const auto split = split_string<true>(joined, std::get<1>(testcase));
 
 			THEN("the result is as expected.")
 			{

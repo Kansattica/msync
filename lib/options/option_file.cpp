@@ -8,7 +8,7 @@ void Read(std::map<std::string, std::string>& parsed, std::string&& line)
 
 void Write(std::map<std::string, std::string>&& map, std::ofstream& of)
 {
-	for (auto& kvp : map)
+	for (const auto& kvp : map)
 		if (!kvp.second.empty()) //don't serialize
 			of << kvp.first << '=' << kvp.second << '\n';
 }

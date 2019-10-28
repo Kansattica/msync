@@ -116,7 +116,7 @@ std::pair<const std::string, user_options>* global_options::select_account(const
 std::vector<std::string_view> global_options::all_accounts() const
 {
 	std::vector<std::string_view> toreturn(accounts.size());
-	std::transform(accounts.begin(), accounts.end(), toreturn.end(), [](const auto& pair)
+	std::transform(accounts.begin(), accounts.end(), toreturn.begin(), [](const auto& pair)
 		{
 			return std::string_view{ pair.first };
 		});

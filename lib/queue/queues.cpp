@@ -33,7 +33,7 @@ void queue_attachments(const fs::path& postfile)
 	std::error_code err;
 	for (auto& attach : post.parsed.attachments)
 	{
-		auto attachpath = fs::canonical(attach, err);
+		const auto attachpath = fs::canonical(attach, err);
 
 		if (err)
 		{
