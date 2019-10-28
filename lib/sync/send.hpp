@@ -127,6 +127,8 @@ private:
 			{
 				const std::string requesturl = paramaterize_url(baseurl, id, "");
 				succeeded = request_with_retries([&]() { return del(requesturl, access_token); });
+				if (succeeded)
+					pl() << requesturl << " OK\n";
 			}
 			else
 			{
@@ -135,12 +137,13 @@ private:
 				status_params params = read_params(file_to_send);
 				succeeded = request_with_retries([&]() { return new_status(baseurl, access_token, params); });
 				if (succeeded)
+				{
 					fs::remove(file_to_send);
+					pl() << id << " OK\n";
+				}
 			}
 
-			if (succeeded)
-				pl() << requesturl << " OK\n";
-			else
+			if (!succeeded)
 				failed.push_back(std::move(queuefile.parsed.front()));
 
 			// remove ID from this queue
