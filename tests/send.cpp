@@ -15,10 +15,17 @@
 #include <algorithm>
 #include <print_logger.hpp>
 
+enum class call_type
+{
+	post, del, status
+};
+
 struct mock_args
 {
+	call_type call;
 	std::string url;
 	std::string access_token;
+	status_params params;
 };
 
 struct mock_network
@@ -33,9 +40,9 @@ struct mock_network
 
 	std::vector<mock_args> arguments;
 	
-	net_response mock_post(const std::string_view url, const std::string_view access_token)
+	net_response mock_post(std::string_view url, std::string_view access_token)
 	{
-		arguments.push_back(mock_args{ std::string {url}, std::string { access_token } });
+		arguments.push_back(mock_args{ call_type::post, std::string {url}, std::string { access_token } });
 
 		net_response toreturn;
 		toreturn.retryable_error = (--succeed_after > 0);
@@ -45,9 +52,28 @@ struct mock_network
 		return toreturn;
 	}
 
-	net_response operator()(const std::string_view url, const std::string_view access_token)
+	net_response mock_delete(std::string_view url, std::string_view access_token)
 	{
-		return mock_post(url, access_token);
+		arguments.push_back(mock_args{ call_type::del, std::string {url}, std::string { access_token } });
+
+		net_response toreturn;
+		toreturn.retryable_error = (--succeed_after > 0);
+		if (succeed_after == 0) { succeed_after = succeed_after_n; }
+		toreturn.okay = !(fatal_error || toreturn.retryable_error);
+		toreturn.status_code = status_code;
+		return toreturn;
+	}
+
+	net_response mock_new_status(std::string_view url, std::string_view access_token, status_params params)
+	{
+		arguments.push_back(mock_args{ call_type::del, std::string {url}, std::string { access_token }, std::move(params) });
+
+		net_response toreturn;
+		toreturn.retryable_error = (--succeed_after > 0);
+		if (succeed_after == 0) { succeed_after = succeed_after_n; }
+		toreturn.okay = !(fatal_error || toreturn.retryable_error);
+		toreturn.status_code = status_code;
+		return toreturn;
 	}
 
 private:
@@ -73,7 +99,26 @@ std::vector<std::string_view> repeat_each_element(const std::vector<std::string>
 		}
 	}
 	return toreturn;
+}
 
+auto make_mock_post(mock_network& mock)
+{
+	return [&mock](auto url, auto access_token) { return mock.mock_post(url, access_token); };
+}
+
+auto make_mock_delete(mock_network& mock)
+{
+	return [&mock](auto url, auto access_token) { return mock.mock_delete(url, access_token); };
+}
+
+auto make_mock_status(mock_network& mock)
+{
+	return [&mock](auto url, auto access_token, auto& params) { return mock.mock_new_status(url, access_token, params); };
+}
+
+auto mocked_send(mock_network& mock)
+{
+	return send_posts{ make_mock_post(mock), make_mock_delete(mock), make_mock_status(mock) };
 }
 
 SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.")
@@ -101,7 +146,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 		{
 			mock_network mock;
 
-			send_posts<mock_network, void, void> send{ mock };
+			auto send = mocked_send(mock);
 
 			send.send(account, instanceurl, accesstoken);
 
@@ -128,6 +173,11 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 					}));
 
 			}
+
+			THEN("only the post function was called.")
+			{
+				REQUIRE(std::all_of(mock.arguments.begin(), mock.arguments.end(), [&](const auto& actual) { return actual.call == call_type::post; }));
+			}
 		}
 	}
 
@@ -151,7 +201,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 		{
 			mock_network mock;
 
-			send_posts<mock_network, void, void> send{ mock };
+			auto send = mocked_send(mock);
 
 			send.send(account, instanceurl, accesstoken);
 
@@ -178,6 +228,11 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 						return actual.url == make_expected_url(expected, queue.second, instanceurl);
 					}));
 
+			}
+
+			THEN("only the post function was called.")
+			{
+				REQUIRE(std::all_of(mock.arguments.begin(), mock.arguments.end(), [&](const auto& actual) { return actual.call == call_type::post; }));
 			}
 		}
 	}
@@ -213,7 +268,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			mock_network mock;
 			mock.set_succeed_after(retries.second);
 
-			send_posts<mock_network, void, void> send{ mock };
+			auto send = mocked_send(mock);
 
 			send.retries = retries.first;
 
@@ -242,6 +297,11 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 						return actual.url == make_expected_url(expected, queue.second, instanceurl);
 					}));
 
+			}
+
+			THEN("only the post function was called.")
+			{
+				REQUIRE(std::all_of(mock.arguments.begin(), mock.arguments.end(), [&](const auto& actual) { return actual.call == call_type::post; }));
 			}
 		}
 	}
@@ -278,7 +338,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			mock.fatal_error = true;
 			mock.status_code = 500;
 
-			send_posts<mock_network, void, void> send{ mock };
+			auto send = mocked_send(mock);
 
 			send.retries = retries.first;
 
@@ -306,6 +366,11 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 						return actual.url == make_expected_url(expected, queue.second, instanceurl);
 					}));
 
+			}
+
+			THEN("only the post function was called.")
+			{
+				REQUIRE(std::all_of(mock.arguments.begin(), mock.arguments.end(), [&](const auto& actual) { return actual.call == call_type::post; }));
 			}
 		}
 	}

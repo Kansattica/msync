@@ -13,6 +13,7 @@
 #include "../options/global_options.hpp"
 #include "../queue/queues.hpp"
 #include "../util/util.hpp"
+#include "../postfile/outgoing_post.hpp"
 
 template <typename post_request, typename delete_request, typename post_new_status>
 struct send_posts
@@ -20,7 +21,7 @@ struct send_posts
 public:
 	int retries = 3;
 
-	send_posts(post_request& func) : post(func) { }
+	send_posts(post_request& post, delete_request& del, post_new_status& new_status) : post(post), del(del), new_status(new_status) { }
 
 	void send_all()
 	{
@@ -51,7 +52,10 @@ public:
 
 private:
 	std::string_view access_token;
+
 	post_request& post;
+	delete_request& del;
+	post_new_status& new_status;
 
 	constexpr const std::string_view status_route() const { return "/api/v1/statuses/"; }
 
@@ -73,9 +77,7 @@ private:
 
 			const std::string requesturl = paramaterize_url(baseurl, id, undo ? route<toread, false>() : route<toread, true>());
 
-			auto send_request = [&]() { return post(requesturl, access_token); };
-
-			if (request_with_retries(send_request))
+			if (request_with_retries( [&]() { return post(requesturl, access_token); }))
 				pl() << requesturl << " OK\n";
 			else
 				failedids.push_back(std::move(queuefile.parsed.front()));
@@ -101,7 +103,17 @@ private:
 			// if it has a minus sign at the end, assume it's an ID to be deleted.
 			const bool undo = should_undo(id);
 
-//			const std::string requesturl = undo ? paramaterize_url(baseurl, id, "") : ;
+			bool succeeded;
+			if (undo)
+			{
+				const std::string requesturl = paramaterize_url(baseurl, id, "");
+				succeeded = request_with_retries([&]() { return del(requesturl, access_token); });
+			}
+			else
+			{
+				status_params params;
+				succeeded = request_with_retries([&]() { return new_status(baseurl, access_token, params); });
+			}
 
 			//if (request_with_retries())
 			//	pl() << requesturl << " OK\n";
