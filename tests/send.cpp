@@ -125,6 +125,9 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 	logs_off = true;
 
 	const test_file fi = account_directory();
+	constexpr std::string_view account = "someguy@cool.account";
+	constexpr std::string_view instanceurl = "cool.account";
+	constexpr std::string_view accesstoken = "sometoken";
 
 	const auto queue = GENERATE(
 		std::make_tuple(queues::fav, "/favourite", "/unfavourite"),
@@ -135,9 +138,8 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 		std::vector<std::string>{},
 		std::vector<std::string>{ "justone" });
 
-	constexpr std::string_view account = "someguy@cool.account";
-	constexpr std::string_view instanceurl = "cool.account";
-	constexpr std::string_view accesstoken = "sometoken";
+	const bool send_all = GENERATE(true, false);
+
 
 	GIVEN("A queue with some ids to add and a good connection")
 	{
@@ -151,7 +153,10 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			auto send = send_posts{ mockpost, mockdel, mocknew };
 
-			send.send(account, instanceurl, accesstoken);
+			if (send_all)
+				send.send_all();
+			else
+				send.send(account, instanceurl, accesstoken);
 
 			THEN("the queue is now empty.")
 			{
@@ -200,7 +205,10 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			auto send = send_posts{ mockpost, mockdel, mocknew };
 
-			send.send(account, instanceurl, accesstoken);
+			if (send_all)
+				send.send_all();
+			else
+				send.send(account, instanceurl, accesstoken);
 
 			THEN("the queue is now empty.")
 			{
@@ -261,7 +269,10 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			send.retries = retries.first;
 
-			send.send(account, instanceurl, accesstoken);
+			if (send_all)
+				send.send_all();
+			else
+				send.send(account, instanceurl, accesstoken);
 
 			THEN("the queue is now empty.")
 			{
@@ -325,7 +336,10 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			send.retries = retries.first;
 
-			send.send(account, instanceurl, accesstoken);
+			if (send_all)
+				send.send_all();
+			else
+				send.send(account, instanceurl, accesstoken);
 
 			THEN("the queue hasn't changed.")
 			{
@@ -360,11 +374,3 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 	}
 }
 
-SCENARIO("Send correctly sends new posts and deletes existing ones.")
-{
-	GIVEN("A queue with some post filenames to send.")
-	{
-
-	}
-
-}
