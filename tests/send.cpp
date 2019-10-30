@@ -140,6 +140,13 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 	const bool send_all = GENERATE(true, false);
 
+	if (send_all)
+	{
+		auto& new_account = options().add_new_account(std::string{ account });
+		new_account.second.set_option(user_option::instance_url, std::string{ instanceurl });
+		new_account.second.set_option(user_option::access_token, std::string{ accesstoken });
+	}
+
 
 	GIVEN("A queue with some ids to add and a good connection")
 	{
