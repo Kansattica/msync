@@ -4,7 +4,6 @@
 #include <string_view>
 #include <string>
 #include <vector>
-#include <filesystem.hpp>
 
 struct net_response
 {
@@ -14,6 +13,7 @@ struct net_response
 	std::string message;
 };
 
+class std::filesystem::path;
 struct status_params
 {
 	int idempotency_id;
@@ -21,7 +21,7 @@ struct status_params
 	std::string reply_to;
 	std::string content_warning;
 	std::string visibility;
-	std::vector<fs::path> attachments;
+	std::vector<std::filesystem::path> attachments;
 	std::vector<std::string> descriptions;
 };
 
