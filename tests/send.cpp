@@ -382,7 +382,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 	}
 }
 
-SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]")
+SCENARIO("Send correctly sends new posts and deletes existing ones.")
 {
 	logs_off = true;
 	const test_file fi = account_directory();
