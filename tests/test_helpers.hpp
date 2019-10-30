@@ -8,6 +8,8 @@
 #include <string_view>
 
 std::vector<std::string> read_lines(const fs::path& toread);
+size_t count_files_in_directory(const fs::path& tocheck);
+void touch(const fs::path& totouch);
 
 //ensures a file doesn't exist before and after each test run.
 struct test_file
@@ -37,6 +39,28 @@ public:
 	operator std::string() const { return filename.string(); }
 	const fs::path filename;
 	fs::path filenamebak;
+private:
+};
+
+//ensures a file only exists during each test run
+struct touch_file
+{
+public:
+	touch_file(const char* name) : touch_file(fs::path(name)) {};
+	touch_file(std::string_view name) : touch_file(fs::path(name)) {};
+	touch_file(fs::path name) : filename(name)
+	{
+		if (!fs::exists(filename))
+			touch(filename);
+	};
+
+	~touch_file()
+	{
+		fs::remove(filename);
+	};
+
+	operator std::string() const { return filename.string(); }
+	const fs::path filename;
 private:
 };
 

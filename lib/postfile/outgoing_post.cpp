@@ -18,6 +18,11 @@ constexpr std::array<std::string_view, 5> OPTIONS = {
 	"visibility", "cw", "reply_to", "attach", "descriptions"
 };
 
+std::string post_content::visibility() const
+{
+	return std::string{ VISIBILITIES[static_cast<size_t>(vis)][0] };
+}
+
 size_t is_option(const std::string_view line, size_t equals_sign);
 bool is_snip(const std::string_view line);
 void parse_option(post_content& post, size_t option_index, const std::string_view value);

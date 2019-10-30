@@ -10,10 +10,8 @@
 #include <msync_exception.hpp>
 
 
-fs::path get_file_queue_directory(const std::string_view account, bool create)
+fs::path get_file_queue_directory(std::string_view account)
 {
-	if (!create)
-		return "";
 	return options().executable_location / Account_Directory / account / File_Queue_Directory;
 }
 
@@ -113,7 +111,7 @@ void enqueue(const queues toenqueue, const std::string_view account, const std::
 {
 	queue_list toaddto = open_queue(toenqueue, account);
 
-	const fs::path filequeuedir = get_file_queue_directory(account, toenqueue == queues::post);
+	const fs::path filequeuedir = toenqueue == queues::post ? get_file_queue_directory(account) : "";
 	for (const auto& id : add)
 	{
 		std::string queuethis = id;
@@ -145,7 +143,7 @@ void dequeue(queues todequeue, const std::string_view account, std::vector<std::
 {
 	queue_list toremovefrom = open_queue(todequeue, account);
 
-	const fs::path filequeuedir = get_file_queue_directory(account, todequeue == queues::post);
+	const fs::path filequeuedir = todequeue == queues::post ? get_file_queue_directory(account) : "";
 	for (auto it = toremove.begin(); it != toremove.end(); )
 	{
 		if (todequeue == queues::post)
@@ -189,7 +187,7 @@ void clear(queues toclear, const std::string_view account)
 
 	if (toclear == queues::post)
 	{
-		fs::remove_all(get_file_queue_directory(account, true));
+		fs::remove_all(get_file_queue_directory(account));
 	}
 }
 

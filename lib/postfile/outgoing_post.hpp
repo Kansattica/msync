@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <string_view>
 
 #include "../filebacked/file_backed.hpp"
 
@@ -24,6 +25,9 @@ struct post_content
 	std::vector<std::string> attachments;
 	std::vector<std::string> descriptions;
 	visibility vis = visibility::pub;
+
+	std::string visibility() const;
+
 	raw_text_mode is_raw = raw_text_mode::unset;
 };
 

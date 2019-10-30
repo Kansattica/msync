@@ -2,9 +2,11 @@
 #define _MSYNC_SEND_HPP_
 
 #include <print_logger.hpp>
+#include <filesystem.hpp>
+
 #include <string>
 #include <string_view>
-
+#include <algorithm>
 #include <utility>
 #include <deque>
 
@@ -49,6 +51,9 @@ public:
 
 		pl() << "Sending queued boosts for " << account << '\n';
 		process_queue<queues::boost>(account, baseurl);
+
+		pl() << "Sending queued posts for " << account << '\n';
+		process_posts(account, baseurl);
 	}
 
 private:
@@ -90,6 +95,20 @@ private:
 		queuefile.parsed = std::move(failedids);
 	}
 
+	std::vector<fs::path> ensure_attachments(const std::vector<std::string>& attach)
+	{
+		std::vector<fs::path> toreturn;
+		toreturn.reserve(attach.size());
+		for (const auto& path : attach)
+		{
+			fs::path toinsert{ path };
+			if (!fs::exists(toinsert))
+				pl() << "Couldn't find file " << toinsert << ". Will be skipped.\n";
+			toreturn.push_back(std::move(toinsert));
+		}
+		return toreturn;
+	}
+
 	status_params read_params(const fs::path& path)
 	{
 		static int idempotency_id = 1;
@@ -97,13 +116,13 @@ private:
 		const outgoing_post post{ path };
 
 		status_params toreturn;
-		toreturn.attachments = post.parsed.attachments;
+		toreturn.attachments = ensure_attachments(post.parsed.attachments);
 		toreturn.body = post.parsed.text;
 		toreturn.content_warning = post.parsed.content_warning;
 		toreturn.descriptions = post.parsed.descriptions;
 		toreturn.idempotency_id = idempotency_id++;
 		toreturn.reply_to = post.parsed.reply_to_id;
-		toreturn.visibility = post.parsed.vis;
+		toreturn.visibility = post.parsed.visibility();
 
 		return toreturn;
 	}
@@ -114,6 +133,7 @@ private:
 
 		std::deque<std::string> failed;
 
+		const fs::path file_queue_directory = get_file_queue_directory(account);
 		while (!queuefile.parsed.empty())
 		{
 			std::string_view id = queuefile.parsed.front();
@@ -132,9 +152,8 @@ private:
 			}
 			else
 			{
-				const static fs::path base = options().executable_location / File_Queue_Directory;
-				const fs::path file_to_send = base / id;
-				status_params params = read_params(file_to_send);
+				const fs::path file_to_send = file_queue_directory / id;
+				const status_params params = read_params(file_to_send);
 				succeeded = request_with_retries([&]() { return new_status(baseurl, access_token, params); });
 				if (succeeded)
 				{

@@ -37,3 +37,22 @@ std::vector<std::string> read_lines(const fs::path& toread)
 
 	return toreturn;
 }
+
+size_t count_files_in_directory(const fs::path& tocheck)
+{
+	if (!fs::is_directory(tocheck)) { return false; }
+
+	size_t count = 0;
+	auto dir = fs::directory_iterator(tocheck);
+	while (dir != fs::end(dir))
+	{
+		++count;
+		++dir;
+	}
+	return count;
+}
+
+void touch(const fs::path& totouch)
+{
+	std::ofstream of(totouch, std::ios::out | std::ios::app);
+}

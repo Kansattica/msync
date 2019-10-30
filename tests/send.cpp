@@ -10,6 +10,7 @@
 
 #include <string_view>
 #include <vector>
+#include <array>
 #include <string>
 #include <utility>
 #include <algorithm>
@@ -381,3 +382,133 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 	}
 }
 
+SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]")
+{
+	logs_off = true;
+	const test_file fi = account_directory();
+
+	constexpr std::string_view account = "someguy@cool.account";
+	constexpr std::string_view instanceurl = "cool.account";
+	constexpr std::string_view accesstoken = "sometoken";
+	constexpr std::string_view new_post_url = "https://cool.account/api/v1/statuses";
+
+	const bool send_all = GENERATE(true, false);
+
+	const static fs::path queue_directory = fi.filename / account / File_Queue_Directory;
+
+	if (send_all)
+	{
+		auto& new_account = options().add_new_account(std::string{ account });
+		new_account.second.set_option(user_option::instance_url, std::string{ instanceurl });
+		new_account.second.set_option(user_option::access_token, std::string{ accesstoken });
+	}
+
+	GIVEN("A queue with some post filenames to send.")
+	{
+		const std::array<test_file, 3> to_enqueue { "first.post", "second.post", "another kind of post" };
+		const std::array<touch_file, 4> attachment_files{ "attachments", "on", "this", "one" };
+
+		const static std::vector<fs::path> expected_attach{ fs::canonical("attachments"), fs::canonical("on")
+			, fs::canonical("this"), fs::canonical("one") };
+		const static std::vector<std::string> expected_descriptions{ "with", "some", "descriptions" };
+
+		{
+			outgoing_post first{ to_enqueue[0].filename };
+			first.parsed.text = "This one just has a body.";
+
+			outgoing_post second{ to_enqueue[1].filename };
+			second.parsed.text = "This one has a body, too.";
+			second.parsed.content_warning = "And a content warning.";
+			second.parsed.vis = visibility::priv;
+			second.parsed.reply_to_id = "10";
+
+			outgoing_post third{ to_enqueue[2].filename };
+			third.parsed.attachments = { "attachments", "on", "this", "one" };
+			third.parsed.descriptions = { "with", "some", "descriptions" };
+			third.parsed.vis = visibility::direct;
+		}
+
+		enqueue(queues::post, account, { "first.post", "second.post", "another kind of post" });
+
+		WHEN("the posts are sent over a good connection")
+		{
+			mock_network_post mockpost;
+			mock_network_delete mockdel;
+			mock_network_new_status mocknew;
+
+			auto send = send_posts{ mockpost, mockdel, mocknew };
+
+			if (send_all)
+				send.send_all();
+			else
+				send.send(account, instanceurl, accesstoken);
+
+			THEN("the queue and post directory is now empty.")
+			{
+				REQUIRE(print(queues::post, account).empty());
+				REQUIRE(count_files_in_directory(queue_directory));
+			}
+
+			THEN("the input files and attachments are untouched")
+			{
+				REQUIRE(std::all_of(to_enqueue.begin(), to_enqueue.end(), [](const auto& file) { return fs::exists(file.filename); }));
+				REQUIRE(std::all_of(attachment_files.begin(), attachment_files.end(), [](const auto& file) { return fs::exists(file.filename); }));
+			}
+
+			THEN("one call per ID was made.")
+			{
+				REQUIRE(mocknew.arguments.size() == 3);
+			}
+
+			THEN("the access token was passed in.")
+			{
+				REQUIRE(std::all_of(mocknew.arguments.begin(), mocknew.arguments.end(), [&](const auto& actual) { return actual.access_token == accesstoken; }));
+			}
+
+			THEN("the URLs are as expected.")
+			{
+				REQUIRE(std::all_of(mockpost.arguments.begin(), mockpost.arguments.end(), [&](const auto& actual) { return actual.url == new_post_url; }));
+			}
+
+			THEN("the post parameters are as expected.")
+			{
+				const auto& first = mocknew.arguments[0];
+				REQUIRE(first.params.attachments.empty());
+				REQUIRE(first.params.body == "This one just has a body.");
+				REQUIRE(first.params.content_warning.empty());
+				REQUIRE(first.params.descriptions.empty());
+				REQUIRE(first.params.reply_to.empty());
+				REQUIRE(first.params.visibility == "public");
+
+				const auto& second = mocknew.arguments[1];
+				REQUIRE(second.params.attachments.empty());
+				REQUIRE(second.params.body == "This one has a body, too.");
+				REQUIRE(second.params.content_warning == "And a content warning.");
+				REQUIRE(second.params.descriptions.empty());
+				REQUIRE(second.params.reply_to == "10");
+				REQUIRE(second.params.visibility == "private");
+
+				const auto& third = mocknew.arguments[2];
+				REQUIRE(third.params.attachments == expected_attach);
+				REQUIRE(third.params.body.empty());
+				REQUIRE(third.params.content_warning.empty());
+				REQUIRE(third.params.descriptions == expected_descriptions);
+				REQUIRE(third.params.reply_to.empty());
+				REQUIRE(third.params.visibility == "direct");
+			}
+
+			THEN("the idempotency IDs are unique per call.")
+			{
+				const auto newend = std::unique(mocknew.arguments.begin(), mocknew.arguments.end(), [](const mock_args& lhs, const mock_args& rhs)
+					{
+						return lhs.params.idempotency_id == rhs.params.idempotency_id;
+					});
+
+				// basically, if std::unique had no work to do
+				REQUIRE(newend == mocknew.arguments.end());
+			}
+		}
+
+	}
+
+}

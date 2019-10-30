@@ -14,6 +14,8 @@ enum class queues
     post
 };
 
+fs::path get_file_queue_directory(std::string_view account);
+
 void enqueue(queues toenqueue, const std::string_view account, const std::vector<std::string>& add);
 
 // dequeue mutates and moves from the vector for efficiency

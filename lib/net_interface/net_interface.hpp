@@ -16,7 +16,7 @@ struct net_response
 class std::filesystem::path;
 struct status_params
 {
-	int idempotency_id;
+	int idempotency_id = -1;
 	std::string body;
 	std::string reply_to;
 	std::string content_warning;
