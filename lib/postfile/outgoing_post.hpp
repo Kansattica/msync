@@ -26,7 +26,7 @@ struct post_content
 	std::vector<std::string> descriptions;
 	visibility vis = visibility::pub;
 
-	std::string visibility() const;
+	std::string visibility_string() const;
 
 	raw_text_mode is_raw = raw_text_mode::unset;
 };

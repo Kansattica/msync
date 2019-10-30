@@ -18,7 +18,7 @@ constexpr std::array<std::string_view, 5> OPTIONS = {
 	"visibility", "cw", "reply_to", "attach", "descriptions"
 };
 
-std::string post_content::visibility() const
+std::string post_content::visibility_string() const
 {
 	return std::string{ VISIBILITIES[static_cast<size_t>(vis)][0] };
 }

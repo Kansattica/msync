@@ -122,7 +122,7 @@ private:
 		toreturn.descriptions = post.parsed.descriptions;
 		toreturn.idempotency_id = idempotency_id++;
 		toreturn.reply_to = post.parsed.reply_to_id;
-		toreturn.visibility = post.parsed.visibility();
+		toreturn.visibility = post.parsed.visibility_string();
 
 		return toreturn;
 	}
