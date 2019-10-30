@@ -45,8 +45,9 @@ add_subdirectory(lib/util)
 
 
 target_include_directories(netinterface INTERFACE lib/net_interface)
+target_link_libraries(netinterface INTERFACE filesystem)
 
-target_link_libraries(net PRIVATE ${CPR_LIBRARIES} netinterface)
+target_link_libraries(net PRIVATE ${CPR_LIBRARIES} netinterface filesystem)
 
 target_include_directories(filebacked INTERFACE lib/filebacked)
 target_link_libraries(filebacked INTERFACE printlog filesystem)

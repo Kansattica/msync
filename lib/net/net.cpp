@@ -4,6 +4,8 @@
 #include <string>
 #include <utility>
 
+#include <filesystem.hpp>
+
 std::string_view ensure_small_string(const std::string_view sv)
 {
 	// I want to ensure that, when a string is constructed from this, it's cheap to make

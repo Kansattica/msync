@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include <filesystem.hpp>
+
 struct net_response
 {
 	int status_code = 200;
@@ -13,7 +15,6 @@ struct net_response
 	std::string message;
 };
 
-class std::filesystem::path;
 struct status_params
 {
 	int idempotency_id = -1;
