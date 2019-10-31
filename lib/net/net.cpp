@@ -38,14 +38,16 @@ net_response handle_response(cpr::Response&& response)
 	return to_return;
 }
 
-static const std::string idempotency_key_header{ "Idempotency-Key" };
+constexpr auto idempotency_key_header{ "Idempotency-Key" };
+constexpr auto authorization_key_header{ "Authorization" };
 net_response simple_post(const std::string_view url, const std::string_view access_token)
 {
 	// add rate limiting handling later
 	return handle_response(
 		cpr::Post(cpr::Url{ url },
-			cpr::Header{ {idempotency_key_header, std::string{ ensure_small_string(url) } } },
-			cpr::Header{ {"Authorization", make_bearer(access_token) } })
+			cpr::Header{ {idempotency_key_header, std::string{ ensure_small_string(url) } } ,
+						 {authorization_key_header, make_bearer(access_token) } }
+		)
 	);
 }
 
@@ -54,7 +56,7 @@ net_response simple_delete(const std::string_view url, const std::string_view ac
 	// add rate limiting handling later
 	return handle_response(
 		cpr::Delete(cpr::Url{ url },
-			cpr::Header{ {"Authorization", make_bearer(access_token) } })
+			cpr::Header{ {authorization_key_header, make_bearer(access_token) } })
 	);
 }
 
@@ -76,7 +78,7 @@ net_response new_status(std::string_view url, std::string_view access_token, sta
 
 	return handle_response(
 		cpr::Post(cpr::Url{ url },
-		cpr::Header{ {idempotency_key_header, std::to_string(params.idempotency_id) } },
-		cpr::Header{ {"Authorization", make_bearer(access_token) } },
-		post_params));
+			cpr::Header{ {idempotency_key_header, std::to_string(params.idempotency_id) },
+						 {authorization_key_header, make_bearer(access_token) } },
+			post_params));
 }
