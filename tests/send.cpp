@@ -447,7 +447,9 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 			THEN("the queue and post directory is now empty.")
 			{
 				REQUIRE(print(queues::post, account).empty());
-				REQUIRE(count_files_in_directory(queue_directory) == 0);
+
+				// it'll leave the .bak files behind
+				REQUIRE(count_files_in_directory(queue_directory) == 3);
 			}
 
 			THEN("the input files and attachments are untouched")
@@ -525,7 +527,9 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 			THEN("the queue and post directories are not empty.")
 			{
 				REQUIRE(print(queues::post, account) == expected_files);
-				REQUIRE(count_files_in_directory(queue_directory) == 3);
+
+				// queueing the posts makes a .bak file for them
+				REQUIRE(count_files_in_directory(queue_directory) == 6);
 			}
 
 			THEN("the input files and attachments are untouched")
