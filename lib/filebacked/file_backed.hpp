@@ -6,7 +6,7 @@
 #include <filesystem.hpp>
 #include <print_logger.hpp>
 
-template <typename Container, void(*Read)(Container&, std::string&&), void(*Write)(Container&&, std::ofstream&), bool skip_blank = true, bool skip_comment = true>
+template <typename Container, void(*Read)(Container&, std::string&&), void(*Write)(Container&&, std::ofstream&), bool skip_blank = true, bool skip_comment = true, bool read_only = false>
 class file_backed
 {
 public:
@@ -34,6 +34,12 @@ public:
 
 	~file_backed()
 	{
+		if constexpr (read_only)
+		{
+			// if they only wanted to look at the thing, don't save the changes
+			return;
+		}
+
 		if (backing.empty())
 			return; // we got moved from, so the new version will save it
 

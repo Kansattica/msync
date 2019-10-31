@@ -113,15 +113,15 @@ private:
 	{
 		static int idempotency_id = 1;
 
-		const outgoing_post post{ path };
+		readonly_outgoing_post post{ path };
 
 		status_params toreturn;
 		toreturn.attachments = ensure_attachments(post.parsed.attachments);
-		toreturn.body = post.parsed.text;
-		toreturn.content_warning = post.parsed.content_warning;
-		toreturn.descriptions = post.parsed.descriptions;
+		toreturn.body = std::move(post.parsed.text);
+		toreturn.content_warning = std::move(post.parsed.content_warning);
+		toreturn.descriptions = std::move(post.parsed.descriptions);
 		toreturn.idempotency_id = idempotency_id++;
-		toreturn.reply_to = post.parsed.reply_to_id;
+		toreturn.reply_to = std::move(post.parsed.reply_to_id);
 		toreturn.visibility = post.parsed.visibility_string();
 
 		return toreturn;
