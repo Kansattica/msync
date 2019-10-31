@@ -62,13 +62,13 @@ int main(int argc, const char* argv[])
 					{
 						pl() << option_name << ": ";
 						print_stringptr(option_value);
+						pl() << '\n';
 					}
 				}
 				else
 				{
-					pl() << SYNC_SETTING_NAMES[static_cast<int>(assume_account(user).second.get_sync_option(opt))];
+					pl() << option_name << ": " << SYNC_SETTING_NAMES[static_cast<int>(assume_account(user).second.get_sync_option(opt))] << '\n';
 				}
-				pl() << '\n';
 			}
 			pl() << "Accounts registered: ";
 			{
