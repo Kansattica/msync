@@ -382,7 +382,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 	}
 }
 
-SCENARIO("Send correctly sends new posts and deletes existing ones.")
+SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]")
 {
 	logs_off = true;
 	const test_file fi = account_directory();
@@ -461,6 +461,12 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 			THEN("one call per ID was made.")
 			{
 				REQUIRE(mocknew.arguments.size() == 3);
+			}
+
+			THEN("the other APIs weren't called.")
+			{
+				REQUIRE(mockpost.arguments.empty());
+				REQUIRE(mockdel.arguments.empty());
 			}
 
 			THEN("the access token was passed in.")
@@ -543,6 +549,12 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 				REQUIRE(mocknew.arguments.size() == 3);
 			}
 
+			THEN("the other APIs weren't called.")
+			{
+				REQUIRE(mockpost.arguments.empty());
+				REQUIRE(mockdel.arguments.empty());
+			}
+
 			THEN("the access token was passed in.")
 			{
 				REQUIRE(std::all_of(mocknew.arguments.begin(), mocknew.arguments.end(), [&](const auto& actual) { return actual.access_token == accesstoken; }));
@@ -592,6 +604,116 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 			}
 		}
 
-	}
+		WHEN("the posts are sent over a flaky connection that eventually succeeds")
+		{
+			const auto retries = GENERATE(
+				std::make_pair(3, 3),
+				std::make_pair(5, 5),
+				std::make_pair(1, 1),
+				std::make_pair(0, 3),
+				std::make_pair(-1, 3));
 
+			mocknew.fatal_error = false;
+			mocknew.set_succeed_after(retries.second);
+
+			auto send = send_posts{ mockpost, mockdel, mocknew };
+
+			send.retries = retries.first;
+
+			if (send_all)
+				send.send_all();
+			else
+				send.send(account, instanceurl, accesstoken);
+
+			THEN("the queue and post directories are emptied.")
+			{
+				REQUIRE(print(queues::post, account).empty());
+
+				// queueing the posts makes a .bak file for them
+				REQUIRE(count_files_in_directory(queue_directory) == 3);
+			}
+
+			THEN("the input files and attachments are untouched")
+			{
+				REQUIRE(std::all_of(to_enqueue.begin(), to_enqueue.end(), [](const auto& file) { return fs::exists(file.filename); }));
+				REQUIRE(std::all_of(attachment_files.begin(), attachment_files.end(), [](const auto& file) { return fs::exists(file.filename); }));
+			}
+
+			THEN("[retries] calls per ID was made.")
+			{
+				REQUIRE(mocknew.arguments.size() == 3 * retries.second);
+			}
+
+			THEN("the other APIs weren't called.")
+			{
+				REQUIRE(mockpost.arguments.empty());
+				REQUIRE(mockdel.arguments.empty());
+			}
+
+			THEN("the access token was passed in.")
+			{
+				REQUIRE(std::all_of(mocknew.arguments.begin(), mocknew.arguments.end(), [&](const auto& actual) { return actual.access_token == accesstoken; }));
+			}
+
+			THEN("the URLs are as expected.")
+			{
+				REQUIRE(std::all_of(mockpost.arguments.begin(), mockpost.arguments.end(), [&](const auto& actual) { return actual.url == new_post_url; }));
+			}
+
+			THEN("the post parameters are as expected.")
+			{
+				size_t idx = 0;
+				int expected_idempotency_id = -1;
+				for (size_t i = 0; i < retries.second; i++)
+				{
+					const auto& first = mocknew.arguments[idx++];
+					REQUIRE(first.params.attachments.empty());
+					REQUIRE(first.params.body == "This one just has a body.");
+					REQUIRE(first.params.content_warning.empty());
+					REQUIRE(first.params.descriptions.empty());
+					REQUIRE(first.params.reply_to.empty());
+					REQUIRE(first.params.visibility == "public");
+
+					if (expected_idempotency_id == -1)
+						expected_idempotency_id = first.params.idempotency_id;
+					else
+						REQUIRE(expected_idempotency_id == first.params.idempotency_id);
+				}
+
+				expected_idempotency_id = -1;
+				for (size_t i = 0; i < retries.second; i++)
+				{
+					const auto& second = mocknew.arguments[idx++];
+					REQUIRE(second.params.attachments.empty());
+					REQUIRE(second.params.body == "This one has a body, too.");
+					REQUIRE(second.params.content_warning == "And a content warning.");
+					REQUIRE(second.params.descriptions.empty());
+					REQUIRE(second.params.reply_to == "10");
+					REQUIRE(second.params.visibility == "private");
+
+					if (expected_idempotency_id == -1)
+						expected_idempotency_id = second.params.idempotency_id;
+					else
+						REQUIRE(expected_idempotency_id == second.params.idempotency_id);
+				}
+
+				expected_idempotency_id = -1;
+				for (size_t i = 0; i < retries.second; i++)
+				{
+					const auto& third = mocknew.arguments[idx++];
+					REQUIRE(third.params.attachments == expected_attach);
+					REQUIRE(third.params.body.empty());
+					REQUIRE(third.params.content_warning.empty());
+					REQUIRE(third.params.descriptions == expected_descriptions);
+					REQUIRE(third.params.reply_to.empty());
+					REQUIRE(third.params.visibility == "direct");
+
+					if (expected_idempotency_id == -1)
+						expected_idempotency_id = third.params.idempotency_id;
+					else
+						REQUIRE(expected_idempotency_id == third.params.idempotency_id);
+				}
+			}
+		}
+	}
 }
