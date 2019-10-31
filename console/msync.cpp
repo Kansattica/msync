@@ -70,10 +70,10 @@ int main(int argc, const char* argv[])
 					pl() << option_name << ": " << SYNC_SETTING_NAMES[static_cast<int>(assume_account(user).second.get_sync_option(opt))] << '\n';
 				}
 			}
-			pl() << "Accounts registered: ";
+			pl() << "Accounts registered:\n";
 			{
 				const auto accountnames = options().all_accounts();
-				join_iterable(accountnames.begin(), accountnames.end(), ", ", pl());
+				join_iterable(accountnames.begin(), accountnames.end(), '\n', pl());
 			}
 			break;
 		case mode::config:
