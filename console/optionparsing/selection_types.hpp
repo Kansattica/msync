@@ -27,6 +27,6 @@ struct queue_options
 
 struct gen_options
 {
-	std::string filename = "post.msync";
+	std::string filename = "new_post";
 	post_content post;
 };
