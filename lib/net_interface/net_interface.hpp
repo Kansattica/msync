@@ -21,7 +21,7 @@ struct status_params
 	std::string reply_to;
 	std::string content_warning;
 	std::string visibility;
-	std::vector<std::filesystem::path> attachments;
+	std::vector<fs::path> attachments;
 	std::vector<std::string> descriptions;
 };
 
