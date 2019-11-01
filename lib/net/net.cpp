@@ -60,17 +60,17 @@ net_response simple_delete(const std::string_view url, const std::string_view ac
 	);
 }
 
-void add_if_value(cpr::Parameters& params, const char* key, std::string&& value)
+void add_if_value(cpr::Payload& params, const char* key, std::string&& value)
 {
 	if (!value.empty())
-		params.AddParameter(cpr::Parameter(key, std::move(value)));
+		params.AddPair(cpr::Pair(key, std::move(value)));
 }
 
 net_response new_status(std::string_view url, std::string_view access_token, status_params params)
 {
 	std::string idempotency_key = params.body;
 
-	cpr::Parameters post_params;
+	cpr::Payload post_params{};
 	add_if_value(post_params, "status", std::move(params.body));
 	add_if_value(post_params, "spoiler_text", std::move(params.content_warning));
 	add_if_value(post_params, "visibility", std::move(params.visibility));
@@ -80,7 +80,7 @@ net_response new_status(std::string_view url, std::string_view access_token, sta
 
 	return handle_response(
 		cpr::Post(cpr::Url{ url },
-			cpr::Header{ { idempotency_key_header, std::move(idempotency_key) },
+			cpr::Header{ //{ idempotency_key_header, std::move(idempotency_key) },
 						 { authorization_key_header, make_bearer(access_token) } },
 						 std::move(post_params)));
 }
