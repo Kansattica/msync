@@ -17,7 +17,6 @@ struct net_response
 
 struct status_params
 {
-	int idempotency_id = -1;
 	std::string body;
 	std::string reply_to;
 	std::string content_warning;

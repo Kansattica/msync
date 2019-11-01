@@ -114,7 +114,6 @@ private:
 
 	status_params read_params(const fs::path& path)
 	{
-		static int idempotency_id = 1;
 
 		readonly_outgoing_post post{ path };
 
@@ -123,7 +122,6 @@ private:
 		toreturn.body = std::move(post.parsed.text);
 		toreturn.content_warning = std::move(post.parsed.content_warning);
 		toreturn.descriptions = std::move(post.parsed.descriptions);
-		toreturn.idempotency_id = idempotency_id++;
 		toreturn.reply_to = std::move(post.parsed.reply_to_id);
 		toreturn.visibility = post.parsed.visibility_string();
 

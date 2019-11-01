@@ -506,16 +506,6 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 				REQUIRE(third.params.visibility == "direct");
 			}
 
-			THEN("the idempotency IDs are unique per post.")
-			{
-				const auto newend = std::unique(mocknew.arguments.begin(), mocknew.arguments.end(), [](const mock_args& lhs, const mock_args& rhs)
-					{
-						return lhs.params.idempotency_id == rhs.params.idempotency_id;
-					});
-
-				// basically, if std::unique had no work to do
-				REQUIRE(newend == mocknew.arguments.end());
-			}
 		}
 
 		WHEN("the posts are sent over a bad or no connection")
@@ -592,16 +582,6 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 				REQUIRE(third.params.visibility == "direct");
 			}
 
-			THEN("the idempotency IDs are unique per post.")
-			{
-				const auto newend = std::unique(mocknew.arguments.begin(), mocknew.arguments.end(), [](const mock_args& lhs, const mock_args& rhs)
-					{
-						return lhs.params.idempotency_id == rhs.params.idempotency_id;
-					});
-
-				// basically, if std::unique had no work to do
-				REQUIRE(newend == mocknew.arguments.end());
-			}
 		}
 
 		WHEN("the posts are sent over a flaky connection that eventually succeeds")
@@ -663,7 +643,6 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 			THEN("the post parameters are as expected.")
 			{
 				size_t idx = 0;
-				int expected_idempotency_id = -1;
 				for (size_t i = 0; i < retries.second; i++)
 				{
 					const auto& first = mocknew.arguments[idx++];
@@ -673,14 +652,8 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 					REQUIRE(first.params.descriptions.empty());
 					REQUIRE(first.params.reply_to.empty());
 					REQUIRE(first.params.visibility == "public");
-
-					if (expected_idempotency_id == -1)
-						expected_idempotency_id = first.params.idempotency_id;
-					else
-						REQUIRE(expected_idempotency_id == first.params.idempotency_id);
 				}
 
-				expected_idempotency_id = -1;
 				for (size_t i = 0; i < retries.second; i++)
 				{
 					const auto& second = mocknew.arguments[idx++];
@@ -690,14 +663,8 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 					REQUIRE(second.params.descriptions.empty());
 					REQUIRE(second.params.reply_to == "10");
 					REQUIRE(second.params.visibility == "private");
-
-					if (expected_idempotency_id == -1)
-						expected_idempotency_id = second.params.idempotency_id;
-					else
-						REQUIRE(expected_idempotency_id == second.params.idempotency_id);
 				}
 
-				expected_idempotency_id = -1;
 				for (size_t i = 0; i < retries.second; i++)
 				{
 					const auto& third = mocknew.arguments[idx++];
@@ -707,11 +674,6 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 					REQUIRE(third.params.descriptions == expected_descriptions);
 					REQUIRE(third.params.reply_to.empty());
 					REQUIRE(third.params.visibility == "direct");
-
-					if (expected_idempotency_id == -1)
-						expected_idempotency_id = third.params.idempotency_id;
-					else
-						REQUIRE(expected_idempotency_id == third.params.idempotency_id);
 				}
 			}
 		}

@@ -68,6 +68,8 @@ void add_if_value(cpr::Parameters& params, const char* key, std::string&& value)
 
 net_response new_status(std::string_view url, std::string_view access_token, status_params params)
 {
+	std::string idempotency_key = params.body;
+
 	cpr::Parameters post_params;
 	add_if_value(post_params, "status", std::move(params.body));
 	add_if_value(post_params, "spoiler_text", std::move(params.content_warning));
@@ -78,7 +80,7 @@ net_response new_status(std::string_view url, std::string_view access_token, sta
 
 	return handle_response(
 		cpr::Post(cpr::Url{ url },
-			cpr::Header{ {idempotency_key_header, std::to_string(params.idempotency_id) },
-						 {authorization_key_header, make_bearer(access_token) } },
-			post_params));
+			cpr::Header{ { idempotency_key_header, std::move(idempotency_key) },
+						 { authorization_key_header, make_bearer(access_token) } },
+						 std::move(post_params)));
 }
