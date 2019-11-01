@@ -3,4 +3,6 @@ target_sources_local(sync
 	send.hpp
 	recv.hpp
 	recv.cpp
+	read_response.cpp
+	read_response.hpp
 	)

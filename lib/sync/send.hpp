@@ -8,6 +8,7 @@
 #include <string_view>
 #include <algorithm>
 #include <utility>
+#include <tuple> // for std::tie
 #include <deque>
 
 #include "../net_interface/net_interface.hpp"
@@ -17,6 +18,8 @@
 #include "../util/util.hpp"
 #include "../postfile/outgoing_post.hpp"
 #include "../constants/constants.hpp"
+
+#include "read_response.hpp"
 
 template <typename post_request, typename delete_request, typename post_new_status>
 struct send_posts
@@ -83,7 +86,7 @@ private:
 
 			const std::string requesturl = paramaterize_url(baseurl, id, undo ? route<toread, false>() : route<toread, true>());
 
-			if (request_with_retries( [&]() { return post(requesturl, access_token); }))
+			if (request_with_retries( [&]() { return post(requesturl, access_token); }).first)
 				pl() << requesturl << " OK\n";
 			else
 				failedids.push_back(std::move(queuefile.parsed.front()));
@@ -127,6 +130,22 @@ private:
 		return toreturn;
 	}
 
+	void print_status(mastodon_status&& status)
+	{
+		pl() << "Created post at " << status.url << '\n';
+
+		if (!status.content_warning.empty())
+			pl() << "CW: " << status.content_warning << '\n';
+
+		if (status.content.size() > 30)
+		{
+			status.content.resize(30);
+			status.content += "...";
+		}
+
+		pl() << "Body: " << status.content << '\n';
+	}
+
 	void process_posts(const std::string_view account, const std::string_view baseurl) 
 	{
 		auto queuefile = get(queues::post, account);
@@ -146,7 +165,7 @@ private:
 			if (undo)
 			{
 				const std::string requesturl = paramaterize_url(baseurl, id, "");
-				succeeded = request_with_retries([&]() { return del(requesturl, access_token); });
+				succeeded = request_with_retries([&]() { return del(requesturl, access_token); }).first;
 				if (succeeded)
 					pl() << requesturl << " OK\n";
 			}
@@ -154,11 +173,12 @@ private:
 			{
 				const fs::path file_to_send = file_queue_directory / id;
 				const status_params params = read_params(file_to_send);
-				succeeded = request_with_retries([&]() { return new_status(baseurl, access_token, params); });
+				std::string response;
+				std::tie(succeeded, response) = request_with_retries([&]() { return new_status(baseurl, access_token, params); });
 				if (succeeded)
 				{
 					fs::remove(file_to_send);
-					pl() << id << " OK\n";
+					print_status(read_status(response));
 				}
 			}
 
@@ -191,7 +211,7 @@ private:
 	}
 
 	template <typename make_request>
-	bool request_with_retries(make_request req)
+	std::pair<bool, std::string> request_with_retries(make_request req)
 	{
 		for (int i = 0; i < retries; i++)
 		{
@@ -211,13 +231,13 @@ private:
 			if (!response.okay)
 			{
 				pl() << response.message << '\n';
-				return false;
+				return std::make_pair(false, std::move(response.message));
 			}
 
 			// must be 200, OK response
-			return true;
+			return std::make_pair(true, std::move(response.message));
 		}
-		return false;
+		return std::make_pair(false, "Maximum retries reached.");
 	}
 
 	constexpr bool should_undo(std::string_view& id) const
