@@ -165,7 +165,7 @@ private:
 				const std::string requesturl = paramaterize_url(baseurl, id, "");
 				succeeded = request_with_retries([&]() { return del(requesturl, access_token); }).first;
 				if (succeeded)
-					pl() << requesturl << " OK\n";
+					pl() << "DELETE " << requesturl << " OK\n";
 			}
 			else
 			{
