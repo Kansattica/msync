@@ -16,8 +16,8 @@
 
 using json = nlohmann::json;
 
-constexpr auto scopes = "write read:statuses read:lists";
-constexpr auto urlscopes = "write%20read:statuses%20read:lists";
+constexpr auto scopes = "write:favourites write:media write:statuses";
+constexpr auto urlscopes = "write:favourites%20write:media%20write:statuses";
 constexpr auto redirect_uri = "urn:ietf:wg:oauth:2.0:oob";
 
 void make_new_account(const std::string& accountname)
