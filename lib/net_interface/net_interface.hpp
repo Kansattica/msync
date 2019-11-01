@@ -17,6 +17,7 @@ struct net_response
 
 struct status_params
 {
+	uint64_t idempotency_key;
 	std::string body;
 	std::string reply_to;
 	std::string content_warning;

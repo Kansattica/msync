@@ -20,6 +20,7 @@
 #include "../constants/constants.hpp"
 
 #include "read_response.hpp"
+#include "sync_helpers.hpp"
 
 template <typename post_request, typename delete_request, typename post_new_status>
 struct send_posts
@@ -114,10 +115,10 @@ private:
 
 	status_params read_params(const fs::path& path)
 	{
-
 		readonly_outgoing_post post{ path };
 
 		status_params toreturn;
+		toreturn.idempotency_key = random_number();
 		toreturn.attachments = ensure_attachments(post.parsed.attachments);
 		toreturn.body = std::move(post.parsed.text);
 		toreturn.content_warning = std::move(post.parsed.content_warning);
@@ -144,7 +145,7 @@ private:
 		pl() << "Body: " << status.content << '\n';
 	}
 
-	void process_posts(const std::string_view account, const std::string_view baseurl) 
+	void process_posts(const std::string_view account, const std::string_view baseurl)
 	{
 		auto queuefile = get(queues::post, account);
 
@@ -238,23 +239,6 @@ private:
 		return std::make_pair(false, "Maximum retries reached.");
 	}
 
-	constexpr bool should_undo(std::string_view& id) const
-	{
-		if (id.back() == '-')
-		{
-			id.remove_suffix(1);
-			return true;
-		}
-
-		return false;
-	}
-
-	std::string paramaterize_url(const std::string_view before, const std::string_view middle, const std::string_view after) const
-	{
-		std::string toreturn{ before };
-		toreturn.reserve(toreturn.size() + middle.size() + after.size());
-		return toreturn.append(middle).append(after);
-	}
 };
 
 #endif
