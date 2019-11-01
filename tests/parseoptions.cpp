@@ -729,6 +729,38 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 		}
 	}
 
+	GIVEN("A command line that enqueues a post")
+	{
+		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
+		int argc = 4;
+		char const* argv[]{ "msync", qcommand, "post", "msync.post"};
+
+		WHEN("the command line is parsed")
+		{
+			auto result = parse(argc, argv);
+
+			THEN("the parse is good.")
+			{
+				REQUIRE(result.okay);
+			}
+
+			THEN("the correct queue is selected")
+			{
+				REQUIRE(result.queue_opt.selected == queues::post);
+			}
+
+			THEN("the post IDs are parsed.")
+			{
+				REQUIRE(result.queue_opt.queued == std::vector<std::string>{"msync.post"});
+			}
+
+			THEN("the correct action is selected.")
+			{
+				REQUIRE(result.queue_opt.to_do == queue_action::add);
+			}
+		}
+	}
+
 	GIVEN("A command line that clears the post queue.")
 	{
 		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
