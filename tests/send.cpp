@@ -455,21 +455,24 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 		{
 			outgoing_post first{ to_enqueue[0].filename };
 			first.parsed.text = "This one just has a body.";
+			first.parsed.reply_id = "Hi";
 
 			outgoing_post second{ to_enqueue[1].filename };
 			second.parsed.text = "This one has a body, too.";
 			second.parsed.content_warning = "And a content warning.";
 			second.parsed.vis = visibility::priv;
-			second.parsed.reply_to_id = "10";
+			second.parsed.reply_to_id = "Hi";
 
 			outgoing_post third{ to_enqueue[2].filename };
 			third.parsed.attachments = { "attachments", "on" };
 			third.parsed.descriptions = { "with", "some", "descriptions" };
+			third.parsed.reply_to_id = "Hi";
 			third.parsed.vis = visibility::direct;
 
 			outgoing_post fourth{ to_enqueue[3].filename };
 			fourth.parsed.attachments = { "attachments", "on", "this", "one" };
 			fourth.parsed.descriptions = { "with", "some", "descriptions" };
+			fourth.parsed.reply_to_id = "777777";
 			fourth.parsed.vis = visibility::unlisted;
 		}
 
@@ -537,23 +540,29 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 				REQUIRE(second.params.attachment_ids.empty());
 				REQUIRE(second.params.body == "This one has a body, too.");
 				REQUIRE(second.params.content_warning == "And a content warning.");
-				REQUIRE(second.params.reply_to == "10");
 				REQUIRE(second.params.visibility == "private");
 
 				const auto& third = mocknew.arguments[2];
 				REQUIRE(third.params.attachment_ids.size() == 2);
 				REQUIRE(third.params.body.empty());
 				REQUIRE(third.params.content_warning.empty());
-				REQUIRE(third.params.reply_to.empty());
 				REQUIRE(third.params.visibility == "direct");
 
 				const auto& fourth = mocknew.arguments[3];
 				REQUIRE(fourth.params.attachment_ids.size() == 4);
 				REQUIRE(fourth.params.body.empty());
 				REQUIRE(fourth.params.content_warning.empty());
-				REQUIRE(fourth.params.reply_to.empty());
+				REQUIRE(fourth.params.reply_to == "777777");
 				REQUIRE(fourth.params.visibility == "unlisted");
+
+				// test that posts are threaded correctly
+				// that's the hardcoded post ID that every reply gets
+				// I really should have it generate those automatically.
+				REQUIRE(second.params.reply_to == "103060746072056173");
+				REQUIRE(third.params.reply_to == "103060746072056173");
+
 			}
+
 
 			THEN("the uploads are as expected.")
 			{
@@ -628,17 +637,20 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 				REQUIRE(first.params.attachment_ids.empty());
 				REQUIRE(first.params.body == "This one just has a body.");
 				REQUIRE(first.params.content_warning.empty());
-				REQUIRE(first.params.reply_to.empty());
 				REQUIRE(first.params.visibility == "public");
 
 				const auto& second = mocknew.arguments[1];
 				REQUIRE(second.params.attachment_ids.empty());
 				REQUIRE(second.params.body == "This one has a body, too.");
 				REQUIRE(second.params.content_warning == "And a content warning.");
-				REQUIRE(second.params.reply_to == "10");
 				REQUIRE(second.params.visibility == "private");
 
 				// the third and fourth calls should never be made because the uploads failed.
+
+				// test that posts are threaded correctly
+				// that's the hardcoded post ID that every reply gets
+				// I really should have it generate those automatically.
+				REQUIRE(second.params.reply_to == "103060746072056173");
 			}
 
 			THEN("Only the first upload per post is attempted.")
@@ -729,8 +741,12 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 					REQUIRE(second.params.attachment_ids.empty());
 					REQUIRE(second.params.body == "This one has a body, too.");
 					REQUIRE(second.params.content_warning == "And a content warning.");
-					REQUIRE(second.params.reply_to == "10");
 					REQUIRE(second.params.visibility == "private");
+
+					// test that posts are threaded correctly
+					// that's the hardcoded post ID that every reply gets
+					// I really should have it generate those automatically.
+					REQUIRE(second.params.reply_to == "103060746072056173");
 				}
 
 				for (size_t i = 0; i < retries.second; i++)
@@ -739,8 +755,8 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 					REQUIRE(third.params.attachment_ids.size() == 2);
 					REQUIRE(third.params.body.empty());
 					REQUIRE(third.params.content_warning.empty());
-					REQUIRE(third.params.reply_to.empty());
 					REQUIRE(third.params.visibility == "direct");
+					REQUIRE(third.params.reply_to == "103060746072056173");
 				}
 
 				for (size_t i = 0; i < retries.second; i++)
@@ -749,7 +765,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 					REQUIRE(fourth.params.attachment_ids.size() == 4);
 					REQUIRE(fourth.params.body.empty());
 					REQUIRE(fourth.params.content_warning.empty());
-					REQUIRE(fourth.params.reply_to.empty());
+					REQUIRE(fourth.params.reply_to == "777777");
 					REQUIRE(fourth.params.visibility == "unlisted");
 				}
 			}
@@ -774,7 +790,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 					REQUIRE(mockupload.arguments[idx].attachment_args.description == expected_descriptions[1]);
 					idx++;
 				}
-				
+
 				//attached to the fourth
 				for (size_t i = 0; i < 4; i++)
 				{

@@ -103,20 +103,24 @@ private:
 		queuefile.parsed = std::move(failedids);
 	}
 
-	void print_status(mastodon_status&& status)
+	void print_status(const mastodon_status& status)
 	{
 		pl() << "Created post at " << status.url << '\n';
 
 		if (!status.content_warning.empty())
 			pl() << "CW: " << status.content_warning << '\n';
 
-		if (status.content.size() > 30)
+		static const int max_length = 30;
+		std::string_view toprint{ status.content };
+		if (toprint.size() > max_length)
 		{
-			status.content.resize(30);
-			status.content += "...";
+			toprint.remove_suffix(toprint.size() - max_length);
 		}
 
-		pl() << "Body: " << status.content << '\n';
+		pl() << "Body: " << toprint;
+		if (toprint.size() > max_length)
+			pl() << "...";
+		pl() << '\n';
 	}
 
 	void process_posts(const std::string_view account, const std::string_view statusurl, const std::string_view mediaurl)
@@ -148,7 +152,6 @@ private:
 				file_status_params params = read_params(file_to_send);
 
 				std::string response;
-
 				for (const auto& attachment : params.attachments)
 				{
 					if (!fs::exists(attachment.file))
@@ -179,7 +182,12 @@ private:
 					if (succeeded)
 					{
 						fs::remove(file_to_send);
-						print_status(read_status(response));
+						auto parsed_status = read_status(response);
+						if (!params.reply_id.empty())
+						{
+							store_thread_id(std::move(params.reply_id), std::move(parsed_status.id));
+						}
+						print_status(parsed_status);
 					}
 
 				}
