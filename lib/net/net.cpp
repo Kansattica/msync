@@ -76,15 +76,11 @@ void add_if_value(cpr::Payload& params, const char* key, std::string&& value)
 		params.AddPair(cpr::Pair(key, std::move(value)));
 }
 
-void add_array(cpr::Payload& params, std::string key, std::vector<std::string>&& values)
+void add_array(cpr::Payload& params, const char* key, std::vector<std::string>&& values)
 {
-	key += '[';
-	for (size_t i = 0; i < values.size(); i++)
+	for (auto&& value : values)
 	{
-		std::string thisKey = key;
-		thisKey += std::to_string(i);
-		thisKey += ']';
-		params.AddPair(cpr::Pair(std::move(thisKey), std::move(values[i])));
+		params.AddPair(cpr::Pair(key, std::move(value)));
 	}
 
 }
@@ -96,9 +92,12 @@ net_response new_status(std::string_view url, std::string_view access_token, sta
 	add_if_value(post_params, "spoiler_text", std::move(params.content_warning));
 	add_if_value(post_params, "visibility", std::move(params.visibility));
 	add_if_value(post_params, "in_reply_to_id", std::move(params.reply_to));
-	add_array(post_params, "media_ids", std::move(params.attachment_ids));
 
-	// gotta handle attachments
+	// the mastodon api page doesn't mention this, but apparently this is a feature of rails
+	// (that the other mastodon api libs use)
+	// that lets you specify arrays with empty brackets like this
+	add_array(post_params, "media_ids[]", std::move(params.attachment_ids));
+
 
 	return handle_response(
 		cpr::Post(cpr::Url{ url },
