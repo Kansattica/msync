@@ -15,7 +15,7 @@ struct parsed_account
 
 std::optional<parsed_account> parse_account_name(const std::string& name);
 
-std::string strip_html_tags(const std::string& to_strip);
+std::string clean_up_html(const std::string& to_strip);
 
 template <bool allowEmpty = false>
 std::vector<std::string_view> split_string(const std::string_view tosplit, const char on)

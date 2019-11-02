@@ -287,20 +287,20 @@ SCENARIO("split_string and join_iterable are inverses.")
 	}
 }
 
-SCENARIO("strip_html_tags does that.")
+SCENARIO("clean_up_html removes HTML tags and entities.")
 {
-	GIVEN("A string with some HTML tags in it.")
+	GIVEN("A string with some HTML tags and/or entities in it.")
 	{
 		const auto tostrip = GENERATE(
 			std::make_tuple("<p>hello there</p>", "hello there"),
 			std::make_tuple("<p>I'm here</p><div> for you</dove>", "I'm here for you"),
 			std::make_tuple(" i am com</p>u<to>r", " i am comur"),
-			std::make_tuple("<tr class=\"t - nv\"><td colspan=\"5\">Language</a> </td></tr>", "Language ")
+			std::make_tuple("this<p>&apos;that", "this'that")
 		);
 
 		WHEN("the HTML is stripped")
 		{
-			const auto stripped = strip_html_tags(std::get<0>(tostrip));
+			const auto stripped = clean_up_html(std::get<0>(tostrip));
 
 			THEN("the result is as expected and has no HTML tags.")
 			{
@@ -323,7 +323,7 @@ SCENARIO("strip_html_tags does that.")
 
 		WHEN("the HTML is stripped")
 		{
-			const auto stripped = strip_html_tags(tostrip);
+			const auto stripped = clean_up_html(tostrip);
 
 			THEN("the result is unchanged.")
 			{
