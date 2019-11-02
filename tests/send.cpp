@@ -21,7 +21,7 @@ struct mock_args
 	std::string url;
 	std::string access_token;
 	status_params params;
-	attachment attachment;
+	attachment attachment_args;
 };
 
 constexpr std::string_view some_status = R"(
@@ -559,16 +559,16 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 			{
 				REQUIRE(mockupload.arguments.size() == 6);
 				// attached to the third 
-				REQUIRE(mockupload.arguments[0].attachment.file == expected_attach[0]);
-				REQUIRE(mockupload.arguments[0].attachment.description == expected_descriptions[0]);
-				REQUIRE(mockupload.arguments[1].attachment.file == expected_attach[1]);
-				REQUIRE(mockupload.arguments[1].attachment.description == expected_descriptions[1]);
+				REQUIRE(mockupload.arguments[0].attachment_args.file == expected_attach[0]);
+				REQUIRE(mockupload.arguments[0].attachment_args.description == expected_descriptions[0]);
+				REQUIRE(mockupload.arguments[1].attachment_args.file == expected_attach[1]);
+				REQUIRE(mockupload.arguments[1].attachment_args.description == expected_descriptions[1]);
 				
 				//attached to the fourth
 				for (size_t i = 0; i < 4; i++)
 				{
-					REQUIRE(mockupload.arguments[i + 2].attachment.file == expected_attach[i]);
-					REQUIRE(mockupload.arguments[i + 2].attachment.description == expected_descriptions[i]);
+					REQUIRE(mockupload.arguments[i + 2].attachment_args.file == expected_attach[i]);
+					REQUIRE(mockupload.arguments[i + 2].attachment_args.description == expected_descriptions[i]);
 				}
 			}
 
@@ -644,10 +644,10 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 			THEN("Only the first upload per post is attempted.")
 			{
 				REQUIRE(mockupload.arguments.size() == 2);
-				REQUIRE(mockupload.arguments[0].attachment.file == expected_attach[0]);
-				REQUIRE(mockupload.arguments[0].attachment.description == expected_descriptions[0]);
-				REQUIRE(mockupload.arguments[1].attachment.file == expected_attach[0]);
-				REQUIRE(mockupload.arguments[1].attachment.description == expected_descriptions[0]);
+				REQUIRE(mockupload.arguments[0].attachment_args.file == expected_attach[0]);
+				REQUIRE(mockupload.arguments[0].attachment_args.description == expected_descriptions[0]);
+				REQUIRE(mockupload.arguments[1].attachment_args.file == expected_attach[0]);
+				REQUIRE(mockupload.arguments[1].attachment_args.description == expected_descriptions[0]);
 			}
 
 
@@ -763,15 +763,15 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 				// attached to the third 
 				for (size_t i = 0; i < retries.second; i++)
 				{
-					REQUIRE(mockupload.arguments[idx].attachment.file == expected_attach[0]);
-					REQUIRE(mockupload.arguments[idx].attachment.description == expected_descriptions[0]);
+					REQUIRE(mockupload.arguments[idx].attachment_args.file == expected_attach[0]);
+					REQUIRE(mockupload.arguments[idx].attachment_args.description == expected_descriptions[0]);
 					idx++;
 				}
 
 				for (size_t i = 0; i < retries.second; i++)
 				{
-					REQUIRE(mockupload.arguments[idx].attachment.file == expected_attach[1]);
-					REQUIRE(mockupload.arguments[idx].attachment.description == expected_descriptions[1]);
+					REQUIRE(mockupload.arguments[idx].attachment_args.file == expected_attach[1]);
+					REQUIRE(mockupload.arguments[idx].attachment_args.description == expected_descriptions[1]);
 					idx++;
 				}
 				
@@ -780,8 +780,8 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 				{
 					for (size_t j = 0; j < retries.second; j++)
 					{
-						REQUIRE(mockupload.arguments[idx].attachment.file == expected_attach[i]);
-						REQUIRE(mockupload.arguments[idx].attachment.description == expected_descriptions[i]);
+						REQUIRE(mockupload.arguments[idx].attachment_args.file == expected_attach[i]);
+						REQUIRE(mockupload.arguments[idx].attachment_args.description == expected_descriptions[i]);
 						idx++;
 					}
 				}
