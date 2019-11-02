@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <exception>
 #include <msync_exception.hpp>
 #include <print_logger.hpp>
