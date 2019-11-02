@@ -21,3 +21,9 @@ mastodon_status read_status(const std::string& status_json)
 
 	return toreturn;
 }
+
+std::string read_upload_id(const std::string& attachment_json)
+{
+	return json::parse(attachment_json)["id"].get<std::string>();
+
+}

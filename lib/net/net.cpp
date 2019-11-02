@@ -45,8 +45,8 @@ net_response simple_post(const std::string_view url, const std::string_view acce
 	// add rate limiting handling later
 	return handle_response(
 		cpr::Post(cpr::Url{ url },
-			cpr::Header{ {idempotency_key_header, std::string{ ensure_small_string(url) } } ,
-						 {authorization_key_header, make_bearer(access_token) } }
+			cpr::Header{ { idempotency_key_header, std::string{ ensure_small_string(url) } } ,
+						 { authorization_key_header, make_bearer(access_token) } }
 		)
 	);
 }
@@ -58,6 +58,16 @@ net_response simple_delete(const std::string_view url, const std::string_view ac
 		cpr::Delete(cpr::Url{ url },
 			cpr::Header{ {authorization_key_header, make_bearer(access_token) } })
 	);
+}
+
+net_response upload_media(std::string_view url, std::string_view access_token, const fs::path& file, std::string description)
+{
+	return handle_response(
+		cpr::Post(cpr::Url{ url },
+			cpr::Header{ {authorization_key_header, make_bearer(access_token) } },
+			cpr::Multipart{ { "description", std::move(description) },
+							{ "file", cpr::File{file.string()} } }
+	));
 }
 
 void add_if_value(cpr::Payload& params, const char* key, std::string&& value)
@@ -80,5 +90,5 @@ net_response new_status(std::string_view url, std::string_view access_token, sta
 		cpr::Post(cpr::Url{ url },
 			cpr::Header{ { idempotency_key_header, std::to_string(params.idempotency_key) },
 						 { authorization_key_header, make_bearer(access_token) } },
-						 std::move(post_params)));
+			std::move(post_params)));
 }

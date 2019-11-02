@@ -22,13 +22,13 @@ struct status_params
 	std::string reply_to;
 	std::string content_warning;
 	std::string visibility;
-	std::vector<fs::path> attachments;
-	std::vector<std::string> descriptions;
+	std::vector<std::string> attachment_ids;
 };
 
 using post_request = net_response (std::string_view url, std::string_view access_token);
 using delete_request = net_response (std::string_view url, std::string_view access_token);
 using post_new_status = net_response (std::string_view url, std::string_view access_token, status_params params);
+using upload_attachment = net_response(std::string_view url, std::string_view access_token, const fs::path& file, std::string description);
 
 inline constexpr const char* get_error_message(const int status_code, const bool verbose)
 {

@@ -10,6 +10,7 @@
 #include <utility>
 #include <tuple> // for std::tie
 #include <deque>
+#include <optional>
 
 #include "../net_interface/net_interface.hpp"
 #include "../options/user_options.hpp"
@@ -22,13 +23,13 @@
 #include "read_response.hpp"
 #include "sync_helpers.hpp"
 
-template <typename post_request, typename delete_request, typename post_new_status>
+template <typename post_request, typename delete_request, typename post_new_status, typename upload_attachments>
 struct send_posts
 {
 public:
 	int retries = 3;
 
-	send_posts(post_request& post, delete_request& del, post_new_status& new_status) : post(post), del(del), new_status(new_status) { }
+	send_posts(post_request& post, delete_request& del, post_new_status& new_status, upload_attachments& upload) : post(post), del(del), new_status(new_status), upload(upload) { }
 
 	void send_all()
 	{
@@ -66,6 +67,7 @@ private:
 	post_request& post;
 	delete_request& del;
 	post_new_status& new_status;
+	upload_attachments& upload;
 
 	constexpr const std::string_view status_route() const { return "/api/v1/statuses/"; }
 
@@ -99,36 +101,6 @@ private:
 		queuefile.parsed = std::move(failedids);
 	}
 
-	std::vector<fs::path> ensure_attachments(const std::vector<std::string>& attach)
-	{
-		std::vector<fs::path> toreturn;
-		toreturn.reserve(attach.size());
-		for (const auto& path : attach)
-		{
-			fs::path toinsert{ path };
-			if (!fs::exists(toinsert))
-				pl() << "Couldn't find file " << toinsert << ". Will be skipped.\n";
-			toreturn.push_back(std::move(toinsert));
-		}
-		return toreturn;
-	}
-
-	status_params read_params(const fs::path& path)
-	{
-		readonly_outgoing_post post{ path };
-
-		status_params toreturn;
-		toreturn.idempotency_key = random_number();
-		toreturn.attachments = ensure_attachments(post.parsed.attachments);
-		toreturn.body = std::move(post.parsed.text);
-		toreturn.content_warning = std::move(post.parsed.content_warning);
-		toreturn.descriptions = std::move(post.parsed.descriptions);
-		toreturn.reply_to = std::move(post.parsed.reply_to_id);
-		toreturn.visibility = post.parsed.visibility_string();
-
-		return toreturn;
-	}
-
 	void print_status(mastodon_status&& status)
 	{
 		pl() << "Created post at " << status.url << '\n';
@@ -160,7 +132,7 @@ private:
 			// if it has a minus sign at the end, assume it's an ID to be deleted.
 			const bool undo = should_undo(id);
 
-			bool succeeded;
+			bool succeeded = true;
 			if (undo)
 			{
 				const std::string requesturl = paramaterize_url(baseurl, id, "");
@@ -171,13 +143,43 @@ private:
 			else
 			{
 				const fs::path file_to_send = file_queue_directory / id;
-				const status_params params = read_params(file_to_send);
+				file_status_params params = read_params(file_to_send);
+
 				std::string response;
-				std::tie(succeeded, response) = request_with_retries([&]() { return new_status(baseurl, access_token, params); });
+
+				for (const auto& attachment : params.attachments)
+				{
+					if (!fs::exists(attachment.file))
+					{
+						pl() << "Could not find file: " << attachment.file << " skipping this post.\n";
+						succeeded = false;
+						break;
+					}
+
+					std::tie(succeeded, response) = request_with_retries([&]() { return upload(baseurl, access_token, attachment.file, attachment.description); });
+
+					if (succeeded)
+					{
+						pl() << "Uploaded file: " << attachment.file;
+						params.attachment_ids.push_back(read_upload_id(response));
+					}
+					else
+					{
+						pl() << "Could not upload file. Skipping this post.\n";
+						break;
+					}
+				}
+
 				if (succeeded)
 				{
-					fs::remove(file_to_send);
-					print_status(read_status(response));
+					status_params p{ std::move(params) };
+					std::tie(succeeded, response) = request_with_retries([&]() { return new_status(baseurl, access_token, p); });
+					if (succeeded)
+					{
+						fs::remove(file_to_send);
+						print_status(read_status(response));
+					}
+
 				}
 			}
 

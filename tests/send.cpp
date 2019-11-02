@@ -21,6 +21,7 @@ struct mock_args
 	std::string url;
 	std::string access_token;
 	status_params params;
+	attachment attachment;
 };
 
 constexpr std::string_view some_status = R"(
@@ -76,6 +77,23 @@ struct mock_network
 		return toreturn;
 	}
 
+	net_response mock_upload(std::string_view url, std::string_view access_token, const fs::path& file, std::string description)
+	{
+		arguments.push_back(mock_args{ std::string {url}, std::string { access_token }, {},
+			attachment{file, std::move(description)} });
+
+		static int id = 1;
+		net_response toreturn;
+		toreturn.retryable_error = (--succeed_after > 0);
+		if (succeed_after == 0) { succeed_after = succeed_after_n; }
+		toreturn.okay = !(fatal_error || toreturn.retryable_error);
+		toreturn.status_code = status_code;
+		toreturn.message = R"({"id": ")";
+		toreturn.message += std::to_string(id++);
+		toreturn.message += "\"}";
+		return toreturn;
+	}
+
 private:
 	size_t succeed_after_n = 1;
 	size_t succeed_after = succeed_after_n;
@@ -102,6 +120,14 @@ struct mock_network_new_status : public mock_network
 	net_response operator()(std::string_view url, std::string_view access_token, status_params params)
 	{
 		return mock_new_status(url, access_token, std::move(params));
+	}
+};
+
+struct mock_network_upload : public mock_network
+{
+	net_response operator()(std::string_view url, std::string_view access_token, const fs::path& file, std::string description)
+	{
+		return mock_upload(url, access_token, file, std::move(description));
 	}
 };
 
@@ -163,8 +189,9 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			mock_network_post mockpost;
 			mock_network_delete mockdel;
 			mock_network_new_status mocknew;
+			mock_network_upload mockupload;
 
-			auto send = send_posts{ mockpost, mockdel, mocknew };
+			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload };
 
 			if (send_all)
 				send.send_all();
@@ -199,6 +226,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			{
 				REQUIRE(mockdel.arguments.empty());
 				REQUIRE(mocknew.arguments.empty());
+				REQUIRE(mockupload.arguments.empty());
 			}
 		}
 	}
@@ -215,8 +243,9 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			mock_network_post mockpost;
 			mock_network_delete mockdel;
 			mock_network_new_status mocknew;
+			mock_network_upload mockupload;
 
-			auto send = send_posts{ mockpost, mockdel, mocknew };
+			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload };
 
 			if (send_all)
 				send.send_all();
@@ -252,6 +281,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			{
 				REQUIRE(mockdel.arguments.empty());
 				REQUIRE(mocknew.arguments.empty());
+				REQUIRE(mockupload.arguments.empty());
 			}
 		}
 	}
@@ -277,8 +307,9 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			mock_network_delete mockdel;
 			mock_network_new_status mocknew;
+			mock_network_upload mockupload;
 
-			auto send = send_posts{ mockpost, mockdel, mocknew };
+			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload };
 
 			send.retries = retries.first;
 
@@ -316,6 +347,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			{
 				REQUIRE(mockdel.arguments.empty());
 				REQUIRE(mocknew.arguments.empty());
+				REQUIRE(mockupload.arguments.empty());
 			}
 		}
 	}
@@ -344,8 +376,9 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			mock_network_delete mockdel;
 			mock_network_new_status mocknew;
+			mock_network_upload mockupload;
 
-			auto send = send_posts{ mockpost, mockdel, mocknew };
+			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload };
 
 			send.retries = retries.first;
 
@@ -382,12 +415,13 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			{
 				REQUIRE(mockdel.arguments.empty());
 				REQUIRE(mocknew.arguments.empty());
+				REQUIRE(mockupload.arguments.empty());
 			}
 		}
 	}
 }
 
-SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]")
+SCENARIO("Send correctly sends new posts and deletes existing ones.")
 {
 	logs_off = true;
 	const test_file fi = account_directory();
@@ -410,13 +444,13 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 
 	GIVEN("A queue with some post filenames to send.")
 	{
-		const std::array<test_file, 3> to_enqueue { "first.post", "second.post", "another kind of post" };
+		const std::array<test_file, 4> to_enqueue { "first.post", "second.post", "another kind of post", "last one" };
 		const std::array<touch_file, 4> attachment_files{ "attachments", "on", "this", "one" };
 
 		const static std::vector<fs::path> expected_attach{ fs::canonical("attachments"), fs::canonical("on")
 			, fs::canonical("this"), fs::canonical("one") };
-		const static std::vector<std::string> expected_descriptions{ "with", "some", "descriptions" };
-		const static std::vector<std::string> expected_files{ "first.post", "second.post", "another kind of post" };
+		const static std::vector<std::string> expected_descriptions{ "with", "some", "descriptions", "" };
+		const static std::vector<std::string> expected_files{ "first.post", "second.post", "another kind of post", "last one" };
 
 		{
 			outgoing_post first{ to_enqueue[0].filename };
@@ -429,9 +463,14 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 			second.parsed.reply_to_id = "10";
 
 			outgoing_post third{ to_enqueue[2].filename };
-			third.parsed.attachments = { "attachments", "on", "this", "one" };
+			third.parsed.attachments = { "attachments", "on" };
 			third.parsed.descriptions = { "with", "some", "descriptions" };
 			third.parsed.vis = visibility::direct;
+
+			outgoing_post fourth{ to_enqueue[3].filename };
+			fourth.parsed.attachments = { "attachments", "on", "this", "one" };
+			fourth.parsed.descriptions = { "with", "some", "descriptions" };
+			fourth.parsed.vis = visibility::unlisted;
 		}
 
 		enqueue(queues::post, account, expected_files);
@@ -439,11 +478,12 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 		mock_network_post mockpost;
 		mock_network_delete mockdel;
 		mock_network_new_status mocknew;
+		mock_network_upload mockupload;
+
+		auto send = send_posts{ mockpost, mockdel, mocknew, mockupload };
 
 		WHEN("the posts are sent over a good connection")
 		{
-			auto send = send_posts{ mockpost, mockdel, mocknew };
-
 			if (send_all)
 				send.send_all();
 			else
@@ -454,7 +494,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 				REQUIRE(print(queues::post, account).empty());
 
 				// it'll leave the .bak files behind
-				REQUIRE(count_files_in_directory(queue_directory) == 3);
+				REQUIRE(count_files_in_directory(queue_directory) == 4);
 			}
 
 			THEN("the input files and attachments are untouched")
@@ -465,7 +505,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 
 			THEN("one call per ID was made.")
 			{
-				REQUIRE(mocknew.arguments.size() == 3);
+				REQUIRE(mocknew.arguments.size() == 4);
 			}
 
 			THEN("the other APIs weren't called.")
@@ -487,28 +527,49 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 			THEN("the post parameters are as expected.")
 			{
 				const auto& first = mocknew.arguments[0];
-				REQUIRE(first.params.attachments.empty());
+				REQUIRE(first.params.attachment_ids.empty());
 				REQUIRE(first.params.body == "This one just has a body.");
 				REQUIRE(first.params.content_warning.empty());
-				REQUIRE(first.params.descriptions.empty());
 				REQUIRE(first.params.reply_to.empty());
 				REQUIRE(first.params.visibility == "public");
 
 				const auto& second = mocknew.arguments[1];
-				REQUIRE(second.params.attachments.empty());
+				REQUIRE(second.params.attachment_ids.empty());
 				REQUIRE(second.params.body == "This one has a body, too.");
 				REQUIRE(second.params.content_warning == "And a content warning.");
-				REQUIRE(second.params.descriptions.empty());
 				REQUIRE(second.params.reply_to == "10");
 				REQUIRE(second.params.visibility == "private");
 
 				const auto& third = mocknew.arguments[2];
-				REQUIRE(third.params.attachments == expected_attach);
+				REQUIRE(third.params.attachment_ids.size() == 2);
 				REQUIRE(third.params.body.empty());
 				REQUIRE(third.params.content_warning.empty());
-				REQUIRE(third.params.descriptions == expected_descriptions);
 				REQUIRE(third.params.reply_to.empty());
 				REQUIRE(third.params.visibility == "direct");
+
+				const auto& fourth = mocknew.arguments[3];
+				REQUIRE(fourth.params.attachment_ids.size() == 4);
+				REQUIRE(fourth.params.body.empty());
+				REQUIRE(fourth.params.content_warning.empty());
+				REQUIRE(fourth.params.reply_to.empty());
+				REQUIRE(fourth.params.visibility == "unlisted");
+			}
+
+			THEN("the uploads are as expected.")
+			{
+				REQUIRE(mockupload.arguments.size() == 6);
+				// attached to the third 
+				REQUIRE(mockupload.arguments[0].attachment.file == expected_attach[0]);
+				REQUIRE(mockupload.arguments[0].attachment.description == expected_descriptions[0]);
+				REQUIRE(mockupload.arguments[1].attachment.file == expected_attach[1]);
+				REQUIRE(mockupload.arguments[1].attachment.description == expected_descriptions[1]);
+				
+				//attached to the fourth
+				for (size_t i = 0; i < 4; i++)
+				{
+					REQUIRE(mockupload.arguments[i + 2].attachment.file == expected_attach[i]);
+					REQUIRE(mockupload.arguments[i + 2].attachment.description == expected_descriptions[i]);
+				}
 			}
 
 		}
@@ -518,7 +579,8 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 			mocknew.fatal_error = true;
 			mocknew.status_code = 500;
 
-			auto send = send_posts{ mockpost, mockdel, mocknew };
+			mockupload.fatal_error = true;
+			mockupload.status_code = 500;
 
 			if (send_all)
 				send.send_all();
@@ -530,7 +592,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 				REQUIRE(print(queues::post, account) == expected_files);
 
 				// queueing the posts makes a .bak file for them
-				REQUIRE(count_files_in_directory(queue_directory) == 6);
+				REQUIRE(count_files_in_directory(queue_directory) == 8);
 			}
 
 			THEN("the input files and attachments are untouched")
@@ -541,7 +603,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 
 			THEN("one call per ID was made.")
 			{
-				REQUIRE(mocknew.arguments.size() == 3);
+				REQUIRE(mocknew.arguments.size() == 2);
 			}
 
 			THEN("the other APIs weren't called.")
@@ -563,29 +625,31 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 			THEN("the post parameters are as expected.")
 			{
 				const auto& first = mocknew.arguments[0];
-				REQUIRE(first.params.attachments.empty());
+				REQUIRE(first.params.attachment_ids.empty());
 				REQUIRE(first.params.body == "This one just has a body.");
 				REQUIRE(first.params.content_warning.empty());
-				REQUIRE(first.params.descriptions.empty());
 				REQUIRE(first.params.reply_to.empty());
 				REQUIRE(first.params.visibility == "public");
 
 				const auto& second = mocknew.arguments[1];
-				REQUIRE(second.params.attachments.empty());
+				REQUIRE(second.params.attachment_ids.empty());
 				REQUIRE(second.params.body == "This one has a body, too.");
 				REQUIRE(second.params.content_warning == "And a content warning.");
-				REQUIRE(second.params.descriptions.empty());
 				REQUIRE(second.params.reply_to == "10");
 				REQUIRE(second.params.visibility == "private");
 
-				const auto& third = mocknew.arguments[2];
-				REQUIRE(third.params.attachments == expected_attach);
-				REQUIRE(third.params.body.empty());
-				REQUIRE(third.params.content_warning.empty());
-				REQUIRE(third.params.descriptions == expected_descriptions);
-				REQUIRE(third.params.reply_to.empty());
-				REQUIRE(third.params.visibility == "direct");
+				// the third and fourth calls should never be made because the uploads failed.
 			}
+
+			THEN("Only the first upload per post is attempted.")
+			{
+				REQUIRE(mockupload.arguments.size() == 2);
+				REQUIRE(mockupload.arguments[0].attachment.file == expected_attach[0]);
+				REQUIRE(mockupload.arguments[0].attachment.description == expected_descriptions[0]);
+				REQUIRE(mockupload.arguments[1].attachment.file == expected_attach[0]);
+				REQUIRE(mockupload.arguments[1].attachment.description == expected_descriptions[0]);
+			}
+
 
 		}
 
@@ -601,7 +665,8 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 			mocknew.fatal_error = false;
 			mocknew.set_succeed_after(retries.second);
 
-			auto send = send_posts{ mockpost, mockdel, mocknew };
+			mockupload.fatal_error = false;
+			mockupload.set_succeed_after(retries.second);
 
 			send.retries = retries.first;
 
@@ -615,7 +680,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 				REQUIRE(print(queues::post, account).empty());
 
 				// queueing the posts makes a .bak file for them
-				REQUIRE(count_files_in_directory(queue_directory) == 3);
+				REQUIRE(count_files_in_directory(queue_directory) == 4);
 			}
 
 			THEN("the input files and attachments are untouched")
@@ -626,7 +691,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 
 			THEN("[retries] calls per ID was made.")
 			{
-				REQUIRE(mocknew.arguments.size() == 3 * retries.second);
+				REQUIRE(mocknew.arguments.size() == 4 * retries.second);
 			}
 
 			THEN("the other APIs weren't called.")
@@ -651,10 +716,9 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 				for (size_t i = 0; i < retries.second; i++)
 				{
 					const auto& first = mocknew.arguments[idx++];
-					REQUIRE(first.params.attachments.empty());
+					REQUIRE(first.params.attachment_ids.empty());
 					REQUIRE(first.params.body == "This one just has a body.");
 					REQUIRE(first.params.content_warning.empty());
-					REQUIRE(first.params.descriptions.empty());
 					REQUIRE(first.params.reply_to.empty());
 					REQUIRE(first.params.visibility == "public");
 				}
@@ -662,10 +726,9 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 				for (size_t i = 0; i < retries.second; i++)
 				{
 					const auto& second = mocknew.arguments[idx++];
-					REQUIRE(second.params.attachments.empty());
+					REQUIRE(second.params.attachment_ids.empty());
 					REQUIRE(second.params.body == "This one has a body, too.");
 					REQUIRE(second.params.content_warning == "And a content warning.");
-					REQUIRE(second.params.descriptions.empty());
 					REQUIRE(second.params.reply_to == "10");
 					REQUIRE(second.params.visibility == "private");
 				}
@@ -673,12 +736,54 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[problem]
 				for (size_t i = 0; i < retries.second; i++)
 				{
 					const auto& third = mocknew.arguments[idx++];
-					REQUIRE(third.params.attachments == expected_attach);
+					REQUIRE(third.params.attachment_ids.size() == 2);
 					REQUIRE(third.params.body.empty());
 					REQUIRE(third.params.content_warning.empty());
-					REQUIRE(third.params.descriptions == expected_descriptions);
 					REQUIRE(third.params.reply_to.empty());
 					REQUIRE(third.params.visibility == "direct");
+				}
+
+				for (size_t i = 0; i < retries.second; i++)
+				{
+					const auto& fourth = mocknew.arguments[idx++];
+					REQUIRE(fourth.params.attachment_ids.size() == 4);
+					REQUIRE(fourth.params.body.empty());
+					REQUIRE(fourth.params.content_warning.empty());
+					REQUIRE(fourth.params.reply_to.empty());
+					REQUIRE(fourth.params.visibility == "unlisted");
+				}
+			}
+
+			THEN("the uploads are as expected.")
+			{
+				REQUIRE(mockupload.arguments.size() == 6 * retries.second);
+
+				size_t idx = 0;
+
+				// attached to the third 
+				for (size_t i = 0; i < retries.second; i++)
+				{
+					REQUIRE(mockupload.arguments[idx].attachment.file == expected_attach[0]);
+					REQUIRE(mockupload.arguments[idx].attachment.description == expected_descriptions[0]);
+					idx++;
+				}
+
+				for (size_t i = 0; i < retries.second; i++)
+				{
+					REQUIRE(mockupload.arguments[idx].attachment.file == expected_attach[1]);
+					REQUIRE(mockupload.arguments[idx].attachment.description == expected_descriptions[1]);
+					idx++;
+				}
+				
+				//attached to the fourth
+				for (size_t i = 0; i < 4; i++)
+				{
+					for (size_t j = 0; j < retries.second; j++)
+					{
+						REQUIRE(mockupload.arguments[idx].attachment.file == expected_attach[i]);
+						REQUIRE(mockupload.arguments[idx].attachment.description == expected_descriptions[i]);
+						idx++;
+					}
 				}
 			}
 		}
