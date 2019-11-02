@@ -1,8 +1,8 @@
 #include <catch2/catch.hpp>
 
 #include <fstream>
-#include <algorithm>
 
+#include <string>
 #include <string_view>
 
 #include <print_logger.hpp>
