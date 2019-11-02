@@ -667,7 +667,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 
 		WHEN("the posts are sent over a flaky connection that eventually succeeds")
 		{
-			const auto retries = GENERATE(
+			const std::pair<int, size_t> retries = GENERATE(
 				std::make_pair(3, 3),
 				std::make_pair(5, 5),
 				std::make_pair(1, 1),
