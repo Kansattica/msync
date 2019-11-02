@@ -26,7 +26,7 @@ script:
   - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE ..
   - cmake --build . --config $BUILDTYPE --parallel 2
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then EXELOCATION="./$BUILDTYPE/msync.exe"; else EXELOCATION="./msync"; fi
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then TESTLOCATION="./tests/$BUILDTYPE/tests.exe -d yes | cut -c 10- | grep ^Scenario | uniq"; else TESTLOCATION="./tests/tests"; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then TESTLOCATION="./tests/$BUILDTYPE/tests.exe ~[long_run]"; else TESTLOCATION="./tests/tests"; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then NETTESTLOCATION="./tests/$BUILDTYPE/net_tests.exe"; else NETTESTLOCATION="./tests/net_tests"; fi
 
 after_success:
