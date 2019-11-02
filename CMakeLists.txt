@@ -50,7 +50,7 @@ target_link_libraries(netinterface INTERFACE filesystem)
 target_link_libraries(net PRIVATE ${CPR_LIBRARIES} netinterface filesystem)
 
 target_include_directories(filebacked INTERFACE lib/filebacked)
-target_link_libraries(filebacked INTERFACE printlog filesystem)
+target_link_libraries(filebacked INTERFACE filesystem)
 
 target_link_libraries(sync PRIVATE options printlog queue util netinterface postfile constants filesystem nlohmann_json::nlohmann_json)
 

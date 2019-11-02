@@ -4,7 +4,6 @@
 #include <fstream>
 
 #include <filesystem.hpp>
-#include <print_logger.hpp>
 
 template <typename Container, void(*Read)(Container&, std::string&&), void(*Write)(Container&&, std::ofstream&), bool skip_blank = true, bool skip_comment = true, bool read_only = false>
 class file_backed
@@ -16,8 +15,6 @@ public:
 		std::ifstream backingfile(backing);
 		for (std::string line; getline(backingfile, line);)
 		{
-			plverb() << "Parsing line: " << line << '\n';
-
 			const auto first_non_whitespace = line.find_first_not_of(" \t\r\n");
 
 			if constexpr (skip_blank)
@@ -53,13 +50,10 @@ public:
 			fs::remove(backup);
 #endif
 			fs::rename(backing, backup);
-			plverb() << "Saved backup to " << backup << '\n';
 		}
 
 		std::ofstream of{ backing };
 		Write(std::move(parsed), of);
-
-		plverb() << "Saved " << backing << '\n';
 	}
 
 	// can be moved

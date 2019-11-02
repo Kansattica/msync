@@ -20,7 +20,7 @@ On Linux systems, it works a lot better if it can link in your system's openssl 
 - [ ] Download posts from lists
 - [ ] Download posts from your profile
 - [X] Post template file generation
-- [ ] Attachment support
+- [X] Attachment support
 - [ ] Nicknames for accounts
 
 ### Roadmap (things for later)

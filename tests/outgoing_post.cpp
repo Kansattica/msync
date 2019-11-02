@@ -10,7 +10,6 @@
 
 SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 {
-	logs_off = true;
 	test_file fi{ "outfile" };
 	GIVEN("An outgoing_post with only text is filled and destroyed")
 	{
