@@ -58,7 +58,8 @@ public:
 		process_queue<queues::boost>(account, baseurl);
 
 		pl() << "Sending queued posts for " << account << '\n';
-		process_posts(account, baseurl);
+		const std::string mediaurl = make_api_url(instanceurl, media_route());
+		process_posts(account, baseurl, mediaurl);
 	}
 
 private:
@@ -70,6 +71,7 @@ private:
 	upload_attachments& upload;
 
 	constexpr const std::string_view status_route() const { return "/api/v1/statuses/"; }
+	constexpr const std::string_view media_route() const { return "/api/v1/media/"; }
 
 	constexpr const std::pair<std::string_view, std::string_view> favroutepost() const { return { "/favourite", "/unfavourite" }; }
 	constexpr const std::pair<std::string_view, std::string_view> boostroutepost() const { return { "/reblog", "/unreblog" }; }
@@ -117,7 +119,7 @@ private:
 		pl() << "Body: " << status.content << '\n';
 	}
 
-	void process_posts(const std::string_view account, const std::string_view baseurl)
+	void process_posts(const std::string_view account, const std::string_view statusurl, const std::string_view mediaurl)
 	{
 		auto queuefile = get(queues::post, account);
 
@@ -135,7 +137,7 @@ private:
 			bool succeeded = true;
 			if (undo)
 			{
-				const std::string requesturl = paramaterize_url(baseurl, id, "");
+				const std::string requesturl = paramaterize_url(statusurl, id, "");
 				succeeded = request_with_retries([&]() { return del(requesturl, access_token); }).first;
 				if (succeeded)
 					pl() << "DELETE " << requesturl << " OK\n";
@@ -156,11 +158,11 @@ private:
 						break;
 					}
 
-					std::tie(succeeded, response) = request_with_retries([&]() { return upload(baseurl, access_token, attachment.file, attachment.description); });
+					std::tie(succeeded, response) = request_with_retries([&]() { return upload(mediaurl, access_token, attachment.file, attachment.description); });
 
 					if (succeeded)
 					{
-						pl() << "Uploaded file: " << attachment.file;
+						pl() << "Uploaded file: " << attachment.file << '\n';
 						params.attachment_ids.push_back(read_upload_id(response));
 					}
 					else
@@ -173,7 +175,7 @@ private:
 				if (succeeded)
 				{
 					status_params p{ std::move(params) };
-					std::tie(succeeded, response) = request_with_retries([&]() { return new_status(baseurl, access_token, p); });
+					std::tie(succeeded, response) = request_with_retries([&]() { return new_status(statusurl, access_token, p); });
 					if (succeeded)
 					{
 						fs::remove(file_to_send);
