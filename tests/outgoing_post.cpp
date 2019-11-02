@@ -120,13 +120,13 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 		const bool snip = GENERATE(true, false);
 		
 		const auto content_warning = GENERATE(as<std::string_view>{},
-			"", "danger!", "that good good stuff", "=");
+			"", "that good good stuff", "=");
 
 		const auto reply_to = GENERATE(as<std::string_view>{},
 			"", "123980123", "X");
 
 		const auto reply_id = GENERATE(as<std::string_view>{},
-			"", "X");
+			"", "Hi!");
 
 		const auto visibility = GENERATE(
 			std::make_pair("", visibility::pub),
