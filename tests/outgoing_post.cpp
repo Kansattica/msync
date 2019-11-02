@@ -5,11 +5,14 @@
 
 #include <string_view>
 
+#include <print_logger.hpp>
+
 #include "test_helpers.hpp"
 #include "../postfile/outgoing_post.hpp"
 
 SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 {
+	logs_off = true;
 	test_file fi{ "outfile" };
 	GIVEN("An outgoing_post with only text is filled and destroyed")
 	{
@@ -123,7 +126,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 			"", "123980123", "X");
 
 		const auto reply_id = GENERATE(as<std::string_view>{},
-			"", "123980123", "X");
+			"", "X");
 
 		const auto visibility = GENERATE(
 			std::make_pair("", visibility::pub),
