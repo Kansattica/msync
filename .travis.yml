@@ -11,7 +11,7 @@ matrix:
   include:
   - os: windows
     compiler: msvc
-    env: BUILDTYPE=Release 
+    env: BUILDTYPE=Release
   #- os: windows
     #compiler: msvc
     #env: BUILDTYPE=MinSizeRel 
@@ -26,7 +26,7 @@ script:
   - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE ..
   - cmake --build . --config $BUILDTYPE --parallel 2
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then EXELOCATION="./$BUILDTYPE/msync.exe"; else EXELOCATION="./msync"; fi
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then TESTLOCATION="./tests/$BUILDTYPE/tests.exe"; else TESTLOCATION="./tests/tests"; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then TESTLOCATION="./tests/$BUILDTYPE/tests.exe -r compact -s"; else TESTLOCATION="./tests/tests"; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then NETTESTLOCATION="./tests/$BUILDTYPE/net_tests.exe"; else NETTESTLOCATION="./tests/net_tests"; fi
 
 after_success:
