@@ -4,7 +4,7 @@
 
 struct sync_options
 {
-    int retries = 3;
+    unsigned int retries = 3;
 	bool send = true;
 	bool get = true;
     sync_settings mode;

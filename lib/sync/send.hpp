@@ -27,7 +27,7 @@ template <typename post_request, typename delete_request, typename post_new_stat
 struct send_posts
 {
 public:
-	int retries = 3;
+	unsigned int retries = 3;
 
 	send_posts(post_request& post, delete_request& del, post_new_status& new_status, upload_attachments& upload) : post(post), del(del), new_status(new_status), upload(upload) { }
 
@@ -42,9 +42,9 @@ public:
 
 	void send(const std::string_view account, const std::string_view instanceurl, const std::string_view access_token)
 	{
-		if (retries < 1)
+		if (retries == 0)
 		{
-			pl() << "Number of retries must be positive (got " << retries << "). Resetting to 3.\n";
+			pl() << "Number of retries cannot be zero or less. Resetting to 3.\n";
 			retries = 3;
 		}
 
@@ -71,7 +71,7 @@ private:
 	upload_attachments& upload;
 
 	constexpr const std::string_view status_route() const { return "/api/v1/statuses/"; }
-	constexpr const std::string_view media_route() const { return "/api/v1/media/"; }
+	constexpr const std::string_view media_route() const { return "/api/v1/media"; }
 
 	constexpr const std::pair<std::string_view, std::string_view> favroutepost() const { return { "/favourite", "/unfavourite" }; }
 	constexpr const std::pair<std::string_view, std::string_view> boostroutepost() const { return { "/reblog", "/unreblog" }; }
