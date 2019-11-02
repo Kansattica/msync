@@ -113,7 +113,7 @@ if (MSYNC_BUILD_TESTS)
 	FetchContent_Declare(
 		catch2lib
 		GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-		GIT_TAG		   2c869e17e4803d30b3d5ca5b0d76387b9db97fa5
+		GIT_TAG 			87b745da6625b7469e61de5910978a097caf8b74
 		)
 
 	FetchContent_GetProperties(catch2lib)
