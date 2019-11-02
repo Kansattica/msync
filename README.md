@@ -11,15 +11,15 @@ Once `msync` has features, I'll have releases available for download. For now, i
 On Linux systems, it works a lot better if it can link in your system's openssl (or whatever other TLS implementation cURL knows how to use) and, if you have it, libcurl. Consider installing these through your package manager.
 
 ### Features (that I'm going to implement soon)
-- [ ] Multiple account support
-- [ ] Queue posts, boosts, and favs
-- [ ] Send posts, boosts, and favs
+- [X] Multiple account support
+- [X] Queue posts, boosts, and favs
+- [X] Send posts, boosts, and favs
 - [ ] Download posts from home timeline
 - [ ] Download direct messages
 - [ ] Download notifications
 - [ ] Download posts from lists
 - [ ] Download posts from your profile
-- [ ] Post template file generation
+- [X] Post template file generation
 - [ ] Attachment support
 - [ ] Nicknames for accounts
 
