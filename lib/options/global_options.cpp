@@ -98,7 +98,7 @@ std::pair<const std::string, user_options>* global_options::select_account(const
                 return std::tolower(a) == std::tolower(b); //case insensitive
             }))
         {
-            plverb() << "Matched account" << entry.first << "\n";
+            plverb() << "Matched account " << entry.first << '\n';
             matched++;
 
 			if (matched > 1) { return nullptr; }
