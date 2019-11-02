@@ -118,7 +118,7 @@ private:
 		}
 
 		pl() << "Body: " << toprint;
-		if (toprint.size() > max_length)
+		if (status.content.size() > max_length)
 			pl() << "...";
 		pl() << '\n';
 	}
