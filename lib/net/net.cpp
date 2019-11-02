@@ -76,6 +76,19 @@ void add_if_value(cpr::Payload& params, const char* key, std::string&& value)
 		params.AddPair(cpr::Pair(key, std::move(value)));
 }
 
+void add_array(cpr::Payload& params, std::string key, std::vector<std::string>&& values)
+{
+	key += '[';
+	for (size_t i = 0; i < values.size(); i++)
+	{
+		std::string thisKey = key;
+		thisKey += std::to_string(i);
+		thisKey += ']';
+		params.AddPair(cpr::Pair(std::move(thisKey), std::move(values[i])));
+	}
+
+}
+
 net_response new_status(std::string_view url, std::string_view access_token, status_params params)
 {
 	cpr::Payload post_params{};
@@ -83,6 +96,7 @@ net_response new_status(std::string_view url, std::string_view access_token, sta
 	add_if_value(post_params, "spoiler_text", std::move(params.content_warning));
 	add_if_value(post_params, "visibility", std::move(params.visibility));
 	add_if_value(post_params, "in_reply_to_id", std::move(params.reply_to));
+	add_array(post_params, "media_ids", std::move(params.attachment_ids));
 
 	// gotta handle attachments
 
