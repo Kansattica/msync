@@ -110,7 +110,7 @@ private:
 		if (!status.content_warning.empty())
 			pl() << "CW: " << status.content_warning << '\n';
 
-		static const int max_length = 30;
+		static const int max_length = 60;
 		std::string_view toprint{ status.content };
 		if (toprint.size() > max_length)
 		{
@@ -118,7 +118,7 @@ private:
 		}
 
 		pl() << "Body: " << toprint;
-		if (toprint.size() > max_length)
+		if (status.content.size() > max_length)
 			pl() << "...";
 		pl() << '\n';
 	}
