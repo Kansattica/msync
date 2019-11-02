@@ -161,6 +161,8 @@ private:
 						break;
 					}
 
+					pl() << "Uploading " << attachment.file << "...\n";
+
 					std::tie(succeeded, response) = request_with_retries([&]() { return upload(mediaurl, access_token, attachment.file, attachment.description); });
 
 					if (succeeded)
