@@ -65,6 +65,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 						(option("-d", "--description") & values("file description", ret.gen_opt.post.descriptions)).doc("Associate this description with the corresponding file."),
 						(option("-o", "--output") & value("filename", ret.gen_opt.filename)).doc("Specify an output file. Default is new_post."),
 						(option("-r", "--reply-to") & value("reply_to", ret.gen_opt.post.reply_to_id)).doc("Reply to the specified post ID."),
+						(option("-i", "--reply-id") & value("id", ret.gen_opt.post.reply_id)).doc("Set an ID so that this post can be replied to with --reply-to."),
 						(option("-c", "--content-warning") & value("warning", ret.gen_opt.post.content_warning)).doc("Set a content warning (or subject) for the post.")
 					) % "generate options");
 

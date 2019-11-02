@@ -20,6 +20,7 @@ enum class raw_text_mode
 struct post_content
 {
 	std::string text;
+	std::string reply_id;
 	std::string reply_to_id;
 	std::string content_warning;
 	std::vector<std::string> attachments;

@@ -945,8 +945,8 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 	GIVEN("A combination of options for the file generator")
 	{
 		// try every combination of bits. note that the ranges are half-open, including the 0 and excluding the maximum.
-		auto combination = GENERATE(range(0, 0b111 + 1));
-		auto longopt = GENERATE(range(0, 0b1111 + 1));
+		auto combination = GENERATE(range(0, 0b1111 + 1));
+		auto longopt = GENERATE(range(0, 0b11111 + 1));
 		auto attach = GENERATE(0, 1, 2, 3, 4);
 		auto description = GENERATE(0, 1, 2, 3, 4);
 
@@ -1005,6 +1005,20 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 			options.push_back(std::move(opt));
 		}
 
+		if (flag_set(combination, 3))
+		{
+			command_line_option opt;
+			opt.order = 11;
+			if (flag_set(longopt, 3))
+				opt.options.push_back("-i");
+			else
+				opt.options.push_back("--reply-id");
+
+			opt.options.push_back("76543");
+			expected.post.reply_id = "76543";
+			options.push_back(std::move(opt));
+		}
+
 		std::sort(options.begin(), options.end());
 		std::vector<const char*> argv;
 
@@ -1014,12 +1028,12 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 			{
 				argv.clear();
 				argv.push_back("msync");
-				if (flag_set(longopt, 3))
+				if (flag_set(longopt, 4))
 					argv.push_back("gen");
 				else
 					argv.push_back("generate");
 
-				for (auto& option : options)
+				for (const auto& option : options)
 				{
 					argv.insert(argv.end(), option.options.begin(), option.options.end());
 				}
@@ -1038,6 +1052,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 						parsed.gen_opt.post.attachments.begin(), parsed.gen_opt.post.attachments.end()));
 					REQUIRE(expected.post.content_warning == parsed.gen_opt.post.content_warning);
 					REQUIRE(expected.post.reply_to_id == parsed.gen_opt.post.reply_to_id);
+					REQUIRE(expected.post.reply_id == parsed.gen_opt.post.reply_id);
 				}
 
 			} while (std::next_permutation(options.begin(), options.end()));

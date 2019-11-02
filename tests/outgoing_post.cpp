@@ -122,6 +122,9 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 		const auto reply_to = GENERATE(as<std::string_view>{},
 			"", "123980123", "X");
 
+		const auto reply_id = GENERATE(as<std::string_view>{},
+			"", "123980123", "X");
+
 		const auto visibility = GENERATE(
 			std::make_pair("", visibility::pub),
 			std::make_pair("public", visibility::pub),
@@ -155,6 +158,9 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 
 			if (!reply_to.empty())
 				of << "reply_to=" << reply_to << '\n';
+
+			if (!reply_id.empty())
+				of << "reply_id=" << reply_id << '\n';
 
 			if (visibility.first[0] != '\0')
 				of << "visibility=" << visibility.first << '\n';
@@ -206,6 +212,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 
 					REQUIRE(result.parsed.content_warning == content_warning);
 					REQUIRE(result.parsed.reply_to_id == reply_to);
+					REQUIRE(result.parsed.reply_id == reply_id);
 				}
 			}
 
@@ -234,6 +241,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 
 					REQUIRE(result.parsed.content_warning == content_warning);
 					REQUIRE(result.parsed.reply_to_id == reply_to);
+					REQUIRE(result.parsed.reply_id == reply_id);
 				}
 			}
 		}
@@ -258,6 +266,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 
 					REQUIRE(result.parsed.content_warning == content_warning);
 					REQUIRE(result.parsed.reply_to_id == reply_to);
+					REQUIRE(result.parsed.reply_id == reply_id);
 				}
 
 				result.parsed.text = "some garbage";
@@ -286,6 +295,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 
 					REQUIRE(result.parsed.content_warning == content_warning);
 					REQUIRE(result.parsed.reply_to_id == reply_to);
+					REQUIRE(result.parsed.reply_id == reply_id);
 
 					// no backup file is made
 					REQUIRE_FALSE(fs::exists(fi.filenamebak));

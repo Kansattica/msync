@@ -14,8 +14,8 @@ constexpr std::array<std::array<std::string_view, 2>, 4> VISIBILITIES = { {
 	{"direct", "dm"}
 } };
 
-constexpr std::array<std::string_view, 5> OPTIONS = {
-	"visibility", "cw", "reply_to", "attach", "descriptions"
+constexpr std::array<std::string_view, 6> OPTIONS = {
+	"visibility", "cw", "reply_to", "attach", "descriptions", "reply_id"
 };
 
 std::string post_content::visibility_string() const
@@ -23,9 +23,9 @@ std::string post_content::visibility_string() const
 	return std::string{ VISIBILITIES[static_cast<size_t>(vis)][0] };
 }
 
-size_t is_option(const std::string_view line, size_t equals_sign);
-bool is_snip(const std::string_view line);
-void parse_option(post_content& post, size_t option_index, const std::string_view value);
+size_t is_option(std::string_view line, size_t equals_sign);
+bool is_snip(std::string_view line);
+void parse_option(post_content& post, size_t option_index, std::string_view value);
 void fix_descriptions(post_content& post);
 
 void Read(post_content& post, std::string&& line)
@@ -97,6 +97,11 @@ void Write(post_content&& post, std::ofstream& of)
 		of << "reply_to=" << post.reply_to_id << '\n';
 	}
 
+	if (!post.reply_id.empty())
+	{
+		of << "reply_id=" << post.reply_id << '\n';
+	}
+
 	fix_descriptions(post);
 	if (!post.attachments.empty())
 	{
@@ -119,7 +124,7 @@ void Write(post_content&& post, std::ofstream& of)
 	of << post.text;
 }
 
-size_t is_option(const std::string_view line, size_t equals_sign)
+size_t is_option(std::string_view line, size_t equals_sign)
 {
 	size_t idx = 0;
 	for (const auto& option : OPTIONS)
@@ -142,7 +147,7 @@ size_t is_option(const std::string_view line, size_t equals_sign)
 	return -1;
 }
 
-bool is_snip(const std::string_view line)
+bool is_snip(std::string_view line)
 {
 	if (line.size() < 3)
 	{
@@ -152,7 +157,7 @@ bool is_snip(const std::string_view line)
 	return std::all_of(line.begin(), line.begin() + 3, [](char c) { return c == '-'; });
 }
 
-visibility parse_visibility(const std::string_view value)
+visibility parse_visibility(std::string_view value)
 {
 	static_assert(VISIBILITIES.size() == 4);
 	static_assert(VISIBILITIES[static_cast<int>(visibility::pub)][0] == "public");
@@ -184,7 +189,7 @@ visibility parse_visibility(const std::string_view value)
 	return visibility::pub;
 }
 
-void store_string(std::string& store_in, const std::string_view value)
+void store_string(std::string& store_in, std::string_view value)
 {
 	store_in = std::string{ value };
 }
@@ -198,12 +203,13 @@ void store_vector(std::vector<std::string>& store_in, const std::string_view val
 
 void parse_option(post_content& post, size_t option_index, const std::string_view value)
 {
-	static_assert(OPTIONS.size() == 5);
+	static_assert(OPTIONS.size() == 6);
 	static_assert(OPTIONS[0] == "visibility");
 	static_assert(OPTIONS[1] == "cw");
 	static_assert(OPTIONS[2] == "reply_to");
 	static_assert(OPTIONS[3] == "attach");
 	static_assert(OPTIONS[4] == "descriptions");
+	static_assert(OPTIONS[5] == "reply_id");
 
 	switch (option_index)
 	{
@@ -225,6 +231,10 @@ void parse_option(post_content& post, size_t option_index, const std::string_vie
 		// so are descriptions
 		// note that it's okay to have an empty description, but not an empty attachment
 		store_vector<true>(post.descriptions, value);
+		break;
+	case 5:
+		// reply_ids are just strings
+		store_string(post.reply_id, value);
 		break;
 	}
 }
