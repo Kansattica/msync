@@ -81,7 +81,7 @@ public:
 	file_backed& operator=(const file_backed& other) = delete; // copy assignment
 
 private:
-	const fs::path backing;
+	fs::path backing;
 };
 
 #endif
