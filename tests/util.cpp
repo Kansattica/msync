@@ -295,7 +295,8 @@ SCENARIO("clean_up_html removes HTML tags and entities.")
 			std::make_tuple("<p>hello there</p>", "hello there"),
 			std::make_tuple("<p>I'm here</p><div> for you</dove>", "I'm here for you"),
 			std::make_tuple(" i am com</p>u<to>r", " i am comur"),
-			std::make_tuple("this<p>&apos;that", "this'that")
+			std::make_tuple("this<p>&apos;that", "this'that"),
+			std::make_tuple("this<p>&amp;th<div>a</div>t", "this&that")
 		);
 
 		WHEN("the HTML is stripped")
@@ -318,6 +319,8 @@ SCENARIO("clean_up_html removes HTML tags and entities.")
 			">:3",
 			"This is a regular sentence.      \t\n",
 			";>",
+			"&as",
+			"&;&;&;><as",
 			"<hatml  /"
 		);
 
