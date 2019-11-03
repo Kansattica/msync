@@ -37,6 +37,9 @@ bool Read(post_content& post, std::string&& line)
 
 	if (post.is_raw == raw_text_mode::raw)
 	{
+		if (line.empty())
+			return true;
+		
 		// if we're in here, then we're getting the entire rest of the post
 		if (!post.text.empty())
 		{

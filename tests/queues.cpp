@@ -232,7 +232,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 		fs::create_directory(testdir.filename);
 
 		int postno = 1;
-		for (auto& fi : postfiles)
+		for (const auto& fi : postfiles)
 		{
 			std::ofstream of{ fi.filename };
 			of << "I'm number " << postno++ << '\n';
