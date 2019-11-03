@@ -296,14 +296,16 @@ SCENARIO("clean_up_html removes HTML tags and entities.")
 			std::make_tuple("<p>I'm here</p><div> for you</dove>", "I'm here for you"),
 			std::make_tuple(" i am com</p>u<to>r", " i am comur"),
 			std::make_tuple("this<p>&apos;that", "this'that"),
-			std::make_tuple("this<p>&amp;th<div>a</div>t", "this&that")
+			std::make_tuple("this<p>&amp;th<div>a</div>t", "this&that"),
+			std::make_tuple("<p>look at my :custom_emojo:</p>", "look at my :custom_emojo:"),
+			std::make_tuple("&hearts;&hearts;&hearts;&hearts;&hearts;&hearts;", "♥♥♥♥♥♥")
 		);
 
-		WHEN("the HTML is stripped")
+		WHEN("the HTML is cleaned up")
 		{
 			const auto stripped = clean_up_html(std::get<0>(tostrip));
 
-			THEN("the result is as expected and has no HTML tags.")
+			THEN("the entities are decoded and has no HTML tags.")
 			{
 				REQUIRE(stripped == std::get<1>(tostrip));
 			}
@@ -319,6 +321,8 @@ SCENARIO("clean_up_html removes HTML tags and entities.")
 			">:3",
 			"This is a regular sentence.      \t\n",
 			";>",
+			":>",
+			">:>",
 			"&as",
 			"&;&;&;><as",
 			"<hatml  /"
