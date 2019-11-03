@@ -20,7 +20,7 @@ constexpr std::array<std::string_view, 6> OPTIONS = {
 
 std::string post_content::visibility_string() const
 {
-	return std::string{ VISIBILITIES[static_cast<size_t>(vis)][0] };
+	return std::string{ VISIBILITIES[static_cast<int>(vis)][0] };
 }
 
 size_t is_option(std::string_view line, size_t equals_sign);

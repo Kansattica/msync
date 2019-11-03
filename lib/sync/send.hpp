@@ -226,7 +226,7 @@ private:
 	template <typename make_request>
 	std::pair<bool, std::string> request_with_retries(make_request req)
 	{
-		for (int i = 0; i < retries; i++)
+		for (unsigned int i = 0; i < retries; i++)
 		{
 			const net_response response = req();
 
