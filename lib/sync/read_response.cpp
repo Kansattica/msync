@@ -3,6 +3,8 @@
 #include <nlohmann/json.hpp>
 #include <print_logger.hpp>
 
+#include <string_view>
+
 #include "../util/util.hpp"
 
 using json = nlohmann::json;
@@ -15,8 +17,8 @@ mastodon_status read_status(const std::string& status_json)
 
 	toreturn.id = parsed["id"].get<std::string>();
 	toreturn.url = parsed["uri"].get<std::string>();
-	toreturn.content_warning = clean_up_html(parsed["spoiler_text"].get<std::string>());
-	toreturn.content = clean_up_html(parsed["content"].get<std::string>());
+	toreturn.content_warning = clean_up_html(parsed["spoiler_text"].get<std::string_view>());
+	toreturn.content = clean_up_html(parsed["content"].get<std::string_view>());
 	toreturn.visibility = parsed["visibility"].get<std::string>();
 
 	return toreturn;
