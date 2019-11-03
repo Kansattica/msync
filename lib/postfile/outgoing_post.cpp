@@ -23,7 +23,7 @@ std::string post_content::visibility_string() const
 	return std::string{ VISIBILITIES[static_cast<int>(vis)][0] };
 }
 
-size_t is_option(std::string_view line, size_t equals_sign);
+int is_option(std::string_view line, size_t equals_sign);
 bool is_snip(std::string_view line);
 void parse_option(post_content& post, size_t option_index, std::string_view value);
 void fix_descriptions(post_content& post);
@@ -50,24 +50,19 @@ void Read(post_content& post, std::string&& line)
 	// - be raw text
 
 	const auto equals = line.find('=');
-
-	// size_t is unsigned, so this is actually some gigantic number
-	// should be fine unless msync has billions of options some day
-	size_t option_index = -1;
-
 	if (equals != std::string::npos)
 	{
-		option_index = is_option(line, equals);
-	}
+		const int option_index = is_option(line, equals);
 
-	// if it's an option, parse it
-	if (option_index != -1)
-	{
-		post.is_raw = raw_text_mode::cooked;
-		std::string_view option_val{ line };
-		option_val.remove_prefix(equals + 1);
-		parse_option(post, option_index, option_val);
-		return;
+		// if it's an option, parse it
+		if (option_index != -1)
+		{
+			post.is_raw = raw_text_mode::cooked;
+			std::string_view option_val{ line };
+			option_val.remove_prefix(equals + 1);
+			parse_option(post, option_index, option_val);
+			return;
+		}
 	}
 
 	// if it's a snip, everything else is raw
@@ -124,9 +119,9 @@ void Write(post_content&& post, std::ofstream& of)
 	of << post.text;
 }
 
-size_t is_option(std::string_view line, size_t equals_sign)
+int is_option(std::string_view line, size_t equals_sign)
 {
-	size_t idx = 0;
+	int idx = 0;
 	for (const auto& option : OPTIONS)
 	{
 		if (option.size() != equals_sign)
