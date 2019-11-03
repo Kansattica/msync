@@ -28,7 +28,7 @@ std::optional<parsed_account> parse_account_name(const std::string& name)
 // if src is null, modifies dest in place
 extern "C" size_t decode_html_entities_utf8(char *dest, const char *src);
 
-std::string clean_up_html(const std::string& to_strip)
+std::string clean_up_html(std::string_view to_strip)
 {
 	const static std::regex remove_tags{ "<[^<]*>" };
 
@@ -44,7 +44,7 @@ std::string clean_up_html(const std::string& to_strip)
 
 	const auto end_of_output = std::regex_replace(output_buffer.get(), to_strip.begin(), to_strip.end(), remove_tags, "");
 
-	size_t decoded_length = decode_html_entities_utf8(output_buffer.get(), nullptr);
+	const size_t decoded_length = decode_html_entities_utf8(output_buffer.get(), nullptr);
 
 	return std::string(output_buffer.get(), decoded_length);
 }
