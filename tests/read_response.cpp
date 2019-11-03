@@ -24,7 +24,9 @@ SCENARIO("read_status correctly reads and cleans the relevant fields from a JSON
 			std::make_pair(R"({"id":"123456789", "uri":"https://website.egg/cool", "spoiler_text":"", "content":"<p>hi there</p>", "visibility": "unlisted"})",
 				mastodon_status{ "123456789", "https://website.egg/cool", "", "hi there", "unlisted" }),
 			std::make_pair(R"({"id":"22222", "uri":"https://website.egg/cool", "spoiler_text":"", "content":"hi&amp;there", "visibility": "direct"})",
-				mastodon_status{ "22222", "https://website.egg/cool", "", "hi&there", "direct" })
+				mastodon_status{ "22222", "https://website.egg/cool", "", "hi&there", "direct" }),
+			std::make_pair(R"({"id":"1234567890", "uri":"https://website.egg/cool", "spoiler_text":"ladies", "content":"<p>hi there</p>", "visibility": "unlisted"})",
+				mastodon_status{ "1234567890", "https://website.egg/cool", "ladies", "hi there", "unlisted" })
 		);
 
 		WHEN("The string is read.")
