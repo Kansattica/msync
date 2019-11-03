@@ -38,3 +38,29 @@ SCENARIO("read_status correctly reads and cleans the relevant fields from a JSON
 		}
 	}
 }
+
+SCENARIO("read_upload_id correctly reads the ID from a JSON status.")
+{
+	GIVEN("A json string with the relevant fields.")
+	{
+		const auto test = GENERATE(
+			std::make_pair(R"({"id":"hello", "uri":"https://website.egg/cool"})",
+				"hello"),
+			std::make_pair(R"({"id":"123456789", "uri":"https://website.egg/cool"})",
+				"123456789"),
+			std::make_pair(R"({"id":"22222", "uri":"https://website.egg/cool"})",
+				"22222")
+		);
+
+		WHEN("The string is read.")
+		{
+			const auto result = read_upload_id(std::get<0>(test));
+
+			THEN("The result is as expected.")
+			{
+				REQUIRE(std::get<1>(test) == result);
+			}
+		}
+	}
+}
+
