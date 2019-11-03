@@ -33,8 +33,8 @@ public:
 	{
 		if constexpr (read_only)
 		{
-			// if they only wanted to look at the thing, don't save the changes
 			return;
+			// if they only wanted to look at the thing, don't save the changes
 		}
 
 		if (backing.empty())
@@ -74,7 +74,7 @@ public:
 	file_backed& operator=(const file_backed& other) = delete; // copy assignment
 
 private:
-	fs::path backing;
+	const fs::path backing;
 };
 
 #endif
