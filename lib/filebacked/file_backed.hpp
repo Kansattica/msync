@@ -3,9 +3,11 @@
 
 #include <fstream>
 
+#include <iterator>
+
 #include <filesystem.hpp>
 
-template <typename Container, void(*Read)(Container&, std::string&&), void(*Write)(Container&&, std::ofstream&), bool skip_blank = true, bool skip_comment = true, bool read_only = false>
+template <typename Container, bool(*Read)(Container&, std::string&&), void(*Write)(Container&&, std::ofstream&), bool skip_blank = true, bool skip_comment = true, bool read_only = false>
 class file_backed
 {
 public:
@@ -25,7 +27,12 @@ public:
 				if (line[first_non_whitespace] == '#')
 					continue; //skip comments
 
-			Read(parsed, std::move(line));
+			// if they return true...
+			if (Read(parsed, std::move(line)))
+			{
+				// ...read to end of string https://stackoverflow.com/questions/3203452/how-to-read-entire-stream-into-a-stdstring
+				Read(parsed, std::string(std::istreambuf_iterator<char>(backingfile), {}));
+			}
 		}
 	}
 

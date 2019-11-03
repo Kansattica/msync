@@ -28,7 +28,7 @@ bool is_snip(std::string_view line);
 void parse_option(post_content& post, size_t option_index, std::string_view value);
 void fix_descriptions(post_content& post);
 
-void Read(post_content& post, std::string&& line)
+bool Read(post_content& post, std::string&& line)
 {
 	// there's two kinds of these post files.
 	// one has some options on the top, one is just text
@@ -37,11 +37,19 @@ void Read(post_content& post, std::string&& line)
 
 	if (post.is_raw == raw_text_mode::raw)
 	{
-		post.text.reserve(post.text.length() + line.length() + 1);
+		// if we're in here, then we're getting the entire rest of the post
 		if (!post.text.empty())
+		{
+			post.text.reserve(post.text.length() + line.length() + 1);
 			post.text.append(1, '\n');
-		post.text.append(line);
-		return;
+			post.text.append(line);
+		}
+		else
+		{
+			post.text = std::move(line);
+		}
+
+		return true;
 	}
 
 	// lines can be one of three types:
@@ -61,7 +69,7 @@ void Read(post_content& post, std::string&& line)
 			std::string_view option_val{ line };
 			option_val.remove_prefix(equals + 1);
 			parse_option(post, option_index, option_val);
-			return;
+			return false;
 		}
 	}
 
@@ -70,14 +78,16 @@ void Read(post_content& post, std::string&& line)
 	{
 		post.is_raw = raw_text_mode::raw;
 		fix_descriptions(post);
-		return;
+		return true;
 	}
 
 	// if it's anything else, must be raw, including this line
+	// and this must be the first raw line
+	// if we return true, the rest will be delivered with no processing
 	post.is_raw = raw_text_mode::raw;
 	fix_descriptions(post);
-	Read(post, std::move(line));
-	return;
+	post.text = std::move(line);
+	return true;
 }
 
 void Write(post_content&& post, std::ofstream& of)

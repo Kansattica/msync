@@ -1,8 +1,9 @@
 #include "queue_list.hpp"
 
-void Read(std::deque<std::string>& queued, std::string&& line)
+bool Read(std::deque<std::string>& queued, std::string&& line)
 {
 	queued.push_back(std::move(line));
+	return false;
 }
 
 void Write(std::deque<std::string>&& que, std::ofstream& of)

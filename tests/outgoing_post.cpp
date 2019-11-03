@@ -74,10 +74,10 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 
 	GIVEN("A raw text file.")
 	{
-		auto testtext = GENERATE(as<std::string_view>{},
+		const auto testtext = GENERATE(as<std::string_view>{},
 			"this is a post!",
 			"Rad post for you, baby.",
-			"This\none's\tgot newlines",
+			"This\none's\tgot new\n\nlines",
 			"phony=option",
 			"#lookslikeacomment",
 			" ---" );

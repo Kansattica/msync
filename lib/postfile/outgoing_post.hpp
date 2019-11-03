@@ -32,7 +32,7 @@ struct post_content
 	raw_text_mode is_raw = raw_text_mode::unset;
 };
 
-void Read(post_content&, std::string&&);
+bool Read(post_content&, std::string&&);
 void Write(post_content&&, std::ofstream&);
 
 using outgoing_post = file_backed<post_content, Read, Write, false, false, false>;
