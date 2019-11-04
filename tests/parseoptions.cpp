@@ -997,8 +997,10 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 			opt.order = 6;
 			if (flag_set(longopt, 2))
 				opt.options.push_back("-c");
-			else
+			else if (flag_set(longopt, 0)) // I don't really want to make the number of combinations even worse
 				opt.options.push_back("--content-warning");
+			else
+				opt.options.push_back("--cw");
 
 			opt.options.push_back("there's content in here!");
 			expected.post.content_warning = "there's content in here!";

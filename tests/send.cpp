@@ -49,6 +49,8 @@ struct mock_network
 		if (succeed_after == 0) { succeed_after = succeed_after_n; }
 		toreturn.okay = !(fatal_error || toreturn.retryable_error);
 		toreturn.status_code = status_code;
+		if (!toreturn.okay)
+			toreturn.message = R"({ "error": "some problem" })";
 		return toreturn;
 	}
 
@@ -61,6 +63,8 @@ struct mock_network
 		if (succeed_after == 0) { succeed_after = succeed_after_n; }
 		toreturn.okay = !(fatal_error || toreturn.retryable_error);
 		toreturn.status_code = status_code;
+		if (!toreturn.okay)
+			toreturn.message = R"({ "error": "some problem" })";
 		return toreturn;
 	}
 
