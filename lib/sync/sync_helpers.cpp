@@ -3,6 +3,7 @@
 #include <random>
 #include <algorithm>
 #include <unordered_map>
+#include <utility>
 
 #include "../postfile/outgoing_post.hpp"
 
@@ -50,15 +51,15 @@ std::vector<attachment> make_attachments(std::vector<std::string>&& attachments,
 	return toreturn;
 }
 
-static std::unordered_map<std::string, std::string> threaded_ids;
+static std::unordered_map<std::string, std::pair<std::string, bool>> threaded_ids;
 
 // the idea here is that posts can optionally have some local ID. 
 // if another post's reply_to_id is set to one of those, then fix it up so that 
 // that post is a reply to the first one.
 
-void store_thread_id(std::string msync_id, std::string remote_server_id)
+void store_thread_id(std::string msync_id, std::string remote_server_id, bool success)
 {
-	threaded_ids.emplace(std::move(msync_id), std::move(remote_server_id));
+	threaded_ids.emplace(std::move(msync_id), std::make_pair(std::move(remote_server_id), success));
 }
 
 
@@ -76,10 +77,11 @@ file_status_params read_params(const fs::path& path)
 
 	if (!toreturn.reply_to.empty())
 	{
-		auto val = threaded_ids.find(toreturn.reply_to);
+		const auto val = threaded_ids.find(toreturn.reply_to);
 		if (val != threaded_ids.end()) 
 		{
-			toreturn.reply_to = val->second;
+			toreturn.reply_to = val->second.first;
+			toreturn.okay = val->second.second;
 		}
 	}
 

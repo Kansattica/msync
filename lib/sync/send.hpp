@@ -103,6 +103,37 @@ private:
 		queuefile.parsed = std::move(failedids);
 	}
 
+	bool send_attachments(file_status_params& params, std::string_view mediaurl)
+	{
+		bool succeeded;
+		std::string response;
+		for (const auto& attachment : params.attachments)
+		{
+			if (!fs::exists(attachment.file))
+			{
+				pl() << "Could not find file: " << attachment.file << " skipping this post.\n";
+				return false;
+			}
+
+			pl() << "Uploading " << attachment.file << "...\n";
+
+			std::tie(succeeded, response) = request_with_retries([&]() { return upload(mediaurl, access_token, attachment.file, attachment.description); });
+
+			if (succeeded)
+			{
+				pl() << "Uploaded file: " << attachment.file << '\n';
+				params.attachment_ids.push_back(read_upload_id(response));
+			}
+			else
+			{
+				pl() << "Could not upload file. Skipping this post.\n";
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	void process_posts(const std::string_view account, const std::string_view statusurl, const std::string_view mediaurl)
 	{
 		auto queuefile = get(queues::post, account);
@@ -131,31 +162,16 @@ private:
 				const fs::path file_to_send = file_queue_directory / id;
 				file_status_params params = read_params(file_to_send);
 
-				std::string response;
-				for (const auto& attachment : params.attachments)
+				std::string parsed_status_id;
+				if (!params.okay)
 				{
-					if (!fs::exists(attachment.file))
-					{
-						pl() << "Could not find file: " << attachment.file << " skipping this post.\n";
-						succeeded = false;
-						break;
-					}
+					pl() << id << ": This post is a reply to a post that failed to send. Skipping.\n";
+					succeeded = false;
+				}
 
-					pl() << "Uploading " << attachment.file << "...\n";
-
-					std::tie(succeeded, response) = request_with_retries([&]() { return upload(mediaurl, access_token, attachment.file, attachment.description); });
-
-					if (succeeded)
-					{
-						pl() << "Uploaded file: " << attachment.file << '\n';
-						params.attachment_ids.push_back(read_upload_id(response));
-					}
-					else
-					{
-						pl() << "Could not upload file. Skipping this post.\n";
-						succeeded = false;
-						break;
-					}
+				if (succeeded)
+				{
+					succeeded = send_attachments(params, mediaurl);
 				}
 
 				if (succeeded)
@@ -168,20 +184,23 @@ private:
 					print_truncated_string(p.body, pl());
 					pl() << '\n';
 
+					std::string response;
 					std::tie(succeeded, response) = request_with_retries([&]() { return new_status(statusurl, access_token, p); });
 
 					if (succeeded)
 					{
 						fs::remove(file_to_send);
 						auto parsed_status = read_status(response);
-						if (!params.reply_id.empty())
-						{
-							store_thread_id(std::move(params.reply_id), std::move(parsed_status.id));
-						}
 						pl() << "Created post at " << parsed_status.url << '\n';
+						parsed_status_id = std::move(parsed_status.id);
 					}
-
 				}
+
+				if (!params.reply_id.empty())
+				{
+					store_thread_id(std::move(params.reply_id), std::move(parsed_status_id), succeeded);
+				}
+
 			}
 
 			if (!succeeded)
@@ -196,54 +215,54 @@ private:
 
 
 	template <queues tosend, bool create>
-	constexpr std::string_view route() const
-	{
-		std::pair<std::string_view, std::string_view> toreturn;
-		if constexpr (tosend == queues::fav)
+		constexpr std::string_view route() const
 		{
-			toreturn = favroutepost();
-		}
+			std::pair<std::string_view, std::string_view> toreturn;
+			if constexpr (tosend == queues::fav)
+			{
+				toreturn = favroutepost();
+			}
 
-		if constexpr (tosend == queues::boost)
-		{
-			toreturn = boostroutepost();
-		}
+			if constexpr (tosend == queues::boost)
+			{
+				toreturn = boostroutepost();
+			}
 
-		return std::get<create ? 0 : 1>(toreturn);
-	}
+			return std::get<create ? 0 : 1>(toreturn);
+		}
 
 	template <typename make_request>
-	std::pair<bool, std::string> request_with_retries(make_request req)
-	{
-		for (unsigned int i = 0; i < retries; i++)
+		std::pair<bool, std::string> request_with_retries(make_request req)
 		{
-			net_response response = req();
-
-			pl() << get_error_message(response.status_code, verbose_logs);
-
-			// later, handle what happens if we get rate limited
-
-			if (response.retryable_error)
+			for (unsigned int i = 0; i < retries; i++)
 			{
-				// should retry
-				continue;
-			}
+				net_response response = req();
 
-			// some other error, assume unrecoverable
-			if (!response.okay)
-			{
-				auto parsed_error = read_error(response.message);
-				if (!parsed_error.empty())
-					response.message = std::move(parsed_error);
-				pl() << response.message << '\n';
-				return std::make_pair(false, std::move(response.message));
-			}
+				pl() << get_error_message(response.status_code, verbose_logs);
 
-			// must be 200, OK response
-			return std::make_pair(true, std::move(response.message));
+				// later, handle what happens if we get rate limited
+
+				if (response.retryable_error)
+				{
+					// should retry
+					continue;
+				}
+
+				// some other error, assume unrecoverable
+				if (!response.okay)
+				{
+					auto parsed_error = read_error(response.message);
+					if (!parsed_error.empty())
+						response.message = std::move(parsed_error);
+					pl() << response.message << '\n';
+					return std::make_pair(false, std::move(response.message));
+				}
+
+				// must be 200, OK response
+				return std::make_pair(true, std::move(response.message));
+			}
+			return std::make_pair(false, "Maximum retries reached.");
 		}
-		return std::make_pair(false, "Maximum retries reached.");
-	}
 
 };
 
