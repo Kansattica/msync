@@ -12,7 +12,7 @@ bool should_undo(std::string_view& id);
 
 std::string paramaterize_url(std::string_view before, std::string_view middle, std::string_view after);
 
-void store_thread_id(std::string msync_id, std::string remote_server_id, bool success);
+void store_thread_id(std::string msync_id, std::string remote_server_id);
 
 struct attachment
 {

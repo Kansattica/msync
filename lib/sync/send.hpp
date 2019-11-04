@@ -194,11 +194,37 @@ private:
 						pl() << "Created post at " << parsed_status.url << '\n';
 						parsed_status_id = std::move(parsed_status.id);
 					}
+					else
+					{
+						// we have to save that reply_to value back to the file if it failed
+						params.reply_to = std::move(p.reply_to);
+					}
 				}
 
 				if (!params.reply_id.empty())
 				{
-					store_thread_id(std::move(params.reply_id), std::move(parsed_status_id), succeeded);
+					// store the parsed status ID regardless- the empty string if this failed
+					// or a real ID if it succeeded.
+					store_thread_id(std::move(params.reply_id), std::move(parsed_status_id));
+				}
+
+				if (!succeeded && !params.reply_to.empty())
+				{
+					// if this one is a reply to another post in this queue
+					// and that one succeeded but this one failed, then
+					// we want to write the real post ID back to the file so it'll 
+					// do the right thing next time we try to sync up
+
+					outgoing_post post{ file_to_send };
+
+					// if the reply ID in the file doesn't match the one we have
+					// (because reply_to is now an ID to a post on the remote server)
+					// replace it with the remote ID
+					if (post.parsed.reply_to_id != params.reply_to)
+					{
+						post.parsed.reply_to_id = std::move(params.reply_to);
+					}
+
 				}
 
 			}
