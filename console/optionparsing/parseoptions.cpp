@@ -66,7 +66,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 						(option("-o", "--output") & value("filename", ret.gen_opt.filename)).doc("Specify an output file. Default is new_post."),
 						(option("-r", "--reply-to") & value("reply_to", ret.gen_opt.post.reply_to_id)).doc("Reply to the specified post ID."),
 						(option("-i", "--reply-id") & value("id", ret.gen_opt.post.reply_id)).doc("Set an ID so that this post can be replied to with --reply-to."),
-						(option("-c", "--content-warning") & value("warning", ret.gen_opt.post.content_warning)).doc("Set a content warning (or subject) for the post.")
+						(option("-c", "--content-warning", "--cw") & value("warning", ret.gen_opt.post.content_warning)).doc("Set a content warning (or subject) for the post.")
 					) % "generate options");
 
 	const auto queueMode = (command("q", "queue").set(ret.selected, mode::queue).doc("Manage queued favs, boosts, and posts") &
