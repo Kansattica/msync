@@ -50,6 +50,8 @@ SCENARIO("read_upload_id correctly reads the ID from a JSON status.")
 				"hello"),
 			std::make_pair(R"({"id":"123456789", "uri":"https://website.egg/cool"})",
 				"123456789"),
+			std::make_pair(R"({"id":"1221"})",
+				"1221"),
 			std::make_pair(R"({"id":"22222", "uri":"https://website.egg/cool"})",
 				"22222")
 		);
