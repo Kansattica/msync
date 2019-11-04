@@ -22,11 +22,17 @@ struct mock_args
 	std::string access_token;
 	status_params params;
 	attachment attachment_args;
+	std::string id;
 };
 
-constexpr std::string_view some_status = R"(
-{"id":"103060746072056173","created_at":"2019-11-01T04:23:04.957Z","in_reply_to_id":null,"in_reply_to_account_id":null,"sensitive":true,"spoiler_text":"Another test","visibility":"public","language":"en","uri":"https://social.illegalpornography.com/users/BestGirlGrace/statuses/103060746072056173","url":"https://social.illegalpornography.com/@BestGirlGrace/103060746072056173","replies_count":2,"reblogs_count":0,"favourites_count":2,"favourited":false,"reblogged":false,"muted":false,"pinned":false,"content":"\u003cp\u003ehowdy, nerds\u003cbr /\u003ecome here often?\u003c/p\u003e","reblog":null,"application":{"name":"msync","website":"https://github.com/kansattica/msync"},"account":{"id":"1","username":"BestGirlGrace","acct":"BestGirlGrace","display_name":"Grace Attorney: Tail Destinies","locked":false,"bot":false,"created_at":"2018-08-16T04:45:49.523Z","note":"\u003cp\u003eThe buzz in your brain, the tingle behind your eyes, the good girl sneaking through your thoughts. Your favorite free-floating, reality-hacking, mind-tweaking, shitposting, horny, skunky, viral, infowitch.\u003c/p\u003e\u003cp\u003eHeader by @CorruptveSpirit@twitter, avi by the inimitable \u003cspan class=\"h-card\"\u003e\u003ca href=\"https://mellified.men/@distressedegg\" class=\"u-url mention\"\u003e@\u003cspan\u003edistressedegg\u003c/span\u003e\u003c/a\u003e\u003c/span\u003e!\u003c/p\u003e","url":"https://social.illegalpornography.com/@BestGirlGrace","avatar":"https://justa.goodchristian.website/system/accounts/avatars/000/000/001/original/58734519fdd5e4e0.png?1569913000","avatar_static":"https://justa.goodchristian.website/system/accounts/avatars/000/000/001/original/58734519fdd5e4e0.png?1569913000","header":"https://justa.goodchristian.website/system/accounts/headers/000/000/001/original/ba0b91a0c6545d9a.gif?1536301933","header_static":"https://justa.goodchristian.website/system/accounts/headers/000/000/001/static/ba0b91a0c6545d9a.png?1536301933","followers_count":1406,"following_count":700,"statuses_count":43711,"last_status_at":"2019-11-01T04:43:21.637Z","emojis":[],"fields":[{"name":"Pronouns","value":"she/her","verified_at":null},{"name":"Hornt Writing","value":"\u003ca href=\"https://perfect.hypnovir.us\" rel=\"me nofollow noopener\" target=\"_blank\"\u003e\u003cspan class=\"invisible\"\u003ehttps://\u003c/span\u003e\u003cspan class=\"\"\u003eperfect.hypnovir.us\u003c/span\u003e\u003cspan class=\"invisible\"\u003e\u003c/span\u003e\u003c/a\u003e","verified_at":"2019-07-08T07:50:47.669+00:00"},{"name":"Fax Number","value":"(580) 4-GRACE-5","verified_at":null},{"name":"I made","value":"\u003ca href=\"https://github.com/Kansattica/Fluency\" rel=\"me nofollow noopener\" target=\"_blank\"\u003e\u003cspan class=\"invisible\"\u003ehttps://\u003c/span\u003e\u003cspan class=\"\"\u003egithub.com/Kansattica/Fluency\u003c/span\u003e\u003cspan class=\"invisible\"\u003e\u003c/span\u003e\u003c/a\u003e","verified_at":null}]},"media_attachments":[],"mentions":[],"tags":[],"emojis":[],"card":null,"poll":null}
-)";
+std::string make_status_json(unsigned int id)
+{
+	std::string toreturn = R"({"id": ")";
+	toreturn += std::to_string(id);
+	toreturn += R"(", "uri": "https://who.cares/api/statuses/123", "spoiler_text": "hey there", "content": "buddy guy", "visibility": "public"})";
+	
+	return toreturn;
+}
 
 struct mock_network
 {
@@ -70,30 +76,32 @@ struct mock_network
 
 	net_response mock_new_status(std::string_view url, std::string_view access_token, status_params params)
 	{
-		arguments.push_back(mock_args{ std::string {url}, std::string { access_token }, std::move(params) });
+		static unsigned int id = 1000000;
+		arguments.push_back(mock_args{ std::string {url}, std::string { access_token }, std::move(params), {}, std::to_string(++id)});
 
 		net_response toreturn;
 		toreturn.retryable_error = (--succeed_after > 0);
 		if (succeed_after == 0) { succeed_after = succeed_after_n; }
 		toreturn.okay = !(fatal_error || toreturn.retryable_error);
 		toreturn.status_code = status_code;
-		toreturn.message = some_status;
+		toreturn.message = make_status_json(id);
 		return toreturn;
 	}
 
 	net_response mock_upload(std::string_view url, std::string_view access_token, const fs::path& file, std::string description)
 	{
+		static unsigned int id = 100;
+		std::string str_id = std::to_string(++id);
 		arguments.push_back(mock_args{ std::string {url}, std::string { access_token }, {},
-			attachment{file, std::move(description)} });
+			attachment{file, std::move(description)}, str_id });
 
-		static int id = 1;
 		net_response toreturn;
 		toreturn.retryable_error = (--succeed_after > 0);
 		if (succeed_after == 0) { succeed_after = succeed_after_n; }
 		toreturn.okay = !(fatal_error || toreturn.retryable_error);
 		toreturn.status_code = status_code;
 		toreturn.message = R"({"id": ")";
-		toreturn.message += std::to_string(id++);
+		toreturn.message += str_id;
 		toreturn.message += "\"}";
 		return toreturn;
 	}
@@ -560,10 +568,9 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 				REQUIRE(fourth.params.visibility == "unlisted");
 
 				// test that posts are threaded correctly
-				// that's the hardcoded post ID that every reply gets
-				// I really should have it generate those automatically.
-				REQUIRE(second.params.reply_to == "103060746072056173");
-				REQUIRE(third.params.reply_to == "103060746072056173");
+				// these two should be a reply to the same one
+				REQUIRE(second.params.reply_to == first.id);
+				REQUIRE(third.params.reply_to == first.id);
 
 			}
 
@@ -651,10 +658,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 
 				// the third and fourth calls should never be made because the uploads failed.
 
-				// test that posts are threaded correctly
-				// that's the hardcoded post ID that every reply gets
-				// I really should have it generate those automatically.
-				REQUIRE(second.params.reply_to == "103060746072056173");
+				REQUIRE(second.params.reply_to == first.id);
 			}
 
 			THEN("Only the first upload per post is attempted.")
@@ -729,6 +733,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 			THEN("the post parameters are as expected.")
 			{
 				size_t idx = 0;
+				std::string reply_to_id;
 				for (size_t i = 0; i < retries.second; i++)
 				{
 					const auto& first = mocknew.arguments[idx++];
@@ -737,6 +742,10 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 					REQUIRE(first.params.content_warning.empty());
 					REQUIRE(first.params.reply_to.empty());
 					REQUIRE(first.params.visibility == "public");
+					if (reply_to_id.empty())
+						reply_to_id = first.id;
+					else
+						REQUIRE(first.id == reply_to_id);
 				}
 
 				for (size_t i = 0; i < retries.second; i++)
@@ -748,9 +757,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 					REQUIRE(second.params.visibility == "private");
 
 					// test that posts are threaded correctly
-					// that's the hardcoded post ID that every reply gets
-					// I really should have it generate those automatically.
-					REQUIRE(second.params.reply_to == "103060746072056173");
+					REQUIRE(second.params.reply_to == reply_to_id);
 				}
 
 				for (size_t i = 0; i < retries.second; i++)
@@ -760,7 +767,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 					REQUIRE(third.params.body.empty());
 					REQUIRE(third.params.content_warning.empty());
 					REQUIRE(third.params.visibility == "direct");
-					REQUIRE(third.params.reply_to == "103060746072056173");
+					REQUIRE(third.params.reply_to == reply_to_id);
 				}
 
 				for (size_t i = 0; i < retries.second; i++)
