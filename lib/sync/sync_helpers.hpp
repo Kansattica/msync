@@ -27,4 +27,24 @@ struct file_status_params : public status_params
 };
 
 file_status_params read_params(const fs::path& path);
+
+template <typename Stream>
+void print_truncated_string(std::string_view toprint, Stream& str)
+{
+	static constexpr int max_length = 60;
+	bool truncated = false;
+	if (toprint.size() > max_length)
+	{
+		toprint.remove_suffix(toprint.size() - max_length);
+		truncated = true;
+	}
+
+	if (toprint.back() == '\n')
+		toprint.remove_suffix(1);
+
+	str << toprint;
+	if (truncated)
+		str << "...";
+
+}
 #endif

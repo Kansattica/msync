@@ -18,6 +18,11 @@ String get_if_set(const json& parsed, const char* key)
 	return val->get<String>();
 }
 
+std::string read_error(const std::string& response_json)
+{
+	return get_if_set<std::string>(json::parse(response_json), "error");
+}
+
 mastodon_status read_status(const std::string& status_json)
 {
 	const auto parsed = json::parse(status_json);
@@ -41,5 +46,4 @@ mastodon_status read_status(const std::string& status_json)
 std::string read_upload_id(const std::string& attachment_json)
 {
 	return json::parse(attachment_json)["id"].get<std::string>();
-
 }

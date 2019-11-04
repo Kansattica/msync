@@ -61,6 +61,7 @@ void store_thread_id(std::string msync_id, std::string remote_server_id)
 	threaded_ids.emplace(std::move(msync_id), std::move(remote_server_id));
 }
 
+
 file_status_params read_params(const fs::path& path)
 {
 	readonly_outgoing_post post{ path };

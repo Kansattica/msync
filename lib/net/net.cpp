@@ -30,10 +30,19 @@ net_response handle_response(cpr::Response&& response)
 	// I don't think we can trust response.error, it says OK even if the status code is 400 something
 	to_return.okay = !response.error && response.status_code >= 200 && response.status_code < 300;
 
-	if (to_return.okay)
-		to_return.message = std::move(response.text);
-	else
+	// if we're not okay, try and get the error message
+	// but this is only some kinds of error.
+	// if Mastodon returns an error (and not nginx),
+	// then response.error.message will be empty, but response.text will have important stuff in it
+	// for example, if the user sends a bad post, you'll get a 422 and the error is in response.text
+
+	if (!to_return.okay)
+	{
 		to_return.message = std::move(response.error.message);
+	}
+
+	if (to_return.message.empty())
+		to_return.message = std::move(response.text);
 
 	return to_return;
 }

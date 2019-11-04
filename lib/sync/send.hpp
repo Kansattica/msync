@@ -103,26 +103,6 @@ private:
 		queuefile.parsed = std::move(failedids);
 	}
 
-	void print_status(const mastodon_status& status)
-	{
-		pl() << "Created post at " << status.url << '\n';
-
-		if (!status.content_warning.empty())
-			pl() << "CW: " << status.content_warning << '\n';
-
-		static const int max_length = 60;
-		std::string_view toprint{ status.content };
-		if (toprint.size() > max_length)
-		{
-			toprint.remove_suffix(toprint.size() - max_length);
-		}
-
-		pl() << "Body: " << toprint;
-		if (status.content.size() > max_length)
-			pl() << "...";
-		pl() << '\n';
-	}
-
 	void process_posts(const std::string_view account, const std::string_view statusurl, const std::string_view mediaurl)
 	{
 		auto queuefile = get(queues::post, account);
@@ -173,6 +153,7 @@ private:
 					else
 					{
 						pl() << "Could not upload file. Skipping this post.\n";
+						succeeded = false;
 						break;
 					}
 				}
@@ -180,7 +161,15 @@ private:
 				if (succeeded)
 				{
 					status_params p{ std::move(params) };
+
+					pl() << "Sending post: "; 
+					if (!p.content_warning.empty())
+						pl() << "\nCW: " << p.content_warning << '\n';
+					print_truncated_string(p.body, pl());
+					pl() << '\n';
+
 					std::tie(succeeded, response) = request_with_retries([&]() { return new_status(statusurl, access_token, p); });
+
 					if (succeeded)
 					{
 						fs::remove(file_to_send);
@@ -189,7 +178,7 @@ private:
 						{
 							store_thread_id(std::move(params.reply_id), std::move(parsed_status.id));
 						}
-						print_status(parsed_status);
+						pl() << "Created post at " << parsed_status.url << '\n';
 					}
 
 				}
@@ -228,7 +217,7 @@ private:
 	{
 		for (unsigned int i = 0; i < retries; i++)
 		{
-			const net_response response = req();
+			net_response response = req();
 
 			pl() << get_error_message(response.status_code, verbose_logs);
 
@@ -243,6 +232,9 @@ private:
 			// some other error, assume unrecoverable
 			if (!response.okay)
 			{
+				auto parsed_error = read_error(response.message);
+				if (!parsed_error.empty())
+					response.message = std::move(parsed_error);
 				pl() << response.message << '\n';
 				return std::make_pair(false, std::move(response.message));
 			}

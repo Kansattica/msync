@@ -80,7 +80,8 @@ UNSET(CURL_VERSION_STRING)
 
 if (NOT USE_SYSTEM_CURL AND UNIX)
 	# if we're building our own curl, statically link openssl
-	set (OPENSSL_USE_STATIC_LIBS TRUE)
+	#set (OPENSSL_USE_STATIC_LIBS TRUE)
+	set (OPENSSL_USE_STATIC_LIBS FALSE)
 
 	# static openssl has problems with finding the correct cert store
 	# someday, we'll be able to handle this in application code, but not today
