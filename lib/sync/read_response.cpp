@@ -20,7 +20,16 @@ String get_if_set(const json& parsed, const char* key)
 
 std::string read_error(const std::string& response_json)
 {
-	return get_if_set<std::string>(json::parse(response_json), "error");
+	const auto parsed = json::parse(response_json, nullptr, false); //don't throw on a bad parse
+
+	// a parse fail is fine here because it might just be a plain error string
+	// from nginx, for instance
+	if (parsed == json::value_t::discarded)
+	{
+		return "";
+	}
+
+	return get_if_set<std::string>(parsed, "error");
 }
 
 mastodon_status read_status(const std::string& status_json)
