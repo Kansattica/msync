@@ -162,7 +162,6 @@ private:
 				const fs::path file_to_send = file_queue_directory / id;
 				file_status_params params = read_params(file_to_send);
 
-				std::string parsed_status_id;
 				if (!params.okay)
 				{
 					pl() << id << ": This post is a reply to a post that failed to send. Skipping.\n";
@@ -174,6 +173,7 @@ private:
 					succeeded = send_attachments(params, mediaurl);
 				}
 
+				std::string parsed_status_id;
 				if (succeeded)
 				{
 					status_params p{ std::move(params) };

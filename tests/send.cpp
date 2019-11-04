@@ -84,7 +84,10 @@ struct mock_network
 		if (succeed_after == 0) { succeed_after = succeed_after_n; }
 		toreturn.okay = !(fatal_error || toreturn.retryable_error);
 		toreturn.status_code = status_code;
-		toreturn.message = make_status_json(id);
+		if (!toreturn.okay)
+			toreturn.message = R"({ "error": "some problem" })";
+		else
+			toreturn.message = make_status_json(id);
 		return toreturn;
 	}
 
@@ -623,7 +626,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 
 			THEN("one call per ID was made.")
 			{
-				REQUIRE(mocknew.arguments.size() == 2);
+				REQUIRE(mocknew.arguments.size() == 1);
 			}
 
 			THEN("the other APIs weren't called.")
@@ -650,24 +653,17 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 				REQUIRE(first.params.content_warning.empty());
 				REQUIRE(first.params.visibility == "public");
 
-				const auto& second = mocknew.arguments[1];
-				REQUIRE(second.params.attachment_ids.empty());
-				REQUIRE(second.params.body == "This one has a body, too.");
-				REQUIRE(second.params.content_warning == "And a content warning.");
-				REQUIRE(second.params.visibility == "private");
+				// the second call should never be made because it was a reply to the first.
 
 				// the third and fourth calls should never be made because the uploads failed.
 
-				REQUIRE(second.params.reply_to == first.id);
 			}
 
 			THEN("Only the first upload per post is attempted.")
 			{
-				REQUIRE(mockupload.arguments.size() == 2);
+				REQUIRE(mockupload.arguments.size() == 1);
 				REQUIRE(mockupload.arguments[0].attachment_args.file == expected_attach[0]);
 				REQUIRE(mockupload.arguments[0].attachment_args.description == expected_descriptions[0]);
-				REQUIRE(mockupload.arguments[1].attachment_args.file == expected_attach[0]);
-				REQUIRE(mockupload.arguments[1].attachment_args.description == expected_descriptions[0]);
 			}
 
 
@@ -733,7 +729,6 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 			THEN("the post parameters are as expected.")
 			{
 				size_t idx = 0;
-				std::string reply_to_id;
 				for (size_t i = 0; i < retries.second; i++)
 				{
 					const auto& first = mocknew.arguments[idx++];
@@ -742,11 +737,11 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 					REQUIRE(first.params.content_warning.empty());
 					REQUIRE(first.params.reply_to.empty());
 					REQUIRE(first.params.visibility == "public");
-					if (reply_to_id.empty())
-						reply_to_id = first.id;
-					else
-						REQUIRE(first.id == reply_to_id);
 				}
+
+				// the other replies will be to the last ID for this post
+				// since that's the one that actually went through
+				std::string reply_to_id = mocknew.arguments[idx - 1].id;
 
 				for (size_t i = 0; i < retries.second; i++)
 				{

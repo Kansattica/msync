@@ -58,7 +58,12 @@ static std::unordered_map<std::string, std::string> threaded_ids;
 
 void store_thread_id(std::string msync_id, std::string remote_server_id)
 {
-	threaded_ids.emplace(std::move(msync_id), std::move(remote_server_id));
+	// if another post uses the same key ID, replace it
+	// this is mostly to make the tests work, though it is also closer to what you might expect
+
+	// I considered scoping the threaded_ids to the process_posts functions, but it's probably good to
+	// let people thread across accounts, even though we currently can't really guarantee an order, so hm
+	threaded_ids.insert_or_assign(std::move(msync_id), std::move(remote_server_id));
 }
 
 file_status_params read_params(const fs::path& path)
