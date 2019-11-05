@@ -77,7 +77,6 @@ std::unordered_map<std::string, user_options> global_options::read_accounts()
 
 std::pair<const std::string, user_options>* global_options::select_account(const std::string_view name)
 {
-    int matched = 0;
 	std::pair<const std::string, user_options>* candidate = nullptr;
     for (auto& entry : accounts)
     {
@@ -93,18 +92,16 @@ std::pair<const std::string, user_options>* global_options::select_account(const
             }))
         {
             plverb() << "Matched account " << entry.first << '\n';
-            matched++;
 
-			if (matched > 1) { return nullptr; }
+			// if this is the second candidate we've found, it's ambiguous and return nothing
+			if (candidate != nullptr) { return nullptr; }
 
             candidate = &entry;
         }
     }
-
-    if (matched == 1)
-        return candidate;
-
-    return nullptr;
+	
+	// nullptr if we found nothing, points to the account entry if we found exactly one candidate
+	return candidate;
 }
 
 std::vector<std::string_view> global_options::all_accounts() const
