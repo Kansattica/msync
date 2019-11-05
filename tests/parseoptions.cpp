@@ -850,7 +850,7 @@ bool flag_set(int combo, int position)
 
 struct command_line_option
 {
-	int order = -1;
+	unsigned int order = 1000;
 	std::vector<const char*> options;
 
 	friend bool operator< (const command_line_option& lhs, const command_line_option& rhs)
@@ -1010,7 +1010,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 			options.push_back(std::move(opt));
 		}
 
-		for (int i = 0; i < options.size(); i++)
+		for (unsigned int i = 0; i < options.size(); i++)
 			options[i].order = i;
 
 		std::vector<const char*> argv;
