@@ -115,7 +115,10 @@ int main(int argc, const char* argv[])
 				send_posts send{ simple_post, simple_delete, new_status, upload_media };
 				send.retries = parsed.sync_opts.retries;
 				if (user == nullptr)
-					send.send_all();
+				{
+					options().foreach_account([&send](const auto& user) {
+						send.send(user.first, *user.second.get_option(user_option::instance_url), *user.second.get_option(user_option::access_token)); });
+				}
 				else
 					send.send(user->first, *user->second.get_option(user_option::instance_url), *user->second.get_option(user_option::access_token));
 			}

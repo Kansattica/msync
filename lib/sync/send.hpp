@@ -13,8 +13,6 @@
 #include <optional>
 
 #include "../net_interface/net_interface.hpp"
-#include "../options/user_options.hpp"
-#include "../options/global_options.hpp"
 #include "../queue/queues.hpp"
 #include "../util/util.hpp"
 #include "../postfile/outgoing_post.hpp"
@@ -30,15 +28,6 @@ public:
 	unsigned int retries = 3;
 
 	send_posts(post_request& post, delete_request& del, post_new_status& new_status, upload_attachments& upload) : post(post), del(del), new_status(new_status), upload(upload) { }
-
-	void send_all()
-	{
-		options().foreach_account([this](const auto& user)
-			{
-				this->send(user.first, *user.second.get_option(user_option::instance_url), *user.second.get_option(user_option::access_token));
-			});
-		
-	}
 
 	void send(const std::string_view account, const std::string_view instanceurl, const std::string_view access_token)
 	{

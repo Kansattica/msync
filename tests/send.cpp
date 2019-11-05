@@ -3,7 +3,6 @@
 #include "../lib/sync/send.hpp"
 #include "../lib/net_interface/net_interface.hpp"
 #include "../lib/queue/queues.hpp"
-#include "../lib/options/global_options.hpp"
 #include "../lib/constants/constants.hpp"
 
 #include "test_helpers.hpp"
@@ -189,16 +188,6 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 		std::vector<std::string>{},
 		std::vector<std::string>{ "justone" });
 
-	const bool send_all = GENERATE(true, false);
-
-	if (send_all)
-	{
-		auto& new_account = options().add_new_account(std::string{ account });
-		new_account.second.set_option(user_option::instance_url, std::string{ instanceurl });
-		new_account.second.set_option(user_option::access_token, std::string{ accesstoken });
-	}
-
-
 	GIVEN("A queue with some ids to add and a good connection")
 	{
 		enqueue(std::get<0>(queue), account, testvect);
@@ -212,10 +201,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload };
 
-			if (send_all)
-				send.send_all();
-			else
-				send.send(account, instanceurl, accesstoken);
+			send.send(account, instanceurl, accesstoken);
 
 			THEN("the queue is now empty.")
 			{
@@ -266,10 +252,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload };
 
-			if (send_all)
-				send.send_all();
-			else
-				send.send(account, instanceurl, accesstoken);
+			send.send(account, instanceurl, accesstoken);
 
 			THEN("the queue is now empty.")
 			{
@@ -332,10 +315,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			send.retries = retries.first;
 
-			if (send_all)
-				send.send_all();
-			else
-				send.send(account, instanceurl, accesstoken);
+			send.send(account, instanceurl, accesstoken);
 
 			THEN("the queue is now empty.")
 			{
@@ -354,7 +334,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("the URLs are as expected.")
 			{
-				auto repeated = repeat_each_element(testvect, retries.second);
+				const auto repeated = repeat_each_element(testvect, retries.second);
 				REQUIRE(std::equal(mockpost.arguments.begin(), mockpost.arguments.end(), repeated.begin(), repeated.end(), [&](const auto& actual, const auto& expected)
 					{
 						return actual.url == make_expected_url(expected, std::get<1>(queue), instanceurl);
@@ -388,7 +368,6 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 		WHEN("the queue is sent")
 		{
-
 			mock_network_post mockpost;
 			mockpost.fatal_error = true;
 			mockpost.status_code = 500;
@@ -401,10 +380,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			send.retries = retries.first;
 
-			if (send_all)
-				send.send_all();
-			else
-				send.send(account, instanceurl, accesstoken);
+			send.send(account, instanceurl, accesstoken);
 
 			THEN("the queue hasn't changed.")
 			{
@@ -450,16 +426,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 	constexpr std::string_view accesstoken = "sometoken";
 	constexpr std::string_view new_post_url = "https://cool.account/api/v1/statuses";
 
-	const bool send_all = GENERATE(true, false);
-
 	const static fs::path queue_directory = fi.filename / account / File_Queue_Directory;
-
-	if (send_all)
-	{
-		auto& new_account = options().add_new_account(std::string{ account });
-		new_account.second.set_option(user_option::instance_url, std::string{ instanceurl });
-		new_account.second.set_option(user_option::access_token, std::string{ accesstoken });
-	}
 
 	GIVEN("A queue with some post filenames to send.")
 	{
@@ -507,10 +474,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 
 		WHEN("the posts are sent over a good connection")
 		{
-			if (send_all)
-				send.send_all();
-			else
-				send.send(account, instanceurl, accesstoken);
+			send.send(account, instanceurl, accesstoken);
 
 			THEN("the queue and post directory is now empty.")
 			{
@@ -602,10 +566,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 		{
 			mocknew.fail_if_body = "This one has a body, too.";
 
-			if (send_all)
-				send.send_all();
-			else
-				send.send(account, instanceurl, accesstoken);
+			send.send(account, instanceurl, accesstoken);
 
 			THEN("the queue and post directory removes the successfully sent posts.")
 			{
@@ -702,10 +663,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 			mockupload.fatal_error = true;
 			mockupload.status_code = 500;
 
-			if (send_all)
-				send.send_all();
-			else
-				send.send(account, instanceurl, accesstoken);
+			send.send(account, instanceurl, accesstoken);
 
 			THEN("the queue and post directories are not empty.")
 			{
@@ -783,10 +741,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 
 			send.retries = retries.first;
 
-			if (send_all)
-				send.send_all();
-			else
-				send.send(account, instanceurl, accesstoken);
+			send.send(account, instanceurl, accesstoken);
 
 			THEN("the queue and post directories are emptied.")
 			{
