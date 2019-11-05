@@ -54,7 +54,7 @@ target_link_libraries(filebacked INTERFACE filesystem)
 
 target_link_libraries(sync PRIVATE options printlog queue util netinterface postfile constants filesystem nlohmann_json::nlohmann_json)
 
-target_link_libraries(options PRIVATE constants whereami printlog exception filebacked)
+target_link_libraries(options PRIVATE whereami printlog exception filebacked constants)
 target_link_libraries(options PUBLIC filesystem) 
 
 target_link_libraries(postfile PRIVATE filebacked printlog util)

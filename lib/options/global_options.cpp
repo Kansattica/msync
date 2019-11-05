@@ -1,6 +1,5 @@
 #include "global_options.hpp"
 #include "user_options.hpp"
-#include <constants.hpp>
 #include <filesystem.hpp>
 #include <msync_exception.hpp>
 #include <print_logger.hpp>
@@ -20,9 +19,7 @@ using namespace std::string_literals;
 
 std::pair<const std::string, user_options>& global_options::add_new_account(std::string name)
 {
-    fs::path user_path = executable_location;
-    user_path /= Account_Directory;
-    user_path /= name;
+    fs::path user_path = account_directory_location / name;
 
     fs::create_directories(user_path); //can throw if something goes wrong
 
@@ -50,16 +47,14 @@ fs::path global_options::get_exe_location()
 
 std::unordered_map<std::string, user_options> global_options::read_accounts()
 {
-    fs::path account_location = executable_location / Account_Directory;
-
-    plverb() << "Reading accounts from " << account_location << "\n";
+    plverb() << "Reading accounts from " << account_directory_location << "\n";
 
     std::unordered_map<std::string, user_options> toreturn;
 
-    if (!fs::exists(account_location))
+    if (!fs::exists(account_directory_location))
         return toreturn;
 
-    for (auto& userfolder : fs::directory_iterator(account_location))
+    for (const auto& userfolder : fs::directory_iterator(account_directory_location))
     {
         if (!fs::is_directory(userfolder))
         {
@@ -84,7 +79,6 @@ std::pair<const std::string, user_options>* global_options::select_account(const
 {
     int matched = 0;
 	std::pair<const std::string, user_options>* candidate = nullptr;
-
     for (auto& entry : accounts)
     {
         // if name is longer than the entry, we'll step off the end of entry and segfault

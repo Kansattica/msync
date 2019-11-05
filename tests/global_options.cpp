@@ -7,23 +7,6 @@
 #include <string>
 using namespace std::string_literals;
 
-SCENARIO("Both paths we care about are directories.")
-{
-	const test_file acc = account_directory();
-	GIVEN("A global_options object")
-	{
-		global_options opts;
-
-		WHEN("the object is created")
-		{
-			THEN("executable_location is actually a directory.")
-			{
-				REQUIRE(fs::is_directory(opts.executable_location));
-			}
-		}
-	}
-}
-
 SCENARIO("add_new_account correctly handles input.")
 {
 	const test_file acc = account_directory();
