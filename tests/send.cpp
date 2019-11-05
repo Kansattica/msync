@@ -25,10 +25,10 @@ struct mock_args
 	std::string id;
 };
 
-std::string make_status_json(unsigned int id)
+std::string make_status_json(const std::string& id)
 {
 	std::string toreturn = R"({"id": ")";
-	toreturn += std::to_string(id);
+	toreturn += id;
 	toreturn += R"(", "uri": "https://who.cares/api/statuses/123", "spoiler_text": "hey there", "content": "buddy guy", "visibility": "public"})";
 	
 	return toreturn;
@@ -77,7 +77,8 @@ struct mock_network
 	net_response mock_new_status(std::string_view url, std::string_view access_token, status_params params)
 	{
 		static unsigned int id = 1000000;
-		arguments.push_back(mock_args{ std::string {url}, std::string { access_token }, std::move(params), {}, std::to_string(++id)});
+		std::string str_id = std::to_string(++id);
+		arguments.push_back(mock_args{ std::string {url}, std::string { access_token }, std::move(params), {}, str_id});
 
 		net_response toreturn;
 		toreturn.retryable_error = (--succeed_after > 0);
@@ -87,7 +88,7 @@ struct mock_network
 		if (!toreturn.okay)
 			toreturn.message = R"({ "error": "some problem" })";
 		else
-			toreturn.message = make_status_json(id);
+			toreturn.message = make_status_json(str_id);
 		return toreturn;
 	}
 
