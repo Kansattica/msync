@@ -15,7 +15,6 @@ global_options& options()
 	return options;
 }
 
-using namespace std::string_literals;
 
 std::pair<const std::string, user_options>& global_options::add_new_account(std::string name)
 {
@@ -66,6 +65,7 @@ std::unordered_map<std::string, user_options> global_options::read_accounts()
 
         if (!fs::exists(configfile))
         {
+			using namespace std::string_literals;
             throw msync_exception("Expected to find a config file and didn't find it. Try deleting the folder and running new again: "s + userfolder.path().string());
         }
 
