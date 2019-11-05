@@ -877,6 +877,13 @@ command_line_option pick_attachment(int number, gen_options& expected)
 		expected.post.attachments.push_back("attacher");
 		expected.post.attachments.push_back("somefile");
 		break;
+	case 2:
+		opt.options.push_back("--file");
+		opt.options.push_back("filey");
+		expected.post.attachments.push_back("filey");
+		break;
+	case 3:
+		break;
 	//case 1:
 	//	opt.options.push_back("-f");
 	//	opt.options.push_back("someotherattach");
@@ -884,13 +891,6 @@ command_line_option pick_attachment(int number, gen_options& expected)
 	//	expected.post.attachments.push_back("someotherattach");
 	//	expected.post.attachments.push_back("thirdattach");
 	//	break;
-	//case 3:
-	//	opt.options.push_back("--file");
-	//	opt.options.push_back("filey");
-	//	expected.post.attachments.push_back("filey");
-	//	break;
-	case 2:
-		break;
 	}
 	return opt;
 }
@@ -939,14 +939,14 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		// try every combination of bits. note that the ranges are half-open, including the 0 and excluding the maximum.
 		const auto combination = GENERATE(range(0, 0b1111 + 1));
 		const auto longopt = GENERATE(range(0, 0b11111 + 1));
-		const auto attach = GENERATE(0, 1, 2);
+		const auto attach = GENERATE(0, 1, 2, 3);
 		const auto description = GENERATE(0, 1, 2);
 
 		gen_options expected;
 		std::vector<command_line_option> options;
 		options.reserve(6);
 
-		if (attach != 2)
+		if (attach != 3)
 		{
 			options.push_back(pick_attachment(attach, expected));
 		}
@@ -1046,6 +1046,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 					REQUIRE(expected.post.reply_to_id == parsed.gen_opt.post.reply_to_id);
 					REQUIRE(expected.post.reply_id == parsed.gen_opt.post.reply_id);
 				}
+
 			} while (std::next_permutation(options.begin(), options.end()));
 
 		}
