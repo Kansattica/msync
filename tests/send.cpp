@@ -133,8 +133,11 @@ struct mock_network_delete : public mock_network
 
 struct mock_network_new_status : public mock_network
 {
+	std::string fail_if_body;
 	net_response operator()(std::string_view url, std::string_view access_token, status_params params)
 	{
+		if (!fail_if_body.empty())
+			fatal_error = fail_if_body == params.body;
 		return mock_new_status(url, access_token, std::move(params));
 	}
 };
@@ -477,12 +480,13 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 			second.parsed.text = "This one has a body, too.";
 			second.parsed.content_warning = "And a content warning.";
 			second.parsed.vis = visibility::priv;
+			second.parsed.reply_id = "hi2hi";
 			second.parsed.reply_to_id = "Hi";
 
 			outgoing_post third{ to_enqueue[2].filename };
 			third.parsed.attachments = { "attachments", "on" };
 			third.parsed.descriptions = { "with", "some", "descriptions" };
-			third.parsed.reply_to_id = "Hi";
+			third.parsed.reply_to_id = "hi2hi";
 			third.parsed.vis = visibility::direct;
 
 			outgoing_post fourth{ to_enqueue[3].filename };
@@ -557,12 +561,14 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 				REQUIRE(second.params.body == "This one has a body, too.");
 				REQUIRE(second.params.content_warning == "And a content warning.");
 				REQUIRE(second.params.visibility == "private");
+				REQUIRE(second.params.reply_to == first.id);
 
 				const auto& third = mocknew.arguments[2];
 				REQUIRE(third.params.attachment_ids.size() == 2);
 				REQUIRE(third.params.body.empty());
 				REQUIRE(third.params.content_warning.empty());
 				REQUIRE(third.params.visibility == "direct");
+				REQUIRE(third.params.reply_to == second.id);
 
 				const auto& fourth = mocknew.arguments[3];
 				REQUIRE(fourth.params.attachment_ids.size() == 4);
@@ -570,12 +576,6 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 				REQUIRE(fourth.params.content_warning.empty());
 				REQUIRE(fourth.params.reply_to == "777777");
 				REQUIRE(fourth.params.visibility == "unlisted");
-
-				// test that posts are threaded correctly
-				// these two should be a reply to the same one
-				REQUIRE(second.params.reply_to == first.id);
-				REQUIRE(third.params.reply_to == first.id);
-
 			}
 
 
@@ -594,6 +594,102 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 					REQUIRE(mockupload.arguments[i + 2].attachment_args.file == expected_attach[i]);
 					REQUIRE(mockupload.arguments[i + 2].attachment_args.description == expected_descriptions[i]);
 				}
+			}
+
+		}
+
+		WHEN("one of the threaded posts fails to send")
+		{
+			mocknew.fail_if_body = "This one has a body, too.";
+
+			if (send_all)
+				send.send_all();
+			else
+				send.send(account, instanceurl, accesstoken);
+
+			THEN("the queue and post directory removes the successfully sent posts.")
+			{
+				REQUIRE(print(queues::post, account) == std::vector<std::string>{ "second.post", "another kind of post" });
+
+				// 4 bak files, 2 regular
+				REQUIRE(count_files_in_directory(queue_directory) == 6);
+			}
+
+			THEN("the input files and attachments are untouched")
+			{
+				REQUIRE(std::all_of(to_enqueue.begin(), to_enqueue.end(), [](const auto& file) { return fs::exists(file.filename); }));
+				REQUIRE(std::all_of(attachment_files.begin(), attachment_files.end(), [](const auto& file) { return fs::exists(file.filename); }));
+			}
+
+			THEN("one call per ID was made.")
+			{
+				// send first OK
+				// try and fail to send second
+				// don't try to send third
+				// send fourth OK
+				REQUIRE(mocknew.arguments.size() == 3);
+			}
+
+			THEN("the other APIs weren't called.")
+			{
+				REQUIRE(mockpost.arguments.empty());
+				REQUIRE(mockdel.arguments.empty());
+			}
+
+			THEN("the access token was passed in.")
+			{
+				REQUIRE(std::all_of(mocknew.arguments.begin(), mocknew.arguments.end(), [&](const auto& actual) { return actual.access_token == accesstoken; }));
+			}
+
+			THEN("the URLs are as expected.")
+			{
+				REQUIRE(std::all_of(mockpost.arguments.begin(), mockpost.arguments.end(), [&](const auto& actual) { return actual.url == new_post_url; }));
+			}
+
+			THEN("the post parameters are as expected.")
+			{
+				const auto& first = mocknew.arguments[0];
+				REQUIRE(first.params.attachment_ids.empty());
+				REQUIRE(first.params.body == "This one just has a body.");
+				REQUIRE(first.params.content_warning.empty());
+				REQUIRE(first.params.reply_to.empty());
+				REQUIRE(first.params.visibility == "public");
+
+				const auto& second = mocknew.arguments[1];
+				REQUIRE(second.params.attachment_ids.empty());
+				REQUIRE(second.params.body == "This one has a body, too.");
+				REQUIRE(second.params.content_warning == "And a content warning.");
+				REQUIRE(second.params.visibility == "private");
+				REQUIRE(second.params.reply_to == first.id);
+
+				// third should get skipped because second will fail to send
+
+				const auto& fourth = mocknew.arguments[2];
+				REQUIRE(fourth.params.attachment_ids.size() == 4);
+				REQUIRE(fourth.params.body.empty());
+				REQUIRE(fourth.params.content_warning.empty());
+				REQUIRE(fourth.params.reply_to == "777777");
+				REQUIRE(fourth.params.visibility == "unlisted");
+			}
+
+
+			THEN("the uploads are as expected.")
+			{
+				REQUIRE(mockupload.arguments.size() == 4);
+				
+				//attached to the fourth
+				for (size_t i = 0; i < 4; i++)
+				{
+					REQUIRE(mockupload.arguments[i].attachment_args.file == expected_attach[i]);
+					REQUIRE(mockupload.arguments[i].attachment_args.description == expected_descriptions[i]);
+				}
+			}
+
+			THEN("all replies to a threaded post that fail to send persist the successful post's ID")
+			{
+				const auto& post_id = mocknew.arguments[0].id;
+				readonly_outgoing_post failed_post{ queue_directory / "second.post" };
+				REQUIRE(failed_post.parsed.reply_to_id == post_id);
 			}
 
 		}
@@ -730,6 +826,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 			THEN("the post parameters are as expected.")
 			{
 				size_t idx = 0;
+
 				for (size_t i = 0; i < retries.second; i++)
 				{
 					const auto& first = mocknew.arguments[idx++];
@@ -755,6 +852,9 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 					// test that posts are threaded correctly
 					REQUIRE(second.params.reply_to == reply_to_id);
 				}
+
+				// do it again because third is a reply to second
+				reply_to_id = mocknew.arguments[idx - 1].id;
 
 				for (size_t i = 0; i < retries.second; i++)
 				{
