@@ -4,8 +4,6 @@
 #include "user_options.hpp"
 #include <filesystem.hpp>
 
-#include "../constants/constants.hpp"
-
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -15,7 +13,9 @@
 struct global_options
 {
 public:
-    const fs::path account_directory_location = get_exe_location() / Account_Directory;
+    const fs::path account_directory_location;
+
+	global_options();
 
 	std::pair<const std::string, user_options>& add_new_account(std::string name);
 	std::pair<const std::string, user_options>* select_account(std::string_view name);
@@ -27,9 +27,7 @@ public:
 		std::for_each(accounts.begin(), accounts.end(), c);
 	}
 private:
-    fs::path get_exe_location();
-    std::unordered_map<std::string, user_options> read_accounts();
-    std::unordered_map<std::string, user_options> accounts = read_accounts();
+    std::unordered_map<std::string, user_options> accounts;
 };
 
 global_options& options();

@@ -1,6 +1,6 @@
 #include "global_options.hpp"
 #include "user_options.hpp"
-#include <filesystem.hpp>
+#include "../constants/constants.hpp"
 #include <msync_exception.hpp>
 #include <print_logger.hpp>
 #include <whereami.h>
@@ -15,24 +15,7 @@ global_options& options()
 	return options;
 }
 
-
-std::pair<const std::string, user_options>& global_options::add_new_account(std::string name)
-{
-    fs::path user_path = account_directory_location / name;
-
-    fs::create_directories(user_path); //can throw if something goes wrong
-
-    user_path /= User_Options_Filename;
-
-	const auto [it, inserted] = accounts.emplace(std::move(name), user_options{ std::move(user_path) });
-
-    if (!inserted)
-        plverb() << "Account already exists. Nothing changed.\n";
-
-    return *it;
-}
-
-fs::path global_options::get_exe_location()
+fs::path get_exe_location()
 {
     // see https://github.com/gpakosz/whereami
     const int length = wai_getModulePath(nullptr, 0, nullptr);
@@ -44,7 +27,7 @@ fs::path global_options::get_exe_location()
     return fs::path(path.get(), path.get() + dirname_length);
 }
 
-std::unordered_map<std::string, user_options> global_options::read_accounts()
+std::unordered_map<std::string, user_options> read_accounts(const fs::path& account_directory_location)
 {
     plverb() << "Reading accounts from " << account_directory_location << "\n";
 
@@ -73,6 +56,27 @@ std::unordered_map<std::string, user_options> global_options::read_accounts()
     }
 
     return toreturn;
+}
+
+
+global_options::global_options() : account_directory_location(get_exe_location() / Account_Directory), accounts(read_accounts(account_directory_location))
+{
+}
+
+std::pair<const std::string, user_options>& global_options::add_new_account(std::string name)
+{
+    fs::path user_path = account_directory_location / name;
+
+    fs::create_directories(user_path); //can throw if something goes wrong
+
+    user_path /= User_Options_Filename;
+
+	const auto [it, inserted] = accounts.emplace(std::move(name), user_options{ std::move(user_path) });
+
+    if (!inserted)
+        plverb() << "Account already exists. Nothing changed.\n";
+
+    return *it;
 }
 
 std::pair<const std::string, user_options>* global_options::select_account(const std::string_view name)
