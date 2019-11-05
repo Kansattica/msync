@@ -139,7 +139,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 
 		//it would be really nice if these could be vectors of string views,
 		//but it's way more convenient to be able to compare the vectors with ==
-		//so here's hoping small string optimization helps here
+		//so I'm hoping small string optimization helps here
 		const auto attachments = GENERATE(
 			std::vector<std::string>{},
 			std::vector<std::string>{"an attachment"},
@@ -149,9 +149,9 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 
 		auto descriptions = GENERATE(
 			std::vector<std::string>{},
-			std::vector<std::string>{"describing: an attachment"},
-			std::vector<std::string>{"describing: hi", "describing: there"},
-			std::vector<std::string>{"describing: four", "", "describing: attachments", "describing: foryou"}
+			std::vector<std::string>{"d: an attachment"},
+			std::vector<std::string>{"d: hi", "d: there"},
+			std::vector<std::string>{"d: four", "", "d: attachments", "d: foryou"}
 			);
 
 		{
@@ -273,7 +273,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 				}
 
 				result.parsed.text = "some garbage";
-				result.parsed.content_warning = "some more garbage";
+				result.parsed.content_warning = "more garbage";
 				result.parsed.reply_to_id = "some jerk";
 				result.parsed.attachments.push_back("bad attachment");
 				result.parsed.descriptions.push_back("bad description");
@@ -305,8 +305,6 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 				}
 			}
 		}
-
-
 	}
 }
 

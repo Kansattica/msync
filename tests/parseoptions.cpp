@@ -866,34 +866,30 @@ command_line_option pick_attachment(int number, gen_options& expected)
 	switch (number)
 	{
 	case 0:
-		opt.order = 0;
-		opt.options.emplace_back("-f");
-		opt.options.emplace_back("someattach");
-		expected.post.attachments.emplace_back("someattach");
+		opt.options.push_back("-f");
+		opt.options.push_back("someattach");
+		expected.post.attachments.push_back("someattach");
 		break;
 	case 1:
-		opt.order = 1;
-		opt.options.emplace_back("-f");
-		opt.options.emplace_back("someotherattach");
-		opt.options.emplace_back("thirdattach");
-		expected.post.attachments.emplace_back("someotherattach");
-		expected.post.attachments.emplace_back("thirdattach");
+		opt.options.push_back("--attach");
+		opt.options.push_back("attacher");
+		opt.options.push_back("somefile");
+		expected.post.attachments.push_back("attacher");
+		expected.post.attachments.push_back("somefile");
 		break;
+	//case 1:
+	//	opt.options.push_back("-f");
+	//	opt.options.push_back("someotherattach");
+	//	opt.options.push_back("thirdattach");
+	//	expected.post.attachments.push_back("someotherattach");
+	//	expected.post.attachments.push_back("thirdattach");
+	//	break;
+	//case 3:
+	//	opt.options.push_back("--file");
+	//	opt.options.push_back("filey");
+	//	expected.post.attachments.push_back("filey");
+	//	break;
 	case 2:
-		opt.order = 2;
-		opt.options.emplace_back("--attach");
-		opt.options.emplace_back("attacher");
-		opt.options.emplace_back("somefile");
-		expected.post.attachments.emplace_back("attacher");
-		expected.post.attachments.emplace_back("somefile");
-		break;
-	case 3:
-		opt.order = 3;
-		opt.options.emplace_back("--file");
-		opt.options.emplace_back("filey");
-		expected.post.attachments.emplace_back("filey");
-		break;
-	case 4:
 		break;
 	}
 	return opt;
@@ -906,34 +902,30 @@ command_line_option pick_description(int number, gen_options& expected)
 	switch (number)
 	{
 	case 0:
-		opt.order = 7;
-		opt.options.emplace_back("-d");
-		opt.options.emplace_back("somedescrip");
-		expected.post.descriptions.emplace_back("somedescrip");
+		opt.options.push_back("-d");
+		opt.options.push_back("somedescrip");
+		expected.post.descriptions.push_back("somedescrip");
 		break;
 	case 1:
-		opt.order = 8;
-		opt.options.emplace_back("-d");
-		opt.options.emplace_back("some other description");
-		opt.options.emplace_back("thirddescrip");
-		expected.post.descriptions.emplace_back("some other description");
-		expected.post.descriptions.emplace_back("thirddescrip");
-		break;
+		opt.options.push_back("--description");
+		opt.options.push_back("describer");
+		opt.options.push_back("some file!");
+		expected.post.descriptions.push_back("describer");
+		expected.post.descriptions.push_back("some file!");
+	//case 1:
+	//	opt.options.push_back("-d");
+	//	opt.options.push_back("some other description");
+	//	opt.options.push_back("thirddescrip");
+	//	expected.post.descriptions.push_back("some other description");
+	//	expected.post.descriptions.push_back("thirddescrip");
+	//	break;
+	//	break;
+	//case 3:
+	//	opt.options.push_back("--description");
+	//	opt.options.push_back("some jerk doing a thing.");
+	//	expected.post.descriptions.push_back("some jerk doing a thing.");
+	//	break;
 	case 2:
-		opt.order = 9;
-		opt.options.emplace_back("--description");
-		opt.options.emplace_back("describer");
-		opt.options.emplace_back("some file!");
-		expected.post.descriptions.emplace_back("describer");
-		expected.post.descriptions.emplace_back("some file!");
-		break;
-	case 3:
-		opt.order = 10;
-		opt.options.emplace_back("--description");
-		opt.options.emplace_back("some jerk doing a thing.");
-		expected.post.descriptions.emplace_back("some jerk doing a thing.");
-		break;
-	case 4:
 		break;
 	}
 	return opt;
@@ -945,20 +937,21 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 	GIVEN("A combination of options for the file generator")
 	{
 		// try every combination of bits. note that the ranges are half-open, including the 0 and excluding the maximum.
-		auto combination = GENERATE(range(0, 0b1111 + 1));
-		auto longopt = GENERATE(range(0, 0b11111 + 1));
-		auto attach = GENERATE(0, 1, 2, 3, 4);
-		auto description = GENERATE(0, 1, 2, 3, 4);
+		const auto combination = GENERATE(range(0, 0b1111 + 1));
+		const auto longopt = GENERATE(range(0, 0b11111 + 1));
+		const auto attach = GENERATE(0, 1, 2);
+		const auto description = GENERATE(0, 1, 2);
 
 		gen_options expected;
 		std::vector<command_line_option> options;
+		options.reserve(6);
 
-		if (attach != 4)
+		if (attach != 2)
 		{
 			options.push_back(pick_attachment(attach, expected));
 		}
 
-		if (description != 4)
+		if (description != 2)
 		{
 			options.push_back(pick_description(description, expected));
 		}
@@ -966,7 +959,6 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		if (flag_set(combination, 0))
 		{
 			command_line_option opt;
-			opt.order = 4;
 			if (flag_set(longopt, 0))
 				opt.options.push_back("-o");
 			else
@@ -980,7 +972,6 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		if (flag_set(combination, 1))
 		{
 			command_line_option opt;
-			opt.order = 5;
 			if (flag_set(longopt, 1))
 				opt.options.push_back("-r");
 			else
@@ -994,7 +985,6 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		if (flag_set(combination, 2))
 		{
 			command_line_option opt;
-			opt.order = 6;
 			if (flag_set(longopt, 2))
 				opt.options.push_back("-c");
 			else if (flag_set(longopt, 0)) // I don't really want to make the number of combinations even worse
@@ -1010,7 +1000,6 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		if (flag_set(combination, 3))
 		{
 			command_line_option opt;
-			opt.order = 11;
 			if (flag_set(longopt, 3))
 				opt.options.push_back("-i");
 			else
@@ -1021,7 +1010,9 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 			options.push_back(std::move(opt));
 		}
 
-		std::sort(options.begin(), options.end());
+		for (int i = 0; i < options.size(); i++)
+			options[i].order = i;
+
 		std::vector<const char*> argv;
 
 		WHEN("the command line is parsed")
@@ -1040,7 +1031,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 					argv.insert(argv.end(), option.options.begin(), option.options.end());
 				}
 
-				auto parsed = parse(argv.size(), argv.data());
+				const auto parsed = parse(argv.size(), argv.data());
 
 				THEN("the options are parsed as expected")
 				{
@@ -1050,13 +1041,11 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 
 					REQUIRE(expected.filename == parsed.gen_opt.filename);
 					REQUIRE(expected.post.attachments == parsed.gen_opt.post.attachments);
-					REQUIRE(std::is_permutation(expected.post.attachments.begin(), expected.post.attachments.end(),
-						parsed.gen_opt.post.attachments.begin(), parsed.gen_opt.post.attachments.end()));
+					REQUIRE(expected.post.descriptions == parsed.gen_opt.post.descriptions);
 					REQUIRE(expected.post.content_warning == parsed.gen_opt.post.content_warning);
 					REQUIRE(expected.post.reply_to_id == parsed.gen_opt.post.reply_to_id);
 					REQUIRE(expected.post.reply_id == parsed.gen_opt.post.reply_id);
 				}
-
 			} while (std::next_permutation(options.begin(), options.end()));
 
 		}
