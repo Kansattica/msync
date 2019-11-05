@@ -1019,19 +1019,17 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		{
 			do
 			{
-				argv.clear();
-				argv.push_back("msync");
 				if (flag_set(longopt, 4))
-					argv.push_back("gen");
+					argv = { "msync", "gen" };
 				else
-					argv.push_back("generate");
+					argv = { "msync", "generate" };
 
 				for (const auto& option : options)
 				{
 					argv.insert(argv.end(), option.options.begin(), option.options.end());
 				}
 
-				const auto parsed = parse(argv.size(), argv.data());
+				const auto parsed = parse((int)argv.size(), argv.data());
 
 				THEN("the options are parsed as expected")
 				{
