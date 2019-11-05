@@ -37,7 +37,7 @@ public:
 			retries = 3;
 		}
 
-		const std::string baseurl = make_api_url(instanceurl, status_route());
+		const std::string baseurl = make_api_url(instanceurl, status_route);
 
 		this->access_token = access_token;
 		pl() << "Sending queued favorites for " << account << '\n';
@@ -47,7 +47,7 @@ public:
 		process_queue<queues::boost>(account, baseurl);
 
 		pl() << "Sending queued posts for " << account << '\n';
-		const std::string mediaurl = make_api_url(instanceurl, media_route());
+		const std::string mediaurl = make_api_url(instanceurl, media_route);
 		process_posts(account, baseurl, mediaurl);
 	}
 
@@ -59,14 +59,9 @@ private:
 	post_new_status& new_status;
 	upload_attachments& upload;
 
-	constexpr const std::string_view status_route() const { return "/api/v1/statuses/"; }
-	constexpr const std::string_view media_route() const { return "/api/v1/media"; }
-
-	constexpr const std::pair<std::string_view, std::string_view> favroutepost() const { return { "/favourite", "/unfavourite" }; }
-	constexpr const std::pair<std::string_view, std::string_view> boostroutepost() const { return { "/reblog", "/unreblog" }; }
 
 	template <queues toread>
-	void process_queue(const std::string_view account, const std::string_view baseurl) 
+	void process_queue(const std::string_view account, const std::string_view baseurl)
 	{
 		auto queuefile = get(toread, account);
 
@@ -80,7 +75,7 @@ private:
 
 			const std::string requesturl = paramaterize_url(baseurl, id, undo ? route<toread, false>() : route<toread, true>());
 
-			if (request_with_retries( [&]() { return post(requesturl, access_token); }).first)
+			if (request_with_retries([&]() { return post(requesturl, access_token); }).first)
 				pl() << requesturl << " OK\n";
 			else
 				failedids.push_back(std::move(queuefile.parsed.front()));
@@ -167,7 +162,7 @@ private:
 				{
 					status_params p{ std::move(params) };
 
-					pl() << "Sending post: "; 
+					pl() << "Sending post: ";
 					if (!p.content_warning.empty())
 						pl() << "\nCW: " << p.content_warning << '\n';
 					print_truncated_string(p.body, pl());
@@ -230,54 +225,54 @@ private:
 
 
 	template <queues tosend, bool create>
-		constexpr std::string_view route() const
+	constexpr std::string_view route() const
+	{
+		std::pair<std::string_view, std::string_view> toreturn;
+		if constexpr (tosend == queues::fav)
 		{
-			std::pair<std::string_view, std::string_view> toreturn;
-			if constexpr (tosend == queues::fav)
-			{
-				toreturn = favroutepost();
-			}
-
-			if constexpr (tosend == queues::boost)
-			{
-				toreturn = boostroutepost();
-			}
-
-			return std::get<create ? 0 : 1>(toreturn);
+			toreturn = favroutepost;
 		}
+
+		if constexpr (tosend == queues::boost)
+		{
+			toreturn = boostroutepost;
+		}
+
+		return std::get<create ? 0 : 1>(toreturn);
+	}
 
 	template <typename make_request>
-		std::pair<bool, std::string> request_with_retries(make_request req)
+	std::pair<bool, std::string> request_with_retries(make_request req)
+	{
+		for (unsigned int i = 0; i < retries; i++)
 		{
-			for (unsigned int i = 0; i < retries; i++)
+			net_response response = req();
+
+			pl() << get_error_message(response.status_code, verbose_logs);
+
+			// later, handle what happens if we get rate limited
+
+			if (response.retryable_error)
 			{
-				net_response response = req();
-
-				pl() << get_error_message(response.status_code, verbose_logs);
-
-				// later, handle what happens if we get rate limited
-
-				if (response.retryable_error)
-				{
-					// should retry
-					continue;
-				}
-
-				// some other error, assume unrecoverable
-				if (!response.okay)
-				{
-					auto parsed_error = read_error(response.message);
-					if (!parsed_error.empty())
-						response.message = std::move(parsed_error);
-					pl() << response.message << '\n';
-					return std::make_pair(false, std::move(response.message));
-				}
-
-				// must be 200, OK response
-				return std::make_pair(true, std::move(response.message));
+				// should retry
+				continue;
 			}
-			return std::make_pair(false, "Maximum retries reached.");
+
+			// some other error, assume unrecoverable
+			if (!response.okay)
+			{
+				auto parsed_error = read_error(response.message);
+				if (!parsed_error.empty())
+					response.message = std::move(parsed_error);
+				pl() << response.message << '\n';
+				return std::make_pair(false, std::move(response.message));
+			}
+
+			// must be 200, OK response
+			return std::make_pair(true, std::move(response.message));
 		}
+		return std::make_pair(false, "Maximum retries reached.");
+	}
 
 };
 

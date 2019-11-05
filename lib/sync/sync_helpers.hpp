@@ -8,6 +8,12 @@
 
 #include "../net_interface/net_interface.hpp"
 
+constexpr std::string_view status_route{ "/api/v1/statuses/" };
+constexpr std::string_view media_route{ "/api/v1/media" };
+
+constexpr std::pair<std::string_view, std::string_view> favroutepost{ "/favourite", "/unfavourite" };
+constexpr std::pair<std::string_view, std::string_view> boostroutepost{ "/reblog", "/unreblog" };
+
 bool should_undo(std::string_view& id);
 
 std::string paramaterize_url(std::string_view before, std::string_view middle, std::string_view after);
