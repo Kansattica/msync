@@ -13,6 +13,7 @@ On Linux systems, it works a lot better if it can link in your system's openssl 
 ### Features (that I'm going to implement soon)
 - [X] Multiple account support
 - [X] Queue posts, boosts, and favs
+- [X] Queue up threads before sending.
 - [X] Send posts, boosts, and favs
 - [ ] Download posts from home timeline
 - [ ] Download direct messages
