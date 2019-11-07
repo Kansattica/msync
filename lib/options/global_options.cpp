@@ -44,7 +44,7 @@ std::unordered_map<std::string, user_options> read_accounts(const fs::path& acco
             continue;
         }
 
-        fs::path configfile = userfolder / User_Options_Filename;
+        fs::path configfile = userfolder.path() / User_Options_Filename;
 
         if (!fs::exists(configfile))
         {
