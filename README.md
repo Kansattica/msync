@@ -6,7 +6,7 @@
 `msync` currently supports queueing and sending posts, boosts, and favorites for any number of accounts. Downloading timelines for later reading is on the list.
 
 ### Get msync
-Once `msync` has features, I'll have releases available for download. For now, it has to be built with cmake. If you have a fairly recent version of cmake (3.12 or later), you can simply clone the repo, make a `build` directory, run cmake inside, and cmake will download and build `msync` and its dependencies automatically. 
+Once `msync` has a stable release, I'll have releases available for download. For now, it has to be built with cmake. If you have a fairly recent version of cmake (3.12 or later), you can simply clone the repo, make a `build` directory, run cmake inside, and cmake will download and build `msync` and its dependencies automatically. 
 
 On Linux systems, it works a lot better if it can link in your system's openssl (or whatever other TLS implementation cURL knows how to use) and, if you have it, libcurl. Consider installing these through your package manager.
 
