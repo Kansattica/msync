@@ -3,7 +3,7 @@
 
 `msync` is a command line client for Mastodon (and anything else that implements the same API) that works a little different. `msync` doesn't stay connected to the internet all the time and constantly pull new posts. Instead, it only connects when you use the `msync sync` command. Every other change is stored on your computer until then. You can queue up posts to send, boost, and fav when you're online, download posts, DMs and notifications to look at offline, and do the same for as many accounts as you want.
 
-`msync` doesn't really do much yet, so if you need a command line mastodon client right now, my last project [Mastodial](https://github.com/kansattica/mastodial) can send posts, boosts, and favs and kind of implements the same queueing functionality.
+`msync` currently supports queueing and sending posts, boosts, and favorites for any number of accounts. Downloading timelines for later reading is on the list.
 
 ### Get msync
 Once `msync` has features, I'll have releases available for download. For now, it has to be built with cmake. If you have a fairly recent version of cmake (3.12 or later), you can simply clone the repo, make a `build` directory, run cmake inside, and cmake will download and build `msync` and its dependencies automatically. 
