@@ -507,81 +507,81 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 				REQUIRE(parsed.sync_opts.retries == 10);
 			}
 
-            THEN("the parse is good")
-            {
-                REQUIRE(parsed.okay);
-            }
-        }
-    }
+			THEN("the parse is good")
+			{
+				REQUIRE(parsed.okay);
+			}
+		}
+	}
 
-    GIVEN("A command line that says 'sync' and specifies getting only.")
-    {
-        int argc = 3;
-        char const* argv[]{"msync", "sync", "-g"};
+	GIVEN("A command line that says 'sync' and specifies getting only.")
+	{
+		int argc = 3;
+		char const* argv[]{"msync", "sync", "-g"};
 
-        WHEN("the command line is parsed")
-        {
-            auto parsed = parse(argc, argv);
+		WHEN("the command line is parsed")
+		{
+			auto parsed = parse(argc, argv);
 
-            THEN("the selected mode is sync")
-            {
-                REQUIRE(parsed.selected == mode::sync);
-            }
+			THEN("the selected mode is sync")
+			{
+				REQUIRE(parsed.selected == mode::sync);
+			}
 
-            THEN("account is not set")
-            {
-                REQUIRE(parsed.account.empty());
-            }
+			THEN("account is not set")
+			{
+				REQUIRE(parsed.account.empty());
+			}
 
-            THEN("the correct options are set")
-            {
-                REQUIRE(parsed.sync_opts.get);
-                REQUIRE_FALSE(parsed.sync_opts.send);
-            }
+			THEN("the correct options are set")
+			{
+				REQUIRE(parsed.sync_opts.get);
+				REQUIRE_FALSE(parsed.sync_opts.send);
+			}
 
-            THEN("the parse is good")
-            {
-                REQUIRE(parsed.okay);
-            }
-        }
-    }
+			THEN("the parse is good")
+			{
+				REQUIRE(parsed.okay);
+			}
+		}
+	}
 
-    GIVEN("A command line that says 'sync' and specifies sending only.")
-    {
-        int argc = 3;
-        char const* argv[]{"msync", "sync", "-s"};
+	GIVEN("A command line that says 'sync' and specifies sending only.")
+	{
+		int argc = 3;
+		char const* argv[]{"msync", "sync", "-s"};
 
-        WHEN("the command line is parsed")
-        {
-            auto parsed = parse(argc, argv);
+		WHEN("the command line is parsed")
+		{
+			auto parsed = parse(argc, argv);
 
-            THEN("the selected mode is sync")
-            {
-                REQUIRE(parsed.selected == mode::sync);
-            }
+			THEN("the selected mode is sync")
+			{
+				REQUIRE(parsed.selected == mode::sync);
+			}
 
-            THEN("account is not set")
-            {
-                REQUIRE(parsed.account.empty());
-            }
+			THEN("account is not set")
+			{
+				REQUIRE(parsed.account.empty());
+			}
 
-            THEN("the correct options are set")
-            {
-                REQUIRE(parsed.sync_opts.send);
-                REQUIRE_FALSE(parsed.sync_opts.get);
-            }
+			THEN("the correct options are set")
+			{
+				REQUIRE(parsed.sync_opts.send);
+				REQUIRE_FALSE(parsed.sync_opts.get);
+			}
 
-            THEN("the parse is good")
-            {
-                REQUIRE(parsed.okay);
-            }
-        }
-    }
+			THEN("the parse is good")
+			{
+				REQUIRE(parsed.okay);
+			}
+		}
+	}
 
-    GIVEN("A command line that says 'sync' and specifies an account and number of retries with the long options.")
-    {
-        int argc = 6;
-        char const* argv[]{"msync", "sync", "--retries", "15", "--account", "coolfella"};
+	GIVEN("A command line that says 'sync' and specifies an account and number of retries with the long options.")
+	{
+		int argc = 6;
+		char const* argv[]{"msync", "sync", "--retries", "15", "--account", "coolfella"};
 
 		WHEN("the command line is parsed")
 		{
@@ -602,49 +602,49 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 				REQUIRE(parsed.sync_opts.retries == 15);
 			}
 
-            THEN("the parse is good")
-            {
-                REQUIRE(parsed.okay);
-            }
-        }
-    }
+			THEN("the parse is good")
+			{
+				REQUIRE(parsed.okay);
+			}
+		}
+	}
 
-    GIVEN("A command line that says 'sync' and specifies an account, get only, and number of retries with the long options.")
-    {
-        int argc = 7;
-        char const* argv[]{"msync", "sync", "--get-only", "--retries", "15", "--account", "coolfella"};
+	GIVEN("A command line that says 'sync' and specifies an account, get only, and number of retries with the long options.")
+	{
+		int argc = 7;
+		char const* argv[]{"msync", "sync", "--get-only", "--retries", "15", "--account", "coolfella"};
 
-        WHEN("the command line is parsed")
-        {
-            auto parsed = parse(argc, argv);
+		WHEN("the command line is parsed")
+		{
+			auto parsed = parse(argc, argv);
 
-            THEN("the selected mode is sync")
-            {
-                REQUIRE(parsed.selected == mode::sync);
-            }
+			THEN("the selected mode is sync")
+			{
+				REQUIRE(parsed.selected == mode::sync);
+			}
 
-            THEN("account is set")
-            {
-                REQUIRE(parsed.account == "coolfella");
-            }
+			THEN("account is set")
+			{
+				REQUIRE(parsed.account == "coolfella");
+			}
 
-            THEN("the correct number of retries is set")
-            {
-                REQUIRE(parsed.sync_opts.retries == 15);
-            }
+			THEN("the correct number of retries is set")
+			{
+				REQUIRE(parsed.sync_opts.retries == 15);
+			}
 
-            THEN("the correct options are set")
-            {
-                REQUIRE(parsed.sync_opts.get);
-                REQUIRE_FALSE(parsed.sync_opts.send);
-            }
+			THEN("the correct options are set")
+			{
+				REQUIRE(parsed.sync_opts.get);
+				REQUIRE_FALSE(parsed.sync_opts.send);
+			}
 
-            THEN("the parse is good")
-            {
-                REQUIRE(parsed.okay);
-            }
-        }
-    }
+			THEN("the parse is good")
+			{
+				REQUIRE(parsed.okay);
+			}
+		}
+	}
 }
 
 SCENARIO("The command line parser correctly parses when the user wants to interact with the queue.")
@@ -866,32 +866,32 @@ command_line_option pick_attachment(int number, gen_options& expected)
 
 	switch (number)
 	{
-	case 0:
-		opt.options.push_back("-f");
-		opt.options.push_back("someattach");
-		expected.post.attachments.push_back("someattach");
-		break;
-	case 1:
-		opt.options.push_back("--attach");
-		opt.options.push_back("attacher");
-		opt.options.push_back("somefile");
-		expected.post.attachments.push_back("attacher");
-		expected.post.attachments.push_back("somefile");
-		break;
-	case 2:
-		opt.options.push_back("--file");
-		opt.options.push_back("filey");
-		expected.post.attachments.push_back("filey");
-		break;
-	case 3:
-		break;
-	//case 1:
-	//	opt.options.push_back("-f");
-	//	opt.options.push_back("someotherattach");
-	//	opt.options.push_back("thirdattach");
-	//	expected.post.attachments.push_back("someotherattach");
-	//	expected.post.attachments.push_back("thirdattach");
-	//	break;
+		case 0:
+			opt.options.push_back("-f");
+			opt.options.push_back("someattach");
+			expected.post.attachments.push_back("someattach");
+			break;
+		case 1:
+			opt.options.push_back("--attach");
+			opt.options.push_back("attacher");
+			opt.options.push_back("somefile");
+			expected.post.attachments.push_back("attacher");
+			expected.post.attachments.push_back("somefile");
+			break;
+		case 2:
+			opt.options.push_back("--file");
+			opt.options.push_back("filey");
+			expected.post.attachments.push_back("filey");
+			break;
+		case 3:
+			break;
+			//case 1:
+			//	opt.options.push_back("-f");
+			//	opt.options.push_back("someotherattach");
+			//	opt.options.push_back("thirdattach");
+			//	expected.post.attachments.push_back("someotherattach");
+			//	expected.post.attachments.push_back("thirdattach");
+			//	break;
 	}
 	return opt;
 }
@@ -902,32 +902,32 @@ command_line_option pick_description(int number, gen_options& expected)
 
 	switch (number)
 	{
-	case 0:
-		opt.options.push_back("-d");
-		opt.options.push_back("somedescrip");
-		expected.post.descriptions.push_back("somedescrip");
-		break;
-	case 1:
-		opt.options.push_back("--description");
-		opt.options.push_back("describer");
-		opt.options.push_back("some file!");
-		expected.post.descriptions.push_back("describer");
-		expected.post.descriptions.push_back("some file!");
-	//case 1:
-	//	opt.options.push_back("-d");
-	//	opt.options.push_back("some other description");
-	//	opt.options.push_back("thirddescrip");
-	//	expected.post.descriptions.push_back("some other description");
-	//	expected.post.descriptions.push_back("thirddescrip");
-	//	break;
-	//	break;
-	//case 3:
-	//	opt.options.push_back("--description");
-	//	opt.options.push_back("some jerk doing a thing.");
-	//	expected.post.descriptions.push_back("some jerk doing a thing.");
-	//	break;
-	case 2:
-		break;
+		case 0:
+			opt.options.push_back("-d");
+			opt.options.push_back("somedescrip");
+			expected.post.descriptions.push_back("somedescrip");
+			break;
+		case 1:
+			opt.options.push_back("--description");
+			opt.options.push_back("describer");
+			opt.options.push_back("some file!");
+			expected.post.descriptions.push_back("describer");
+			expected.post.descriptions.push_back("some file!");
+			//case 1:
+			//	opt.options.push_back("-d");
+			//	opt.options.push_back("some other description");
+			//	opt.options.push_back("thirddescrip");
+			//	expected.post.descriptions.push_back("some other description");
+			//	expected.post.descriptions.push_back("thirddescrip");
+			//	break;
+			//	break;
+			//case 3:
+			//	opt.options.push_back("--description");
+			//	opt.options.push_back("some jerk doing a thing.");
+			//	expected.post.descriptions.push_back("some jerk doing a thing.");
+			//	break;
+		case 2:
+			break;
 	}
 	return opt;
 }
@@ -939,20 +939,19 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 	{
 		// try every combination of bits. note that the ranges are half-open, including the 0 and excluding the maximum.
 		const auto combination = GENERATE(range(0, 0b1111 + 1));
-		const auto longopt = GENERATE(range(0, 0b11111 + 1));
+		const auto longopt = GENERATE(range(0, 0b111111 + 1));
 		const auto attach = GENERATE(0, 1, 2, 3);
 		const auto description = GENERATE(0, 1, 2);
-		const auto visopt = GENERATE(0, 1, 2);
 		const auto vis = GENERATE(
-			std::make_pair("", visibility::default_vis),
-			std::make_pair("default", visibility::default_vis),
-			std::make_pair("public", visibility::pub),
-			std::make_pair("private", visibility::priv),
-			std::make_pair("followersonly", visibility::priv),
-			std::make_pair("unlisted", visibility::unlisted),
-			std::make_pair("dm", visibility::direct),
-			std::make_pair("direct", visibility::direct)
-		);
+				std::make_pair("", visibility::default_vis),
+				std::make_pair("default", visibility::default_vis),
+				std::make_pair("public", visibility::pub),
+				std::make_pair("private", visibility::priv),
+				std::make_pair("followersonly", visibility::priv),
+				std::make_pair("unlisted", visibility::unlisted),
+				std::make_pair("dm", visibility::direct),
+				std::make_pair("direct", visibility::direct)
+				);
 
 		gen_options expected;
 		std::vector<command_line_option> options;
@@ -961,18 +960,14 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		if (vis.first[0] != '\0')
 		{
 			command_line_option opt;
-			switch(visopt)
-			{
-				case 0:
-					opt.options.push_back("-p");
-					break;
-				case 1:
-					opt.options.push_back("--privacy");
-					break;
-				case 2:
-					opt.options.push_back("--visibility");
-					break;
-			}
+
+			if (flag_set(longopt, 5))
+				opt.options.push_back("-p");
+			else if (flag_set(longopt, 0)) // too many combinations makes the tests way too long
+				opt.options.push_back("--privacy");
+			else
+				opt.options.push_back("--visibility");
+
 			opt.options.push_back(vis.first);
 			expected.post.vis = vis.second;
 			options.push_back(std::move(opt));
