@@ -59,6 +59,16 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 				option("-g", "--get-only").set(ret.sync_opts.send, false).doc("Only download posts, don't send anything from queues.")
 				));
 
+	const auto visibilities = one_of(
+		command("default").set(ret.gen_opt.post.vis, visibility::default_vis),
+		command("public").set(ret.gen_opt.post.vis, visibility::pub),
+		command("private").set(ret.gen_opt.post.vis, visibility::priv),
+		command("followersonly").set(ret.gen_opt.post.vis, visibility::priv),
+		command("unlisted").set(ret.gen_opt.post.vis, visibility::unlisted),
+		command("dm").set(ret.gen_opt.post.vis, visibility::direct),
+		command("direct").set(ret.gen_opt.post.vis, visibility::direct)
+	);
+
 	const auto genMode = (command("gen", "generate").set(ret.selected, mode::gen).doc("Generate a post template in the current folder. Edit this file afterwards to add a body.") &
 			(
 			 (option("-f", "--file", "--attach") & values(match::prefix_not("-"), "file path", ret.gen_opt.post.attachments)).doc("Attach these files to the post."),
@@ -66,7 +76,8 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 			 (option("-o", "--output") & value("filename", ret.gen_opt.filename)).doc("Specify an output file. Default is new_post."),
 			 (option("-r", "--reply-to") & value("reply_to", ret.gen_opt.post.reply_to_id)).doc("Reply to the specified post ID."),
 			 (option("-i", "--reply-id") & value("id", ret.gen_opt.post.reply_id)).doc("Set an ID so that this post can be replied to with --reply-to."),
-			 (option("-c", "--content-warning", "--cw") & value("warning", ret.gen_opt.post.content_warning)).doc("Set a content warning (or subject) for the post.")
+			 (option("-c", "--content-warning", "--cw") & value("warning", ret.gen_opt.post.content_warning)).doc("Set a content warning (or subject) for the post."),
+			 (option("-p", "--privacy", "--visibility") & visibilities).doc("Set the post's visibility.")
 			) % "generate options");
 
 	const auto queueMode = (command("q", "queue").set(ret.selected, mode::queue).doc("Manage queued favs, boosts, and posts") &

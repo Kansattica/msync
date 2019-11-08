@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <utility>
 
 #include "../console/optionparsing/parseoptions.hpp"
 
@@ -941,10 +942,41 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		const auto longopt = GENERATE(range(0, 0b11111 + 1));
 		const auto attach = GENERATE(0, 1, 2, 3);
 		const auto description = GENERATE(0, 1, 2);
+		const auto visopt = GENERATE(0, 1, 2);
+		const auto vis = GENERATE(
+			std::make_pair("", visibility::default_vis),
+			std::make_pair("default", visibility::default_vis),
+			std::make_pair("public", visibility::pub),
+			std::make_pair("private", visibility::priv),
+			std::make_pair("followersonly", visibility::priv),
+			std::make_pair("unlisted", visibility::unlisted),
+			std::make_pair("dm", visibility::direct),
+			std::make_pair("direct", visibility::direct)
+		);
 
 		gen_options expected;
 		std::vector<command_line_option> options;
-		options.reserve(6);
+		options.reserve(7);
+
+		if (!vis.first[0] == '\0')
+		{
+			command_line_option opt;
+			switch(visopt)
+			{
+				case 0:
+					opt.options.push_back("-p");
+					break;
+				case 1:
+					opt.options.push_back("--privacy");
+					break;
+				case 2:
+					opt.options.push_back("--visibility");
+					break;
+			}
+			opt.options.push_back(vis.first);
+			expected.post.vis = vis.second;
+			options.push_back(std::move(opt));
+		}
 
 		if (attach != 3)
 		{
