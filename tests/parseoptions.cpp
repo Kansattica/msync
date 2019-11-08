@@ -934,6 +934,31 @@ command_line_option pick_description(int number, gen_options& expected)
 	return opt;
 }
 
+auto pick_visibility()
+{
+	switch (zero_to_n(7))
+	{
+		case 0:
+			return std::make_pair("", visibility::default_vis);
+		case 1:
+			return std::make_pair("default", visibility::default_vis);
+		case 2:
+			return std::make_pair("public", visibility::pub);
+		case 3:
+			return std::make_pair("private", visibility::priv);
+		case 4:
+			return std::make_pair("followersonly", visibility::priv);
+		case 5:
+			return std::make_pair("unlisted", visibility::unlisted);
+		case 6:
+			return std::make_pair("dm", visibility::direct);
+		case 7:
+			return std::make_pair("direct", visibility::direct);
+	}
+
+	return std::make_pair("Well, this shouldn't happen.", visibility::default_vis);
+}
+
 
 SCENARIO("The command line parser recognizes when the user wants to generate a file.", "[long_run]")
 {
@@ -944,16 +969,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		const auto longcommand = GENERATE(true, false);
 		const auto attach = GENERATE(0, 1, 2, 3);
 		const auto description = GENERATE(0, 1, 2);
-		const auto vis = GENERATE(
-				std::make_pair("", visibility::default_vis),
-				std::make_pair("default", visibility::default_vis),
-				std::make_pair("public", visibility::pub),
-				std::make_pair("private", visibility::priv),
-				std::make_pair("followersonly", visibility::priv),
-				std::make_pair("unlisted", visibility::unlisted),
-				std::make_pair("dm", visibility::direct),
-				std::make_pair("direct", visibility::direct)
-				);
+		const auto vis = pick_visibility();
 
 		gen_options expected;
 		std::vector<command_line_option> options;
