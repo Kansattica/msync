@@ -1071,6 +1071,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 
 					REQUIRE(expected.filename == parsed.gen_opt.filename);
 					REQUIRE(expected.post.attachments == parsed.gen_opt.post.attachments);
+					REQUIRE(expected.post.vis == parsed.gen_opt.post.vis);
 					REQUIRE(expected.post.descriptions == parsed.gen_opt.post.descriptions);
 					REQUIRE(expected.post.content_warning == parsed.gen_opt.post.content_warning);
 					REQUIRE(expected.post.reply_to_id == parsed.gen_opt.post.reply_to_id);
