@@ -958,7 +958,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		std::vector<command_line_option> options;
 		options.reserve(7);
 
-		if (!vis.first[0] == '\0')
+		if (vis.first[0] != '\0')
 		{
 			command_line_option opt;
 			switch(visopt)
