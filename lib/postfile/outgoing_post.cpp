@@ -7,7 +7,8 @@
 #include <string_view>
 #include <algorithm>
 
-constexpr std::array<std::array<std::string_view, 2>, 4> VISIBILITIES = { {
+constexpr std::array<std::array<std::string_view, 2>, 5> VISIBILITIES = { {
+	{"default", ""},
 	{"public", ""},
 	{"private", "followersonly"},
 	{"unlisted", ""},
@@ -20,6 +21,7 @@ constexpr std::array<std::string_view, 6> OPTIONS = {
 
 std::string post_content::visibility_string() const
 {
+	if (vis == visibility::default_vis) { return ""; }
 	return std::string{ VISIBILITIES[static_cast<int>(vis)][0] };
 }
 
@@ -125,6 +127,7 @@ void Write(post_content&& post, std::ofstream& of)
 		of << '\n';
 	}
 
+
 	of << "visibility=" << VISIBILITIES[(int)post.vis][0] << '\n';
 
 	of << "--- post body below this line ---\n";
@@ -167,11 +170,15 @@ bool is_snip(std::string_view line)
 
 visibility parse_visibility(std::string_view value)
 {
-	static_assert(VISIBILITIES.size() == 4);
+	static_assert(VISIBILITIES.size() == 5);
+	static_assert(VISIBILITIES[static_cast<int>(visibility::default_vis)][0] == "default");
 	static_assert(VISIBILITIES[static_cast<int>(visibility::pub)][0] == "public");
 	static_assert(VISIBILITIES[static_cast<int>(visibility::priv)][0] == "private");
 	static_assert(VISIBILITIES[static_cast<int>(visibility::unlisted)][0] == "unlisted");
 	static_assert(VISIBILITIES[static_cast<int>(visibility::direct)][0] == "direct");
+
+	if (value.empty())
+		return visibility::default_vis;
 
 	for (size_t visibility_index = 0; visibility_index < VISIBILITIES.size(); visibility_index++)
 	{

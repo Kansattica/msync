@@ -32,7 +32,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 
 			THEN("everything else is set to its default")
 			{
-				REQUIRE(result.parsed.vis == visibility::pub);
+				REQUIRE(result.parsed.vis == visibility::default_vis);
 				REQUIRE(result.parsed.attachments.empty());
 				REQUIRE(result.parsed.content_warning.empty());
 				REQUIRE(result.parsed.reply_to_id.empty());
@@ -65,7 +65,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 
 			THEN("everything else is set to its default")
 			{
-				REQUIRE(result.parsed.vis == visibility::pub);
+				REQUIRE(result.parsed.vis == visibility::default_vis);
 				REQUIRE(result.parsed.content_warning.empty());
 				REQUIRE(result.parsed.reply_to_id.empty());
 			}
@@ -99,7 +99,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 
 			THEN("everything else is set to its default")
 			{
-				REQUIRE(result.parsed.vis == visibility::pub);
+				REQUIRE(result.parsed.vis == visibility::default_vis);
 				REQUIRE(result.parsed.attachments.empty());
 				REQUIRE(result.parsed.content_warning.empty());
 				REQUIRE(result.parsed.reply_to_id.empty());
@@ -129,7 +129,8 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 			"", "Hi!");
 
 		const auto visibility = GENERATE(
-			std::make_pair("", visibility::pub),
+			std::make_pair("", visibility::default_vis),
+			std::make_pair("default", visibility::default_vis),
 			std::make_pair("public", visibility::pub),
 			std::make_pair("private", visibility::priv),
 			std::make_pair("followersonly", visibility::priv),

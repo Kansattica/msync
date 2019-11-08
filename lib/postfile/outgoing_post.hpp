@@ -9,7 +9,7 @@
 
 enum class visibility
 {
-	pub, priv, unlisted, direct
+	default_vis, pub, priv, unlisted, direct
 };
 
 enum class raw_text_mode
@@ -25,7 +25,7 @@ struct post_content
 	std::string content_warning;
 	std::vector<std::string> attachments;
 	std::vector<std::string> descriptions;
-	visibility vis = visibility::pub;
+	visibility vis = visibility::default_vis;
 
 	std::string visibility_string() const;
 

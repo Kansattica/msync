@@ -518,7 +518,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 				REQUIRE(first.params.body == "This one just has a body.");
 				REQUIRE(first.params.content_warning.empty());
 				REQUIRE(first.params.reply_to.empty());
-				REQUIRE(first.params.visibility == "public");
+				REQUIRE(first.params.visibility.empty());
 
 				const auto& second = mocknew.arguments[1];
 				REQUIRE(second.params.attachment_ids.empty());
@@ -614,7 +614,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 				REQUIRE(first.params.body == "This one just has a body.");
 				REQUIRE(first.params.content_warning.empty());
 				REQUIRE(first.params.reply_to.empty());
-				REQUIRE(first.params.visibility == "public");
+				REQUIRE(first.params.visibility.empty());
 
 				const auto& second = mocknew.arguments[1];
 				REQUIRE(second.params.attachment_ids.empty());
@@ -706,7 +706,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 				REQUIRE(first.params.attachment_ids.empty());
 				REQUIRE(first.params.body == "This one just has a body.");
 				REQUIRE(first.params.content_warning.empty());
-				REQUIRE(first.params.visibility == "public");
+				REQUIRE(first.params.visibility.empty());
 
 				// the second call should never be made because it was a reply to the first.
 
@@ -789,7 +789,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 					REQUIRE(first.params.body == "This one just has a body.");
 					REQUIRE(first.params.content_warning.empty());
 					REQUIRE(first.params.reply_to.empty());
-					REQUIRE(first.params.visibility == "public");
+					REQUIRE(first.params.visibility.empty());
 				}
 
 				// the other replies will be to the last ID for this post
