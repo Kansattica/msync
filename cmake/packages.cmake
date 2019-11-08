@@ -79,7 +79,7 @@ UNSET(CURL_LIBRARIES)
 UNSET(CURL_VERSION_STRING)
 
 if (NOT USE_SYSTEM_CURL AND UNIX)
-	# if we're building our own curl, statically link openssl
+	# you can try to statically link openssl, but you'll run into problems with the cert store
 	#set (OPENSSL_USE_STATIC_LIBS TRUE)
 	set (OPENSSL_USE_STATIC_LIBS FALSE)
 
