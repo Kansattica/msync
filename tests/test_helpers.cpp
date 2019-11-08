@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <whereami.h>
+#include <random>
 
 #include <fstream>
 
@@ -55,4 +56,19 @@ size_t count_files_in_directory(const fs::path& tocheck)
 void touch(const fs::path& totouch)
 {
 	std::ofstream of(totouch, std::ios::out | std::ios::app);
+}
+
+std::mt19937 gen(std::random_device{}());
+
+
+bool flip_coin()
+{
+	static std::uniform_int_distribution<> dis(0, 1);
+	return dis(gen) == 0;
+}
+
+int zero_to_n(int n)
+{
+	std::uniform_int_distribution<> dis(0, n);
+	return dis(gen);
 }

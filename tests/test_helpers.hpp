@@ -11,6 +11,9 @@ std::vector<std::string> read_lines(const fs::path& toread);
 size_t count_files_in_directory(const fs::path& tocheck);
 void touch(const fs::path& totouch);
 
+bool flip_coin();
+int zero_to_n(int n);
+
 //ensures a file doesn't exist before and after each test run.
 struct test_file
 {

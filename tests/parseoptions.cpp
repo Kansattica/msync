@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <utility>
 
+#include "test_helpers.hpp"
+
 #include "../console/optionparsing/parseoptions.hpp"
 
 SCENARIO("The command line parser recognizes when the user wants to start a new account.")
@@ -913,13 +915,13 @@ command_line_option pick_description(int number, gen_options& expected)
 			opt.options.push_back("some file!");
 			expected.post.descriptions.push_back("describer");
 			expected.post.descriptions.push_back("some file!");
+			break;
 			//case 1:
 			//	opt.options.push_back("-d");
 			//	opt.options.push_back("some other description");
 			//	opt.options.push_back("thirddescrip");
 			//	expected.post.descriptions.push_back("some other description");
 			//	expected.post.descriptions.push_back("thirddescrip");
-			//	break;
 			//	break;
 			//case 3:
 			//	opt.options.push_back("--description");
@@ -939,7 +941,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 	{
 		// try every combination of bits. note that the ranges are half-open, including the 0 and excluding the maximum.
 		const auto combination = GENERATE(range(0, 0b1111 + 1));
-		const auto longopt = GENERATE(range(0, 0b111111 + 1));
+		const auto longcommand = GENERATE(true, false);
 		const auto attach = GENERATE(0, 1, 2, 3);
 		const auto description = GENERATE(0, 1, 2);
 		const auto vis = GENERATE(
@@ -961,12 +963,18 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		{
 			command_line_option opt;
 
-			if (flag_set(longopt, 5))
-				opt.options.push_back("-p");
-			else if (flag_set(longopt, 0)) // too many combinations makes the tests way too long
-				opt.options.push_back("--privacy");
-			else
-				opt.options.push_back("--visibility");
+			switch (zero_to_n(2))
+			{
+				case 0:
+					opt.options.push_back("-p");
+					break;
+				case 1:
+					opt.options.push_back("--privacy");
+					break;
+				case 2:
+					opt.options.push_back("--visibility");
+					break;
+			}
 
 			opt.options.push_back(vis.first);
 			expected.post.vis = vis.second;
@@ -986,7 +994,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		if (flag_set(combination, 0))
 		{
 			command_line_option opt;
-			if (flag_set(longopt, 0))
+			if (flip_coin())
 				opt.options.push_back("-o");
 			else
 				opt.options.push_back("--output");
@@ -999,7 +1007,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		if (flag_set(combination, 1))
 		{
 			command_line_option opt;
-			if (flag_set(longopt, 1))
+			if (flip_coin())
 				opt.options.push_back("-r");
 			else
 				opt.options.push_back("--reply-to");
@@ -1012,12 +1020,19 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		if (flag_set(combination, 2))
 		{
 			command_line_option opt;
-			if (flag_set(longopt, 2))
-				opt.options.push_back("-c");
-			else if (flag_set(longopt, 0)) // I don't really want to make the number of combinations even worse
-				opt.options.push_back("--content-warning");
-			else
-				opt.options.push_back("--cw");
+
+			switch (zero_to_n(2))
+			{
+				case 0:
+					opt.options.push_back("-c");
+					break;
+				case 1:
+					opt.options.push_back("--content-warning");
+					break;
+				case 2:
+					opt.options.push_back("--cw");
+					break;
+			}
 
 			opt.options.push_back("there's content in here!");
 			expected.post.content_warning = "there's content in here!";
@@ -1027,7 +1042,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		if (flag_set(combination, 3))
 		{
 			command_line_option opt;
-			if (flag_set(longopt, 3))
+			if (flip_coin())
 				opt.options.push_back("-i");
 			else
 				opt.options.push_back("--reply-id");
@@ -1042,11 +1057,12 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 
 		std::vector<const char*> argv;
 
+
 		WHEN("the command line is parsed")
 		{
 			do
 			{
-				if (flag_set(longopt, 4))
+				if (longcommand)
 					argv = { "msync", "gen" };
 				else
 					argv = { "msync", "generate" };
