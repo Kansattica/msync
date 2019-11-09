@@ -122,6 +122,7 @@ int main(int argc, const char* argv[])
 				else
 					send.send(user->first, *user->second.get_option(user_option::instance_url), *user->second.get_option(user_option::access_token));
 			}
+			should_print_newline = false;
 			break;
 		case mode::help:
 			should_print_newline = false;
