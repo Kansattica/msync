@@ -79,33 +79,33 @@ net_response upload_media(std::string_view url, std::string_view access_token, c
 	));
 }
 
-void add_if_value(cpr::Payload& params, const char* key, std::string&& value)
+void add_if_value(cpr::Payload& params, const char* key, const std::string& value)
 {
 	if (!value.empty())
-		params.AddPair(cpr::Pair(key, std::move(value)));
+		params.AddPair(cpr::Pair(key, value));
 }
 
-void add_array(cpr::Payload& params, const char* key, std::vector<std::string>&& values)
+void add_array(cpr::Payload& params, const char* key, const std::vector<std::string>& values)
 {
 	for (auto&& value : values)
 	{
-		params.AddPair(cpr::Pair(key, std::move(value)));
+		params.AddPair(cpr::Pair(key, value));
 	}
 
 }
 
-net_response new_status(std::string_view url, std::string_view access_token, status_params params)
+net_response new_status(std::string_view url, std::string_view access_token, const status_params& params)
 {
 	cpr::Payload post_params{};
-	add_if_value(post_params, "status", std::move(params.body));
-	add_if_value(post_params, "spoiler_text", std::move(params.content_warning));
-	add_if_value(post_params, "visibility", std::move(params.visibility));
-	add_if_value(post_params, "in_reply_to_id", std::move(params.reply_to));
+	add_if_value(post_params, "status", params.body);
+	add_if_value(post_params, "spoiler_text", params.content_warning);
+	add_if_value(post_params, "visibility", params.visibility);
+	add_if_value(post_params, "in_reply_to_id", params.reply_to);
 
 	// the mastodon api page doesn't mention this, but apparently this is a feature of rails
 	// (that the other mastodon api libs use)
 	// that lets you specify arrays with empty brackets like this
-	add_array(post_params, "media_ids[]", std::move(params.attachment_ids));
+	add_array(post_params, "media_ids[]", params.attachment_ids);
 
 
 	return handle_response(

@@ -160,16 +160,14 @@ private:
 				std::string parsed_status_id;
 				if (succeeded)
 				{
-					status_params p{ std::move(params) };
-
 					pl() << "Sending post: ";
-					if (!p.content_warning.empty())
-						pl() << "\nCW: " << p.content_warning << '\n';
-					print_truncated_string(p.body, pl());
+					if (!params.content_warning.empty())
+						pl() << "\nCW: " << params.content_warning << '\n';
+					print_truncated_string(params.body, pl());
 					pl() << '\n';
 
 					std::string response;
-					std::tie(succeeded, response) = request_with_retries([&]() { return new_status(statusurl, access_token, p); });
+					std::tie(succeeded, response) = request_with_retries([&]() { return new_status(statusurl, access_token, params); });
 
 					if (succeeded)
 					{
@@ -177,11 +175,6 @@ private:
 						auto parsed_status = read_status(response);
 						pl() << "Created post at " << parsed_status.url << '\n';
 						parsed_status_id = std::move(parsed_status.id);
-					}
-					else
-					{
-						// we have to save that reply_to value back to the file if it failed
-						params.reply_to = std::move(p.reply_to);
 					}
 				}
 

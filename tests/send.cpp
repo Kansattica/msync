@@ -73,11 +73,11 @@ struct mock_network
 		return toreturn;
 	}
 
-	net_response mock_new_status(std::string_view url, std::string_view access_token, status_params params)
+	net_response mock_new_status(std::string_view url, std::string_view access_token, const status_params& params)
 	{
 		static unsigned int id = 1000000;
 		std::string str_id = std::to_string(++id);
-		arguments.push_back(mock_args{ std::string {url}, std::string { access_token }, std::move(params), {}, str_id});
+		arguments.push_back(mock_args{ std::string {url}, std::string { access_token }, params, {}, str_id});
 
 		net_response toreturn;
 		toreturn.retryable_error = (--succeed_after > 0);
@@ -133,11 +133,11 @@ struct mock_network_delete : public mock_network
 struct mock_network_new_status : public mock_network
 {
 	std::string fail_if_body;
-	net_response operator()(std::string_view url, std::string_view access_token, status_params params)
+	net_response operator()(std::string_view url, std::string_view access_token, const status_params& params)
 	{
 		if (!fail_if_body.empty())
 			fatal_error = fail_if_body == params.body;
-		return mock_new_status(url, access_token, std::move(params));
+		return mock_new_status(url, access_token, params);
 	}
 };
 
