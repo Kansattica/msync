@@ -131,7 +131,7 @@ int main(int argc, const char* argv[])
 			pl() << "[option not implemented]";
 		}
 	}
-	catch (const std::exception & e)
+	catch (const std::exception& e)
 	{
 		pl() << "An error occurred: " << e.what();
 		pl() << "\nFor account: " << parsed.account;
