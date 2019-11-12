@@ -220,11 +220,11 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("the URLs are as expected.")
 			{
-				REQUIRE(std::equal(mockpost.arguments.begin(), mockpost.arguments.end(), testvect.begin(), testvect.end(), [&](const auto& actual, const auto& expected)
-					{
-						return actual.url == make_expected_url(expected, std::get<1>(queue), instanceurl);
-					}));
-
+				REQUIRE(testvect.size() == mockpost.arguments.size());
+				for (unsigned int i = 0; i < testvect.size(); i++)
+				{
+					REQUIRE(mockpost.arguments[i].url == make_expected_url(testvect[i], std::get<1>(queue), instanceurl));
+				}
 			}
 
 			THEN("only the post function was called.")
@@ -272,10 +272,11 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			THEN("the URLs are as expected.")
 			{
 				//testvect doesn't have the trailing minus signs, which is what we want for this test.
-				REQUIRE(std::equal(mockpost.arguments.begin(), mockpost.arguments.end(), testvect.begin(), testvect.end(), [&](const auto& actual, const auto& expected)
-					{
-						return actual.url == make_expected_url(expected, std::get<2>(queue), instanceurl);
-					}));
+				REQUIRE(testvect.size() == mockpost.arguments.size());
+				for (unsigned int i = 0; i < testvect.size(); i++)
+				{
+					REQUIRE(mockpost.arguments[i].url == make_expected_url(testvect[i], std::get<2>(queue), instanceurl));
+				}
 
 			}
 
@@ -335,10 +336,11 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			THEN("the URLs are as expected.")
 			{
 				const auto repeated = repeat_each_element(testvect, retries.second);
-				REQUIRE(std::equal(mockpost.arguments.begin(), mockpost.arguments.end(), repeated.begin(), repeated.end(), [&](const auto& actual, const auto& expected)
-					{
-						return actual.url == make_expected_url(expected, std::get<1>(queue), instanceurl);
-					}));
+				REQUIRE(repeated.size() == mockpost.arguments.size());
+				for (unsigned int i = 0; i < repeated.size(); i++)
+				{
+					REQUIRE(mockpost.arguments[i].url == make_expected_url(repeated[i], std::get<1>(queue), instanceurl));
+				}
 
 			}
 
@@ -399,10 +401,11 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("the URLs are as expected.")
 			{
-				REQUIRE(std::equal(mockpost.arguments.begin(), mockpost.arguments.end(), testvect.begin(), testvect.end(), [&](const auto& actual, const auto& expected)
-					{
-						return actual.url == make_expected_url(expected, std::get<1>(queue), instanceurl);
-					}));
+				REQUIRE(testvect.size() == mockpost.arguments.size());
+				for (unsigned int i = 0; i < testvect.size(); i++)
+				{
+					REQUIRE(mockpost.arguments[i].url == make_expected_url(testvect[i], std::get<1>(queue), instanceurl));
+				}
 
 			}
 
