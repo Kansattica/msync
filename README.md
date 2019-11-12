@@ -10,7 +10,9 @@ Once `msync` has a stable release, I'll have releases available for download. Fo
 
 On Linux systems, it works a lot better if it can link in your system's openssl (or whatever other TLS implementation cURL knows how to use) and, if you have it, libcurl. Consider installing these through your package manager.
 
-### Features (that I'm going to implement soon)
+I currently test `msync` on Debian, Ubuntu, and Manjaro Linux with both clang and gcc, as well as the Microsoft compiler on Windows.
+
+### Features (that are implemented or coming soon)
 - [X] Multiple account support
 - [X] Queue posts, boosts, and favs
 - [X] Queue up threads before sending.
@@ -29,10 +31,11 @@ On Linux systems, it works a lot better if it can link in your system's openssl 
 - [ ] Nicer UI, like a minimal webpage to show downloaded posts in.
 
 ### Build Dependencies
-Cmake will download all of these for you, except it'll use your system's libcurl if you have it.
-- C++ 17 std::filesystem support
+Cmake will download all of these for you, except it'll use your system's libcurl if you have it. I recommend at least having an SSL/TLS library for cmake to find and dynamically link.
+You can verify that this setup works by building tests and running `net_tests`.
 - [Nlohmann Json](https://github.com/nlohmann/json)
-- [whereami](https://github.com/gpakosz/whereami.git)
+- [whereami](https://github.com/gpakosz/whereami)
 - [clipp](https://github.com/muellan/clipp)
 - [CPR](https://github.com/whoshuu/cpr)
 - [curl](https://github.com/curl/curl)
+- [catch2](https://github.com/catchorg/Catch2) if MSYNC_BUILD_TESTS is set.
