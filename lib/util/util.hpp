@@ -26,14 +26,14 @@ std::vector<std::string_view> split_string(const std::string_view tosplit, const
 	{
 		if (tosplit[i] == on)
 		{
-			if constexpr (!allowEmpty)
+			if constexpr (allowEmpty)
 			{
-				if (i > start)
-					toreturn.push_back(tosplit.substr(start, (i - start)));
+				toreturn.push_back(tosplit.substr(start, (i - start)));
 			}
 			else
 			{
-				toreturn.push_back(tosplit.substr(start, (i - start)));
+				if (i > start)
+					toreturn.push_back(tosplit.substr(start, (i - start)));
 			}
 			start = i + 1;
 		}
