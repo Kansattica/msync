@@ -10,7 +10,7 @@ Once `msync` has a stable release, I'll have releases available for download. Fo
 
 On Linux systems, it works a lot better if it can link in your system's openssl (or whatever other TLS implementation cURL knows how to use) and, if you have it, libcurl. Consider installing these through your package manager.
 
-I currently test `msync` on Debian, Ubuntu, and Manjaro Linux with both clang and gcc, as well as the Microsoft compiler on Windows.
+I currently build and ensure all tests pass on Linux with both clang and gcc, as well as the Microsoft compiler on Windows.
 
 ### Features (that are implemented or coming soon)
 - [X] Multiple account support
@@ -28,6 +28,7 @@ I currently test `msync` on Debian, Ubuntu, and Manjaro Linux with both clang an
 
 ### Roadmap (things for later)
 - [ ] Queue and send profile updates
+- [ ] Poll support
 - [ ] Nicer UI, like a minimal webpage to show downloaded posts in.
 
 ### Build Dependencies
