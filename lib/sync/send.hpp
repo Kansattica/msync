@@ -73,7 +73,7 @@ private:
 
 			const bool undo = should_undo(id);
 
-			const std::string requesturl = paramaterize_url(baseurl, id, undo ? route<toread, false>() : route<toread, true>());
+			const std::string requesturl = paramaterize_url(baseurl, id, route<toread>(undo));
 
 			if (request_with_retries([&]() { return post(requesturl, access_token); }).first)
 				pl() << requesturl << " OK\n";
@@ -215,8 +215,8 @@ private:
 	}
 
 
-	template <queues tosend, bool create>
-	constexpr std::string_view route() const
+	template <queues tosend>
+	constexpr std::string_view route(bool undo) const
 	{
 		std::pair<std::string_view, std::string_view> toreturn;
 		if constexpr (tosend == queues::fav)
@@ -229,7 +229,7 @@ private:
 			toreturn = boostroutepost;
 		}
 
-		return std::get<create ? 0 : 1>(toreturn);
+		return undo ? toreturn.second : toreturn.first;
 	}
 
 	template <typename make_request>
