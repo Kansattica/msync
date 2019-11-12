@@ -20,9 +20,11 @@ add_library(util STATIC "")
 add_library(optionparsing STATIC "")
 add_library(printlog STATIC "")
 add_library(postfile STATIC "")
+add_library(postlist STATIC "")
 add_library(net STATIC "")
 add_library(netinterface INTERFACE)
 add_library(filebacked INTERFACE)
+add_library(entities INTERFACE)
 add_library(constants INTERFACE)
 add_library(exception INTERFACE)
 add_executable(msync "")
@@ -39,6 +41,7 @@ add_subdirectory(lib/options)
 add_subdirectory(lib/constants)
 add_subdirectory(lib/net)
 add_subdirectory(lib/postfile)
+add_subdirectory(lib/postlist)
 add_subdirectory(lib/exception)
 add_subdirectory(lib/printlog)
 add_subdirectory(lib/util)
@@ -52,12 +55,16 @@ target_link_libraries(net PRIVATE ${CPR_LIBRARIES} netinterface filesystem)
 target_include_directories(filebacked INTERFACE lib/filebacked)
 target_link_libraries(filebacked INTERFACE filesystem)
 
-target_link_libraries(sync PRIVATE printlog queue util netinterface postfile constants filesystem nlohmann_json::nlohmann_json)
+target_include_directories(entities INTERFACE lib/entities)
+
+target_link_libraries(sync PRIVATE entities printlog queue util netinterface postfile constants filesystem nlohmann_json::nlohmann_json)
 
 target_link_libraries(options PRIVATE whereami printlog exception filebacked constants)
 target_link_libraries(options PUBLIC filesystem) 
 
 target_link_libraries(postfile PRIVATE filebacked printlog util)
+
+target_link_libraries(postlist PRIVATE filesystem entities)
 
 target_link_libraries(queue PRIVATE constants printlog options filebacked exception postfile) 
 

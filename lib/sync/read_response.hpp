@@ -2,14 +2,7 @@
 #define _READ_RESPONSE_
 #include <string>
 
-struct mastodon_status
-{
-	std::string id;
-	std::string url;
-	std::string content_warning;
-	std::string content;
-	std::string visibility;
-};
+#include "../entities/entities.hpp"
 
 std::string read_error(const std::string& response_json);
 
