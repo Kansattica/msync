@@ -91,12 +91,12 @@ struct mock_network
 		return toreturn;
 	}
 
-	net_response mock_upload(std::string_view url, std::string_view access_token, const fs::path& file, std::string description)
+	net_response mock_upload(std::string_view url, std::string_view access_token, const fs::path& file, const std::string& description)
 	{
 		static unsigned int id = 100;
 		std::string str_id = std::to_string(++id);
 		arguments.push_back(mock_args{ std::string {url}, std::string { access_token }, {},
-			attachment{file, std::move(description)}, str_id });
+			attachment{file, description}, str_id });
 
 		net_response toreturn;
 		toreturn.retryable_error = (--succeed_after > 0);
@@ -143,9 +143,9 @@ struct mock_network_new_status : public mock_network
 
 struct mock_network_upload : public mock_network
 {
-	net_response operator()(std::string_view url, std::string_view access_token, const fs::path& file, std::string description)
+	net_response operator()(std::string_view url, std::string_view access_token, const fs::path& file, const std::string& description)
 	{
-		return mock_upload(url, access_token, file, std::move(description));
+		return mock_upload(url, access_token, file, description);
 	}
 };
 

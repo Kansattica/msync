@@ -69,12 +69,12 @@ net_response simple_delete(const std::string_view url, const std::string_view ac
 	);
 }
 
-net_response upload_media(std::string_view url, std::string_view access_token, const fs::path& file, std::string description)
+net_response upload_media(std::string_view url, std::string_view access_token, const fs::path& file, const std::string& description)
 {
 	return handle_response(
 		cpr::Post(cpr::Url{ url },
 			cpr::Header{ {authorization_key_header, make_bearer(access_token) } },
-			cpr::Multipart{ { "description", std::move(description) },
+			cpr::Multipart{ { "description", description },
 							{ "file", cpr::File{file.string()} } }
 	));
 }
