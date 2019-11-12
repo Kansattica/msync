@@ -32,7 +32,7 @@ I currently test `msync` on Debian, Ubuntu, and Manjaro Linux with both clang an
 
 ### Build Dependencies
 Cmake will download all of these for you, except it'll use your system's libcurl if you have it. I recommend at least having an SSL/TLS library for cmake to find and dynamically link.
-You can verify that this setup works by building tests and running `net_tests`.
+You can verify that your setup works by building tests and running `net_tests`.
 - [Nlohmann Json](https://github.com/nlohmann/json)
 - [whereami](https://github.com/gpakosz/whereami)
 - [clipp](https://github.com/muellan/clipp)
