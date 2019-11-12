@@ -201,9 +201,7 @@ private:
 					{
 						post.parsed.reply_to_id = std::move(params.reply_to);
 					}
-
 				}
-
 			}
 
 			if (!succeeded)

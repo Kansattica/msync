@@ -87,11 +87,10 @@ void add_if_value(cpr::Payload& params, const char* key, const std::string& valu
 
 void add_array(cpr::Payload& params, const char* key, const std::vector<std::string>& values)
 {
-	for (auto&& value : values)
+	for (const auto& value : values)
 	{
 		params.AddPair(cpr::Pair(key, value));
 	}
-
 }
 
 net_response new_status(std::string_view url, std::string_view access_token, const status_params& params)
