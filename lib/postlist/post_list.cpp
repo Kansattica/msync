@@ -32,6 +32,8 @@ std::ofstream& operator<<(std::ofstream& out, const mastodon_status& status)
 	}
 
 	out << "favs: " << status.favorites << "boosts: " << status.boosts << "replies: " << status.replies << '\n';
+
+	return out;
 }
 
 const char* notification_verb(notif_type t)
@@ -59,4 +61,6 @@ std::ofstream& operator<<(std::ofstream& out, const mastodon_notification& notif
 	{
 		out << notification.status.value();
 	}
+
+	return out;
 }
