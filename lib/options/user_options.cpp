@@ -32,15 +32,15 @@ sync_settings user_options::get_sync_option(user_option toget) const
 
 void user_options::set_option(user_option opt, std::string value)
 {
-    backing.parsed.insert_or_assign(USER_OPTION_NAMES[static_cast<size_t>(opt)], std::move(value));
+	backing.parsed.insert_or_assign(std::string{ USER_OPTION_NAMES[static_cast<size_t>(opt)] }, std::move(value));
 }
 
 void user_options::set_option(user_option opt, list_operations value)
 {
-    backing.parsed.insert_or_assign(USER_OPTION_NAMES[static_cast<size_t>(opt)], LIST_OPERATION_NAMES[static_cast<size_t>(value)]);
+	backing.parsed.insert_or_assign(std::string{ USER_OPTION_NAMES[static_cast<size_t>(opt)] }, std::string{ LIST_OPERATION_NAMES[static_cast<size_t>(value)] });
 }
 
 void user_options::set_option(user_option opt, sync_settings value)
 {
-    backing.parsed.insert_or_assign(USER_OPTION_NAMES[static_cast<size_t>(opt)], SYNC_SETTING_NAMES[static_cast<size_t>(value)]);
+	backing.parsed.insert_or_assign(std::string{ USER_OPTION_NAMES[static_cast<size_t>(opt)] }, std::string{ SYNC_SETTING_NAMES[static_cast<size_t>(value)] });
 }

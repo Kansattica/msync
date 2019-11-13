@@ -2,6 +2,7 @@
 #include <msync_exception.hpp>
 #include <print_logger.hpp>
 #include <string>
+#include <string_view>
 #include <algorithm>
 
 #include "../lib/options/global_options.hpp"
@@ -19,7 +20,7 @@ std::pair<const std::string, user_options>& assume_account(std::pair<const std::
 
 void print_stringptr(const std::string* toprint);
 bool is_sensitive(user_option opt);
-void print_sensitive(const char* name, const std::string* value);
+void print_sensitive(std::string_view name, const std::string* value);
 
 template <typename T>
 void uniqueify(T& toprint);
@@ -188,7 +189,7 @@ bool is_sensitive(user_option opt)
 	return false;
 }
 
-void print_sensitive(const char* name, const std::string* value)
+void print_sensitive(std::string_view name, const std::string* value)
 {
 	if (value == nullptr)
 		return;
