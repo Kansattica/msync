@@ -6,9 +6,9 @@
 
 #include "../filebacked/file_backed.hpp"
 
-bool Read(std::map<std::string, std::string>&, std::string&&);
-void Write(std::map<std::string, std::string>&&, std::ofstream&);
+bool Read(std::map<std::string, std::string, std::less<>>&, std::string&&);
+void Write(std::map<std::string, std::string, std::less<>>&&, std::ofstream&);
 
-using option_file = file_backed<std::map<std::string, std::string>, Read, Write>;
+using option_file = file_backed<std::map<std::string, std::string, std::less<>>, Read, Write>;
 
 #endif
