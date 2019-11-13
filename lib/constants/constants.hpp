@@ -1,5 +1,5 @@
-#ifndef _CONSTANTS_H_
-#define _CONSTANTS_H_
+#ifndef _CONSTANTS_HPP_
+#define _CONSTANTS_HPP_
 
 #include <string_view>
 
