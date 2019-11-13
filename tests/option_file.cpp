@@ -214,7 +214,7 @@ SCENARIO("option_files read data when created.")
     }
 }
 
-SCENARIO("option_file is nothrow move constructible and assignable.")
+SCENARIO("option_file is nothrow move constructible and assignable, but not copyable.")
 {
 	static_assert(std::is_nothrow_move_constructible<option_file>::value, "option_files should be nothrow move constructible.");
 	static_assert(std::is_nothrow_move_assignable<option_file>::value, "option_files should be nothrow move assignable.");
