@@ -24,6 +24,8 @@ public:
 
 	~post_list()
 	{
+		if (backing.empty()) { return; } // if we got moved from, don't touch the file in this one
+
 		std::ofstream of(backing, std::ios::app | std::ios::ate | std::ios::out);
 		for (const auto& post : toappend)
 		{
