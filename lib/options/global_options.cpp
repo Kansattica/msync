@@ -6,6 +6,7 @@
 #include <whereami.h>
 #include <algorithm>
 #include <memory>
+#include <iterator>
 
 #include <cctype>
 
@@ -110,8 +111,9 @@ std::pair<const std::string, user_options>* global_options::select_account(const
 
 std::vector<std::string_view> global_options::all_accounts() const
 {
-	std::vector<std::string_view> toreturn(accounts.size());
-	std::transform(accounts.begin(), accounts.end(), toreturn.begin(), [](const auto& pair)
+	std::vector<std::string_view> toreturn;
+	toreturn.reserve(accounts.size());
+	std::transform(accounts.begin(), accounts.end(), std::back_insert_iterator(toreturn), [](const auto& pair)
 		{
 			return std::string_view{ pair.first };
 		});
