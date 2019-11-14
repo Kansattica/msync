@@ -46,6 +46,25 @@ favs: 50 boosts: 600 replies: 7000
 --------------
 )";
 
+const static std::string expected_everything = R"(id: everything
+url: https://website.egg/everything
+author: cyberfriend (bot)
+reply to: 123456
+boost of: https://different.website.egg/goodpost
+cw: Wow! A post!
+body: Imagine: a post for you. :blobcat:
+visibility: direct
+attachments:
+https://fake.website.egg/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.png?1573544488
+this is a description
+with a newline
+https://another.site/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.mp3?1573544488
+I am also a description!
+posted on: 10:57AM 11-14-2019
+favs: 8 boosts: 99 replies: 100000
+--------------
+)";
+
 struct status_test_case
 {
 	mastodon_status& status;
@@ -107,11 +126,27 @@ SCENARIO("post_list correctly serializes lists of statuses.")
 		justattachments.replies = 7000;
 		justattachments.author = remotebotauthor;
 
-		std::array<status_test_case, 3> statuses 
+		mastodon_status everything;
+		everything.id = "everything";
+		everything.url = "https://website.egg/everything";
+		everything.content_warning = "Wow! A post!";
+		everything.content = "Imagine: a post for you. :blobcat:";
+		everything.visibility = "direct";
+		everything.created_at = "10:57AM 11-14-2019";
+		everything.reply_to_post_id = "123456";
+		everything.original_post_url = "https://different.website.egg/goodpost";
+		everything.attachments = { {"https://fake.website.egg/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.png?1573544488", "this is a description\nwith a newline"}, {"https://another.site/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.mp3?1573544488", "I am also a description!"} };
+		everything.favorites = 8;
+		everything.boosts = 99;
+		everything.replies = 100000;
+		everything.author = localbotauthor;
+
+		std::array<status_test_case, 4> statuses 
 		{ 
 			status_test_case{ content_nocw, expected_content_nocw },
 			status_test_case{ content_cw, expected_content_cw },
-			status_test_case{ justattachments, expected_justattachments }
+			status_test_case{ justattachments, expected_justattachments },
+			status_test_case{ everything, expected_everything }
 		};
 
 		test_file fi{ "postlist.test" };
