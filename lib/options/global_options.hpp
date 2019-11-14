@@ -6,7 +6,6 @@
 
 #include <string>
 #include <string_view>
-#include <unordered_map>
 #include <utility>
 #include <algorithm>
 
@@ -27,7 +26,7 @@ public:
 		std::for_each(accounts.begin(), accounts.end(), c);
 	}
 private:
-    std::unordered_map<std::string, user_options> accounts;
+	std::vector<std::pair<const std::string, user_options>> accounts;
 };
 
 global_options& options();

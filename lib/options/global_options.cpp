@@ -28,56 +28,49 @@ fs::path get_exe_location()
     return fs::path(path.get(), path.get() + dirname_length);
 }
 
-std::unordered_map<std::string, user_options> read_accounts(const fs::path& account_directory_location)
+global_options::global_options() : account_directory_location(get_exe_location() / Account_Directory)
 {
-    plverb() << "Reading accounts from " << account_directory_location << "\n";
+	plverb() << "Reading accounts from " << account_directory_location << "\n";
 
-    std::unordered_map<std::string, user_options> toreturn;
+	if (!fs::exists(account_directory_location))
+		return;
 
-    if (!fs::exists(account_directory_location))
-        return toreturn;
+	for (const auto& userfolder : fs::directory_iterator(account_directory_location))
+	{
+		if (!fs::is_directory(userfolder))
+		{
+			plverb() << userfolder << " is not a directory. Skipping.\n";
+			continue;
+		}
 
-    for (const auto& userfolder : fs::directory_iterator(account_directory_location))
-    {
-        if (!fs::is_directory(userfolder))
-        {
-            plverb() << userfolder << " is not a directory. Skipping.\n";
-            continue;
-        }
+		fs::path configfile = userfolder.path() / User_Options_Filename;
 
-        fs::path configfile = userfolder.path() / User_Options_Filename;
-
-        if (!fs::exists(configfile))
-        {
+		if (!fs::exists(configfile))
+		{
 			using namespace std::string_literals;
-            throw msync_exception("Expected to find a config file and didn't find it. Try deleting the folder and running new again: "s + userfolder.path().string());
-        }
+			throw msync_exception("Expected to find a config file and didn't find it. Try deleting the folder and running new again: "s + userfolder.path().string());
+		}
 
-		toreturn.emplace(userfolder.path().filename().string(), user_options{ std::move(configfile) });
-    }
-
-    return toreturn;
-}
-
-
-global_options::global_options() : account_directory_location(get_exe_location() / Account_Directory), accounts(read_accounts(account_directory_location))
-{
+		accounts.emplace_back(userfolder.path().filename().string(), user_options{ std::move(configfile) });
+	}
 }
 
 std::pair<const std::string, user_options>& global_options::add_new_account(std::string name)
 {
+	const auto contains = std::find_if(accounts.begin(), accounts.end(), [&name](const auto& account_pair) { return name == account_pair.first; });
+	if (contains != accounts.end())
+	{
+		plverb() << "Account " << name << " already exists.";
+		return *contains;
+	}
+
     fs::path user_path = account_directory_location / name;
 
     fs::create_directories(user_path); //can throw if something goes wrong
 
     user_path /= User_Options_Filename;
 
-	const auto [it, inserted] = accounts.emplace(std::move(name), user_options{ std::move(user_path) });
-
-    if (!inserted)
-        plverb() << "Account already exists. Nothing changed.\n";
-
-    return *it;
+	return accounts.emplace_back(std::move(name), user_options{ std::move(user_path) });
 }
 
 std::pair<const std::string, user_options>* global_options::select_account(const std::string_view name)
