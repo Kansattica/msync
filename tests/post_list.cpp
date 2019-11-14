@@ -10,7 +10,8 @@
 #include <filesystem.hpp>
 #include <string_view>
 
-constexpr std::string_view expected_content_nocw = R"(id: contentnocw
+// these are std::strings because catch's StartsWith doesn't work with string_views
+const static std::string expected_content_nocw = R"(id: contentnocw
 url: https://website.egg/contentnocw
 author: regular@website.egg
 body: This is a...
@@ -21,7 +22,7 @@ favs: 0 boosts: 1 replies: 2
 --------------
 )";
 
-constexpr std::string_view expected_content_cw = R"(id: contentcw
+const static std::string expected_content_cw = R"(id: contentcw
 url: https://website.egg/contentcw
 author: afriend
 cw: test inside
@@ -32,7 +33,7 @@ favs: 2 boosts: 3 replies: 4
 --------------
 )";
 
-constexpr std::string_view expected_justattachments = R"(id: justattachments
+const static std::string expected_justattachments = R"(id: justattachments
 url: https://website.egg/justattachments
 author: someone@online.egg (bot)
 visibility: private
@@ -48,7 +49,7 @@ favs: 50 boosts: 600 replies: 7000
 struct status_test_case
 {
 	mastodon_status& status;
-	const std::string_view expected;
+	const std::string& expected;
 };
 
 template <typename LHS, typename RHS>
@@ -110,24 +111,45 @@ SCENARIO("post_list correctly serializes lists of statuses.")
 		{ 
 			status_test_case{ content_nocw, expected_content_nocw },
 			status_test_case{ content_cw, expected_content_cw },
-			status_test_case{ justattachments, expected_justattachments}
+			status_test_case{ justattachments, expected_justattachments }
 		};
 
 		test_file fi{ "postlist.test" };
 		WHEN("one status is added to a post_list and destroyed")
 		{
-			auto& test_case = GENERATE_REF(from_range(statuses));
+			auto& test_post = GENERATE_REF(from_range(statuses));
 
 			{
 				post_list<mastodon_status> list{ fi.filename };
-				list.toappend.push_back(std::move(test_case.status));
+				list.toappend.push_back(std::move(test_post.status));
 			}
 
 			THEN("the generated file is as expected.")
 			{
 				const auto actual = read_file(fi.filename);
-				INFO("The strings mismatch at position " << mismatch_loc(actual, test_case.expected));
-				REQUIRE(actual == test_case.expected);
+				INFO("The strings mismatch at position " << mismatch_loc(actual, test_post.expected));
+				REQUIRE(actual == test_post.expected);
+			}
+		}
+
+		WHEN("two statuses are added to a post_list and destroyed")
+		{
+			auto& test_post = GENERATE_REF(from_range(statuses));
+			auto& other_test_post = GENERATE_REF(from_range(statuses));
+
+			{
+				// these have to be copied in, otherwise you get weirdness when the two refer to the same object and it gets moved from twice.
+				post_list<mastodon_status> list{ fi.filename };
+				list.toappend.push_back(test_post.status);
+				list.toappend.push_back(other_test_post.status);
+			}
+
+			THEN("the generated file is as expected.")
+			{
+				using namespace Catch::Matchers;
+				const auto actual = read_file(fi.filename);
+				REQUIRE_THAT(actual, StartsWith(test_post.expected) && EndsWith(other_test_post.expected));
+				REQUIRE(actual.size() == test_post.expected.size() + other_test_post.expected.size());
 			}
 		}
 	}
