@@ -57,7 +57,7 @@ global_options::global_options() : account_directory_location(get_exe_location()
 
 std::pair<const std::string, user_options>& global_options::add_new_account(std::string name)
 {
-	const auto contains = std::find(accounts.begin(), accounts.end(), [&name](const auto& account_pair) { return name == account_pair.first; });
+	const auto contains = std::find_if(accounts.begin(), accounts.end(), [&name](const auto& account_pair) { return name == account_pair.first; });
 	if (contains != accounts.end())
 	{
 		plverb() << "Account " << name << " already exists.";
