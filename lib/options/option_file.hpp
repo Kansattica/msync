@@ -6,6 +6,8 @@
 
 #include "../filebacked/file_backed.hpp"
 
+// adding this std::less<> thing makes the comparators "transparent", which means
+// that using, say, a string view as a key doesn't make you construct a new string.
 bool Read(std::map<std::string, std::string, std::less<>>&, std::string&&);
 void Write(std::map<std::string, std::string, std::less<>>&&, std::ofstream&);
 
