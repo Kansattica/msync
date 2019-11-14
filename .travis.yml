@@ -4,6 +4,9 @@ env:
   #- BUILDTYPE=MinSizeRel
 os: linux
 dist: bionic
+arch:
+  - amd64
+  - arm64
 compiler:
   - gcc
   - clang
