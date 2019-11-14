@@ -51,6 +51,23 @@ SCENARIO("add_new_account correctly handles input.")
 					REQUIRE(fs::exists(userfile));
 				}
 			}
+
+			AND_WHEN("the same account is added again")
+			{
+				const auto& alsoadded = opts.add_new_account("coolguy@website.com");
+
+				THEN("the objects are the same")
+				{
+					REQUIRE(&alsoadded == &added);
+				}
+
+				THEN("there's still only one account in all_accounts")
+				{
+					const auto accounts = opts.all_accounts();
+					REQUIRE(accounts.size() == 1);
+					REQUIRE(accounts[0] == "coolguy@website.com");
+				}
+			}
 		}
 	}
 }
