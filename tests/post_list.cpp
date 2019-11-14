@@ -152,5 +152,28 @@ SCENARIO("post_list correctly serializes lists of statuses.")
 				REQUIRE(actual.size() == test_post.expected.size() + other_test_post.expected.size());
 			}
 		}
+
+		WHEN("two statuses are added to a post_list and destroyed one at a time.")
+		{
+			auto& test_post = GENERATE_REF(from_range(statuses));
+			auto& other_test_post = GENERATE_REF(from_range(statuses));
+
+			{
+				post_list<mastodon_status> list{ fi.filename };
+				list.toappend.push_back(test_post.status);
+			}
+			{
+				post_list<mastodon_status> list{ fi.filename };
+				list.toappend.push_back(other_test_post.status);
+			}
+
+			THEN("the generated file is as expected.")
+			{
+				using namespace Catch::Matchers;
+				const auto actual = read_file(fi.filename);
+				REQUIRE_THAT(actual, StartsWith(test_post.expected) && EndsWith(other_test_post.expected));
+				REQUIRE(actual.size() == test_post.expected.size() + other_test_post.expected.size());
+			}
+		}
 	}
 }
