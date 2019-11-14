@@ -1,22 +1,36 @@
 #include "post_list.hpp"
 
-void print(std::ofstream& out, const char* key, const std::string& val)
+void print(std::ofstream& out, const char* key, const std::string& val, bool newline = true)
 {
 	if (!val.empty())
-		out << key << val << '\n';
+	{
+		out << key << val;
+		if (newline)
+			out << '\n';
+	}
+}
+
+void print(std::ofstream& out, const char* key, bool val, bool newline = true)
+{
+	if (val)
+	{
+		out << key;
+		if (newline)
+			out << '\n';
+	}
 }
 
 std::ofstream& operator<<(std::ofstream& out, const mastodon_status& status)
 {
 	print(out, "id: ", status.id);
 	print(out, "url: ", status.url);
-	print(out, "author: ", status.author.account_name);
+	print(out, "author: ", status.author.account_name, !status.author.is_bot);
+	print(out, " (bot)", status.author.is_bot);
 	print(out, "reply to: ", status.reply_to_post_id);
 	print(out, "boost of: ", status.original_post_url);
 	print(out, "cw: ", status.content_warning);
 	print(out, "body: ", status.content);
 	print(out, "visibility: ", status.visibility);
-	print(out, "posted on: ", status.created_at);
 
 	if (!status.attachments.empty())
 	{
@@ -31,7 +45,8 @@ std::ofstream& operator<<(std::ofstream& out, const mastodon_status& status)
 		}
 	}
 
-	out << "favs: " << status.favorites << "boosts: " << status.boosts << "replies: " << status.replies << '\n';
+	print(out, "posted on: ", status.created_at);
+	out << "favs: " << status.favorites << " boosts: " << status.boosts << " replies: " << status.replies << '\n';
 
 	return out;
 }

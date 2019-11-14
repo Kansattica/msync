@@ -19,7 +19,7 @@ struct mastodon_account
 	std::string url;
 	std::string avatar;
 	std::vector<mastodon_account_field> fields;
-	bool is_bot;
+	bool is_bot = false;
 };
 
 struct mastodon_attachment
@@ -38,9 +38,9 @@ struct mastodon_status
 	std::string created_at;
 	std::string reply_to_post_id;
 	std::string original_post_url; // if this is a boost of another post 
-	unsigned int favorites;
-	unsigned int boosts;
-	unsigned int replies;
+	unsigned int favorites = 0;
+	unsigned int boosts = 0;
+	unsigned int replies = 0;
 	std::vector<mastodon_attachment> attachments;
 	mastodon_account author;
 };

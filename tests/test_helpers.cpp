@@ -5,6 +5,7 @@
 #include <random>
 
 #include <fstream>
+#include <iterator>
 
 #include "../lib/constants/constants.hpp"
 
@@ -58,8 +59,17 @@ void touch(const fs::path& totouch)
 	std::ofstream of(totouch, std::ios::out | std::ios::app);
 }
 
-std::mt19937 gen(std::random_device{}());
+std::string read_file(const fs::path& file)
+{
+	std::ifstream fi(file, std::ios::ate | std::ios::in);
 
+	std::string content;
+	content.reserve(fi.tellg());
+	fi.seekg(0, std::ios::beg);
+	return content.append(std::istreambuf_iterator(fi), std::istreambuf_iterator<char>());
+}
+
+std::mt19937 gen(std::random_device{}());
 
 bool flip_coin()
 {
