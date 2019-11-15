@@ -1,8 +1,6 @@
 #include "util.hpp"
 
 #include <regex>
-#include <memory>
-
 
 std::string make_api_url(const std::string_view instance_url, const std::string_view api_route)
 {
@@ -32,19 +30,17 @@ std::string clean_up_html(std::string_view to_strip)
 {
 	const static std::regex remove_tags{ "<[^<]*>" };
 
-	// make_unique will zero out the char buffer
-	// so no need to worry about null terminators
-	// see: https://stackoverflow.com/questions/42140212/does-make-unique-value-initializes-char-array
-	
 	// regex_replace will always keep the string the same length or make it shorter, so it won't cause an overflow
 	// the author of decode_html_entities says the same thing
 	// I think the +1 here is necessary because .size() doesn't account for the null terminator
 	// either way, one extra byte won't hurt
-	auto output_buffer = std::make_unique<char[]>(to_strip.size() + 1);
 
-	const auto end_of_output = std::regex_replace(output_buffer.get(), to_strip.begin(), to_strip.end(), remove_tags, "");
+	std::string output_buffer(to_strip.size() + 1, '\0');
 
-	const size_t decoded_length = decode_html_entities_utf8(output_buffer.get(), nullptr);
+	const auto end_of_output = std::regex_replace(&output_buffer[0], to_strip.begin(), to_strip.end(), remove_tags, "");
 
-	return std::string(output_buffer.get(), decoded_length);
+	const size_t decoded_length = decode_html_entities_utf8(&output_buffer[0], nullptr);
+
+	output_buffer.resize(decoded_length);
+	return output_buffer;
 }
