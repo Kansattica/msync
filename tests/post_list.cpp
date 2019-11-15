@@ -35,7 +35,7 @@ posted on: 10:55AM 11-14-2019
 
 const static std::string expected_justattachments = R"(id: justattachments
 url: https://website.egg/justattachments
-author: someone@online.egg (bot)
+author: someone@online.egg [bot]
 visibility: private
 attachments:
 https://fake.website.egg/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.png?1573544488
@@ -48,7 +48,7 @@ posted on: 10:56AM 11-14-2019
 
 const static std::string expected_everything = R"(id: everything
 url: https://website.egg/everything
-author: cyberfriend (bot)
+author: cyberfriend [bot]
 reply to: 123456
 boost of: https://different.website.egg/goodpost
 cw: Wow! A post!
