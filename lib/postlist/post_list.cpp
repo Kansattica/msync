@@ -55,10 +55,10 @@ const char* notification_verb(notif_type t)
 {
 	switch (t)
 	{
-	case notif_type::boost:
-		return " boosted your post:";
 	case notif_type::favorite:
 		return " favorited your post:";
+	case notif_type::boost:
+		return " boosted your post:";
 	case notif_type::mention:
 		return " mentioned you:";
 	case notif_type::follow:
@@ -70,7 +70,8 @@ const char* notification_verb(notif_type t)
 
 std::ofstream& operator<<(std::ofstream& out, const mastodon_notification& notification)
 {
-	out << notification.account.account_name << notification_verb(notification.type);
+	out << "at " << notification.created_at << ", ";
+	out << notification.account.account_name << (notification.account.is_bot ? " [bot]" : "") << notification_verb(notification.type);
 	
 	if (notification.status.has_value())
 	{

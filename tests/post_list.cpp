@@ -71,6 +71,7 @@ struct status_test_case
 	const std::string& expected;
 };
 
+
 template <typename LHS, typename RHS>
 size_t mismatch_loc(const LHS& lhs, const RHS& rhs)
 {
@@ -227,6 +228,158 @@ SCENARIO("post_list correctly serializes lists of statuses.")
 				const auto actual = read_file(fi.filename);
 				REQUIRE_THAT(actual, StartsWith(test_post.expected) && EndsWith(other_test_post.expected));
 				REQUIRE(actual.size() == test_post.expected.size() + other_test_post.expected.size());
+			}
+		}
+	}
+}
+
+constexpr std::string_view expected_fav = "at 10:50 AM 11/15/2019, localhuman favorited your post:\n";
+constexpr std::string_view expected_boost = "at 10:51 AM 11/15/2019, localbot [bot] boosted your post:\n";
+constexpr std::string_view expected_mention = "at 10:52 AM 11/15/2019, remotehuman@crime.egg mentioned you:\n";
+constexpr std::string_view expected_follow = "at 10:53 AM 11/15/2019, remotebot@crime.egg [bot] followed you.";
+
+struct notif_test_case
+{
+	const mastodon_notification& notif;
+	const std::string_view expected_notif;
+	const std::string_view expected_status;
+};
+
+mastodon_notification make_favorite()
+{
+	mastodon_notification notif;
+	notif.account.account_name = "localhuman";
+	notif.account.is_bot = false;
+	notif.created_at = "10:50 AM 11/15/2019";
+	notif.status = make_nocw();
+	notif.type = notif_type::favorite;
+	return notif;
+}
+
+mastodon_notification make_boost()
+{
+	mastodon_notification notif;
+	notif.account.account_name = "localbot";
+	notif.account.is_bot = true;
+	notif.created_at = "10:51 AM 11/15/2019";
+	notif.status = make_cw();
+	notif.type = notif_type::boost;
+	return notif;
+}
+
+mastodon_notification make_mention()
+{
+	mastodon_notification notif;
+	notif.account.account_name = "remotehuman@crime.egg";
+	notif.account.is_bot = false;
+	notif.created_at = "10:52 AM 11/15/2019";
+	notif.status = make_attachments();
+	notif.type = notif_type::mention;
+	return notif;
+}
+
+mastodon_notification make_follow()
+{
+	mastodon_notification notif;
+	notif.account.account_name = "remotebot@crime.egg";
+	notif.account.is_bot = true;
+	notif.created_at = "10:53 AM 11/15/2019";
+	notif.type = notif_type::follow;
+	return notif;
+}
+
+size_t compare_window(std::string_view expected, std::string_view entire, size_t index)
+{
+	REQUIRE(expected == entire.substr(index, expected.size()));
+	return index + expected.size();
+}
+
+SCENARIO("post_list correctly serializes lists of notifications.")
+{
+	GIVEN("Some notifications to serialize with associated statuses.")
+	{
+		const static auto fav = make_favorite();
+		const static auto boost = make_boost();
+		const static auto mention = make_mention();
+		const static auto follow = make_follow();
+
+		const static std::array<notif_test_case, 4> notifs
+		{
+			notif_test_case{ fav, expected_fav, expected_content_nocw },
+			notif_test_case{ boost, expected_boost, expected_content_cw },
+			notif_test_case{ mention, expected_mention, expected_justattachments },
+			notif_test_case{ follow, expected_follow, "\n--------------\n"}
+		};
+
+		test_file fi{ "postlist.test" };
+		WHEN("One of the notifications is serialized with post_list")
+		{
+			const auto& test_case = GENERATE(from_range(notifs));
+
+			{
+				post_list<mastodon_notification> list{ fi.filename };
+				list.write(test_case.notif);
+			}
+
+			THEN("The single post is written as expected.")
+			{
+				const std::string actual = read_file(fi.filename);
+
+				size_t idx = 0;
+				idx = compare_window(test_case.expected_notif, actual, idx);
+				idx = compare_window(test_case.expected_status, actual, idx);
+				REQUIRE(idx == actual.size());
+			}
+		}
+
+		WHEN("Two notifications are serialized with post_list")
+		{
+			const auto& test_case = GENERATE(from_range(notifs));
+			const auto& other_test_case = GENERATE(from_range(notifs));
+
+			{
+				post_list<mastodon_notification> list{ fi.filename };
+				list.write(test_case.notif);
+				list.write(other_test_case.notif);
+			}
+
+			THEN("Both posts are written as expected.")
+			{
+				const std::string actual = read_file(fi.filename);
+
+				size_t idx = 0;
+				idx = compare_window(test_case.expected_notif, actual, idx);
+				idx = compare_window(test_case.expected_status, actual, idx);
+				idx = compare_window(other_test_case.expected_notif, actual, idx);
+				idx = compare_window(other_test_case.expected_status, actual, idx);
+				REQUIRE(idx == actual.size());
+			}
+		}
+
+		WHEN("Two notifications are serialized with post_list destroyed between them")
+		{
+			const auto& test_case = GENERATE(from_range(notifs));
+			const auto& other_test_case = GENERATE(from_range(notifs));
+
+			{
+				post_list<mastodon_notification> list{ fi.filename };
+				list.write(test_case.notif);
+			}
+			{
+				post_list<mastodon_notification> list{ fi.filename };
+				list.write(other_test_case.notif);
+			}
+
+			THEN("Both posts are written as expected.")
+			{
+				const std::string actual = read_file(fi.filename);
+
+				size_t idx = 0;
+				idx = compare_window(test_case.expected_notif, actual, idx);
+				idx = compare_window(test_case.expected_status, actual, idx);
+				idx = compare_window(other_test_case.expected_notif, actual, idx);
+				idx = compare_window(other_test_case.expected_status, actual, idx);
+				REQUIRE(idx == actual.size());
 			}
 		}
 	}
