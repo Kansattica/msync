@@ -29,15 +29,20 @@ extern "C" size_t decode_html_entities_utf8(char *dest, const char *src);
 std::string clean_up_html(std::string_view to_strip)
 {
 	const static std::regex remove_tags{ "<[^<]*>" };
+	const static std::regex replace_newlines{ "</p><p>" };
 
 	// regex_replace will always keep the string the same length or make it shorter, so it won't cause an overflow
 	// the author of decode_html_entities says the same thing
 	// I think the +1 here is necessary because .size() doesn't account for the null terminator that decode_html_entities will want.
 	// either way, one extra byte won't hurt
 
-	std::string output_buffer(to_strip.size() + 1, '\0');
+	std::string temp_buffer(to_strip.size() + 1, '\0');
 
-	const auto end_of_output = std::regex_replace(&output_buffer[0], to_strip.begin(), to_strip.end(), remove_tags, "");
+	const auto end_of_output = std::regex_replace(&temp_buffer[0], to_strip.begin(), to_strip.end(), replace_newlines, "\n");
+
+	temp_buffer.resize(end_of_output - &temp_buffer[0]);
+
+	std::string output_buffer = std::regex_replace(temp_buffer, remove_tags, "");
 
 	const size_t decoded_length = decode_html_entities_utf8(&output_buffer[0], nullptr);
 
