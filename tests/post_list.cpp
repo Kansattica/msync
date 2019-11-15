@@ -10,8 +10,7 @@
 #include <filesystem.hpp>
 #include <string_view>
 
-// these are std::strings because catch's StartsWith doesn't work with string_views
-const static std::string expected_content_nocw = R"(id: contentnocw
+constexpr std::string_view expected_content_nocw = R"(id: contentnocw
 url: https://website.egg/contentnocw
 author: regular@website.egg
 body: This is a...
@@ -22,7 +21,7 @@ posted on: 10:54AM 11-14-2019
 --------------
 )";
 
-const static std::string expected_content_cw = R"(id: contentcw
+constexpr std::string_view expected_content_cw = R"(id: contentcw
 url: https://website.egg/contentcw
 author: afriend
 cw: test inside
@@ -33,7 +32,7 @@ posted on: 10:55AM 11-14-2019
 --------------
 )";
 
-const static std::string expected_justattachments = R"(id: justattachments
+constexpr std::string_view expected_justattachments = R"(id: justattachments
 url: https://website.egg/justattachments
 author: someone@online.egg [bot]
 visibility: private
@@ -46,7 +45,7 @@ posted on: 10:56AM 11-14-2019
 --------------
 )";
 
-const static std::string expected_everything = R"(id: everything
+constexpr std::string_view expected_everything = R"(id: everything
 url: https://website.egg/everything
 author: cyberfriend [bot]
 reply to: 123456
@@ -68,7 +67,7 @@ posted on: 10:57AM 11-14-2019
 struct status_test_case
 {
 	const mastodon_status& status;
-	const std::string& expected;
+	const std::string_view expected;
 };
 
 
@@ -153,6 +152,12 @@ mastodon_status make_everything()
 	return everything;
 }
 
+size_t compare_window(std::string_view expected, std::string_view entire, size_t index)
+{
+	REQUIRE(expected == entire.substr(index, expected.size()));
+	return index + expected.size();
+}
+
 SCENARIO("post_list correctly serializes lists of statuses.")
 {
 	GIVEN("Some mastodon_statuses and authors to serialize")
@@ -201,10 +206,12 @@ SCENARIO("post_list correctly serializes lists of statuses.")
 
 			THEN("the generated file is as expected.")
 			{
-				using namespace Catch::Matchers;
 				const auto actual = read_file(fi.filename);
-				REQUIRE_THAT(actual, StartsWith(test_post.expected) && EndsWith(other_test_post.expected));
-				REQUIRE(actual.size() == test_post.expected.size() + other_test_post.expected.size());
+
+				size_t idx = 0;
+				idx = compare_window(test_post.expected, actual, idx);
+				idx = compare_window(other_test_post.expected, actual, idx);
+				REQUIRE(idx == actual.size());
 			}
 		}
 
@@ -224,10 +231,12 @@ SCENARIO("post_list correctly serializes lists of statuses.")
 
 			THEN("the generated file is as expected.")
 			{
-				using namespace Catch::Matchers;
 				const auto actual = read_file(fi.filename);
-				REQUIRE_THAT(actual, StartsWith(test_post.expected) && EndsWith(other_test_post.expected));
-				REQUIRE(actual.size() == test_post.expected.size() + other_test_post.expected.size());
+
+				size_t idx = 0;
+				idx = compare_window(test_post.expected, actual, idx);
+				idx = compare_window(other_test_post.expected, actual, idx);
+				REQUIRE(idx == actual.size());
 			}
 		}
 	}
@@ -286,12 +295,6 @@ mastodon_notification make_follow()
 	notif.created_at = "10:53 AM 11/15/2019";
 	notif.type = notif_type::follow;
 	return notif;
-}
-
-size_t compare_window(std::string_view expected, std::string_view entire, size_t index)
-{
-	REQUIRE(expected == entire.substr(index, expected.size()));
-	return index + expected.size();
 }
 
 SCENARIO("post_list correctly serializes lists of notifications.")
