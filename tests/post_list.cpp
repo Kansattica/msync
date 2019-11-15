@@ -67,7 +67,7 @@ favs: 8 boosts: 99 replies: 100000
 
 struct status_test_case
 {
-	mastodon_status& status;
+	const mastodon_status& status;
 	const std::string& expected;
 };
 
@@ -83,66 +83,86 @@ size_t mismatch_loc(const LHS& lhs, const RHS& rhs)
 	return lhs.size();
 }
 
+mastodon_status make_nocw()
+{
+	mastodon_status content_nocw;
+	content_nocw.id = "contentnocw";
+	content_nocw.url = "https://website.egg/contentnocw";
+	content_nocw.content = "This is a...\n test post.";
+	content_nocw.visibility = "public";
+	content_nocw.created_at = "10:54AM 11-14-2019";
+	content_nocw.favorites = 0;
+	content_nocw.boosts = 1;
+	content_nocw.replies = 2;
+	content_nocw.author.account_name =  "regular@website.egg";
+	content_nocw.author.is_bot = false;
+	return content_nocw;
+}
+
+mastodon_status make_cw()
+{
+	mastodon_status content_cw;
+	content_cw.id = "contentcw";
+	content_cw.url = "https://website.egg/contentcw";
+	content_cw.content_warning = "test inside";
+	content_cw.content = "This is another test post.";
+	content_cw.visibility = "unlisted";
+	content_cw.created_at = "10:55AM 11-14-2019";
+	content_cw.favorites = 2;
+	content_cw.boosts = 3;
+	content_cw.replies = 4;
+	content_cw.author.account_name = "afriend";
+	content_cw.author.is_bot = false;
+	return content_cw;
+}
+
+mastodon_status make_attachments()
+{
+	mastodon_status justattachments;
+	justattachments.id = "justattachments";
+	justattachments.url = "https://website.egg/justattachments";
+	justattachments.visibility = "private";
+	justattachments.created_at = "10:56AM 11-14-2019";
+	justattachments.attachments = { {"https://fake.website.egg/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.png?1573544488", "this is a description"}, {"https://another.site/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.mp3?1573544488", ""} };
+	justattachments.favorites = 50;
+	justattachments.boosts = 600;
+	justattachments.replies = 7000;
+	justattachments.author.account_name = "someone@online.egg";
+	justattachments.author.is_bot = true;
+	return justattachments;
+}
+
+mastodon_status make_everything()
+{
+	mastodon_status everything;
+	everything.id = "everything";
+	everything.url = "https://website.egg/everything";
+	everything.content_warning = "Wow! A post!";
+	everything.content = "Imagine: a post for you. :blobcat:";
+	everything.visibility = "direct";
+	everything.created_at = "10:57AM 11-14-2019";
+	everything.reply_to_post_id = "123456";
+	everything.original_post_url = "https://different.website.egg/goodpost";
+	everything.attachments = { {"https://fake.website.egg/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.png?1573544488", "this is a description\nwith a newline"}, {"https://another.site/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.mp3?1573544488", "I am also a description!"} };
+	everything.favorites = 8;
+	everything.boosts = 99;
+	everything.replies = 100000;
+	everything.author.account_name = "cyberfriend";
+	everything.author.is_bot = true;
+	return everything;
+}
+
 SCENARIO("post_list correctly serializes lists of statuses.")
 {
 	GIVEN("Some mastodon_statuses and authors to serialize")
 	{
-		mastodon_account remoteauthor; remoteauthor.account_name = "regular@website.egg"; remoteauthor.is_bot = false;
-		mastodon_account remotebotauthor; remotebotauthor.account_name = "someone@online.egg"; remotebotauthor.is_bot = true;
-		mastodon_account localauthor; localauthor.account_name = "afriend"; localauthor.is_bot = false;
-		mastodon_account localbotauthor; localbotauthor.account_name = "cyberfriend"; localbotauthor.is_bot = true;
+		const static mastodon_status content_nocw = make_nocw();
+		const static mastodon_status content_cw = make_cw();
+		const static mastodon_status justattachments = make_attachments();
+		const static mastodon_status everything = make_everything();
 
-		mastodon_status content_nocw;
-		content_nocw.id = "contentnocw";
-		content_nocw.url = "https://website.egg/contentnocw";
-		content_nocw.content = "This is a...\n test post.";
-		content_nocw.visibility = "public";
-		content_nocw.created_at = "10:54AM 11-14-2019";
-		content_nocw.favorites = 0;
-		content_nocw.boosts = 1;
-		content_nocw.replies = 2;
-		content_nocw.author = remoteauthor;
-
-		mastodon_status content_cw;
-		content_cw.id = "contentcw";
-		content_cw.url = "https://website.egg/contentcw";
-		content_cw.content_warning = "test inside";
-		content_cw.content = "This is another test post.";
-		content_cw.visibility = "unlisted";
-		content_cw.created_at = "10:55AM 11-14-2019";
-		content_cw.favorites = 2;
-		content_cw.boosts = 3;
-		content_cw.replies = 4;
-		content_cw.author = localauthor;
-
-		mastodon_status justattachments;
-		justattachments.id = "justattachments";
-		justattachments.url = "https://website.egg/justattachments";
-		justattachments.visibility = "private";
-		justattachments.created_at = "10:56AM 11-14-2019";
-		justattachments.attachments = { {"https://fake.website.egg/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.png?1573544488", "this is a description"}, {"https://another.site/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.mp3?1573544488", ""} };
-		justattachments.favorites = 50;
-		justattachments.boosts = 600;
-		justattachments.replies = 7000;
-		justattachments.author = remotebotauthor;
-
-		mastodon_status everything;
-		everything.id = "everything";
-		everything.url = "https://website.egg/everything";
-		everything.content_warning = "Wow! A post!";
-		everything.content = "Imagine: a post for you. :blobcat:";
-		everything.visibility = "direct";
-		everything.created_at = "10:57AM 11-14-2019";
-		everything.reply_to_post_id = "123456";
-		everything.original_post_url = "https://different.website.egg/goodpost";
-		everything.attachments = { {"https://fake.website.egg/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.png?1573544488", "this is a description\nwith a newline"}, {"https://another.site/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.mp3?1573544488", "I am also a description!"} };
-		everything.favorites = 8;
-		everything.boosts = 99;
-		everything.replies = 100000;
-		everything.author = localbotauthor;
-
-		std::array<status_test_case, 4> statuses 
-		{ 
+		const static std::array<status_test_case, 4> statuses
+		{
 			status_test_case{ content_nocw, expected_content_nocw },
 			status_test_case{ content_cw, expected_content_cw },
 			status_test_case{ justattachments, expected_justattachments },
@@ -152,11 +172,11 @@ SCENARIO("post_list correctly serializes lists of statuses.")
 		test_file fi{ "postlist.test" };
 		WHEN("one status is added to a post_list and destroyed")
 		{
-			auto& test_post = GENERATE_REF(from_range(statuses));
+			const auto& test_post = GENERATE_REF(from_range(statuses));
 
 			{
 				post_list<mastodon_status> list{ fi.filename };
-				list.toappend.push_back(std::move(test_post.status));
+				list.toappend.push_back(test_post.status);
 			}
 
 			THEN("the generated file is as expected.")
@@ -169,8 +189,8 @@ SCENARIO("post_list correctly serializes lists of statuses.")
 
 		WHEN("two statuses are added to a post_list and destroyed")
 		{
-			auto& test_post = GENERATE_REF(from_range(statuses));
-			auto& other_test_post = GENERATE_REF(from_range(statuses));
+			const auto& test_post = GENERATE_REF(from_range(statuses));
+			const auto& other_test_post = GENERATE_REF(from_range(statuses));
 
 			{
 				// these have to be copied in, otherwise you get weirdness when the two refer to the same object and it gets moved from twice.
@@ -190,8 +210,8 @@ SCENARIO("post_list correctly serializes lists of statuses.")
 
 		WHEN("two statuses are added to a post_list and destroyed one at a time.")
 		{
-			auto& test_post = GENERATE_REF(from_range(statuses));
-			auto& other_test_post = GENERATE_REF(from_range(statuses));
+			const auto& test_post = GENERATE_REF(from_range(statuses));
+			const auto& other_test_post = GENERATE_REF(from_range(statuses));
 
 			{
 				post_list<mastodon_status> list{ fi.filename };
