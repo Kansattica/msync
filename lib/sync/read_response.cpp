@@ -38,8 +38,8 @@ mastodon_status read_status(const std::string& status_json)
 
 	mastodon_status toreturn;
 
-	toreturn.id = parsed["id"].get<std::string>();
-	toreturn.url = parsed["uri"].get<std::string>();
+	parsed["id"].get_to(toreturn.id);
+	parsed["uri"].get_to(toreturn.url);
 
 	// the mastodon API says these will always be here, but do this to be safe.
 	// it also says that spoiler_text won't have html, but I'm not sure how correct that is
@@ -47,7 +47,7 @@ mastodon_status read_status(const std::string& status_json)
 	toreturn.content_warning = clean_up_html(get_if_set<std::string_view>(parsed, "spoiler_text"));
 	toreturn.content = clean_up_html(get_if_set<std::string_view>(parsed, "content"));
 
-	toreturn.visibility = parsed["visibility"].get<std::string>();
+	parsed["visibility"].get_to(toreturn.visibility);
 
 	return toreturn;
 }
