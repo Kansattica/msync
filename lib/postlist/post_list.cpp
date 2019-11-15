@@ -46,7 +46,7 @@ std::ofstream& operator<<(std::ofstream& out, const mastodon_status& status)
 	}
 
 	print(out, "posted on: ", status.created_at);
-	out << "favs: " << status.favorites << " boosts: " << status.boosts << " replies: " << status.replies << '\n';
+	out << status.favorites << " favs | " << status.boosts << " boosts | " << status.replies << " replies\n";
 
 	return out;
 }

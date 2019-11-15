@@ -18,7 +18,7 @@ body: This is a...
  test post.
 visibility: public
 posted on: 10:54AM 11-14-2019
-favs: 0 boosts: 1 replies: 2
+0 favs | 1 boosts | 2 replies
 --------------
 )";
 
@@ -29,7 +29,7 @@ cw: test inside
 body: This is another test post.
 visibility: unlisted
 posted on: 10:55AM 11-14-2019
-favs: 2 boosts: 3 replies: 4
+2 favs | 3 boosts | 4 replies
 --------------
 )";
 
@@ -42,7 +42,7 @@ https://fake.website.egg/system/media_attachments/files/000/663/294/original/453
 this is a description
 https://another.site/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.mp3?1573544488
 posted on: 10:56AM 11-14-2019
-favs: 50 boosts: 600 replies: 7000
+50 favs | 600 boosts | 7000 replies
 --------------
 )";
 
@@ -61,7 +61,7 @@ with a newline
 https://another.site/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.mp3?1573544488
 I am also a description!
 posted on: 10:57AM 11-14-2019
-favs: 8 boosts: 99 replies: 100000
+8 favs | 99 boosts | 100000 replies
 --------------
 )";
 
