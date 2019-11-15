@@ -22,9 +22,9 @@ public:
 
 	void write(const post_type& post)
 	{
-		// this assumes that the operator<< for post adds a newline at the end
+		// this assumes that the operator<< for post doesn't add a newline at the end
 		outfile << post;
-		outfile << "--------------\n";
+		outfile << "\n--------------\n";
 	}
 
 private:

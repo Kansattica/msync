@@ -46,7 +46,7 @@ std::ofstream& operator<<(std::ofstream& out, const mastodon_status& status)
 	}
 
 	print(out, "posted on: ", status.created_at);
-	out << status.favorites << " favs | " << status.boosts << " boosts | " << status.replies << " replies\n";
+	out << status.favorites << " favs | " << status.boosts << " boosts | " << status.replies << " replies";
 
 	return out;
 }
@@ -70,10 +70,11 @@ const char* notification_verb(notif_type t)
 
 std::ofstream& operator<<(std::ofstream& out, const mastodon_notification& notification)
 {
-	out << notification.account.account_name << notification_verb(notification.type) << '\n';
+	out << notification.account.account_name << notification_verb(notification.type);
 	
 	if (notification.status.has_value())
 	{
+		out << '\n';
 		out << notification.status.value();
 	}
 
