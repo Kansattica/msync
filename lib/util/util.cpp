@@ -32,7 +32,7 @@ std::string clean_up_html(std::string_view to_strip)
 
 	// regex_replace will always keep the string the same length or make it shorter, so it won't cause an overflow
 	// the author of decode_html_entities says the same thing
-	// I think the +1 here is necessary because .size() doesn't account for the null terminator
+	// I think the +1 here is necessary because .size() doesn't account for the null terminator that decode_html_entities will want.
 	// either way, one extra byte won't hurt
 
 	std::string output_buffer(to_strip.size() + 1, '\0');
