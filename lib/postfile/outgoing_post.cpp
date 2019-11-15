@@ -25,6 +25,8 @@ std::string post_content::visibility_string() const
 	return std::string{ VISIBILITIES[static_cast<int>(vis)][0] };
 }
 
+const char vector_delimiter = '`';
+
 int is_option(std::string_view line, size_t equals_sign);
 bool is_snip(std::string_view line);
 void parse_option(post_content& post, size_t option_index, std::string_view value);
@@ -116,14 +118,14 @@ void Write(post_content&& post, std::ofstream& of)
 	if (!post.attachments.empty())
 	{
 		of << "attach=";
-		join_iterable(post.attachments.begin(), post.attachments.end(), ',', of);
+		join_iterable(post.attachments.begin(), post.attachments.end(), vector_delimiter, of);
 		of << '\n';
 	}
 
 	if (!post.descriptions.empty())
 	{
 		of << "descriptions=";
-		join_iterable(post.descriptions.begin(), post.descriptions.end(), ',', of);
+		join_iterable(post.descriptions.begin(), post.descriptions.end(), vector_delimiter, of);
 		of << '\n';
 	}
 
@@ -212,7 +214,7 @@ void store_string(std::string& store_in, std::string_view value)
 template <bool keepEmpty>
 void store_vector(std::vector<std::string>& store_in, const std::string_view value)
 {
-	const auto split = split_string<keepEmpty>(value, ',');
+	const auto split = split_string<keepEmpty>(value, vector_delimiter);
 	store_in.insert(store_in.end(), split.begin(), split.end());
 }
 

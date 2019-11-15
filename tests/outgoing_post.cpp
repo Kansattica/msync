@@ -151,7 +151,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 		auto descriptions = GENERATE(
 			std::vector<std::string>{},
 			std::vector<std::string>{"d: an attachment"},
-			std::vector<std::string>{"d: hi", "d: there"},
+			std::vector<std::string>{"d: h,i", "d: there"},
 			std::vector<std::string>{"d: four", "", "d: attachments", "d: foryou"}
 			);
 
@@ -174,7 +174,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 				of << "attach=";
 				for (const auto& attach : attachments)
 				{
-					of << attach << ',';
+					of << attach << '`';
 				}
 				of << '\n';
 			}
@@ -184,7 +184,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 				of << "descriptions=";
 				for (const auto& describe : descriptions)
 				{
-					of << describe << ',';
+					of << describe << '`';
 				}
 				of << '\n';
 			}
