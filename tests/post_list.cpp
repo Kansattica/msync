@@ -170,13 +170,13 @@ SCENARIO("post_list correctly serializes lists of statuses.")
 		};
 
 		test_file fi{ "postlist.test" };
-		WHEN("one status is added to a post_list and destroyed")
+		WHEN("one status is written to a post_list and destroyed")
 		{
 			const auto& test_post = GENERATE_REF(from_range(statuses));
 
 			{
 				post_list<mastodon_status> list{ fi.filename };
-				list.toappend.push_back(test_post.status);
+				list.write(test_post.status);
 			}
 
 			THEN("the generated file is as expected.")
@@ -187,16 +187,15 @@ SCENARIO("post_list correctly serializes lists of statuses.")
 			}
 		}
 
-		WHEN("two statuses are added to a post_list and destroyed")
+		WHEN("two statuses are written to a post_list and destroyed")
 		{
 			const auto& test_post = GENERATE_REF(from_range(statuses));
 			const auto& other_test_post = GENERATE_REF(from_range(statuses));
 
 			{
-				// these have to be copied in, otherwise you get weirdness when the two refer to the same object and it gets moved from twice.
 				post_list<mastodon_status> list{ fi.filename };
-				list.toappend.push_back(test_post.status);
-				list.toappend.push_back(other_test_post.status);
+				list.write(test_post.status);
+				list.write(other_test_post.status);
 			}
 
 			THEN("the generated file is as expected.")
@@ -208,18 +207,18 @@ SCENARIO("post_list correctly serializes lists of statuses.")
 			}
 		}
 
-		WHEN("two statuses are added to a post_list and destroyed one at a time.")
+		WHEN("two statuses are written to a post_list and destroyed one at a time.")
 		{
 			const auto& test_post = GENERATE_REF(from_range(statuses));
 			const auto& other_test_post = GENERATE_REF(from_range(statuses));
 
 			{
 				post_list<mastodon_status> list{ fi.filename };
-				list.toappend.push_back(test_post.status);
+				list.write(test_post.status);
 			}
 			{
 				post_list<mastodon_status> list{ fi.filename };
-				list.toappend.push_back(other_test_post.status);
+				list.write(other_test_post.status);
 			}
 
 			THEN("the generated file is as expected.")
