@@ -324,7 +324,7 @@ SCENARIO("post_list correctly serializes lists of notifications.")
 				list.write(test_case.notif);
 			}
 
-			THEN("The single post is written as expected.")
+			THEN("The single notification is written as expected.")
 			{
 				const std::string actual = read_file(fi.filename);
 
@@ -346,7 +346,7 @@ SCENARIO("post_list correctly serializes lists of notifications.")
 				list.write(other_test_case.notif);
 			}
 
-			THEN("Both posts are written as expected.")
+			THEN("Both notifications are written as expected.")
 			{
 				const std::string actual = read_file(fi.filename);
 
@@ -373,7 +373,7 @@ SCENARIO("post_list correctly serializes lists of notifications.")
 				list.write(other_test_case.notif);
 			}
 
-			THEN("Both posts are written as expected.")
+			THEN("Both notifications are written as expected.")
 			{
 				const std::string actual = read_file(fi.filename);
 
