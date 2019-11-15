@@ -144,7 +144,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 		const auto attachments = GENERATE(
 			std::vector<std::string>{},
 			std::vector<std::string>{"an attachment"},
-			std::vector<std::string>{"hi", "there"},
+			std::vector<std::string>{"h,i", "there"},
 			std::vector<std::string>{"four", "entire", "attachments", "foryou"}
 			);
 
