@@ -76,16 +76,27 @@ void from_json(const json& j, mastodon_status& status)
 	status.content = clean_up_html(get_if_set<std::string_view>(j, "content"sv));
 
 	j["visibility"].get_to(status.visibility);
-	j["created_at"].get_to(status.created_at);
 	
 	status.reply_to_post_id = get_if_set<std::string>(j, "in_reply_to_id"sv);
-	status.original_post_url = get_reblog_uri_if_set(j);
-	j["favourites_count"].get_to(status.favorites);
-	j["reblogs_count"].get_to(status.boosts);
-	j["replies_count"].get_to(status.replies);
 
-	j["media_attachments"].get_to(status.attachments);
-	j["account"].get_to(status.author);
+	// basically, if this post is a reblog, we want to get the rest of the stuff out of the nested reblog object.
+
+	const auto is_reblog = j.find("reblog"sv);
+	const json* post = &j;
+	if (is_reblog != j.end() && is_reblog->is_object())
+	{
+		post = &*is_reblog;
+		post->at("uri").get_to(status.original_post_url);
+		j["account"]["acct"].get_to(status.boosted_by);
+		j["account"]["bot"].get_to(status.boosted_by_bot);
+	}
+	post->at("created_at").get_to(status.created_at);
+	post->at("favourites_count").get_to(status.favorites);
+	post->at("reblogs_count").get_to(status.boosts);
+	post->at("replies_count").get_to(status.replies);
+
+	post->at("media_attachments").get_to(status.attachments);
+	post->at("account").get_to(status.author);
 }
 
 mastodon_status read_status(const std::string_view status_json)

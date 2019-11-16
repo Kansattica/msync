@@ -26,6 +26,8 @@ std::ofstream& operator<<(std::ofstream& out, const mastodon_status& status)
 	print(out, "url: ", status.url);
 	print(out, "author: ", status.author.account_name, !status.author.is_bot);
 	print(out, " [bot]", status.author.is_bot);
+	print(out, "boosted by: ", status.boosted_by, !status.boosted_by_bot);
+	print(out, " [bot]", status.boosted_by_bot);
 	print(out, "reply to: ", status.reply_to_post_id);
 	print(out, "boost of: ", status.original_post_url);
 	print(out, "cw: ", status.content_warning);

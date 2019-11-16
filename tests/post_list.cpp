@@ -48,6 +48,7 @@ posted on: 10:56AM 11-14-2019
 constexpr std::string_view expected_everything = R"(id: everything
 url: https://website.egg/everything
 author: cyberfriend [bot]
+boosted by: meatbooster@different.website.egg
 reply to: 123456
 boost of: https://different.website.egg/goodpost
 cw: Wow! A post!
@@ -143,6 +144,8 @@ mastodon_status make_everything()
 	everything.created_at = "10:57AM 11-14-2019";
 	everything.reply_to_post_id = "123456";
 	everything.original_post_url = "https://different.website.egg/goodpost";
+	everything.boosted_by = "meatbooster@different.website.egg";
+	everything.boosted_by_bot = false;
 	everything.attachments = { {"https://fake.website.egg/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.png?1573544488", "this is a description\nwith a newline"}, {"https://another.site/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.mp3?1573544488", "I am also a description!"} };
 	everything.favorites = 8;
 	everything.boosts = 99;
