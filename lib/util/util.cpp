@@ -29,7 +29,7 @@ extern "C" size_t decode_html_entities_utf8(char *dest, const char *src);
 std::string clean_up_html(std::string_view to_strip)
 {
 	const static std::regex remove_tags{ "<[^<]*>" };
-	const static std::regex replace_newlines{ "</p><p>" };
+	const static std::regex replace_newlines{ "</p><p>|<br/?>" };
 
 	// regex_replace will always keep the string the same length or make it shorter, so it won't cause an overflow
 	// the author of decode_html_entities says the same thing
