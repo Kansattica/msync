@@ -331,6 +331,7 @@ SCENARIO("clean_up_html removes HTML tags and entities.")
 			"&;&;&;><as",
 			"",
 			" \t\t\n",
+			"",
 			"<hatml  /"
 		);
 

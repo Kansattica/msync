@@ -314,13 +314,13 @@ SCENARIO("post_list correctly serializes lists of notifications.")
 			notif_test_case{ fav, expected_fav, expected_content_nocw },
 			notif_test_case{ boost, expected_boost, expected_content_cw },
 			notif_test_case{ mention, expected_mention, expected_justattachments },
-			notif_test_case{ follow, expected_follow, "\n--------------\n"}
+			notif_test_case{ follow, expected_follow, "\n--------------\n" }
 		};
 
 		test_file fi{ "postlist.test" };
 		WHEN("One of the notifications is serialized with post_list")
 		{
-			const auto& test_case = GENERATE(from_range(notifs));
+			const auto& test_case = GENERATE_REF(from_range(notifs));
 
 			{
 				post_list<mastodon_notification> list{ fi.filename };
@@ -340,8 +340,8 @@ SCENARIO("post_list correctly serializes lists of notifications.")
 
 		WHEN("Two notifications are serialized with post_list")
 		{
-			const auto& test_case = GENERATE(from_range(notifs));
-			const auto& other_test_case = GENERATE(from_range(notifs));
+			const auto& test_case = GENERATE_REF(from_range(notifs));
+			const auto& other_test_case = GENERATE_REF(from_range(notifs));
 
 			{
 				post_list<mastodon_notification> list{ fi.filename };
@@ -364,8 +364,8 @@ SCENARIO("post_list correctly serializes lists of notifications.")
 
 		WHEN("Two notifications are serialized with post_list destroyed between them")
 		{
-			const auto& test_case = GENERATE(from_range(notifs));
-			const auto& other_test_case = GENERATE(from_range(notifs));
+			const auto& test_case = GENERATE_REF(from_range(notifs));
+			const auto& other_test_case = GENERATE_REF(from_range(notifs));
 
 			{
 				post_list<mastodon_notification> list{ fi.filename };
