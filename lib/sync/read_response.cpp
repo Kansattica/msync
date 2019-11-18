@@ -46,7 +46,7 @@ void from_json(const json& j, mastodon_account& account)
 	account.note = clean_up_html(j["note"].get<std::string_view>());
 	j["url"].get_to(account.url);
 	j["avatar"].get_to(account.avatar);
-	account.fields = get_if_set<std::vector<mastodon_account_field>>(j, "fields");
+	account.fields = get_if_set<std::vector<mastodon_account_field>>(j, "fields"sv);
 	j["bot"].get_to(account.is_bot);
 }
 
