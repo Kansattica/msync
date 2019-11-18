@@ -32,14 +32,6 @@ std::string read_error(const std::string_view response_json)
 	return get_if_set<std::string>(parsed, "error"sv);
 }
 
-NLOHMANN_JSON_SERIALIZE_ENUM(notif_type, {
-		{ notif_type::unknown, "???" },
-		{ notif_type::follow, "follow" },
-		{ notif_type::mention, "mention" },
-		{ notif_type::boost, "reblog" },
-		{ notif_type::favorite, "favourite" },
-	});
-
 void from_json(const json& j, mastodon_account_field& field)
 {
 	j["name"].get_to(field.name);
@@ -98,6 +90,14 @@ void from_json(const json& j, mastodon_status& status)
 	post->at("media_attachments").get_to(status.attachments);
 	post->at("account").get_to(status.author);
 }
+
+NLOHMANN_JSON_SERIALIZE_ENUM(notif_type, {
+		{ notif_type::unknown, "???" }, //nlohmann json will pick the first one in the list if it can't parse
+		{ notif_type::follow, "follow" },
+		{ notif_type::mention, "mention" },
+		{ notif_type::boost, "reblog" },
+		{ notif_type::favorite, "favourite" },
+	});
 
 void from_json(const json& j, mastodon_notification& notif)
 {
