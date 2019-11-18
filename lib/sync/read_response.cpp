@@ -18,14 +18,6 @@ T get_if_set(const json& parsed, const std::string_view key)
 	return val->get<T>();
 }
 
-std::string get_reblog_uri_if_set(const json& parsed)
-{
-	const auto val = parsed.find("reblog"sv);
-	if (val == parsed.end() || val->is_null())
-		return {};
-	return (*val)["uri"].get<std::string>();
-}
-
 std::string read_error(const std::string_view response_json)
 {
 	const auto parsed = json::parse(response_json, nullptr, false); //don't throw on a bad parse
@@ -39,6 +31,14 @@ std::string read_error(const std::string_view response_json)
 
 	return get_if_set<std::string>(parsed, "error"sv);
 }
+
+NLOHMANN_JSON_SERIALIZE_ENUM(notif_type, {
+		{ notif_type::unknown, "???" },
+		{ notif_type::follow, "follow" },
+		{ notif_type::mention, "mention" },
+		{ notif_type::boost, "reblog" },
+		{ notif_type::favorite, "favourite" },
+	});
 
 void from_json(const json& j, mastodon_account_field& field)
 {
@@ -99,9 +99,27 @@ void from_json(const json& j, mastodon_status& status)
 	post->at("account").get_to(status.author);
 }
 
+void from_json(const json& j, mastodon_notification& notif)
+{
+	j["id"].get_to(notif.id);
+	j["type"].get_to(notif.type);
+	j["created_at"].get_to(notif.created_at);
+	j["account"].get_to(notif.account);
+	const auto status = j.find("status"sv);
+	if (status != j.end() && status->is_object())
+	{
+		notif.status = status->get<mastodon_status>();
+	}
+}
+
 mastodon_status read_status(const std::string_view status_json)
 {
 	return json::parse(status_json).get<mastodon_status>();
+}
+
+mastodon_notification read_notification(std::string_view notification_json)
+{
+	return json::parse(notification_json).get<mastodon_notification>();
 }
 
 std::string read_upload_id(const std::string_view attachment_json)

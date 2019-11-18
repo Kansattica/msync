@@ -49,7 +49,7 @@ struct mastodon_status
 
 enum class notif_type
 {
-	follow, mention, boost, favorite
+	unknown, follow, mention, boost, favorite
 };
 
 struct mastodon_notification
