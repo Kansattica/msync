@@ -86,9 +86,9 @@ void from_json(const json& j, mastodon_status& status)
 	if (is_reblog != j.end() && is_reblog->is_object())
 	{
 		post = &*is_reblog;
-		post->at("uri").get_to(status.original_post_url);
 		j["account"]["acct"].get_to(status.boosted_by);
 		j["account"]["bot"].get_to(status.boosted_by_bot);
+		post->at("uri").get_to(status.original_post_url);
 	}
 	post->at("created_at").get_to(status.created_at);
 	post->at("favourites_count").get_to(status.favorites);
@@ -117,7 +117,7 @@ mastodon_status read_status(const std::string_view status_json)
 	return json::parse(status_json).get<mastodon_status>();
 }
 
-mastodon_notification read_notification(std::string_view notification_json)
+mastodon_notification read_notification(const std::string_view notification_json)
 {
 	return json::parse(notification_json).get<mastodon_notification>();
 }
