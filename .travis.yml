@@ -28,12 +28,10 @@ script:
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then EXELOCATION="./$BUILDTYPE/msync.exe"; else EXELOCATION="./msync"; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then TESTLOCATION="./tests/$BUILDTYPE/tests.exe"; else TESTLOCATION="./tests/tests"; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then NETTESTLOCATION="./tests/$BUILDTYPE/net_tests.exe"; else NETTESTLOCATION="./tests/net_tests"; fi
+  - $NETTESTLOCATION
+  - $TESTLOCATION ~[long_run]
+  - $TESTLOCATION [long_run]
 
 after_success:
   - echo "Binary size:"
   - du -h $EXELOCATION
-  - $EXELOCATION help
-  - $TESTLOCATION ~[long_run]
-  - $TESTLOCATION [long_run]
-  - $NETTESTLOCATION
-  
