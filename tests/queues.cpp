@@ -144,6 +144,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 			{
 				dequeue(queues::post, account, std::move(toq));
 
+				CAPTURE(justfilename);
 				THEN("msync's copy of the post is deleted")
 				{
 					REQUIRE_FALSE(fs::exists(file_queue_dir / justfilename));

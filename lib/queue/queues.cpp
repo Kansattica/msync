@@ -134,49 +134,38 @@ void dequeue_post(const fs::path &queuedir, const fs::path& filename)
 	}
 }
 
-void just_filename(std::string& path)
-{
-	path = fs::path(path).filename().string();
-}
-
 void dequeue(queues todequeue, const std::string_view account, std::vector<std::string>&& toremove)
 {
 	queue_list toremovefrom = open_queue(todequeue, account);
 
-	const fs::path filequeuedir = todequeue == queues::post ? get_file_queue_directory(account) : "";
-	for (auto it = toremove.begin(); it != toremove.end(); )
+	if (todequeue == queues::post)
 	{
-		if (todequeue == queues::post)
-			just_filename(*it);
-		
-		// if the item is in the queue, remove it form the queue and from the toremove vector
-		// if this gets to be a performance bottleneck (since it's an n^2 algorithm), make an unordered_set from toremove or sort and do a binary search
-		const auto inqueue = std::find(toremovefrom.parsed.begin(), toremovefrom.parsed.end(), *it);
-		if (inqueue != toremovefrom.parsed.end()) // if we found the thing in the queue, remove from both
-		{
-			plverb() << "Removing " << *it << " from queue.\n";
-			if (todequeue == queues::post)
-			{
-				dequeue_post(filequeuedir, *it);
-			}
-			toremovefrom.parsed.erase(inqueue);
-			it = toremove.erase(it);
-		}
-		else
-		{
-			++it;
-		}
+		// trim path names 
+		std::transform(toremove.begin(), toremove.end(), toremove.begin(), [](const auto& path) { return fs::path(path).filename().string(); });
 	}
+
+	// put the ones to keep first, and the ones to remove last
+	const auto removefrom_pivot = std::stable_partition(toremovefrom.parsed.begin(), toremovefrom.parsed.end(),
+		[&toremove](const auto& id) { return std::find(toremove.begin(), toremove.end(), id) == toremove.end(); });
+
+
+	// put the ones that'll be removed from the queue first and the rest after 
+	const auto toremove_pivot = std::stable_partition(toremove.begin(), toremove.end(),
+		[&toremovefrom](const auto& id) { return std::find(toremovefrom.parsed.begin(), toremovefrom.parsed.end(), id) != toremovefrom.parsed.end(); });
+
+	if (todequeue == queues::post)
+	{
+		const fs::path filequeuedir = get_file_queue_directory(account);
+		std::for_each(toremove.begin(), toremove_pivot,
+			[&filequeuedir](const auto& filepath) { dequeue_post(filequeuedir, filepath); });
+	}
+
+	toremovefrom.parsed.erase(removefrom_pivot, toremovefrom.parsed.end());
 
 	//basically, if a thing isn't in the queue, enqueue removing that thing. unboosting, unfaving, deleting a post
 	//consider removing duplicate removes?
-
-	for (auto& queuedel : toremove)
-	{
-		plverb() << queuedel << " will be removed next time you sync.\n";
-		queuedel.push_back('-');
-		toremovefrom.parsed.push_back(std::move(queuedel));
-	}
+	std::for_each(toremove_pivot, toremove.end(), 
+		[&toremovefrom](auto& queuedel) { queuedel.push_back('-'); toremovefrom.parsed.push_back(std::move(queuedel)); });
 }
 
 void clear(queues toclear, const std::string_view account)
