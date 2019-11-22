@@ -113,3 +113,18 @@ net_response new_status(std::string_view url, std::string_view access_token, con
 						 { authorization_key_header, make_bearer(access_token) } },
 			std::move(post_params)));
 }
+
+net_response get_timeline_and_notifs(std::string_view url, std::string_view access_token, std::string_view min_id, unsigned int limit)
+{
+	cpr::Parameters params{ { "limit", std::to_string(limit) } };
+
+	if (!min_id.empty())
+		params.AddParameter(cpr::Parameter{ "min_id", min_id });
+
+	return handle_response(
+		cpr::Get(cpr::Url{ url },
+			cpr::Header{ {authorization_key_header, make_bearer(access_token) } },
+			std::move(params)
+		)
+	);
+}
