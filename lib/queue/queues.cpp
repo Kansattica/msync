@@ -150,8 +150,9 @@ void dequeue(queues todequeue, const std::string_view account, std::vector<std::
 
 
 	// put the ones that'll be removed from the queue first and the rest after 
+	// all the ones in toremovefrom that are also in toremove are at the end, so we only have to check those.
 	const auto toremove_pivot = std::stable_partition(toremove.begin(), toremove.end(),
-		[&toremovefrom](const auto& id) { return std::find(toremovefrom.parsed.begin(), toremovefrom.parsed.end(), id) != toremovefrom.parsed.end(); });
+		[&toremovefrom, removefrom_pivot](const auto& id) { return std::find(removefrom_pivot, toremovefrom.parsed.end(), id) != toremovefrom.parsed.end(); });
 
 	if (todequeue == queues::post)
 	{
