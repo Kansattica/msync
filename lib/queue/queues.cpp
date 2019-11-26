@@ -111,16 +111,19 @@ void enqueue(const queues toenqueue, const std::string_view account, const std::
 {
 	queue_list toaddto = open_queue(toenqueue, account);
 
-	const fs::path filequeuedir = toenqueue == queues::post ? get_file_queue_directory(account) : "";
-	for (const auto& id : add)
+	if (toenqueue == queues::post)
 	{
-		std::string queuethis = id;
-		if (toenqueue == queues::post)
-		{
-			queuethis = queue_post(filequeuedir, id);
-		}
-		toaddto.parsed.push_back(std::move(queuethis));
+		const fs::path filequeuedir = get_file_queue_directory(account);
+		std::transform(add.begin(), add.end(), std::back_inserter(toaddto.parsed), [&filequeuedir](const auto& id)
+			{
+				return queue_post(filequeuedir, id);
+			});
 	}
+	else
+	{
+		toaddto.parsed.insert(toaddto.parsed.end(), add.begin(), add.end());
+	}
+
 
 	// consider looking for those "delete" guys, the ones with the - at the end, and having this cancel them out, 
 	// but "unboost and reboost", for example, is a valid thing to want to do.
