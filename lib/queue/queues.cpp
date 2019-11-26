@@ -144,13 +144,24 @@ void dequeue(queues todequeue, const std::string_view account, std::vector<std::
 		std::transform(toremove.begin(), toremove.end(), toremove.begin(), [](const auto& path) { return fs::path(path).filename().string(); });
 	}
 
+	// stable_partition is O(n) (assuming it can allocate a temporary buffer)
+	// but doing a O(n) find call for each one makes it O(n^2)
+	// sorting toremove and doing a binary search on it might be faster, 
+	// but that's an O(n lg n) sort and then an O(n lg n) partition-with-find.
+	// if the problem gets big enough, an unordered_set made from the elements of toremove would help
+	// but I think that's overkill for the small lists this program will likely deal with.
+
 	// put the ones to keep first, and the ones to remove last
 	const auto removefrom_pivot = std::stable_partition(toremovefrom.parsed.begin(), toremovefrom.parsed.end(),
 		[&toremove](const auto& id) { return std::find(toremove.begin(), toremove.end(), id) == toremove.end(); });
 
 
 	// put the ones that'll be removed from the queue first and the rest after 
+
 	// all the ones in toremovefrom that are also in toremove are at the end, so we only have to check those.
+	// again, partitioning is O(n) and std::find is O(n), so this is another n^2 algorithm.
+	// but these should be relatively small and so I highly doubt it's going to matter. If it does,
+	// I could copy the things that'll be removed from the queue to an unordered set. Again, overkill for this.
 	const auto toremove_pivot = std::stable_partition(toremove.begin(), toremove.end(),
 		[&toremovefrom, removefrom_pivot](const auto& id) { return std::find(removefrom_pivot, toremovefrom.parsed.end(), id) != toremovefrom.parsed.end(); });
 
