@@ -151,9 +151,17 @@ void dequeue(queues todequeue, const std::string_view account, std::vector<std::
 	// if the problem gets big enough, an unordered_set made from the elements of toremove would help
 	// but I think that's overkill for the small lists this program will likely deal with.
 
+	// what we really want is the set difference between these two, but:
+	// - it would require making a sorted or std::unordered_set copy of toremovefrom and same for toremove
+	// - it'd still be an O(n) operation to remove existing entries from toremovefrom because toremovefrom has to stay in order
+	// - you'd have have to do two set differences- one for the things to be removed from toremovefrom and one
+	//   for the things in toremove that get enqueued with the minus sign
+
 	// put the ones to keep first, and the ones to remove last
 	const auto removefrom_pivot = std::stable_partition(toremovefrom.parsed.begin(), toremovefrom.parsed.end(),
-		[&toremove](const auto& id) { return std::find(toremove.begin(), toremove.end(), id) == toremove.end(); });
+		[&toremove](const auto& id) { 
+			return std::find(toremove.begin(), toremove.end(), id) == toremove.end(); 
+		});
 
 
 	// put the ones that'll be removed from the queue first and the rest after 
@@ -163,7 +171,9 @@ void dequeue(queues todequeue, const std::string_view account, std::vector<std::
 	// but these should be relatively small and so I highly doubt it's going to matter. If it does,
 	// I could copy the things that'll be removed from the queue to an unordered set. Again, overkill for this.
 	const auto toremove_pivot = std::stable_partition(toremove.begin(), toremove.end(),
-		[&toremovefrom, removefrom_pivot](const auto& id) { return std::find(removefrom_pivot, toremovefrom.parsed.end(), id) != toremovefrom.parsed.end(); });
+		[&toremovefrom, removefrom_pivot](const auto& id) { 
+			return std::find(removefrom_pivot, toremovefrom.parsed.end(), id) != toremovefrom.parsed.end(); 
+		});
 
 	if (todequeue == queues::post)
 	{
