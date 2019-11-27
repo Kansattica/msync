@@ -31,11 +31,7 @@ public:
 
 	void send(const std::string_view account, const std::string_view instanceurl, const std::string_view access_token)
 	{
-		if (retries == 0)
-		{
-			pl() << "Number of retries cannot be zero or less. Resetting to 3.\n";
-			retries = 3;
-		}
+		retries = set_default(retries, 3, "Number of retries cannot be zero or less. Resetting to 3.\n", pl());
 
 		const std::string baseurl = make_api_url(instanceurl, status_route);
 

@@ -10,6 +10,8 @@
 
 constexpr std::string_view status_route{ "/api/v1/statuses/" };
 constexpr std::string_view media_route{ "/api/v1/media" };
+constexpr std::string_view home_route{ "/api/v1/timelines/home" };
+constexpr std::string_view notifications_route{ "/api/v1/notifications" };
 
 constexpr std::pair<std::string_view, std::string_view> favroutepost{ "/favourite", "/unfavourite" };
 constexpr std::pair<std::string_view, std::string_view> boostroutepost{ "/reblog", "/unreblog" };
@@ -34,6 +36,18 @@ struct file_status_params : public status_params
 };
 
 file_status_params read_params(const fs::path& path);
+
+template <typename message_type, typename stream_output>
+unsigned int set_default(unsigned int value, unsigned int default_value, const message_type& message, stream_output& out)
+{
+	if (value == 0)
+	{
+		pl() << message;
+		return default_value;
+	}
+
+	return value;
+}
 
 template <typename Stream>
 void print_truncated_string(std::string_view toprint, Stream& str)
