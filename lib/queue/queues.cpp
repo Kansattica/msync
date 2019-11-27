@@ -215,5 +215,7 @@ std::vector<std::string> print(queues toprint, const std::string_view account)
 {
 	//prettyprint posts
 	const readonly_queue_list printthis = open_queue<readonly_queue_list>(toprint, account);
-	return std::vector<std::string> {printthis.parsed.begin(), printthis.parsed.end()};
+	std::vector<std::string> toreturn(printthis.parsed.size());
+	std::move(printthis.parsed.begin(), printthis.parsed.end(), toreturn.begin());
+	return toreturn;
 }
