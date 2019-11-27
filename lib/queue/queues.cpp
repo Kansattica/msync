@@ -83,7 +83,8 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 	return copyto.filename().string();
 }
 
-queue_list open_queue(const queues to_open, const std::string_view account)
+template <typename queue_t = queue_list>
+queue_t open_queue(const queues to_open, const std::string_view account)
 {
 	fs::path qfile = options().account_directory_location / account;
 	fs::create_directories(qfile);
@@ -104,7 +105,7 @@ queue_list open_queue(const queues to_open, const std::string_view account)
 		}
 	}();
 
-	return queue_list{ qfile / to_append };
+	return queue_t{ qfile / to_append };
 }
 
 void enqueue(const queues toenqueue, const std::string_view account, const std::vector<std::string>& add)
@@ -213,6 +214,6 @@ queue_list get(queues toget, const std::string_view account)
 std::vector<std::string> print(queues toprint, const std::string_view account)
 {
 	//prettyprint posts
-	const queue_list printthis = open_queue(toprint, account);
+	const readonly_queue_list printthis = open_queue<readonly_queue_list>(toprint, account);
 	return std::vector<std::string> {printthis.parsed.begin(), printthis.parsed.end()};
 }
