@@ -42,7 +42,7 @@ unsigned int set_default(unsigned int value, unsigned int default_value, const m
 {
 	if (value == 0)
 	{
-		pl() << message;
+		out << message;
 		return default_value;
 	}
 
