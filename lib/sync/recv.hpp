@@ -38,6 +38,7 @@ public:
 		pl() << "Downloading notifications for " << account_name << '\n';
 		update_timeline<to_get::notifications, mastodon_notification>(account);
 		pl() << "Downloading the home timeline for " << account_name << '\n';
+		update_timeline<to_get::home, mastodon_status>(account);
 	}
 
 private:
