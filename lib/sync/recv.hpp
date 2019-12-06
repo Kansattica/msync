@@ -122,7 +122,8 @@ private:
 
 			max_id = lowest_id(incoming);
 
-			total.insert(total.end(), std::make_move_iterator(incoming.begin()), std::make_move_iterator(incoming.end()));
+			if (!incoming.empty()) //I think the insert segfaults if incoming is empty?
+				total.insert(total.end(), std::make_move_iterator(incoming.begin()), std::make_move_iterator(incoming.end()));
 
 		} while (++i < max_requests && !incoming.empty());
 
