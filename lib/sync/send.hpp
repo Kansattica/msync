@@ -71,7 +71,7 @@ private:
 
 			const std::string requesturl = paramaterize_url(baseurl, id, route<toread>(undo));
 
-			if (request_with_retries([&]() { return post(requesturl, access_token); }).first)
+			if (request_with_retries([&]() { return post(requesturl, access_token); }, retries).first)
 				pl() << requesturl << " OK\n";
 			else
 				failedids.push_back(std::move(queuefile.parsed.front()));
@@ -97,7 +97,7 @@ private:
 
 			pl() << "Uploading " << attachment.file << "...\n";
 
-			std::tie(succeeded, response) = request_with_retries([&]() { return upload(mediaurl, access_token, attachment.file, attachment.description); });
+			std::tie(succeeded, response) = request_with_retries([&]() { return upload(mediaurl, access_token, attachment.file, attachment.description); }, retries);
 
 			if (succeeded)
 			{
@@ -133,7 +133,7 @@ private:
 			if (undo)
 			{
 				const std::string requesturl = paramaterize_url(statusurl, id, "");
-				succeeded = request_with_retries([&]() { return del(requesturl, access_token); }).first;
+				succeeded = request_with_retries([&]() { return del(requesturl, access_token); }, retries).first;
 				if (succeeded)
 					pl() << "DELETE " << requesturl << " OK\n";
 			}
@@ -163,7 +163,7 @@ private:
 					pl() << '\n';
 
 					std::string response;
-					std::tie(succeeded, response) = request_with_retries([&]() { return new_status(statusurl, access_token, params); });
+					std::tie(succeeded, response) = request_with_retries([&]() { return new_status(statusurl, access_token, params); }, retries);
 
 					if (succeeded)
 					{
@@ -226,39 +226,6 @@ private:
 		}
 
 		return undo ? toreturn.second : toreturn.first;
-	}
-
-	template <typename make_request>
-	std::pair<bool, std::string> request_with_retries(make_request req)
-	{
-		for (unsigned int i = 0; i < retries; i++)
-		{
-			net_response response = req();
-
-			pl() << get_error_message(response.status_code, verbose_logs);
-
-			// later, handle what happens if we get rate limited
-
-			if (response.retryable_error)
-			{
-				// should retry
-				continue;
-			}
-
-			// some other error, assume unrecoverable
-			if (!response.okay)
-			{
-				auto parsed_error = read_error(response.message);
-				if (!parsed_error.empty())
-					response.message = std::move(parsed_error);
-				pl() << response.message << '\n';
-				return std::make_pair(false, std::move(response.message));
-			}
-
-			// must be 200, OK response
-			return std::make_pair(true, std::move(response.message));
-		}
-		return std::make_pair(false, "Maximum retries reached.");
 	}
 
 };

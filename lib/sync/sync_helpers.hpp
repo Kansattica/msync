@@ -66,6 +66,38 @@ void print_truncated_string(std::string_view toprint, Stream& str)
 	str << toprint;
 	if (truncated)
 		str << "...";
+}
 
+template <typename make_request>
+std::pair<bool, std::string> request_with_retries(make_request req, unsigned int retries)
+{
+	for (unsigned int i = 0; i < retries; i++)
+	{
+		net_response response = req();
+
+		pl() << get_error_message(response.status_code, verbose_logs);
+
+		// later, handle what happens if we get rate limited
+
+		if (response.retryable_error)
+		{
+			// should retry
+			continue;
+		}
+
+		// some other error, assume unrecoverable
+		if (!response.okay)
+		{
+			auto parsed_error = read_error(response.message);
+			if (!parsed_error.empty())
+				response.message = std::move(parsed_error);
+			pl() << response.message << '\n';
+			return std::make_pair(false, std::move(response.message));
+		}
+
+		// must be 200, OK response
+		return std::make_pair(true, std::move(response.message));
+	}
+	return std::make_pair(false, "Maximum retries reached.");
 }
 #endif
