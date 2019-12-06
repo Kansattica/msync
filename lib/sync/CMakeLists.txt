@@ -6,4 +6,5 @@ target_sources_local(sync
 	read_response.hpp
 	sync_helpers.cpp
 	sync_helpers.hpp
+	recv_helpers.hpp
 	)

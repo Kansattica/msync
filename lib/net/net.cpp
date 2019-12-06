@@ -114,20 +114,24 @@ net_response new_status(std::string_view url, std::string_view access_token, con
 			std::move(post_params)));
 }
 
-net_response get_timeline_and_notifs(std::string_view url, std::string_view access_token, std::string_view min_id, std::string_view max_id, unsigned int limit)
+void add_if_value(cpr::Parameters& params, const char* key, const std::string_view value)
 {
-	cpr::Parameters params{ { "limit", std::to_string(limit) } };
+	if (!value.empty())
+		params.AddParameter(cpr::Parameter{ key, value });
+}
 
-	if (!min_id.empty())
-		params.AddParameter(cpr::Parameter{ "min_id", min_id });
+net_response get_timeline_and_notifs(std::string_view url, std::string_view access_token, const timeline_params& params, unsigned int limit)
+{
+	cpr::Parameters query_params{ { "limit", std::to_string(limit) } };
 
-	if (!max_id.empty())
-		params.AddParameter(cpr::Parameter{ "max_id", max_id });
+	add_if_value(query_params, "min_id", params.min_id);
+	add_if_value(query_params, "max_id", params.max_id);
+	add_if_value(query_params, "since_id", params.since_id);
 
 	return handle_response(
 		cpr::Get(cpr::Url{ url },
 			cpr::Header{ {authorization_key_header, make_bearer(access_token) } },
-			std::move(params)
+			std::move(query_params)
 		)
 	);
 }

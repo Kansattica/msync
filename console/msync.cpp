@@ -213,5 +213,4 @@ void print_sensitive(std::string_view name, const std::string* value)
 		return;
 
 	pl() << name << ": [set, not shown for security]\n";
-
 }
