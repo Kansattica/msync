@@ -120,10 +120,12 @@ private:
 
 			incoming = deserialize<mastodon_entity>(response.second);
 
-			max_id = lowest_id(incoming);
-
-			if (!incoming.empty()) //I think the insert segfaults if incoming is empty?
+			if (!incoming.empty())
+			{
+				// can only call lowest_id on a non-empty vector
+				max_id = lowest_id(incoming);
 				total.insert(total.end(), std::make_move_iterator(incoming.begin()), std::make_move_iterator(incoming.end()));
+			}
 
 		} while (++i < max_requests && !incoming.empty());
 
