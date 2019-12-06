@@ -108,8 +108,8 @@ SCENARIO("read_accounts correctly fills global_options on construction.")
 			THEN("it was what we expected")
 			{
 				REQUIRE(found->first == "coolaccount@website.com");
-				REQUIRE(*found->second.get_option(user_option::account_name) == "coolaccount");
-				REQUIRE(*found->second.get_option(user_option::instance_url) == "website.com");
+				REQUIRE(found->second.get_option(user_option::account_name) == "coolaccount");
+				REQUIRE(found->second.get_option(user_option::instance_url) == "website.com");
 			}
 		}
 
@@ -279,7 +279,7 @@ SCENARIO("select_account selects exactly one account.")
 
 			THEN("the user_options is the correct one.")
 			{
-				const std::string account_name = *account->second.get_option(user_option::account_name);
+				const std::string& account_name = account->second.get_option(user_option::account_name);
 				REQUIRE(account_name == "someotheraccount@place2.egg");
 			}
 		}
@@ -296,7 +296,7 @@ SCENARIO("select_account selects exactly one account.")
 
 			THEN("the user_options is the correct one.")
 			{
-				REQUIRE(*account->second.get_option(user_option::account_name) == "someotheraccount@place2.egg");
+				REQUIRE(account->second.get_option(user_option::account_name) == "someotheraccount@place2.egg");
 			}
 		}
 

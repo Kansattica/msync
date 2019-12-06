@@ -5,6 +5,8 @@
 
 #include "../lib/options/user_options.hpp"
 
+#include "../lib/exception/msync_exception.hpp"
+
 SCENARIO("User_options reads from a file when created")
 {
     GIVEN("A file on disk with some properly formatted data")
@@ -24,13 +26,16 @@ SCENARIO("User_options reads from a file when created")
 
             THEN("the fields are set correctly.")
             {
-                REQUIRE(*opt.get_option(user_option::account_name) == "sometester");
-                REQUIRE(*opt.get_option(user_option::instance_url) == "website.egg");
+                REQUIRE(*opt.try_get_option(user_option::account_name) == "sometester");
+                REQUIRE(*opt.try_get_option(user_option::instance_url) == "website.egg");
+                REQUIRE(opt.get_option(user_option::account_name) == "sometester");
+                REQUIRE(opt.get_option(user_option::instance_url) == "website.egg");
             }
 
             THEN("empty fields are handled gracefully.")
             {
-                REQUIRE_FALSE(opt.get_option(user_option::access_token) != nullptr);
+                REQUIRE(opt.try_get_option(user_option::access_token) == nullptr);
+                REQUIRE_THROWS_AS(opt.get_option(user_option::access_token), msync_exception);
             }
 
             THEN("No .bak file is created.")
@@ -64,9 +69,12 @@ SCENARIO("User_options saves changes back to its file")
             THEN("a newly created user_options for the same path should see the change.")
             {
                 user_options newopt(fi.filename);
-                REQUIRE(*newopt.get_option(user_option::account_name) == "someoneelse");
-                REQUIRE(*newopt.get_option(user_option::instance_url) == "website.egg");
-                REQUIRE(newopt.get_option(user_option::access_token) == nullptr);
+                REQUIRE(*newopt.try_get_option(user_option::account_name) == "someoneelse");
+                REQUIRE(*newopt.try_get_option(user_option::instance_url) == "website.egg");
+                REQUIRE(newopt.get_option(user_option::account_name) == "someoneelse");
+                REQUIRE(newopt.get_option(user_option::instance_url) == "website.egg");
+                REQUIRE(newopt.try_get_option(user_option::access_token) == nullptr);
+                REQUIRE_THROWS_AS(newopt.get_option(user_option::access_token), msync_exception);
             }
 
             THEN("a .bak file with the original information should be created.")
@@ -140,7 +148,8 @@ SCENARIO("Get and set options manage string references correctly.")
         WHEN("an option that exists in the dictionary is requested")
         {
             user_options opt(fi.filename);
-            auto val = opt.get_option(user_option::account_name);
+            auto val = opt.try_get_option(user_option::account_name);
+            auto& refval = opt.get_option(user_option::account_name);
 
             THEN("the value is present.")
             {
@@ -150,6 +159,7 @@ SCENARIO("Get and set options manage string references correctly.")
             THEN("the value is correct.")
             {
                 REQUIRE(*val == "sometester");
+                REQUIRE(*val == refval);
             }
 
             AND_WHEN("the option is modified")
@@ -159,6 +169,7 @@ SCENARIO("Get and set options manage string references correctly.")
                 THEN("the change is reflected in the original value")
                 {
                     REQUIRE(*val == "someotherguy");
+                    REQUIRE(refval == "someotherguy");
                 }
             }
         }
@@ -231,7 +242,8 @@ SCENARIO("The enum overload for get_option works.")
                 THEN("it has the correct value.")
                 {
                     REQUIRE(neweropt.get_sync_option(user_option::pull_home) == sync_settings::oldest_first);
-                    REQUIRE(*neweropt.get_option(user_option::pull_home) == "oldest_first");
+                    REQUIRE(*neweropt.try_get_option(user_option::pull_home) == "oldest_first");
+                    REQUIRE(neweropt.get_option(user_option::pull_home) == "oldest_first");
                 }
             }
         }

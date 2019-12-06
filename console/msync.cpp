@@ -44,7 +44,7 @@ int main(int argc, const char* argv[])
 			make_new_account(parsed.account);
 			break;
 		case mode::showopt:
-			print_stringptr(assume_account(user).second.get_option(parsed.toset));
+			print_stringptr(assume_account(user).second.try_get_option(parsed.toset));
 			break;
 		case mode::showallopt:
 			for (auto opt = user_option(0); opt <= user_option::pull_notifications; opt = user_option(static_cast<int>(opt) + 1))
@@ -52,7 +52,7 @@ int main(int argc, const char* argv[])
 				const auto option_name = USER_OPTION_NAMES[static_cast<int>(opt)];
 				if (opt < user_option::pull_home)
 				{
-					const auto option_value = assume_account(user).second.get_option(opt);
+					const auto option_value = assume_account(user).second.try_get_option(opt);
 					if (is_sensitive(opt))
 					{
 						print_sensitive(option_name, option_value);
@@ -118,10 +118,10 @@ int main(int argc, const char* argv[])
 				if (user == nullptr)
 				{
 					options().foreach_account([&send](const auto& user) {
-						send.send(user.first, *user.second.get_option(user_option::instance_url), *user.second.get_option(user_option::access_token)); });
+						send.send(user.first, user.second.get_option(user_option::instance_url), user.second.get_option(user_option::access_token)); });
 				}
 				else
-					send.send(user->first, *user->second.get_option(user_option::instance_url), *user->second.get_option(user_option::access_token));
+					send.send(user->first, user->second.get_option(user_option::instance_url), user->second.get_option(user_option::access_token));
 			}
 			should_print_newline = false;
 			break;
@@ -180,7 +180,7 @@ void print_iterable(const T& vec)
 
 bool is_sensitive(user_option opt)
 {
-	for (const user_option sensitive : {user_option::access_token, user_option::auth_code, user_option::client_id, user_option::client_secret})
+	for (const user_option sensitive : { user_option::access_token, user_option::auth_code, user_option::client_id, user_option::client_secret })
 	{
 		if (opt == sensitive)
 			return true;

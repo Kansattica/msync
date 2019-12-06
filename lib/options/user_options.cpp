@@ -4,13 +4,30 @@
 #include <cassert>
 #include <utility>
 
-const std::string* user_options::get_option(user_option toget) const
+#include "../exception/msync_exception.hpp"
+
+const std::string* user_options::try_get_option(user_option toget) const
 {
     const auto val = backing.parsed.find(USER_OPTION_NAMES[static_cast<size_t>(toget)]);
     if (val == backing.parsed.end())
         return nullptr;
 
     return &val->second;
+}
+
+std::string make_error_message(const std::string_view& option_name)
+{
+    return std::string{ "msync cannot continue because the following option was not set: " }.append(option_name);
+}
+
+const std::string& user_options::get_option(user_option toget) const
+{
+    const auto& option_name = USER_OPTION_NAMES[static_cast<size_t>(toget)];
+    const auto val = backing.parsed.find(option_name);
+    if (val == backing.parsed.end())
+        throw msync_exception(make_error_message(option_name));
+
+    return val->second;
 }
 
 std::array<sync_settings, 3> sync_setting_defaults = {

@@ -12,7 +12,8 @@ struct user_options
 public:
     user_options(fs::path toread) : backing(toread){};
 
-    const std::string* get_option(user_option toget) const;
+    const std::string* try_get_option(user_option toget) const;
+    const std::string& get_option(user_option toget) const;
     sync_settings get_sync_option(user_option toget) const;
 
     void set_option(user_option toset, std::string value);
