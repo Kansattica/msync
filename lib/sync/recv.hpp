@@ -15,6 +15,7 @@
 #include "sync_helpers.hpp"
 #include "recv_helpers.hpp"
 
+#include <filesystem.hpp>
 #include <string_view>
 #include <algorithm>
 #include <iterator>
@@ -35,17 +36,20 @@ public:
 		max_requests = set_default(max_requests, 5, "Maximum requests cannot be zero or less. Resetting to 5.\n", pl());
 		per_call = set_default(per_call, 20, "Number of posts to get per call cannot be zero or less. Resetting to 20.\n", pl());
 
+		const fs::path user_folder = options().account_directory_location / account_name;
+
 		pl() << "Downloading notifications for " << account_name << '\n';
-		update_timeline<to_get::notifications, mastodon_notification>(account);
+		update_timeline<to_get::notifications, mastodon_notification>(account, user_folder);
+
 		pl() << "Downloading the home timeline for " << account_name << '\n';
-		update_timeline<to_get::home, mastodon_status>(account);
+		update_timeline<to_get::home, mastodon_status>(account, user_folder);
 	}
 
 private:
 	get_posts& download;
 
 	template <to_get timeline, typename mastodon_entity>
-	void update_timeline(user_options& account)
+	void update_timeline(user_options& account, const fs::path& user_folder)
 	{
 		constexpr recv_parameters params = get_parameters<timeline>();
 
@@ -69,8 +73,10 @@ private:
 		// the other thing to keep in mind is that the newest posts are first back from the API (that is, the highest ID is at position 0)
 		// but should be written to the file so that the newest post is at the bottom of the file, and so the lowest ID should be written first
 
+		const fs::path target_file = user_folder / params.filename;
+		plverb() << "Writing to " << target_file << '\n';
 
-		post_list<mastodon_entity> writer{ options().account_directory_location / params.filename };
+		post_list<mastodon_entity> writer{ target_file };
 		std::string highest_id;
 
 		if (last_recorded_id == nullptr || sync_method == sync_settings::newest_first)
