@@ -7,6 +7,7 @@
 #include <filesystem.hpp>
 
 #include "../net_interface/net_interface.hpp"
+#include "read_response.hpp"
 
 constexpr std::string_view status_route{ "/api/v1/statuses/" };
 constexpr std::string_view media_route{ "/api/v1/media" };
@@ -75,7 +76,7 @@ std::pair<bool, std::string> request_with_retries(make_request req, unsigned int
 	{
 		net_response response = req();
 
-		os << get_error_message(response.status_code, verbose_logs);
+		os << get_error_message(response.status_code, false);
 
 		// later, handle what happens if we get rate limited
 
@@ -99,7 +100,7 @@ std::pair<bool, std::string> request_with_retries(make_request req, unsigned int
 		return std::make_pair(true, std::move(response.message));
 	}
 
-	pl() << "Maximum retries reached.\n";
+	os << "Maximum retries reached.\n";
 	return std::make_pair(false, "Maximum retries reached.");
 }
 #endif
