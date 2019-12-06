@@ -42,7 +42,7 @@ std::vector<std::string> read_lines(const fs::path& toread)
 
 size_t count_files_in_directory(const fs::path& tocheck)
 {
-	if (!fs::is_directory(tocheck)) { return false; }
+	if (!fs::is_directory(tocheck)) { return -1; }
 
 	size_t count = 0;
 	auto dir = fs::directory_iterator(tocheck);
