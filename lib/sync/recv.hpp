@@ -23,7 +23,7 @@ public:
 	unsigned int max_requests = 10;
 	unsigned int per_call = 20;
 
-	recv_posts(get_posts& get_posts) : download(get_posts) {};
+	recv_posts(get_posts& post_downloader) : download(post_downloader) {};
 
 	void get(std::string_view account_name, user_options& account)
 	{
@@ -48,7 +48,7 @@ private:
 	{
 		if constexpr (timeline == to_get::notifications)
 		{
-			return { user_option::last_notification_id, user_option::pull_notifications, notifications_route, Notifications_Filename }
+			return { user_option::last_notification_id, user_option::pull_notifications, notifications_route, Notifications_Filename };
 		}
 	}
 
