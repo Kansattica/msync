@@ -100,13 +100,14 @@ private:
 		std::string max_id;
 
 		std::vector<mastodon_entity> total, incoming;
+
 		timeline_params query_parameters;
+		query_parameters.since_id = last_recorded_id;
 
 		unsigned int i = 0;
 		do
 		{
 			query_parameters.max_id = max_id;
-			query_parameters.since_id = last_recorded_id;
 
 			print_api_call(url, query_parameters, pl());
 
