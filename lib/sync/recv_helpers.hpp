@@ -18,6 +18,11 @@ constexpr recv_parameters get_parameters()
 	{
 		return { user_option::last_notification_id, user_option::pull_notifications, notifications_route, Notifications_Filename };
 	}
+
+	if constexpr (timeline == to_get::home)
+	{
+		return { user_option::last_home_id, user_option::pull_home, home_route, Home_Timeline_Filename };
+	}
 }
 
 template <typename entity>
