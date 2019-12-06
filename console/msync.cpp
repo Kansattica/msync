@@ -11,6 +11,7 @@
 #include "../lib/postfile/outgoing_post.hpp"
 #include "../lib/queue/queues.hpp"
 #include "../lib/sync/send.hpp"
+#include "../lib/sync/recv.hpp"
 #include "../lib/net/net.hpp"
 #include "../lib/util/util.hpp"
 #include "newaccount.hpp"
@@ -122,6 +123,23 @@ int main(int argc, const char* argv[])
 				}
 				else
 					send.send(user->first, user->second.get_option(user_option::instance_url), user->second.get_option(user_option::access_token));
+			}
+
+			if (parsed.sync_opts.get)
+			{
+				recv_posts recv{ get_timeline_and_notifs };
+				recv.max_requests = parsed.sync_opts.max_requests;
+				recv.per_call = parsed.sync_opts.per_call;
+				recv.retries = parsed.sync_opts.retries;
+
+				if (user == nullptr)
+				{
+					options().foreach_account([&recv](auto& user) {
+						recv.get(user.first, user.second); });
+				}
+				else
+					recv.get(user->first, user->second);
+				
 			}
 			should_print_newline = false;
 			break;

@@ -15,6 +15,19 @@
 
 #include <string_view>
 
+enum class to_get { notifications, home, lists };
+
+struct timeline_parameters { user_option last_id_setting; user_option sync_setting; std::string_view route; std::string_view filename; };
+
+template <to_get timeline>
+constexpr timeline_parameters get_parameters()
+{
+	if constexpr (timeline == to_get::notifications)
+	{
+		return { user_option::last_notification_id, user_option::pull_notifications, notifications_route, Notifications_Filename };
+	}
+}
+
 template <typename get_posts>
 struct recv_posts
 {
@@ -39,18 +52,6 @@ public:
 private:
 	get_posts& download;
 
-	enum class to_get { notifications, home, lists };
-
-	struct timeline_parameters { user_option last_id_setting; user_option sync_setting; std::string_view route; std::string_view filename; };
-
-	template <to_get timeline>
-	constexpr timeline_parameters get_parameters() const
-	{
-		if constexpr (timeline == to_get::notifications)
-		{
-			return { user_option::last_notification_id, user_option::pull_notifications, notifications_route, Notifications_Filename };
-		}
-	}
 
 	template <to_get timeline>
 	void update_timeline(user_options& account)
