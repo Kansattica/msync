@@ -117,9 +117,19 @@ mastodon_status read_status(const std::string_view status_json)
 	return json::parse(status_json).get<mastodon_status>();
 }
 
+std::vector<mastodon_status> read_statuses(const std::string_view timeline_json)
+{
+	return json::parse(timeline_json).get<std::vector<mastodon_status>>();
+}
+
 mastodon_notification read_notification(const std::string_view notification_json)
 {
 	return json::parse(notification_json).get<mastodon_notification>();
+}
+
+std::vector<mastodon_notification> read_notifications(const std::string_view notifications_json)
+{
+	return json::parse(notifications_json).get<std::vector<mastodon_notification>>();
 }
 
 std::string read_upload_id(const std::string_view attachment_json)
