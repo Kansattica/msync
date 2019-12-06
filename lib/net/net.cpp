@@ -114,12 +114,15 @@ net_response new_status(std::string_view url, std::string_view access_token, con
 			std::move(post_params)));
 }
 
-net_response get_timeline_and_notifs(std::string_view url, std::string_view access_token, std::string_view min_id, unsigned int limit)
+net_response get_timeline_and_notifs(std::string_view url, std::string_view access_token, std::string_view min_id, std::string_view max_id, unsigned int limit)
 {
 	cpr::Parameters params{ { "limit", std::to_string(limit) } };
 
 	if (!min_id.empty())
 		params.AddParameter(cpr::Parameter{ "min_id", min_id });
+
+	if (!max_id.empty())
+		params.AddParameter(cpr::Parameter{ "max_id", max_id });
 
 	return handle_response(
 		cpr::Get(cpr::Url{ url },
