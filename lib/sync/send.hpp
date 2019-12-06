@@ -71,7 +71,7 @@ private:
 
 			const std::string requesturl = paramaterize_url(baseurl, id, route<toread>(undo));
 
-			if (request_with_retries([&]() { return post(requesturl, access_token); }, retries).first)
+			if (request_with_retries([&]() { return post(requesturl, access_token); }, retries, pl()).first)
 				pl() << requesturl << " OK\n";
 			else
 				failedids.push_back(std::move(queuefile.parsed.front()));
@@ -97,7 +97,7 @@ private:
 
 			pl() << "Uploading " << attachment.file << "...\n";
 
-			std::tie(succeeded, response) = request_with_retries([&]() { return upload(mediaurl, access_token, attachment.file, attachment.description); }, retries);
+			std::tie(succeeded, response) = request_with_retries([&]() { return upload(mediaurl, access_token, attachment.file, attachment.description); }, retries, pl());
 
 			if (succeeded)
 			{
@@ -133,7 +133,7 @@ private:
 			if (undo)
 			{
 				const std::string requesturl = paramaterize_url(statusurl, id, "");
-				succeeded = request_with_retries([&]() { return del(requesturl, access_token); }, retries).first;
+				succeeded = request_with_retries([&]() { return del(requesturl, access_token); }, retries, pl()).first;
 				if (succeeded)
 					pl() << "DELETE " << requesturl << " OK\n";
 			}
@@ -163,7 +163,7 @@ private:
 					pl() << '\n';
 
 					std::string response;
-					std::tie(succeeded, response) = request_with_retries([&]() { return new_status(statusurl, access_token, params); }, retries);
+					std::tie(succeeded, response) = request_with_retries([&]() { return new_status(statusurl, access_token, params); }, retries, pl());
 
 					if (succeeded)
 					{

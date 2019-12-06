@@ -103,7 +103,7 @@ private:
 
 			print_api_call(url, query_parameters, pl());
 
-			auto response = request_with_retries([&]() { return download(url, access_token, query_parameters, per_call); }, retries);
+			auto response = request_with_retries([&]() { return download(url, access_token, query_parameters, per_call); }, retries, pl());
 
 			if (!response.first)
 			{
@@ -144,7 +144,7 @@ private:
 		{
 			print_api_call(url, query_parameters, pl());
 
-			auto response = request_with_retries([&]() { return download(url, access_token, query_parameters, per_call); }, retries);
+			auto response = request_with_retries([&]() { return download(url, access_token, query_parameters, per_call); }, retries, pl());
 
 			if (!response.first)
 			{
