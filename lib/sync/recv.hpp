@@ -132,7 +132,7 @@ private:
 				total.insert(total.end(), std::make_move_iterator(incoming.begin()), std::make_move_iterator(incoming.end()));
 			}
 
-			loop_iterations--
+			loop_iterations--;
 		} while (loop_iterations > 0 && !incoming.empty());
 
 		plverb() << "Writing " << total.size() << " posts.\n";
@@ -184,7 +184,8 @@ private:
 				std::for_each(incoming.rbegin(), incoming.rend(), [&writer](const auto& elem) { writer.write(elem); });
 			}
 
-		} while (++i < max_requests && !incoming.empty());
+			--loop_iterations;
+		} while (loop_iterations > 0 && !incoming.empty());
 
 		return highest_id_seen;
 	}
