@@ -133,7 +133,9 @@ private:
 			}
 
 			loop_iterations--;
-		} while (loop_iterations > 0 && !incoming.empty());
+
+			// if you get less than you asked for, you're done
+		} while (loop_iterations > 0 && (incoming.size() < per_call));
 
 		plverb() << "Writing " << total.size() << " posts.\n";
 
@@ -185,7 +187,9 @@ private:
 			}
 
 			--loop_iterations;
-		} while (loop_iterations > 0 && !incoming.empty());
+
+			// if you get less than you asked for, you're done
+		} while (loop_iterations > 0 && (incoming.size() < per_call));
 
 		return highest_id_seen;
 	}
