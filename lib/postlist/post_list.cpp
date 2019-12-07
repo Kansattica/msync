@@ -72,6 +72,7 @@ const char* notification_verb(notif_type t)
 
 std::ofstream& operator<<(std::ofstream& out, const mastodon_notification& notification)
 {
+	out << "notification id: " << notification.id << '\n';
 	out << "at " << notification.created_at << ", ";
 	out << notification.account.account_name << (notification.account.is_bot ? " [bot]" : "") << notification_verb(notification.type);
 	
