@@ -164,11 +164,11 @@ private:
 
 			incoming = deserialize<mastodon_entity>(response.second);
 
+			plverb() << "Writing " << incoming.size() << " posts.\n";
+
 			if (!incoming.empty())
 			{
 				query_parameters.min_id = highest_id_seen = highest_id(incoming);
-
-				plverb() << "Writing " << incoming.size() << " posts.\n";
 
 				// we want the latest post (highest ID) to be last, but it's in position 0, so iterate backwards
 				std::for_each(incoming.rbegin(), incoming.rend(), [&writer](const auto& elem) { writer.write(elem); });
