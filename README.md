@@ -28,6 +28,7 @@ I currently build and ensure all tests pass on Linux with both clang and gcc, as
 
 ### Roadmap (things for later)
 - [ ] Queue and send profile updates
+- [ ] Download individual posts and threads by URL or ID
 - [ ] Poll support
 - [ ] Nicer UI, like a minimal webpage to show downloaded posts in.
 
