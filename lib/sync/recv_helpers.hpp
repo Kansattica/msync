@@ -71,29 +71,18 @@ std::string_view get_or_empty(const std::string* str)
 }
 
 template <typename Stream>
-void print_api_call(std::string_view url, const timeline_params& params, Stream& os)
+void print_api_call(std::string_view url, unsigned int limit, const timeline_params& params, Stream& os)
 {
-	bool first = true;
-	os << "GET " << url << '?';
+	os << "GET " << url << "?limit=" << limit;
 
 	if (!params.max_id.empty())
-	{
-		os << "max_id=" << params.max_id;
-		first = false;
-	}
+		os << "&max_id=" << params.max_id;
 
 	if (!params.min_id.empty())
-	{
-		if (!first) { os << '&'; }
-		os << "min_id=" << params.min_id;
-		first = false;
-	}
+		os << "&min_id=" << params.min_id;
 
 	if (!params.since_id.empty())
-	{
-		if (!first) { os << '&'; }
-		os << "since_id=" << params.since_id;
-	}
+		os << "&since_id=" << params.since_id;
 
 	os << '\n';
 }

@@ -114,7 +114,7 @@ private:
 		{
 			query_parameters.max_id = max_id;
 
-			print_api_call(url, query_parameters, pl());
+			print_api_call(url, per_call, query_parameters, pl());
 
 			auto response = request_with_retries([&]() { return download(url, access_token, query_parameters, per_call); }, retries, pl());
 
@@ -165,7 +165,7 @@ private:
 			loop_iterations = std::numeric_limits<unsigned int>::max();
 		do
 		{
-			print_api_call(url, query_parameters, pl());
+			print_api_call(url, per_call, query_parameters, pl());
 
 			const auto response = request_with_retries([&]() { return download(url, access_token, query_parameters, per_call); }, retries, pl());
 
