@@ -15,6 +15,6 @@ constexpr std::string_view Post_Queue_Filename{ "post.queue" };
 constexpr std::string_view File_Queue_Directory{ "queuedposts" };
 
 constexpr std::string_view Home_Timeline_Filename{ "home.list" };
-constexpr std::string_view Direct_Messages_Filename{ "dm.list" };
 constexpr std::string_view Notifications_Filename{ "notifications.list" };
+constexpr std::string_view Direct_Messages_Filename{ "dm.list" };
 #endif

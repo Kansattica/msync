@@ -11,8 +11,6 @@
 
 constexpr std::string_view status_route{ "/api/v1/statuses/" };
 constexpr std::string_view media_route{ "/api/v1/media" };
-constexpr std::string_view home_route{ "/api/v1/timelines/home" };
-constexpr std::string_view notifications_route{ "/api/v1/notifications" };
 
 constexpr std::pair<std::string_view, std::string_view> favroutepost{ "/favourite", "/unfavourite" };
 constexpr std::pair<std::string_view, std::string_view> boostroutepost{ "/reblog", "/unreblog" };

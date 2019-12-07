@@ -8,7 +8,6 @@
 #include "../options/user_options.hpp"
 #include "../options/global_options.hpp"
 
-#include "../constants/constants.hpp"
 #include "../postlist/post_list.hpp"
 #include "../util/util.hpp"
 
@@ -37,6 +36,9 @@ public:
 		per_call = set_default(per_call, 20, "Number of posts to get per call cannot be zero or less. Resetting to 20.\n", pl());
 
 		const fs::path user_folder = options().account_directory_location / account_name;
+
+		pl() << "Downloading direct messages for " << account_name << '\n';
+		update_timeline<to_get::dms, mastodon_status>(account, user_folder);
 
 		pl() << "Downloading notifications for " << account_name << '\n';
 		update_timeline<to_get::notifications, mastodon_notification>(account, user_folder);
@@ -155,7 +157,7 @@ private:
 		{
 			print_api_call(url, query_parameters, pl());
 
-			auto response = request_with_retries([&]() { return download(url, access_token, query_parameters, per_call); }, retries, pl());
+			const auto response = request_with_retries([&]() { return download(url, access_token, query_parameters, per_call); }, retries, pl());
 
 			if (!response.first)
 			{

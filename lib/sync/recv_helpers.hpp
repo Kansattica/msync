@@ -5,11 +5,17 @@
 #include <string_view>
 #include <string>
 
+#include "../constants/constants.hpp"
+
 #include "read_response.hpp"
 
-enum class to_get { notifications, home, lists };
+enum class to_get { notifications, home, dms, lists };
 
 struct recv_parameters { user_option last_id_setting; user_option sync_setting; std::string_view route; std::string_view filename; };
+
+constexpr std::string_view home_route{ "/api/v1/timelines/home" };
+constexpr std::string_view notifications_route{ "/api/v1/notifications" };
+constexpr std::string_view dm_route{ "/api/v1/conversations" };
 
 template <to_get timeline>
 constexpr recv_parameters get_parameters()
@@ -22,6 +28,11 @@ constexpr recv_parameters get_parameters()
 	if constexpr (timeline == to_get::home)
 	{
 		return { user_option::last_home_id, user_option::pull_home, home_route, Home_Timeline_Filename };
+	}
+
+	if constexpr (timeline == to_get::dms)
+	{
+		return { user_option::last_dm_id, user_option::last_dm_id, dm_route, Direct_Messages_Filename };
 	}
 }
 
