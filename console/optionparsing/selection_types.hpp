@@ -5,7 +5,7 @@
 struct sync_options
 {
     unsigned int retries = 3;
-    unsigned int max_requests = 10;
+    unsigned int max_requests = 0;
     unsigned int per_call = 20;
 	bool send = true;
 	bool get = true;

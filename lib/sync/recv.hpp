@@ -18,13 +18,14 @@
 #include <string_view>
 #include <algorithm>
 #include <iterator>
+#include <limits>
 
 template <typename get_posts>
 struct recv_posts
 {
 public:
 	unsigned int retries = 3;
-	unsigned int max_requests = 10;
+	unsigned int max_requests = 0;
 	unsigned int per_call = 20;
 
 	recv_posts(get_posts& post_downloader) : download(post_downloader) {};
@@ -32,7 +33,6 @@ public:
 	void get(std::string_view account_name, user_options& account)
 	{
 		retries = set_default(retries, 3, "Number of retries cannot be zero or less. Resetting to 3.\n", pl());
-		max_requests = set_default(max_requests, 5, "Maximum requests cannot be zero or less. Resetting to 5.\n", pl());
 		per_call = set_default(per_call, 20, "Number of posts to get per call cannot be zero or less. Resetting to 20.\n", pl());
 
 		const fs::path user_folder = options().account_directory_location / account_name;
@@ -78,7 +78,7 @@ private:
 		post_list<mastodon_entity> writer{ target_file };
 		std::string highest_id;
 
-		if (last_recorded_id == nullptr || sync_method == sync_settings::newest_first)
+		if (last_recorded_id.empty() || sync_method == sync_settings::newest_first)
 		{
 			highest_id = newest_first(writer, url, access_token, last_recorded_id);
 		}
@@ -103,7 +103,13 @@ private:
 		timeline_params query_parameters;
 		query_parameters.since_id = last_recorded_id;
 
-		unsigned int i = 0;
+		// if max_requests is zero, that means "make calls until caught up"
+		// however, if we don't have a last recorded ID, make five requests instead so we don't get all posts from now to the beginning of time
+
+		unsigned int loop_iterations = max_requests;
+		if (loop_iterations == 0)
+			loop_iterations = last_recorded_id.empty() ? 5 : std::numeric_limits<unsigned int>::max();
+
 		do
 		{
 			query_parameters.max_id = max_id;
@@ -126,7 +132,8 @@ private:
 				total.insert(total.end(), std::make_move_iterator(incoming.begin()), std::make_move_iterator(incoming.end()));
 			}
 
-		} while (++i < max_requests && !incoming.empty());
+			loop_iterations--
+		} while (loop_iterations > 0 && !incoming.empty());
 
 		plverb() << "Writing " << total.size() << " posts.\n";
 
@@ -149,7 +156,11 @@ private:
 		
 		std::string highest_id_seen;
 
-		unsigned int i = 0;
+		// max_requests being zero means "request until caught up".
+		// oldest_first doesn't have to worry about that "first time" weirdness, the first download will always use newest_first
+		unsigned int loop_iterations = max_requests;
+		if (loop_iterations == 0)
+			loop_iterations = std::numeric_limits<unsigned int>::max();
 		do
 		{
 			print_api_call(url, query_parameters, pl());

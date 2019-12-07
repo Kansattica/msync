@@ -671,7 +671,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 			{
 				REQUIRE(parsed.sync_opts.retries == 3);
 				REQUIRE(parsed.sync_opts.per_call == 20);
-				REQUIRE(parsed.sync_opts.max_requests == 10);
+				REQUIRE(parsed.sync_opts.max_requests == 0);
 			}
 
 			THEN("the correct options are set")
@@ -710,7 +710,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 			THEN("the defaults are set correctly")
 			{
 				REQUIRE(parsed.sync_opts.retries == 3);
-				REQUIRE(parsed.sync_opts.max_requests == 10);
+				REQUIRE(parsed.sync_opts.max_requests == 0);
 			}
 			
 			THEN("the non-defaults are set correctly")
