@@ -32,7 +32,7 @@ constexpr recv_parameters get_parameters()
 
 	if constexpr (timeline == to_get::dms)
 	{
-		return { user_option::last_dm_id, user_option::last_dm_id, dm_route, Direct_Messages_Filename };
+		return { user_option::last_dm_id, user_option::pull_dms, dm_route, Direct_Messages_Filename };
 	}
 }
 
