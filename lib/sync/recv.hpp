@@ -37,9 +37,6 @@ public:
 
 		const fs::path user_folder = options().account_directory_location / account_name;
 
-		pl() << "Downloading direct messages for " << account_name << '\n';
-		update_timeline<to_get::dms, mastodon_status>(account, user_folder);
-
 		pl() << "Downloading notifications for " << account_name << '\n';
 		update_timeline<to_get::notifications, mastodon_notification>(account, user_folder);
 
