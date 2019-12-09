@@ -1,7 +1,6 @@
 #ifndef _RECV_HELPERS_HPP_
 #define _RECV_HELPERS_HPP_
 
-#include <type_traits>
 #include <string_view>
 #include <string>
 
@@ -50,17 +49,18 @@ bool contains_id(const std::vector<entity>& chunk, std::string_view id)
 }
 
 template <typename entity>
-std::vector<entity> deserialize(const std::string& json)
-{
-	if constexpr (std::is_same<entity, mastodon_notification>::value)
-	{
-		return read_notifications(json);
-	}
+std::vector<entity> deserialize(const std::string& json);
 
-	if constexpr (std::is_same<entity, mastodon_status>::value)
-	{
-		return read_statuses(json);
-	}
+template <>
+std::vector<mastodon_notification> deserialize(const std::string& json)
+{
+	return read_notifications(json);
+}
+
+template <>
+std::vector<mastodon_status> deserialize(const std::string& json)
+{
+	return read_statuses(json);
 }
 
 std::string_view get_or_empty(const std::string* str)
