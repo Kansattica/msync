@@ -519,7 +519,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 	GIVEN("A command line that says 'sync' and specifies getting only.")
 	{
 		int argc = 3;
-		char const* argv[]{"msync", "sync", "-g"};
+		char const* argv[]{ "msync", "sync", "-g" };
 
 		WHEN("the command line is parsed")
 		{
@@ -551,7 +551,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 	GIVEN("A command line that says 'sync' and specifies sending only.")
 	{
 		int argc = 3;
-		char const* argv[]{"msync", "sync", "-s"};
+		char const* argv[]{ "msync", "sync", "-s" };
 
 		WHEN("the command line is parsed")
 		{
@@ -583,7 +583,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 	GIVEN("A command line that says 'sync' and specifies an account and number of retries with the long options.")
 	{
 		int argc = 6;
-		char const* argv[]{"msync", "sync", "--retries", "15", "--account", "coolfella"};
+		char const* argv[]{ "msync", "sync", "--retries", "15", "--account", "coolfella" };
 
 		WHEN("the command line is parsed")
 		{
@@ -614,7 +614,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 	GIVEN("A command line that says 'sync' and specifies an account, get only, and number of retries with the long options.")
 	{
 		int argc = 7;
-		char const* argv[]{"msync", "sync", "--get-only", "--retries", "15", "--account", "coolfella"};
+		char const* argv[]{ "msync", "sync", "--get-only", "--retries", "15", "--account", "coolfella" };
 
 		WHEN("the command line is parsed")
 		{
@@ -712,7 +712,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 				REQUIRE(parsed.sync_opts.retries == 3);
 				REQUIRE(parsed.sync_opts.max_requests == 0);
 			}
-			
+
 			THEN("the non-defaults are set correctly")
 			{
 				REQUIRE(parsed.sync_opts.per_call == 50);
@@ -755,7 +755,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 			{
 				REQUIRE(parsed.sync_opts.retries == 3);
 			}
-			
+
 			THEN("the non-defaults are set correctly")
 			{
 				REQUIRE(parsed.sync_opts.per_call == 60);
@@ -774,48 +774,48 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 			}
 		}
 
-	GIVEN("A command line that says 'sync' and specifies receive only and all the options.")
-	{
-		const char* get = GENERATE(as<const char*>{}, "-g", "--get-only", "--recv-only");
-		const char* posts = GENERATE(as<const char*>{}, "-p", "--posts");
-		const char* max = GENERATE(as<const char*>{}, "-m", "--max-requests");
-		const char* retry = GENERATE(as<const char*>{}, "-r", "--retries");
-		const char* account = GENERATE(as<const char*>{}, "-a", "--account");
-		std::array<char const*, 11> argv{ "msync", "sync", get, retry, "200", max, "62", posts, "1000", account, "cool@folks.egg" };
-
-		WHEN("the command line is parsed")
+		GIVEN("A command line that says 'sync' and specifies receive only and all the options.")
 		{
-			auto parsed = parse((int)argv.size(), argv.data());
+			const char* get = GENERATE(as<const char*>{}, "-g", "--get-only", "--recv-only");
+			const char* posts = GENERATE(as<const char*>{}, "-p", "--posts");
+			const char* max = GENERATE(as<const char*>{}, "-m", "--max-requests");
+			const char* retry = GENERATE(as<const char*>{}, "-r", "--retries");
+			const char* account = GENERATE(as<const char*>{}, "-a", "--account");
+			std::array<char const*, 11> argv{ "msync", "sync", get, retry, "200", max, "62", posts, "1000", account, "cool@folks.egg" };
 
-			THEN("the selected mode is sync")
+			WHEN("the command line is parsed")
 			{
-				REQUIRE(parsed.selected == mode::sync);
-			}
+				auto parsed = parse((int)argv.size(), argv.data());
 
-			THEN("account is set")
-			{
-				REQUIRE(parsed.account == "cool@folks.egg");
-			}
+				THEN("the selected mode is sync")
+				{
+					REQUIRE(parsed.selected == mode::sync);
+				}
 
-			THEN("the non-defaults are set correctly")
-			{
-				REQUIRE(parsed.sync_opts.retries == 200);
-				REQUIRE(parsed.sync_opts.max_requests == 62);
-				REQUIRE(parsed.sync_opts.per_call == 1000);
-			}
+				THEN("account is set")
+				{
+					REQUIRE(parsed.account == "cool@folks.egg");
+				}
 
-			THEN("the correct options are set")
-			{
-				REQUIRE(parsed.sync_opts.get);
-				REQUIRE_FALSE(parsed.sync_opts.send);
-			}
+				THEN("the non-defaults are set correctly")
+				{
+					REQUIRE(parsed.sync_opts.retries == 200);
+					REQUIRE(parsed.sync_opts.max_requests == 62);
+					REQUIRE(parsed.sync_opts.per_call == 1000);
+				}
 
-			THEN("the parse is good")
-			{
-				REQUIRE(parsed.okay);
+				THEN("the correct options are set")
+				{
+					REQUIRE(parsed.sync_opts.get);
+					REQUIRE_FALSE(parsed.sync_opts.send);
+				}
+
+				THEN("the parse is good")
+				{
+					REQUIRE(parsed.okay);
+				}
 			}
 		}
-	}
 	}
 }
 
@@ -906,7 +906,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 	{
 		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
 		int argc = 4;
-		char const* argv[]{ "msync", qcommand, "post", "msync.post"};
+		char const* argv[]{ "msync", qcommand, "post", "msync.post" };
 
 		WHEN("the command line is parsed")
 		{
@@ -1038,32 +1038,32 @@ command_line_option pick_attachment(int number, gen_options& expected)
 
 	switch (number)
 	{
-		case 0:
-			opt.options.push_back("-f");
-			opt.options.push_back("someattach");
-			expected.post.attachments.push_back("someattach");
-			break;
-		case 1:
-			opt.options.push_back("--attach");
-			opt.options.push_back("attacher");
-			opt.options.push_back("somefile");
-			expected.post.attachments.push_back("attacher");
-			expected.post.attachments.push_back("somefile");
-			break;
-		case 2:
-			opt.options.push_back("--file");
-			opt.options.push_back("filey");
-			expected.post.attachments.push_back("filey");
-			break;
-		case 3:
-			break;
-			//case 1:
-			//	opt.options.push_back("-f");
-			//	opt.options.push_back("someotherattach");
-			//	opt.options.push_back("thirdattach");
-			//	expected.post.attachments.push_back("someotherattach");
-			//	expected.post.attachments.push_back("thirdattach");
-			//	break;
+	case 0:
+		opt.options.push_back("-f");
+		opt.options.push_back("someattach");
+		expected.post.attachments.push_back("someattach");
+		break;
+	case 1:
+		opt.options.push_back("--attach");
+		opt.options.push_back("attacher");
+		opt.options.push_back("somefile");
+		expected.post.attachments.push_back("attacher");
+		expected.post.attachments.push_back("somefile");
+		break;
+	case 2:
+		opt.options.push_back("--file");
+		opt.options.push_back("filey");
+		expected.post.attachments.push_back("filey");
+		break;
+	case 3:
+		break;
+		//case 1:
+		//	opt.options.push_back("-f");
+		//	opt.options.push_back("someotherattach");
+		//	opt.options.push_back("thirdattach");
+		//	expected.post.attachments.push_back("someotherattach");
+		//	expected.post.attachments.push_back("thirdattach");
+		//	break;
 	}
 	return opt;
 }
@@ -1074,32 +1074,32 @@ command_line_option pick_description(int number, gen_options& expected)
 
 	switch (number)
 	{
-		case 0:
-			opt.options.push_back("-d");
-			opt.options.push_back("somedescrip");
-			expected.post.descriptions.push_back("somedescrip");
-			break;
-		case 1:
-			opt.options.push_back("--description");
-			opt.options.push_back("describer");
-			opt.options.push_back("some file!");
-			expected.post.descriptions.push_back("describer");
-			expected.post.descriptions.push_back("some file!");
-			break;
-			//case 1:
-			//	opt.options.push_back("-d");
-			//	opt.options.push_back("some other description");
-			//	opt.options.push_back("thirddescrip");
-			//	expected.post.descriptions.push_back("some other description");
-			//	expected.post.descriptions.push_back("thirddescrip");
-			//	break;
-			//case 3:
-			//	opt.options.push_back("--description");
-			//	opt.options.push_back("some jerk doing a thing.");
-			//	expected.post.descriptions.push_back("some jerk doing a thing.");
-			//	break;
-		case 2:
-			break;
+	case 0:
+		opt.options.push_back("-d");
+		opt.options.push_back("somedescrip");
+		expected.post.descriptions.push_back("somedescrip");
+		break;
+	case 1:
+		opt.options.push_back("--description");
+		opt.options.push_back("describer");
+		opt.options.push_back("some file!");
+		expected.post.descriptions.push_back("describer");
+		expected.post.descriptions.push_back("some file!");
+		break;
+		//case 1:
+		//	opt.options.push_back("-d");
+		//	opt.options.push_back("some other description");
+		//	opt.options.push_back("thirddescrip");
+		//	expected.post.descriptions.push_back("some other description");
+		//	expected.post.descriptions.push_back("thirddescrip");
+		//	break;
+		//case 3:
+		//	opt.options.push_back("--description");
+		//	opt.options.push_back("some jerk doing a thing.");
+		//	expected.post.descriptions.push_back("some jerk doing a thing.");
+		//	break;
+	case 2:
+		break;
 	}
 	return opt;
 }
@@ -1108,22 +1108,22 @@ auto pick_visibility()
 {
 	switch (zero_to_n(7))
 	{
-		case 0:
-			return std::make_pair("", visibility::default_vis);
-		case 1:
-			return std::make_pair("default", visibility::default_vis);
-		case 2:
-			return std::make_pair("public", visibility::pub);
-		case 3:
-			return std::make_pair("private", visibility::priv);
-		case 4:
-			return std::make_pair("followersonly", visibility::priv);
-		case 5:
-			return std::make_pair("unlisted", visibility::unlisted);
-		case 6:
-			return std::make_pair("dm", visibility::direct);
-		case 7:
-			return std::make_pair("direct", visibility::direct);
+	case 0:
+		return std::make_pair("", visibility::default_vis);
+	case 1:
+		return std::make_pair("default", visibility::default_vis);
+	case 2:
+		return std::make_pair("public", visibility::pub);
+	case 3:
+		return std::make_pair("private", visibility::priv);
+	case 4:
+		return std::make_pair("followersonly", visibility::priv);
+	case 5:
+		return std::make_pair("unlisted", visibility::unlisted);
+	case 6:
+		return std::make_pair("dm", visibility::direct);
+	case 7:
+		return std::make_pair("direct", visibility::direct);
 	}
 
 	return std::make_pair("Well, this shouldn't happen.", visibility::default_vis);
@@ -1151,15 +1151,15 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 
 			switch (zero_to_n(2))
 			{
-				case 0:
-					opt.options.push_back("-p");
-					break;
-				case 1:
-					opt.options.push_back("--privacy");
-					break;
-				case 2:
-					opt.options.push_back("--visibility");
-					break;
+			case 0:
+				opt.options.push_back("-p");
+				break;
+			case 1:
+				opt.options.push_back("--privacy");
+				break;
+			case 2:
+				opt.options.push_back("--visibility");
+				break;
 			}
 
 			opt.options.push_back(vis.first);
@@ -1209,15 +1209,15 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 
 			switch (zero_to_n(2))
 			{
-				case 0:
-					opt.options.push_back("-c");
-					break;
-				case 1:
-					opt.options.push_back("--content-warning");
-					break;
-				case 2:
-					opt.options.push_back("--cw");
-					break;
+			case 0:
+				opt.options.push_back("-c");
+				break;
+			case 1:
+				opt.options.push_back("--content-warning");
+				break;
+			case 2:
+				opt.options.push_back("--cw");
+				break;
 			}
 
 			opt.options.push_back("there's content in here!");
