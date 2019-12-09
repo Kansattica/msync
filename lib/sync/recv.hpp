@@ -26,14 +26,14 @@ struct recv_posts
 public:
 	unsigned int retries = 3;
 	unsigned int max_requests = 0;
-	unsigned int per_call = 20;
+	unsigned int per_call = 100;
 
 	recv_posts(get_posts& post_downloader) : download(post_downloader) {};
 
 	void get(std::string_view account_name, user_options& account)
 	{
 		retries = set_default(retries, 3, "Number of retries cannot be zero or less. Resetting to 3.\n", pl());
-		per_call = set_default(per_call, 20, "Number of posts to get per call cannot be zero or less. Resetting to 20.\n", pl());
+		per_call = set_default(per_call, 100, "Number of posts to get per call cannot be zero or less. Resetting to 50.\n", pl());
 
 		const fs::path user_folder = options().account_directory_location / account_name;
 
