@@ -670,7 +670,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 			THEN("the defaults are set correctly")
 			{
 				REQUIRE(parsed.sync_opts.retries == 3);
-				REQUIRE(parsed.sync_opts.per_call == 100);
+				REQUIRE(parsed.sync_opts.per_call == 40);
 				REQUIRE(parsed.sync_opts.max_requests == 0);
 			}
 
