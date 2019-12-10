@@ -70,8 +70,7 @@ std::string_view get_or_empty(const std::string* str)
 	return *str;
 }
 
-template <typename Number>
-Number clamp_or_default(Number input, Number maxdefault)
+unsigned int clamp_or_default(unsigned int input, unsigned int maxdefault)
 {
 	if (input == 0 || input > maxdefault) { return maxdefault; }
 	return input;
