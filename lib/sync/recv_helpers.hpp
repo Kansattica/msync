@@ -70,6 +70,13 @@ std::string_view get_or_empty(const std::string* str)
 	return *str;
 }
 
+template <typename Number>
+Number clamp_or_default(Number input, Number maxdefault)
+{
+	if (input == 0 || input > maxdefault) { return maxdefault; }
+	return input;
+}
+
 template <typename Stream>
 void print_api_call(std::string_view url, unsigned int limit, const timeline_params& params, Stream& os)
 {

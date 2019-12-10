@@ -55,7 +55,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 	const auto syncMode = (command("sync").set(ret.selected, mode::sync).doc("Synchronize your account[s] with their server[s]. Synchronizes all accounts unless one is specified with -a.") &
 			(
 			(option("-r", "--retries") & value("retries", ret.sync_opts.retries)) % "Retry failed requests n times. (default: 3)",
-			(option("-p", "--posts") & value("count", ret.sync_opts.per_call)) % "When receiving, get this many posts or notifications per call. Decrease this if you have a flaky connection. (default: 40)",
+			(option("-p", "--posts") & value("count", ret.sync_opts.per_call)) % "When receiving, get this many posts or notifications per call. Decrease this if you have a flaky connection. (default: 40 for statuses, 30 for notifications)",
 			(option("-m", "--max-requests") & value("count", ret.sync_opts.max_requests)) % "When receiving, get at most this many pages of posts or notifications. (default: 5 on first run, unlimited afterwards)",
 			one_of(
 				option("-s", "--send-only").set(ret.sync_opts.get, false).doc("Only send queued messages, don't download anything."),

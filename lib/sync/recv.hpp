@@ -26,7 +26,7 @@ struct recv_posts
 public:
 	unsigned int retries = 3;
 	unsigned int max_requests = 0;
-	unsigned int per_call = 40;
+	unsigned int per_call = 0;
 
 	recv_posts(get_posts& post_downloader) : download(post_downloader) {};
 
@@ -34,28 +34,24 @@ public:
 	{
 		retries = set_default(retries, 3, "Number of retries cannot be zero or less. Resetting to 3.\n", pl());
 
-		if (per_call > 40)
-		{
-			// basically, Mastodon will only return, at most, twice its default limit
-			// which, as of this writing, is 20
-			pl() << "Mastodon will only return 40 statuses or notifications at a time.";
-			per_call = 40;
-		}
+		// basically, Mastodon will only return, at most, twice its default limit
+		// which, as of this writing, means the maximum is 40 for statuses and 30 for notifications
+		// (the documentation lies and says that the limit is the same for both)
 
 		const fs::path user_folder = options().account_directory_location / account_name;
 
 		pl() << "Downloading notifications for " << account_name << '\n';
-		update_timeline<to_get::notifications, mastodon_notification>(account, user_folder);
+		update_timeline<to_get::notifications, mastodon_notification>(account, user_folder, clamp_or_default(per_call, 30));
 
 		pl() << "Downloading the home timeline for " << account_name << '\n';
-		update_timeline<to_get::home, mastodon_status>(account, user_folder);
+		update_timeline<to_get::home, mastodon_status>(account, user_folder, clamp_or_default(per_call, 40));
 	}
 
 private:
 	get_posts& download;
 
 	template <to_get timeline, typename mastodon_entity>
-	void update_timeline(user_options& account, const fs::path& user_folder)
+	void update_timeline(user_options& account, const fs::path& user_folder, unsigned int limit)
 	{
 		constexpr recv_parameters params = get_parameters<timeline>();
 
@@ -87,11 +83,11 @@ private:
 
 		if (last_recorded_id.empty() || sync_method == sync_settings::newest_first)
 		{
-			highest_id = newest_first(writer, url, access_token, last_recorded_id);
+			highest_id = newest_first(writer, url, access_token, last_recorded_id, limit);
 		}
 		else if (sync_method == sync_settings::oldest_first)
 		{
-			highest_id = oldest_first(writer, url, access_token, last_recorded_id);
+			highest_id = oldest_first(writer, url, access_token, last_recorded_id, limit);
 		}
 
 		if (!highest_id.empty())
@@ -101,7 +97,7 @@ private:
 	}
 
 	template <typename mastodon_entity>
-	std::string newest_first(post_list<mastodon_entity>& writer, const std::string_view url, const std::string_view access_token, const std::string_view last_recorded_id)
+	std::string newest_first(post_list<mastodon_entity>& writer, const std::string_view url, const std::string_view access_token, const std::string_view last_recorded_id, unsigned int limit)
 	{
 		std::string max_id;
 
@@ -121,9 +117,9 @@ private:
 		{
 			query_parameters.max_id = max_id;
 
-			print_api_call(url, per_call, query_parameters, pl());
+			print_api_call(url, limit, query_parameters, pl());
 
-			auto response = request_with_retries([&]() { return download(url, access_token, query_parameters, per_call); }, retries, pl());
+			auto response = request_with_retries([&]() { return download(url, access_token, query_parameters, limit); }, retries, pl());
 
 			if (!response.first)
 			{
@@ -144,7 +140,7 @@ private:
 			loop_iterations--;
 
 			// if you get less than you asked for, you're done
-		} while (loop_iterations > 0 && (incoming.size() == per_call));
+		} while (loop_iterations > 0 && (incoming.size() == limit));
 
 		plverb() << "Writing " << total.size() << " posts.\n";
 
@@ -159,12 +155,12 @@ private:
 	}
 
 	template <typename mastodon_entity>
-	std::string oldest_first(post_list<mastodon_entity>& writer, const std::string_view url, const std::string_view access_token, const std::string_view last_recorded_id)
+	std::string oldest_first(post_list<mastodon_entity>& writer, const std::string_view url, const std::string_view access_token, const std::string_view last_recorded_id, unsigned int limit)
 	{
 		std::vector<mastodon_entity> incoming;
 		timeline_params query_parameters;
 		query_parameters.min_id = last_recorded_id;
-		
+
 		std::string highest_id_seen;
 
 		// max_requests being zero means "request until caught up".
@@ -174,9 +170,9 @@ private:
 			loop_iterations = std::numeric_limits<unsigned int>::max();
 		do
 		{
-			print_api_call(url, per_call, query_parameters, pl());
+			print_api_call(url, limit, query_parameters, pl());
 
-			const auto response = request_with_retries([&]() { return download(url, access_token, query_parameters, per_call); }, retries, pl());
+			const auto response = request_with_retries([&]() { return download(url, access_token, query_parameters, limit); }, retries, pl());
 
 			if (!response.first)
 			{
@@ -198,7 +194,7 @@ private:
 			--loop_iterations;
 
 			// if you get less than you asked for, you're done
-		} while (loop_iterations > 0 && (incoming.size() == per_call));
+		} while (loop_iterations > 0 && (incoming.size() == limit));
 
 		return highest_id_seen;
 	}
