@@ -80,6 +80,7 @@ void from_json(const json& j, mastodon_status& status)
 		post = &*is_reblog;
 		j["account"]["acct"].get_to(status.boosted_by);
 		j["account"]["bot"].get_to(status.boosted_by_bot);
+		j["account"]["display_name"].get_to(status.boosted_by_display_name);
 		post->at("uri").get_to(status.original_post_url);
 	}
 	post->at("created_at").get_to(status.created_at);

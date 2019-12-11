@@ -12,7 +12,7 @@
 
 constexpr std::string_view expected_content_nocw = R"(id: contentnocw
 url: https://website.egg/contentnocw
-author: regular@website.egg
+author: Normal Person (regular@website.egg)
 body: This is a...
  test post.
 visibility: public
@@ -23,7 +23,7 @@ posted on: 10:54AM 11-14-2019
 
 constexpr std::string_view expected_content_cw = R"(id: contentcw
 url: https://website.egg/contentcw
-author: afriend
+author: Alex Friendford (afriend)
 cw: test inside
 body: This is another test post.
 visibility: unlisted
@@ -34,7 +34,7 @@ posted on: 10:55AM 11-14-2019
 
 constexpr std::string_view expected_justattachments = R"(id: justattachments
 url: https://website.egg/justattachments
-author: someone@online.egg [bot]
+author: Beepin' Online (someone@online.egg) [bot]
 visibility: private
 attachments:
 https://fake.website.egg/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.png?1573544488
@@ -47,8 +47,8 @@ posted on: 10:56AM 11-14-2019
 
 constexpr std::string_view expected_everything = R"(id: everything
 url: https://website.egg/everything
-author: cyberfriend [bot]
-boosted by: meatbooster@different.website.egg
+author: Cyberfriend: The Friendening (cyberfriend) [bot]
+boosted by: Meat Boosterson (meatbooster@different.website.egg)
 reply to: 123456
 boost of: https://different.website.egg/goodpost
 cw: Wow! A post!
@@ -96,6 +96,7 @@ mastodon_status make_nocw()
 	content_nocw.boosts = 1;
 	content_nocw.replies = 2;
 	content_nocw.author.account_name =  "regular@website.egg";
+	content_nocw.author.display_name =  "Normal Person";
 	content_nocw.author.is_bot = false;
 	return content_nocw;
 }
@@ -113,6 +114,7 @@ mastodon_status make_cw()
 	content_cw.boosts = 3;
 	content_cw.replies = 4;
 	content_cw.author.account_name = "afriend";
+	content_cw.author.display_name = "Alex Friendford";
 	content_cw.author.is_bot = false;
 	return content_cw;
 }
@@ -129,6 +131,7 @@ mastodon_status make_attachments()
 	justattachments.boosts = 600;
 	justattachments.replies = 7000;
 	justattachments.author.account_name = "someone@online.egg";
+	justattachments.author.display_name = "Beepin' Online";
 	justattachments.author.is_bot = true;
 	return justattachments;
 }
@@ -145,12 +148,14 @@ mastodon_status make_everything()
 	everything.reply_to_post_id = "123456";
 	everything.original_post_url = "https://different.website.egg/goodpost";
 	everything.boosted_by = "meatbooster@different.website.egg";
+	everything.boosted_by_display_name = "Meat Boosterson";
 	everything.boosted_by_bot = false;
 	everything.attachments = { {"https://fake.website.egg/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.png?1573544488", "this is a description\nwith a newline"}, {"https://another.site/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.mp3?1573544488", "I am also a description!"} };
 	everything.favorites = 8;
 	everything.boosts = 99;
 	everything.replies = 100000;
 	everything.author.account_name = "cyberfriend";
+	everything.author.display_name = "Cyberfriend: The Friendening";
 	everything.author.is_bot = true;
 	return everything;
 }

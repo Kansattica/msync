@@ -77,6 +77,7 @@ SCENARIO("read_status correctly reads and cleans the relevant fields from a JSON
 				REQUIRE(status.original_post_url ==	"https://botsin.space/users/tmnt/statuses/103139477824897157");
 				REQUIRE(status.boosted_by == "BestGirlGrace");
 				REQUIRE(status.boosted_by_bot == false);
+				REQUIRE(status.boosted_by_display_name == "Secret Government Grace :qvp:");
 				REQUIRE(status.favorites == 0);
 				REQUIRE(status.boosts == 11);
 				REQUIRE(status.replies == 1);
@@ -157,6 +158,7 @@ SCENARIO("read_statuses correctly reads and cleans the relevant fields from an a
 				REQUIRE(statuses[1].reply_to_post_id.empty());
 				REQUIRE(statuses[1].original_post_url ==	"https://botsin.space/users/tmnt/statuses/103139477824897157");
 				REQUIRE(statuses[1].boosted_by == "BestGirlGrace");
+				REQUIRE(statuses[1].boosted_by_display_name == "Secret Government Grace :qvp:");
 				REQUIRE(statuses[1].boosted_by_bot == false);
 				REQUIRE(statuses[1].favorites == 0);
 				REQUIRE(statuses[1].boosts == 11);

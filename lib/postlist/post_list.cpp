@@ -10,6 +10,18 @@ void print(std::ofstream& out, const char* key, const std::string& val, bool new
 	}
 }
 
+void print_author(std::ofstream& out, const char* key, const std::string& display_name, const std::string& account, bool bot)
+{
+	if (!display_name.empty())
+	{
+		out << key << display_name << " (" << account << ')';
+		if (bot)
+			out << " [bot]\n";
+		else
+			out << '\n';
+	}
+}
+
 void print(std::ofstream& out, const char* key, bool val, bool newline = true)
 {
 	if (val)
@@ -24,10 +36,8 @@ std::ofstream& operator<<(std::ofstream& out, const mastodon_status& status)
 {
 	print(out, "id: ", status.id);
 	print(out, "url: ", status.url);
-	print(out, "author: ", status.author.account_name, !status.author.is_bot);
-	print(out, " [bot]", status.author.is_bot);
-	print(out, "boosted by: ", status.boosted_by, !status.boosted_by_bot);
-	print(out, " [bot]", status.boosted_by_bot);
+	print_author(out, "author: ", status.author.display_name, status.author.account_name, status.author.is_bot);
+	print_author(out, "boosted by: ", status.boosted_by_display_name, status.boosted_by, status.boosted_by_bot);
 	print(out, "reply to: ", status.reply_to_post_id);
 	print(out, "boost of: ", status.original_post_url);
 	print(out, "cw: ", status.content_warning);
@@ -75,7 +85,7 @@ std::ofstream& operator<<(std::ofstream& out, const mastodon_notification& notif
 	out << "notification id: " << notification.id << '\n';
 	out << "at " << notification.created_at << ", ";
 	out << notification.account.account_name << (notification.account.is_bot ? " [bot]" : "") << notification_verb(notification.type);
-	
+
 	if (notification.status.has_value())
 	{
 		out << '\n';

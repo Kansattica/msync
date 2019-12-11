@@ -39,6 +39,7 @@ struct mastodon_status
 	std::string reply_to_post_id;
 	std::string original_post_url; // if this is a boost of another post 
 	std::string boosted_by; // if this is a boost of another post 
+	std::string boosted_by_display_name; // if this is a boost of another post 
 	bool boosted_by_bot = false; // if this is a boost of another post 
 	unsigned int favorites = 0;
 	unsigned int boosts = 0;
