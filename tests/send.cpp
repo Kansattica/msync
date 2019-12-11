@@ -6,6 +6,7 @@
 #include "../lib/constants/constants.hpp"
 
 #include "test_helpers.hpp"
+#include "mock_network.hpp"
 
 #include <string_view>
 #include <vector>
@@ -15,38 +16,18 @@
 #include <algorithm>
 #include <print_logger.hpp>
 
-struct mock_args
+struct id_mock_args : public basic_mock_args
 {
-	std::string url;
-	std::string access_token;
-	status_params params;
-	attachment attachment_args;
 	std::string id;
 };
 
-std::string make_status_json(const std::string& id)
+struct mock_network_post : public mock_network
 {
-	std::string toreturn = R"({"id": ")";
-	toreturn += id;
-	toreturn += R"(", "created_at" : "2019-06-18T05:25:54.100Z", "in_reply_to_id" : null, "in_reply_to_account_id" : null, "sensitive" : false, "spoiler_text" : "", "visibility" : "public", "language" : "en", "uri" : "https://test.website.egg/users/BestGirlGrace/statuses/102290918869507417", "url" : "https://test.website.egg/@BestGirlGrace/102290918869507417", "replies_count" : 8, "reblogs_count" : 24, "favourites_count" : 56, "content" : "\u003cp\u003eI think this has been done before BUT a world where the superhero/villain scene is a kink thing. Traditionally, the hero is the top and \u0026quot;wins\u0026quot;, though \u0026quot;gritty\u0026quot; pairs with villain tops are more common these days.\u003c/p\u003e", "reblog" : null, "application" : null, "account" : {"id":"1", "username" : "BestGirlGrace", "acct" : "BestGirlGrace", "display_name" : "Secret Government Grace :qvp:", "locked" : false, "bot" : false, "created_at" : "2018-08-16T04:45:49.523Z", "note" : "\u003cp\u003eThe buzz in your brain, the tingle behind your eyes, the good girl sneaking through your thoughts. Your favorite free-floating, reality-hacking, mind-tweaking, shitposting, horny, skunky, viral, infowitch.\u003c/p\u003e\u003cp\u003eHeader by @CorruptveSpirit@twitter, avi by @dogscribss@twitter\u003c/p\u003e", "url" : "https://test.website.egg/@BestGirlGrace", "avatar" : "https://test.website.egg/system/accounts/avatars/000/000/001/original/2c3b6b7ff75a3d40.gif?1573254299", "avatar_static" : "https://test.website.egg/system/accounts/avatars/000/000/001/static/2c3b6b7ff75a3d40.png?1573254299", "header" : "https://test.website.egg/system/accounts/headers/000/000/001/original/ba0b91a0c6545d9a.gif?1536301933", "header_static" : "https://test.website.egg/system/accounts/headers/000/000/001/static/ba0b91a0c6545d9a.png?1536301933", "followers_count" : 1410, "following_count" : 702, "statuses_count" : 45048, "last_status_at" : "2019-11-15T21:23:54.043Z", "emojis" : [{"shortcode":"qvp", "url" : "https://test.website.egg/system/custom_emojis/images/000/036/475/original/3470be8e5f2bf943.png?1564727510", "static_url" : "https://test.website.egg/system/custom_emojis/images/000/036/475/static/3470be8e5f2bf943.png?1564727510", "visible_in_picker" : true}] , "fields" : [{"name":"Pronouns", "value" : "she/her", "verified_at" : null}, { "name":"Hornt Writing","value" : "\u003ca href=\"https://perfect.hypnovir.us\" rel=\"me nofollow noopener\" target=\"_blank\"\u003e\u003cspan class=\"invisible\"\u003ehttps://\u003c/span\u003e\u003cspan class=\"\"\u003eperfect.hypnovir.us\u003c/span\u003e\u003cspan class=\"invisible\"\u003e\u003c/span\u003e\u003c/a\u003e","verified_at" : "2019-07-08T07:50:47.669+00:00" }, { "name":"Fax Number","value" : "(580) 4-GRACE-5","verified_at" : null }, { "name":"I made","value" : "\u003ca href=\"https://github.com/Kansattica/Fluency\" rel=\"me nofollow noopener\" target=\"_blank\"\u003e\u003cspan class=\"invisible\"\u003ehttps://\u003c/span\u003e\u003cspan class=\"\"\u003egithub.com/Kansattica/Fluency\u003c/span\u003e\u003cspan class=\"invisible\"\u003e\u003c/span\u003e\u003c/a\u003e","verified_at" : null }] }, "media_attachments" : [] , "mentions" : [] , "tags" : [] , "emojis" : [] , "card" : null, "poll" : null})";
-	return toreturn;
-}
+	std::vector<basic_mock_args> arguments;
 
-struct mock_network
-{
-	int status_code = 200;
-	bool fatal_error = false;
-
-	void set_succeed_after(size_t n)
+	net_response operator()(std::string_view url, std::string_view access_token)
 	{
-		succeed_after = succeed_after_n = n;
-	}
-
-	std::vector<mock_args> arguments;
-	
-	net_response mock_post(std::string_view url, std::string_view access_token)
-	{
-		arguments.push_back(mock_args{ std::string {url}, std::string { access_token } });
+		arguments.push_back(basic_mock_args{ std::string {url}, std::string { access_token } });
 
 		net_response toreturn;
 		toreturn.retryable_error = (--succeed_after > 0);
@@ -57,10 +38,15 @@ struct mock_network
 			toreturn.message = R"({ "error": "some problem" })";
 		return toreturn;
 	}
+};
 
-	net_response mock_delete(std::string_view url, std::string_view access_token)
+struct mock_network_delete : public mock_network
+{
+	std::vector<basic_mock_args> arguments;
+
+	net_response operator()(std::string_view url, std::string_view access_token)
 	{
-		arguments.push_back(mock_args{ std::string {url}, std::string { access_token } });
+		arguments.push_back(basic_mock_args{ std::string {url}, std::string { access_token } });
 
 		net_response toreturn;
 		toreturn.retryable_error = (--succeed_after > 0);
@@ -71,12 +57,26 @@ struct mock_network
 			toreturn.message = R"({ "error": "some problem" })";
 		return toreturn;
 	}
+};
 
-	net_response mock_new_status(std::string_view url, std::string_view access_token, const status_params& params)
+struct status_mock_args : public id_mock_args
+{
+	status_params params;
+};
+
+struct mock_network_new_status : public mock_network
+{
+	std::string fail_if_body;
+
+	std::vector<status_mock_args> arguments;
+
+	net_response operator()(std::string_view url, std::string_view access_token, const status_params& params)
 	{
+		if (!fail_if_body.empty())
+			fatal_error = fail_if_body == params.body;
+
 		static unsigned int id = 1000000;
 		std::string str_id = std::to_string(++id);
-		arguments.push_back(mock_args{ std::string {url}, std::string { access_token }, params, {}, str_id});
 
 		net_response toreturn;
 		toreturn.retryable_error = (--succeed_after > 0);
@@ -87,15 +87,25 @@ struct mock_network
 			toreturn.message = R"({ "error": "some problem" })";
 		else
 			toreturn.message = make_status_json(str_id);
+
+		arguments.push_back(status_mock_args{ std::string {url}, std::string { access_token }, std::move(str_id), params});
+
 		return toreturn;
 	}
+};
 
-	net_response mock_upload(std::string_view url, std::string_view access_token, const fs::path& file, const std::string& description)
+struct upload_mock_args : public id_mock_args
+{
+	attachment attachment_args;
+};
+
+struct mock_network_upload : public mock_network
+{
+	std::vector<upload_mock_args> arguments;
+	net_response operator()(std::string_view url, std::string_view access_token, const fs::path& file, const std::string& description)
 	{
 		static unsigned int id = 100;
 		std::string str_id = std::to_string(++id);
-		arguments.push_back(mock_args{ std::string {url}, std::string { access_token }, {},
-			attachment{file, description}, str_id });
 
 		net_response toreturn;
 		toreturn.retryable_error = (--succeed_after > 0);
@@ -105,46 +115,11 @@ struct mock_network
 		toreturn.message = R"({"id": ")";
 		toreturn.message += str_id;
 		toreturn.message += "\"}";
+
+		arguments.push_back(upload_mock_args{ std::string {url}, std::string { access_token }, std::move(str_id),
+			attachment{file, description} });
+
 		return toreturn;
-	}
-
-private:
-	size_t succeed_after_n = 1;
-	size_t succeed_after = succeed_after_n;
-};
-
-struct mock_network_post : public mock_network
-{
-	net_response operator()(std::string_view url, std::string_view access_token)
-	{
-		return mock_post(url, access_token);
-	}
-};
-
-struct mock_network_delete : public mock_network
-{
-	net_response operator()(std::string_view url, std::string_view access_token)
-	{
-		return mock_delete(url, access_token);
-	}
-};
-
-struct mock_network_new_status : public mock_network
-{
-	std::string fail_if_body;
-	net_response operator()(std::string_view url, std::string_view access_token, const status_params& params)
-	{
-		if (!fail_if_body.empty())
-			fatal_error = fail_if_body == params.body;
-		return mock_new_status(url, access_token, params);
-	}
-};
-
-struct mock_network_upload : public mock_network
-{
-	net_response operator()(std::string_view url, std::string_view access_token, const fs::path& file, const std::string& description)
-	{
-		return mock_upload(url, access_token, file, description);
 	}
 };
 
@@ -167,7 +142,6 @@ std::vector<std::string_view> repeat_each_element(const std::vector<std::string>
 	}
 	return toreturn;
 }
-
 
 SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.")
 {
