@@ -84,7 +84,7 @@ int zero_to_n(int n)
 	return dis(gen);
 }
 
-std::string make_status_json(const std::string& id)
+std::string make_status_json(std::string_view id)
 {
 	std::string toreturn = R"({"id": ")";
 	toreturn += id;
@@ -92,7 +92,7 @@ std::string make_status_json(const std::string& id)
 	return toreturn;
 }
 
-std::string make_notification_json(const std::string& id)
+std::string make_notification_json(std::string_view id)
 {
 	static constexpr std::array<std::string_view, 4> notification_types{ "follow", "mention", "reblog", "favourite" };
 

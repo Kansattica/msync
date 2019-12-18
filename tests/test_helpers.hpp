@@ -12,8 +12,8 @@ size_t count_files_in_directory(const fs::path& tocheck);
 void touch(const fs::path& totouch);
 std::string read_file(const fs::path& file);
 
-std::string make_status_json(const std::string& id);
-std::string make_notification_json(const std::string& id);
+std::string make_status_json(std::string_view id);
+std::string make_notification_json(std::string_view id);
 
 bool flip_coin();
 int zero_to_n(int n);
