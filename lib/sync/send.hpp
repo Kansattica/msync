@@ -72,7 +72,7 @@ private:
 			const std::string requesturl = paramaterize_url(baseurl, id, route<toread>(undo));
 
 			if (request_with_retries([&]() { return post(requesturl, access_token); }, retries, pl()).first)
-				pl() << requesturl << " OK\n";
+				pl() << "POST " << requesturl << " OK\n";
 			else
 				failedids.push_back(std::move(queuefile.parsed.front()));
 
