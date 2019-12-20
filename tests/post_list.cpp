@@ -250,10 +250,10 @@ SCENARIO("post_list correctly serializes lists of statuses.")
 	}
 }
 
-constexpr std::string_view expected_fav = "notification id: 12345\nat 10:50 AM 11/15/2019, localhuman favorited your post:\n";
-constexpr std::string_view expected_boost = "notification id: 67890\nat 10:51 AM 11/15/2019, localbot [bot] boosted your post:\n";
-constexpr std::string_view expected_mention = "notification id: 2567893344\nat 10:52 AM 11/15/2019, remotehuman@crime.egg mentioned you:\n";
-constexpr std::string_view expected_follow = "notification id: 9802347509287\nat 10:53 AM 11/15/2019, remotebot@crime.egg [bot] followed you.";
+constexpr std::string_view expected_fav = "notification id: 12345\nat 10:50 AM 11/15/2019, Alex Humansworth (localhuman) favorited your post:\n";
+constexpr std::string_view expected_boost = "notification id: 67890\nat 10:51 AM 11/15/2019, Chad Beeps (localbot) [bot] boosted your post:\n";
+constexpr std::string_view expected_mention = "notification id: 2567893344\nat 10:52 AM 11/15/2019, Egg Criminal (remotehuman@crime.egg) mentioned you:\n";
+constexpr std::string_view expected_follow = "notification id: 9802347509287\nat 10:53 AM 11/15/2019, Electronic Egg Criminal (remotebot@crime.egg) [bot] followed you.";
 
 struct notif_test_case
 {
@@ -267,6 +267,7 @@ mastodon_notification make_favorite()
 	mastodon_notification notif;
 	notif.id = "12345";
 	notif.account.account_name = "localhuman";
+	notif.account.display_name = "Alex Humansworth";
 	notif.account.is_bot = false;
 	notif.created_at = "10:50 AM 11/15/2019";
 	notif.status = make_nocw();
@@ -279,6 +280,7 @@ mastodon_notification make_boost()
 	mastodon_notification notif;
 	notif.id = "67890";
 	notif.account.account_name = "localbot";
+	notif.account.display_name = "Chad Beeps";
 	notif.account.is_bot = true;
 	notif.created_at = "10:51 AM 11/15/2019";
 	notif.status = make_cw();
@@ -291,6 +293,7 @@ mastodon_notification make_mention()
 	mastodon_notification notif;
 	notif.id = "2567893344";
 	notif.account.account_name = "remotehuman@crime.egg";
+	notif.account.display_name = "Egg Criminal";
 	notif.account.is_bot = false;
 	notif.created_at = "10:52 AM 11/15/2019";
 	notif.status = make_attachments();
@@ -303,6 +306,7 @@ mastodon_notification make_follow()
 	mastodon_notification notif;
 	notif.id = "9802347509287";
 	notif.account.account_name = "remotebot@crime.egg";
+	notif.account.display_name = "Electronic Egg Criminal";
 	notif.account.is_bot = true;
 	notif.created_at = "10:53 AM 11/15/2019";
 	notif.type = notif_type::follow;
