@@ -85,7 +85,7 @@ private:
 		{
 			highest_id = newest_first(writer, url, access_token, last_recorded_id, limit);
 		}
-		else if (sync_method == sync_settings::oldest_first)
+		else if (sync_method == sync_settings::oldest_first) //else if because dont_sync is an option
 		{
 			highest_id = oldest_first(writer, url, access_token, last_recorded_id, limit);
 		}
