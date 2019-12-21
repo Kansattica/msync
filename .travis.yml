@@ -18,7 +18,7 @@ matrix:
   
 before_install:
   - if [ "$TRAVIS_COMPILER" = "gcc" ]; then sudo -E apt-get -yqq --no-install-suggests --no-install-recommends install g++-8 && CC=gcc-8 && CXX=g++-8; fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo -E apt -yqq install libcurl4-openssl-dev libstdc++-8-dev; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo -E apt -yqq install --fix-missing libcurl4-openssl-dev libstdc++-8-dev; fi
 
 script:
   - mkdir build
