@@ -249,3 +249,78 @@ SCENARIO("The enum overload for get_option works.")
         }
     }
 }
+
+SCENARIO("The boolean overload for get_option works.")
+{
+	const test_file fi{ "testfilefriend" };
+    GIVEN("An empty user_options")
+    {
+        user_options opt{fi.filename};
+
+        WHEN("one of the five boolean options.")
+        {
+            const auto option = GENERATE(user_option::exclude_boost, user_option::exclude_fav,
+                user_option::exclude_follow, user_option::exclude_mention, user_option::exclude_poll);
+
+            const auto result = opt.get_bool_option(option);
+
+            THEN("the result has the correct default.")
+            {
+				REQUIRE(result == false);
+            }
+        }
+    }
+
+    GIVEN("A user_options with some of the exclude options set.")
+    {
+        user_options opt{fi.filename};
+        opt.set_bool_option(user_option::exclude_boost, true);
+
+        WHEN("one of the three options that have sync settings is asked for.")
+        {
+			const auto option = GENERATE(user_option::exclude_boost, user_option::exclude_fav,
+                user_option::exclude_follow, user_option::exclude_mention, user_option::exclude_poll);
+
+            const auto result = opt.get_bool_option(option);
+
+            THEN("the result has the correct set or default value.")
+            {
+                if (option == user_option::exclude_boost)
+                {
+                    REQUIRE(result == true);
+                }
+                else
+                {
+                    REQUIRE(result == false);
+                }
+            }
+        }
+
+        WHEN("the user_options is destroyed")
+        {
+            {
+                user_options newopt = std::move(opt);
+            }
+
+            THEN("The generated file has the correct option set.")
+            {
+                auto lines = read_lines(fi.filename);
+
+                REQUIRE(lines.size() == 1);
+                REQUIRE(lines[0] == "exclude_boosts=true");
+            }
+
+            AND_WHEN("a new user_options is created from that file")
+            {
+                user_options neweropt(fi.filename);
+
+                THEN("it has the correct value.")
+                {
+                    REQUIRE(neweropt.get_bool_option(user_option::exclude_boost) == true);
+                    REQUIRE(*neweropt.try_get_option(user_option::exclude_boost) == "true");
+                    REQUIRE(neweropt.get_option(user_option::exclude_boost) == "true");
+                }
+            }
+        }
+    }
+}
