@@ -1,6 +1,7 @@
 #include <catch2/catch.hpp>
 
 #include "../lib/sync/recv.hpp"
+#include "../lib/options/global_options.hpp"
 
 #include "test_helpers.hpp"
 #include "mock_network.hpp"
@@ -114,5 +115,19 @@ struct mock_network_get : public mock_network
 
 SCENARIO("Recv downloads and writes the correct number of posts.")
 {
+	constexpr std::string_view account_name = "user@crime.egg";
+	const test_file account_dir = account_directory();
+	const auto user_dir = account_dir.filename / account_name;
 
+	auto& account = options().add_new_account(std::string{ account_name });
+
+	REQUIRE(account.first == account_name);
+
+	account.second.set_option(user_option::account_name, "user");
+	account.second.set_option(user_option::instance_url, "crime.egg");
+	
+	GIVEN("A user account with no previously stored information.")
+	{
+
+	}
 }

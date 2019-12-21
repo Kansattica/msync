@@ -19,6 +19,8 @@
 #include <algorithm>
 #include <iterator>
 #include <limits>
+#include <array>
+#include <utility>
 
 template <typename get_posts>
 struct recv_posts
@@ -27,6 +29,7 @@ public:
 	unsigned int retries = 3;
 	unsigned int max_requests = 0;
 	unsigned int per_call = 0;
+
 
 	recv_posts(get_posts& post_downloader) : download(post_downloader) {};
 
@@ -40,8 +43,10 @@ public:
 
 		const fs::path user_folder = options().account_directory_location / account_name;
 
+		exclude_notif_types = make_excludes(account);
+
 		pl() << "Downloading notifications for " << account_name << '\n';
-		update_timeline<to_get::notifications, mastodon_notification>(account, user_folder, clamp_or_default(per_call, 30));
+		update_timeline<to_get::notifications, mastodon_notification, true>(account, user_folder, clamp_or_default(per_call, 30));
 
 		pl() << "Downloading the home timeline for " << account_name << '\n';
 		update_timeline<to_get::home, mastodon_status>(account, user_folder, clamp_or_default(per_call, 40));
@@ -49,8 +54,9 @@ public:
 
 private:
 	get_posts& download;
+	std::vector<std::string_view> exclude_notif_types;
 
-	template <to_get timeline, typename mastodon_entity>
+	template <to_get timeline, typename mastodon_entity, bool use_excludes = false>
 	void update_timeline(user_options& account, const fs::path& user_folder, unsigned int limit)
 	{
 		constexpr recv_parameters params = get_parameters<timeline>();
@@ -83,11 +89,11 @@ private:
 
 		if (last_recorded_id.empty() || sync_method == sync_settings::newest_first)
 		{
-			highest_id = newest_first(writer, url, access_token, last_recorded_id, limit);
+			highest_id = newest_first<mastodon_entity, use_excludes>(writer, url, access_token, last_recorded_id, limit);
 		}
 		else if (sync_method == sync_settings::oldest_first) //else if because dont_sync is an option
 		{
-			highest_id = oldest_first(writer, url, access_token, last_recorded_id, limit);
+			highest_id = oldest_first<mastodon_entity, use_excludes>(writer, url, access_token, last_recorded_id, limit);
 		}
 
 		if (!highest_id.empty())
@@ -96,7 +102,7 @@ private:
 		}
 	}
 
-	template <typename mastodon_entity>
+	template <typename mastodon_entity, bool use_excludes>
 	std::string newest_first(post_list<mastodon_entity>& writer, const std::string_view url, const std::string_view access_token, const std::string_view last_recorded_id, unsigned int limit)
 	{
 		std::string max_id;
@@ -105,6 +111,8 @@ private:
 
 		timeline_params query_parameters;
 		query_parameters.since_id = last_recorded_id;
+
+		if constexpr (use_excludes) { query_parameters.exclude_notifs = &exclude_notif_types; }
 
 		// if max_requests is zero, that means "make calls until caught up"
 		// however, if we don't have a last recorded ID, make five requests instead so we don't get all posts from now to the beginning of time
@@ -154,12 +162,15 @@ private:
 		return "";
 	}
 
-	template <typename mastodon_entity>
+	template <typename mastodon_entity, bool use_excludes>
 	std::string oldest_first(post_list<mastodon_entity>& writer, const std::string_view url, const std::string_view access_token, const std::string_view last_recorded_id, unsigned int limit)
 	{
 		std::vector<mastodon_entity> incoming;
+
 		timeline_params query_parameters;
 		query_parameters.min_id = last_recorded_id;
+
+		if constexpr (use_excludes) { query_parameters.exclude_notifs = &exclude_notif_types; }
 
 		std::string highest_id_seen;
 
@@ -197,6 +208,28 @@ private:
 		} while (loop_iterations > 0 && (incoming.size() == limit));
 
 		return highest_id_seen;
+	}
+
+	std::vector<std::string_view> make_excludes(const user_options& account)
+	{
+		static constexpr std::array<std::pair<user_option, std::string_view>, 5> option_name_pairs =
+		{
+			std::make_pair(user_option::exclude_follow, "follow"),
+			std::make_pair(user_option::exclude_fav, "favourite"),
+			std::make_pair(user_option::exclude_boost, "reblog"),
+			std::make_pair(user_option::exclude_mention, "mention"),
+			std::make_pair(user_option::exclude_poll, "poll")
+		};
+
+		std::vector<std::string_view> toreturn;
+
+		for (const auto& pair : option_name_pairs)
+		{
+			if (account.get_bool_option(pair.first))
+				toreturn.push_back(pair.second);
+		}
+
+		return toreturn;
 	}
 };
 

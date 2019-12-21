@@ -30,6 +30,7 @@ struct timeline_params
 	std::string_view min_id;
 	std::string_view max_id;
 	std::string_view since_id;
+	std::vector<std::string_view>* exclude_notifs = nullptr;
 };
 
 using post_request = net_response (std::string_view url, std::string_view access_token);

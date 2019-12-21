@@ -30,7 +30,12 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 				command("accountname").set(ret.toset, user_option::account_name).set(ret.selected, mode::showopt),
 				command("instanceurl").set(ret.toset, user_option::instance_url).set(ret.selected, mode::showopt),
 				command("clientid").set(ret.toset, user_option::client_id).set(ret.selected, mode::showopt),
-				command("clientsecret").set(ret.toset, user_option::client_secret).set(ret.selected, mode::showopt)));
+				command("clientsecret").set(ret.toset, user_option::client_secret).set(ret.selected, mode::showopt),
+				command("excludeboosts").set(ret.toset, user_option::exclude_boost).set(ret.selected, mode::showopt),
+				command("excludefav").set(ret.toset, user_option::exclude_fav).set(ret.selected, mode::showopt),
+				command("excludefollow").set(ret.toset, user_option::exclude_follow).set(ret.selected, mode::showopt),
+				command("excludemention").set(ret.toset, user_option::exclude_mention).set(ret.selected, mode::showopt),
+				command("excludepoll").set(ret.toset, user_option::exclude_poll).set(ret.selected, mode::showopt)));
 
 	const auto newaccount = (command("new").set(ret.selected, mode::newuser)).doc("Register a new account with msync. Start here.");
 	const auto configMode = (command("config").set(ret.selected, mode::config).doc("Set and show account-specific options.") &

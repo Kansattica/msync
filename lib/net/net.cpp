@@ -120,6 +120,14 @@ void add_if_value(cpr::Parameters& params, const char* key, const std::string_vi
 		params.AddParameter(cpr::Parameter{ key, value });
 }
 
+void add_array(cpr::Parameters& params, const char* key, const std::vector<std::string_view>& values)
+{
+	for (const auto& value : values)
+	{
+		params.AddParameter(cpr::Parameter{ key, value });
+	}
+}
+
 net_response get_timeline_and_notifs(std::string_view url, std::string_view access_token, const timeline_params& params, unsigned int limit)
 {
 	cpr::Parameters query_params{ { "limit", std::to_string(limit) } };
@@ -127,6 +135,8 @@ net_response get_timeline_and_notifs(std::string_view url, std::string_view acce
 	add_if_value(query_params, "min_id", params.min_id);
 	add_if_value(query_params, "max_id", params.max_id);
 	add_if_value(query_params, "since_id", params.since_id);
+
+	if (params.exclude_notifs != nullptr) { add_array(query_params, "exclude_types[]", *params.exclude_notifs); }
 
 	return handle_response(
 		cpr::Get(cpr::Url{ url },
