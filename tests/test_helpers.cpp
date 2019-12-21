@@ -74,7 +74,7 @@ std::mt19937 gen(std::random_device{}());
 
 bool flip_coin()
 {
-	const static std::uniform_int_distribution<> dis(0, 1);
+	static std::uniform_int_distribution<> dis(0, 1);
 	return dis(gen) == 0;
 }
 
