@@ -51,10 +51,13 @@ sync_settings user_options::get_sync_option(user_option toget) const
 bool user_options::get_bool_option(user_option toget) const
 {
     const auto val = backing.parsed.find(USER_OPTION_NAMES[static_cast<size_t>(toget)]);
-    if (val == backing.parsed.end())
+    if (val == backing.parsed.end() || val->second.empty())
         return false;
+
     const auto firstchar = val->second[0];
-    return firstchar == 't' || firstchar == 'T';
+
+    // true or yes are truthy, everything else is falsy
+    return firstchar == 't' || firstchar == 'T' || firstchar == 'y' || firstchar == 'Y';
 }
 
 void user_options::set_option(user_option opt, std::string value)

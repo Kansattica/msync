@@ -257,7 +257,7 @@ SCENARIO("The boolean overload for get_option works.")
     {
         user_options opt{fi.filename};
 
-        WHEN("one of the five boolean options.")
+        WHEN("one of the five boolean options is asked for.")
         {
             const auto option = GENERATE(user_option::exclude_boost, user_option::exclude_fav,
                 user_option::exclude_follow, user_option::exclude_mention, user_option::exclude_poll);
@@ -271,12 +271,49 @@ SCENARIO("The boolean overload for get_option works.")
         }
     }
 
+    GIVEN("An empty user_options")
+    {
+        user_options opt{fi.filename};
+
+        WHEN("one of the five boolean options is set to 'true' or 'yes'.")
+        {
+            const auto option = GENERATE(user_option::exclude_boost, user_option::exclude_fav,
+                user_option::exclude_follow, user_option::exclude_mention, user_option::exclude_poll);
+
+            const auto value = GENERATE(as<std::string>{}, "true", "True", "TRUE", "yes", "Yes", "YES", "Yeehaw", "yeehaw", "t", "T", "y", "Y");
+
+            opt.set_option(option, value);
+
+            THEN("the result has been set to true.")
+            {
+                const auto result = opt.get_bool_option(option);
+				REQUIRE(result == true);
+            }
+        }
+
+        WHEN("one of the five boolean options is set to anything else")
+        {
+            const auto option = GENERATE(user_option::exclude_boost, user_option::exclude_fav,
+                user_option::exclude_follow, user_option::exclude_mention, user_option::exclude_poll);
+
+            const auto value = GENERATE(as<std::string>{}, "false", "no", "knock it off", "", ":(", "No");
+
+            opt.set_option(option, value);
+
+            THEN("the result has been set correctly.")
+            {
+                const auto result = opt.get_bool_option(option);
+				REQUIRE(result == false);
+            }
+        }
+    }
+
     GIVEN("A user_options with some of the exclude options set.")
     {
         user_options opt{fi.filename};
         opt.set_bool_option(user_option::exclude_boost, true);
 
-        WHEN("one of the three options that have sync settings is asked for.")
+        WHEN("one of the options that have boolean settings is asked for.")
         {
 			const auto option = GENERATE(user_option::exclude_boost, user_option::exclude_fav,
                 user_option::exclude_follow, user_option::exclude_mention, user_option::exclude_poll);
