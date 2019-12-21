@@ -90,6 +90,14 @@ void print_api_call(std::string_view url, unsigned int limit, const timeline_par
 	if (!params.since_id.empty())
 		os << "&since_id=" << params.since_id;
 
+	if (params.exclude_notifs != nullptr && !params.exclude_notifs->empty())
+	{
+		for (const auto& type : *params.exclude_notifs)
+		{
+			os << "&exclude_types[]=" << type;
+		}
+	}
+
 	os << '\n';
 }
 #endif
