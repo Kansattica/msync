@@ -18,6 +18,7 @@ public:
 
 	std::pair<const std::string, user_options>& add_new_account(std::string name);
 	std::pair<const std::string, user_options>* select_account(std::string_view name);
+	void clear_accounts();
 	std::vector<std::string_view> all_accounts() const;
 
 	template <typename Callable>

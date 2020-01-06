@@ -175,7 +175,7 @@ SCENARIO("select_account selects exactly one account.")
 		}
 	}
 
-	GIVEN("An accounts unordered_map with one entry")
+	GIVEN("A global_options with one account")
 	{
 		const test_file fi = acc.filename / "someaccount@website.com";
 
@@ -235,7 +235,7 @@ SCENARIO("select_account selects exactly one account.")
 		}
 	}
 
-	GIVEN("An accounts unordered_map with two entries")
+	GIVEN("An global_options with two accounts")
 	{
 		const test_file fi = acc.filename / "someaccount@website.com";
 		const test_file anotherfi = acc.filename / "someotheraccount@place2.egg";
@@ -342,4 +342,39 @@ SCENARIO("select_account selects exactly one account.")
 			}
 		}
 	}
+}
+
+SCENARIO("clear_accounts deletes all the accounts known to the global_options.")
+{
+	const test_file acc = account_directory();
+
+	GIVEN("A global_options with two accounts.")
+	{
+		const test_file fi = acc.filename / "someaccount@website.com";
+		const test_file anotherfi = acc.filename / "someotheraccount@place2.egg";
+
+		global_options options;
+
+		for (const auto& accountname : { "someaccount@website.com", "someotheraccount@place2.egg" })
+		{
+			auto& newaccount = options.add_new_account(accountname);
+			newaccount.second.set_option(user_option::account_name, accountname);
+		}
+
+		WHEN("The accounts are cleared")
+		{
+			options.clear_accounts();
+
+			THEN("There's no accounts.")
+			{
+				REQUIRE(options.all_accounts().empty());
+			}
+
+			THEN("The accounts directory is empty.")
+			{
+				REQUIRE(count_files_in_directory(acc.filename) == 0);
+			}
+		}
+	}
+
 }

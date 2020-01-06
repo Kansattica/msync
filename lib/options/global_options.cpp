@@ -102,6 +102,16 @@ std::pair<const std::string, user_options>* global_options::select_account(const
 	return candidate;
 }
 
+void global_options::clear_accounts()
+{
+	for (const auto& account : accounts)
+	{
+		fs::remove_all(account_directory_location / account.first);
+	}
+
+	accounts.clear();
+}
+
 std::vector<std::string_view> global_options::all_accounts() const
 {
 	std::vector<std::string_view> toreturn;
