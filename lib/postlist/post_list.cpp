@@ -34,7 +34,7 @@ void print(std::ofstream& out, const char* key, bool val, bool newline = true)
 
 std::ofstream& operator<<(std::ofstream& out, const mastodon_status& status)
 {
-	print(out, "id: ", status.id);
+	print(out, "status id: ", status.id);
 	print(out, "url: ", status.url);
 	print_author(out, "author: ", status.author.display_name, status.author.account_name, status.author.is_bot);
 	print_author(out, "boosted by: ", status.boosted_by_display_name, status.boosted_by, status.boosted_by_bot);

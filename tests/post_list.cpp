@@ -10,7 +10,7 @@
 #include <filesystem.hpp>
 #include <string_view>
 
-constexpr std::string_view expected_content_nocw = R"(id: contentnocw
+constexpr std::string_view expected_content_nocw = R"(status id: contentnocw
 url: https://website.egg/contentnocw
 author: Normal Person (regular@website.egg)
 body: This is a...
@@ -21,7 +21,7 @@ posted on: 10:54AM 11-14-2019
 --------------
 )";
 
-constexpr std::string_view expected_content_cw = R"(id: contentcw
+constexpr std::string_view expected_content_cw = R"(status id: contentcw
 url: https://website.egg/contentcw
 author: Alex Friendford (afriend)
 cw: test inside
@@ -32,7 +32,7 @@ posted on: 10:55AM 11-14-2019
 --------------
 )";
 
-constexpr std::string_view expected_justattachments = R"(id: justattachments
+constexpr std::string_view expected_justattachments = R"(status id: justattachments
 url: https://website.egg/justattachments
 author: Beepin' Online (someone@online.egg) [bot]
 visibility: private
@@ -45,7 +45,7 @@ posted on: 10:56AM 11-14-2019
 --------------
 )";
 
-constexpr std::string_view expected_everything = R"(id: everything
+constexpr std::string_view expected_everything = R"(status id: everything
 url: https://website.egg/everything
 author: Cyberfriend: The Friendening (cyberfriend) [bot]
 boosted by: Meat Boosterson (meatbooster@different.website.egg)
