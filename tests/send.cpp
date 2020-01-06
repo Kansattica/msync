@@ -86,7 +86,7 @@ struct mock_network_new_status : public mock_network
 		if (!toreturn.okay)
 			toreturn.message = R"({ "error": "some problem" })";
 		else
-			toreturn.message = make_status_json(str_id);
+			make_status_json(str_id, toreturn.message);
 
 		arguments.push_back(status_mock_args{ std::string {url}, std::string { access_token }, std::move(str_id), params});
 
