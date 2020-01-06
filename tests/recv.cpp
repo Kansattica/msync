@@ -96,6 +96,9 @@ struct mock_network_get : public mock_network
 
 			CAPTURE(url);
 			FAIL("Hey, I don't know what to do with this URL.");
+
+			// some compilers complain if control could reach the end of the function (even though it almost certainly won't here- I'm pretty sure FAIL throws an exception)
+			return std::make_tuple(make_status_json, 0u, 0u);
 		}();
 
 		auto upper_bound = lowest_id + total_count;
