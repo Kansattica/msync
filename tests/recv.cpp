@@ -58,12 +58,19 @@ struct get_mock_args : basic_mock_args
 	std::string min_id;
 	std::string max_id;
 	std::string since_id;
-
+	std::vector<std::string> exclude_notifs;
 	unsigned int limit;
 };
 
 constexpr unsigned int lowest_post_id = 1000000;
 constexpr unsigned int lowest_notif_id = 10000;
+
+std::vector<std::string> copy_excludes(std::vector<std::string_view>* ex)
+{
+	if (ex == nullptr) { return {}; }
+
+	return std::vector<std::string>(ex->begin(), ex->end());
+}
 
 struct mock_network_get : public mock_network
 {
@@ -75,7 +82,7 @@ struct mock_network_get : public mock_network
 	net_response operator()(std::string_view url, std::string_view access_token, const timeline_params& params, unsigned int limit)
 	{
 		arguments.push_back(get_mock_args{ std::string{url}, std::string{access_token}, 
-			std::string{params.min_id}, std::string{params.max_id}, std::string{params.since_id}, limit });
+			std::string{params.min_id}, std::string{params.max_id}, std::string{params.since_id}, copy_excludes(params.exclude_notifs), limit });
 
 		net_response toreturn;
 		toreturn.retryable_error = (--succeed_after > 0);
@@ -227,7 +234,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 				REQUIRE(args.size() == 10);
 				REQUIRE(std::all_of(args.begin(), args.begin() + 5, [&](const get_mock_args& arg) { return arg.url == expected_notification_endpoint && arg.limit == 30; }));
 				REQUIRE(std::all_of(args.begin() + 5, args.end(), [&](const get_mock_args& arg) { return arg.url == expected_home_endpoint && arg.limit == 40; }));
-				REQUIRE(std::all_of(args.begin(), args.end(), [&](const get_mock_args& arg) { return arg.access_token == expected_access_token; }));
+				REQUIRE(std::all_of(args.begin(), args.end(), [&](const get_mock_args& arg) { return arg.access_token == expected_access_token && arg.exclude_notifs.empty(); }));
 			}
 
 			THEN("Both files have the expected number of posts, and the IDs are strictly increasing.")
