@@ -78,12 +78,15 @@ int main(int argc, const char* argv[])
 			break;
 		case mode::config:
 			assume_account(user).second.set_option(parsed.toset, parsed.optionval);
+			should_print_newline = false;
 			break;
 		case mode::configsync:
 			assume_account(user).second.set_option(parsed.toset, parsed.sync_opts.mode);
+			should_print_newline = false;
 			break;
 		case mode::configlist:
 			assume_account(user).second.set_option(parsed.toset, parsed.listops);
+			should_print_newline = false;
 			break;
 		case mode::queue:
 			uniqueify(parsed.queue_opt.queued);
