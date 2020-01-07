@@ -1243,7 +1243,6 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 
 		std::vector<const char*> argv;
 
-
 		WHEN("the command line is parsed")
 		{
 			do
@@ -1278,7 +1277,6 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 			} while (std::next_permutation(options.begin(), options.end()));
 
 		}
-
 	}
 }
 
