@@ -17,13 +17,14 @@ I currently build and ensure all tests pass on Linux with both clang and gcc, as
 - [X] Queue posts, boosts, and favs
 - [X] Queue up threads before sending.
 - [X] Send posts, boosts, and favs
-- [ ] Download posts from home timeline
+- [X] Download posts from home timeline
 - [ ] Download direct messages
-- [ ] Download notifications
+- [X] Download notifications
 - [ ] Download posts from lists
 - [ ] Download posts from your profile
 - [X] Post template file generation
 - [X] Attachment support
+- [X] Ability to exclude notifications by type.
 - [ ] Nicknames for accounts
 
 ### Roadmap (things for later)
@@ -31,6 +32,7 @@ I currently build and ensure all tests pass on Linux with both clang and gcc, as
 - [ ] Download individual posts and threads by URL or ID
 - [ ] Poll support
 - [ ] Nicer UI, like a minimal webpage to show downloaded posts in.
+- [ ] A proper manual for the weirder ins and outs of msync
 
 ### Build Dependencies
 Cmake will download all of these for you, except it'll use your system's libcurl if you have it. I recommend at least having an SSL/TLS library for cmake to find and dynamically link.
