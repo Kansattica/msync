@@ -226,11 +226,12 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 				REQUIRE(std::all_of(args.begin(), args.end(), [](const get_mock_args& arg) { return arg.access_token == "token!"sv; }));
 			}
 
-			constexpr int expected_home_statuses = 40 * 5;
-			constexpr int expected_notifications = 30 * 5;
 
 			THEN("Both files have the expected number of posts, and the IDs are strictly increasing.")
 			{
+				constexpr int expected_home_statuses = 40 * 5;
+				constexpr int expected_notifications = 30 * 5;
+
 				verify_file(home_timeline_file, expected_home_statuses, "status id: ");
 				verify_file(notifications_file, expected_notifications, "notification id: ");
 			}
