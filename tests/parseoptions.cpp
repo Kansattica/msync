@@ -1126,6 +1126,7 @@ auto pick_visibility()
 		return std::make_pair("direct", visibility::direct);
 	}
 
+	FAIL("Hey, the visibility picker screwed up.");
 	return std::make_pair("Well, this shouldn't happen.", visibility::default_vis);
 }
 
