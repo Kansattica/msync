@@ -8,7 +8,7 @@
 ### Get msync
 Once `msync` has a stable release, I'll have releases available for download. For now, it has to be built with cmake. If you have a fairly recent version of cmake (3.12 or later), you can simply clone the repo, make a `build` directory, run cmake inside, and cmake will download and build `msync` and its dependencies automatically. 
 
-On Linux systems, it works a lot better if it can link in your system's openssl (or whatever other TLS implementation cURL knows how to use) and, if you have it, libcurl. Consider installing these through your package manager.
+On Linux systems, it works a lot better if it can link in your system's openssl (or whatever other TLS implementation cURL knows how to use) and, if you have it, libcurl. Consider installing these through your package manager. For example, I install `libcurl4-openssl-dev` on Debian.
 
 I currently build and ensure all tests pass on Linux with both clang and gcc, as well as the Microsoft compiler on Windows.
 
