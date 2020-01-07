@@ -67,7 +67,7 @@ int main(int argc, const char* argv[])
 				}
 				else if (opt >= user_option::exclude_follow && opt <= user_option::exclude_poll)
 				{
-					pl() << option_name << ": " << assume_account(user).second.get_bool_option(opt);
+					pl() << option_name << ": " << (assume_account(user).second.get_bool_option(opt) ? "true" : "false") << '\n';
 				}
 				else
 				{
