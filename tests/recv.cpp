@@ -294,5 +294,93 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 		}
 	}
 
+	GIVEN("A user account that excludes some notification types.")
+	{
+		account.second.set_bool_option(user_option::exclude_boost, true);
+		account.second.set_bool_option(user_option::exclude_follow, true);
+		account.second.set_bool_option(user_option::exclude_fav, false);
+
+		WHEN("That account is given to recv and told to update.")
+		{
+			recv_posts post_getter{ mock_get };
+
+			post_getter.get(account.first, account.second);
+
+			THEN("Calls to the notification API correctly include the excluded notif types.")
+			{
+				const auto& args = mock_get.arguments;
+				for (auto it = args.begin(); it != args.begin() + 5; ++it)
+				{
+					REQUIRE_THAT(it->exclude_notifs, Catch::UnorderedEquals(std::vector<std::string>{ "reblog", "follow" }));
+				}
+			}
+
+			THEN("Five calls each were made to the home and notification API endpoints with the correct URLs, default limits, and access tokens.")
+			{
+				const auto& args = mock_get.arguments;
+				CAPTURE(args);
+				REQUIRE(args.size() == 10);
+				REQUIRE(std::all_of(args.begin(), args.begin() + 5, [&](const get_mock_args& arg) { return arg.url == expected_notification_endpoint && arg.limit == 30; }));
+				REQUIRE(std::all_of(args.begin() + 5, args.end(), [&](const get_mock_args& arg) { return arg.url == expected_home_endpoint && arg.limit == 40 && arg.exclude_notifs.empty(); }));
+				REQUIRE(std::all_of(args.begin(), args.end(), [&](const get_mock_args& arg) { return arg.access_token == expected_access_token; }));
+			}
+
+			THEN("Both files have the expected number of posts, and the IDs are strictly increasing.")
+			{
+				constexpr int expected_home_statuses = 40 * 5;
+				constexpr int expected_notifications = 30 * 5;
+
+				verify_file(home_timeline_file, expected_home_statuses, "status id: ");
+				verify_file(notifications_file, expected_notifications, "notification id: ");
+			}
+
+			THEN("The correct last IDs are saved back to the account.")
+			{
+				std::array<char, 10> id_char_buf;
+
+				REQUIRE(account.second.get_option(user_option::last_home_id) == sv_to_chars(lowest_post_id + mock_get.total_post_count, id_char_buf));
+				REQUIRE(account.second.get_option(user_option::last_notification_id) == sv_to_chars(lowest_notif_id + mock_get.total_notif_count, id_char_buf));
+			}
+
+			AND_WHEN("More posts and notifications are added and get is called again.")
+			{
+				mock_get.arguments.clear();
+				mock_get.total_post_count += 10;
+				mock_get.total_notif_count += 15;
+
+				post_getter.get(account.first, account.second);
+
+				THEN("Only one call was made to each endpoint.")
+				{
+					const auto& args = mock_get.arguments;
+					REQUIRE(args.size() == 2);
+					REQUIRE(args[0].url == expected_notification_endpoint);
+					REQUIRE(args[0].limit == 30);
+					REQUIRE(args[1].url == expected_home_endpoint);
+					REQUIRE(args[1].limit == 40);
+				}
+
+				THEN("The correct last IDs are saved back to the account.")
+				{
+					std::array<char, 10> id_char_buf;
+
+					REQUIRE(account.second.get_option(user_option::last_home_id) == sv_to_chars(lowest_post_id + mock_get.total_post_count, id_char_buf));
+					REQUIRE(account.second.get_option(user_option::last_notification_id) == sv_to_chars(lowest_notif_id + mock_get.total_notif_count, id_char_buf));
+				}
+
+				THEN("Both files have the expected number of posts, and the IDs are strictly increasing.")
+				{
+					// the -1 is because adding 10 to the post count only adds 9 new statuses because you already got the 0th status last time
+					// this feels weird because of the weird mix of half-open ranges and fully closed ranges, but I believe it's correct
+					constexpr int expected_home_statuses = 40 * 5 + 10 - 1;
+					constexpr int expected_notifications = 30 * 5 + 15 - 1;
+
+					verify_file(home_timeline_file, expected_home_statuses, "status id: ");
+					verify_file(notifications_file, expected_notifications, "notification id: ");
+				}
+			}
+		}
+	}
+
 	options().clear_accounts();
 }
