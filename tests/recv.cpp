@@ -153,7 +153,7 @@ struct mock_network_get : public mock_network
 
 void verify_file(const fs::path& file, int expected_count, const std::string& id_starts_with)
 {
-	constexpr std::string_view dashes = "--------------";
+	static constexpr std::string_view dashes = "--------------";
 
 	const auto lines = read_lines(file);
 
@@ -191,7 +191,11 @@ void verify_file(const fs::path& file, int expected_count, const std::string& id
 
 SCENARIO("Recv downloads and writes the correct number of posts.")
 {
-	constexpr std::string_view account_name = "user@crime.egg";
+	static constexpr std::string_view account_name = "user@crime.egg";
+	static constexpr std::string_view expected_notification_endpoint = "https://crime.egg/api/v1/notifications";
+	static constexpr std::string_view expected_home_endpoint = "https://crime.egg/api/v1/timelines/home";
+	static constexpr std::string_view expected_access_token = "token!";
+
 	const test_file account_dir = account_directory();
 
 	const static auto user_dir = account_dir.filename / account_name;
@@ -216,16 +220,15 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 
 			post_getter.get(account.first, account.second);
 
-			THEN("Five calls each were made to the home and notification API endpoints with the correct URLs and access tokens.")
+			THEN("Five calls each were made to the home and notification API endpoints with the correct URLs, default limits, and access tokens.")
 			{
 				const auto& args = mock_get.arguments;
 				CAPTURE(args);
 				REQUIRE(args.size() == 10);
-				REQUIRE(std::all_of(args.begin(), args.begin() + 5, [](const get_mock_args& arg) { return arg.url == "https://crime.egg/api/v1/notifications"sv; }));
-				REQUIRE(std::all_of(args.begin() + 5, args.end(), [](const get_mock_args& arg) { return arg.url == "https://crime.egg/api/v1/timelines/home"sv; }));
-				REQUIRE(std::all_of(args.begin(), args.end(), [](const get_mock_args& arg) { return arg.access_token == "token!"sv; }));
+				REQUIRE(std::all_of(args.begin(), args.begin() + 5, [&](const get_mock_args& arg) { return arg.url == expected_notification_endpoint && arg.limit == 30; }));
+				REQUIRE(std::all_of(args.begin() + 5, args.end(), [&](const get_mock_args& arg) { return arg.url == expected_home_endpoint && arg.limit == 40; }));
+				REQUIRE(std::all_of(args.begin(), args.end(), [&](const get_mock_args& arg) { return arg.access_token == expected_access_token; }));
 			}
-
 
 			THEN("Both files have the expected number of posts, and the IDs are strictly increasing.")
 			{
@@ -242,6 +245,44 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 
 				REQUIRE(account.second.get_option(user_option::last_home_id) == sv_to_chars(lowest_post_id + mock_get.total_post_count, id_char_buf));
 				REQUIRE(account.second.get_option(user_option::last_notification_id) == sv_to_chars(lowest_notif_id + mock_get.total_notif_count, id_char_buf));
+			}
+
+			AND_WHEN("More posts and notifications are added and get is called again.")
+			{
+				mock_get.arguments.clear();
+				mock_get.total_post_count += 10;
+				mock_get.total_notif_count += 15;
+
+				post_getter.get(account.first, account.second);
+
+				THEN("Only one call was made to each endpoint.")
+				{
+					const auto& args = mock_get.arguments;
+					REQUIRE(args.size() == 2);
+					REQUIRE(args[0].url == expected_notification_endpoint);
+					REQUIRE(args[0].limit == 30);
+					REQUIRE(args[1].url == expected_home_endpoint);
+					REQUIRE(args[1].limit == 40);
+				}
+
+				THEN("The correct last IDs are saved back to the account.")
+				{
+					std::array<char, 10> id_char_buf;
+
+					REQUIRE(account.second.get_option(user_option::last_home_id) == sv_to_chars(lowest_post_id + mock_get.total_post_count, id_char_buf));
+					REQUIRE(account.second.get_option(user_option::last_notification_id) == sv_to_chars(lowest_notif_id + mock_get.total_notif_count, id_char_buf));
+				}
+
+				THEN("Both files have the expected number of posts, and the IDs are strictly increasing.")
+				{
+					// the -1 is because adding 10 to the post count only adds 9 new statuses because you already got the 0th status last time
+					// this feels weird because of the weird mix of half-open ranges and fully closed ranges, but I believe it's correct
+					constexpr int expected_home_statuses = 40 * 5 + 10 - 1;
+					constexpr int expected_notifications = 30 * 5 + 15 - 1;
+
+					verify_file(home_timeline_file, expected_home_statuses, "status id: ");
+					verify_file(notifications_file, expected_notifications, "notification id: ");
+				}
 			}
 		}
 	}
