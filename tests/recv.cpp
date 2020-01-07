@@ -64,6 +64,7 @@ struct get_mock_args : basic_mock_args
 
 constexpr unsigned int lowest_post_id = 1000000;
 constexpr unsigned int lowest_notif_id = 10000;
+constexpr unsigned int lowest_dm_id = 100000;
 
 std::vector<std::string> copy_excludes(std::vector<std::string_view>* ex)
 {
@@ -78,6 +79,7 @@ struct mock_network_get : public mock_network
 
 	unsigned int total_post_count = 310;
 	unsigned int total_notif_count = 240;
+	unsigned int total_dm_count = 320;
 
 	net_response operator()(std::string_view url, std::string_view access_token, const timeline_params& params, unsigned int limit)
 	{
@@ -100,6 +102,7 @@ struct mock_network_get : public mock_network
 			std::string_view url_view = url.substr(url.find_last_of('/') + 1);
 			if (url_view == "notifications") { return std::make_tuple(make_notification_json, lowest_notif_id, total_notif_count); }
 			if (url_view == "home") { return std::make_tuple(make_status_json, lowest_post_id, total_post_count); }
+			if (url_view == "conversations") { return std::make_tuple(make_dm_json, lowest_dm_id, total_dm_count); }
 
 			CAPTURE(url);
 			FAIL("Hey, I don't know what to do with this URL.");
@@ -140,9 +143,9 @@ struct mock_network_get : public mock_network
 			lower_bound = lowest_id;
 		}
 
-		if (upper_bound > lowest_id + total_post_count)
+		if (upper_bound > lowest_id + total_count)
 		{
-			upper_bound = lowest_id + total_post_count;
+			upper_bound = lowest_id + total_count;
 		}
 
 		if (lower_bound >= upper_bound)
@@ -201,13 +204,16 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 	static constexpr std::string_view account_name = "user@crime.egg";
 	static constexpr std::string_view expected_notification_endpoint = "https://crime.egg/api/v1/notifications";
 	static constexpr std::string_view expected_home_endpoint = "https://crime.egg/api/v1/timelines/home";
+	static constexpr std::string_view expected_dm_endpoint = "https://crime.egg/api/v1/conversations";
 	static constexpr std::string_view expected_access_token = "token!";
 
 	const test_file account_dir = account_directory();
 
 	const static auto user_dir = account_dir.filename / account_name;
+
 	const static auto home_timeline_file = user_dir / Home_Timeline_Filename;
 	const static auto notifications_file = user_dir / Notifications_Filename;
+	const static auto dms_file = user_dir / Direct_Messages_Filename;
 
 	auto& account = options().add_new_account(std::string{ account_name });
 
@@ -227,13 +233,14 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 
 			post_getter.get(account.first, account.second);
 
-			THEN("Five calls each were made to the home and notification API endpoints with the correct URLs, default limits, and access tokens.")
+			THEN("Five calls each were made to the home, DMs, and notification API endpoints with the correct URLs, default limits, and access tokens.")
 			{
 				const auto& args = mock_get.arguments;
 				CAPTURE(args);
-				REQUIRE(args.size() == 10);
-				REQUIRE(std::all_of(args.begin(), args.begin() + 5, [&](const get_mock_args& arg) { return arg.url == expected_notification_endpoint && arg.limit == 30; }));
-				REQUIRE(std::all_of(args.begin() + 5, args.end(), [&](const get_mock_args& arg) { return arg.url == expected_home_endpoint && arg.limit == 40; }));
+				REQUIRE(args.size() == 15);
+				REQUIRE(std::all_of(args.begin(), args.begin() + 5, [&](const get_mock_args& arg) { return arg.url == expected_dm_endpoint && arg.limit == 40; }));
+				REQUIRE(std::all_of(args.begin() + 5, args.begin() + 10, [&](const get_mock_args& arg) { return arg.url == expected_notification_endpoint && arg.limit == 30; }));
+				REQUIRE(std::all_of(args.begin() + 10, args.end(), [&](const get_mock_args& arg) { return arg.url == expected_home_endpoint && arg.limit == 40; }));
 				REQUIRE(std::all_of(args.begin(), args.end(), [&](const get_mock_args& arg) { return arg.access_token == expected_access_token && arg.exclude_notifs.empty(); }));
 			}
 
@@ -241,9 +248,11 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 			{
 				constexpr int expected_home_statuses = 40 * 5;
 				constexpr int expected_notifications = 30 * 5;
+				constexpr int expected_dms = 40 * 5;
 
 				verify_file(home_timeline_file, expected_home_statuses, "status id: ");
 				verify_file(notifications_file, expected_notifications, "notification id: ");
+				verify_file(dms_file, expected_dms, "dm id: ");
 			}
 
 			THEN("The correct last IDs are saved back to the account.")
@@ -252,6 +261,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 
 				REQUIRE(account.second.get_option(user_option::last_home_id) == sv_to_chars(lowest_post_id + mock_get.total_post_count, id_char_buf));
 				REQUIRE(account.second.get_option(user_option::last_notification_id) == sv_to_chars(lowest_notif_id + mock_get.total_notif_count, id_char_buf));
+				REQUIRE(account.second.get_option(user_option::last_dm_id) == sv_to_chars(lowest_dm_id + mock_get.total_dm_count, id_char_buf));
 			}
 
 			AND_WHEN("More posts and notifications are added and get is called again.")
@@ -265,11 +275,13 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 				THEN("Only one call was made to each endpoint.")
 				{
 					const auto& args = mock_get.arguments;
-					REQUIRE(args.size() == 2);
-					REQUIRE(args[0].url == expected_notification_endpoint);
-					REQUIRE(args[0].limit == 30);
-					REQUIRE(args[1].url == expected_home_endpoint);
-					REQUIRE(args[1].limit == 40);
+					REQUIRE(args.size() == 3);
+					REQUIRE(args[0].url == expected_dm_endpoint);
+					REQUIRE(args[0].limit == 40);
+					REQUIRE(args[1].url == expected_notification_endpoint);
+					REQUIRE(args[1].limit == 30);
+					REQUIRE(args[2].url == expected_home_endpoint);
+					REQUIRE(args[2].limit == 40);
 				}
 
 				THEN("The correct last IDs are saved back to the account.")
@@ -278,6 +290,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 
 					REQUIRE(account.second.get_option(user_option::last_home_id) == sv_to_chars(lowest_post_id + mock_get.total_post_count, id_char_buf));
 					REQUIRE(account.second.get_option(user_option::last_notification_id) == sv_to_chars(lowest_notif_id + mock_get.total_notif_count, id_char_buf));
+					REQUIRE(account.second.get_option(user_option::last_dm_id) == sv_to_chars(lowest_dm_id + mock_get.total_dm_count, id_char_buf));
 				}
 
 				THEN("Both files have the expected number of posts, and the IDs are strictly increasing.")
@@ -286,9 +299,11 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 					// this feels weird because of the weird mix of half-open ranges and fully closed ranges, but I believe it's correct
 					constexpr int expected_home_statuses = 40 * 5 + 10 - 1;
 					constexpr int expected_notifications = 30 * 5 + 15 - 1;
+					constexpr int expected_dms = 40 * 5; // didn't add any new DMs
 
 					verify_file(home_timeline_file, expected_home_statuses, "status id: ");
 					verify_file(notifications_file, expected_notifications, "notification id: ");
+					verify_file(dms_file, expected_dms, "dm id: ");
 				}
 			}
 		}
@@ -309,7 +324,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 			THEN("Calls to the notification API correctly include the excluded notif types.")
 			{
 				const auto& args = mock_get.arguments;
-				for (auto it = args.begin(); it != args.begin() + 5; ++it)
+				for (auto it = args.begin() + 5; it != args.begin() + 10; ++it)
 				{
 					REQUIRE_THAT(it->exclude_notifs, Catch::UnorderedEquals(std::vector<std::string>{ "reblog", "follow" }));
 				}
@@ -319,9 +334,10 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 			{
 				const auto& args = mock_get.arguments;
 				CAPTURE(args);
-				REQUIRE(args.size() == 10);
-				REQUIRE(std::all_of(args.begin(), args.begin() + 5, [&](const get_mock_args& arg) { return arg.url == expected_notification_endpoint && arg.limit == 30; }));
-				REQUIRE(std::all_of(args.begin() + 5, args.end(), [&](const get_mock_args& arg) { return arg.url == expected_home_endpoint && arg.limit == 40 && arg.exclude_notifs.empty(); }));
+				REQUIRE(args.size() == 15);
+				REQUIRE(std::all_of(args.begin(), args.begin() + 5, [&](const get_mock_args& arg) { return arg.url == expected_dm_endpoint && arg.limit == 40 && arg.exclude_notifs.empty(); }));
+				REQUIRE(std::all_of(args.begin() + 5, args.begin() + 10, [&](const get_mock_args& arg) { return arg.url == expected_notification_endpoint && arg.limit == 30; }));
+				REQUIRE(std::all_of(args.begin() + 10, args.end(), [&](const get_mock_args& arg) { return arg.url == expected_home_endpoint && arg.limit == 40 && arg.exclude_notifs.empty(); }));
 				REQUIRE(std::all_of(args.begin(), args.end(), [&](const get_mock_args& arg) { return arg.access_token == expected_access_token; }));
 			}
 
@@ -329,9 +345,11 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 			{
 				constexpr int expected_home_statuses = 40 * 5;
 				constexpr int expected_notifications = 30 * 5;
+				constexpr int expected_dms = 40 * 5;
 
 				verify_file(home_timeline_file, expected_home_statuses, "status id: ");
 				verify_file(notifications_file, expected_notifications, "notification id: ");
+				verify_file(dms_file, expected_dms, "dm id: ");
 			}
 
 			THEN("The correct last IDs are saved back to the account.")
@@ -340,6 +358,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 
 				REQUIRE(account.second.get_option(user_option::last_home_id) == sv_to_chars(lowest_post_id + mock_get.total_post_count, id_char_buf));
 				REQUIRE(account.second.get_option(user_option::last_notification_id) == sv_to_chars(lowest_notif_id + mock_get.total_notif_count, id_char_buf));
+				REQUIRE(account.second.get_option(user_option::last_dm_id) == sv_to_chars(lowest_dm_id + mock_get.total_dm_count, id_char_buf));
 			}
 
 			AND_WHEN("More posts and notifications are added and get is called again.")
@@ -353,11 +372,13 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 				THEN("Only one call was made to each endpoint.")
 				{
 					const auto& args = mock_get.arguments;
-					REQUIRE(args.size() == 2);
-					REQUIRE(args[0].url == expected_notification_endpoint);
-					REQUIRE(args[0].limit == 30);
-					REQUIRE(args[1].url == expected_home_endpoint);
-					REQUIRE(args[1].limit == 40);
+					REQUIRE(args.size() == 3);
+					REQUIRE(args[0].url == expected_dm_endpoint);
+					REQUIRE(args[0].limit == 40);
+					REQUIRE(args[1].url == expected_notification_endpoint);
+					REQUIRE(args[1].limit == 30);
+					REQUIRE(args[2].url == expected_home_endpoint);
+					REQUIRE(args[2].limit == 40);
 				}
 
 				THEN("The correct last IDs are saved back to the account.")
@@ -366,6 +387,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 
 					REQUIRE(account.second.get_option(user_option::last_home_id) == sv_to_chars(lowest_post_id + mock_get.total_post_count, id_char_buf));
 					REQUIRE(account.second.get_option(user_option::last_notification_id) == sv_to_chars(lowest_notif_id + mock_get.total_notif_count, id_char_buf));
+					REQUIRE(account.second.get_option(user_option::last_dm_id) == sv_to_chars(lowest_dm_id + mock_get.total_dm_count, id_char_buf));
 				}
 
 				THEN("Both files have the expected number of posts, and the IDs are strictly increasing.")
@@ -374,9 +396,11 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 					// this feels weird because of the weird mix of half-open ranges and fully closed ranges, but I believe it's correct
 					constexpr int expected_home_statuses = 40 * 5 + 10 - 1;
 					constexpr int expected_notifications = 30 * 5 + 15 - 1;
+					constexpr int expected_dms = 40 * 5; // didn't add any new DMs
 
 					verify_file(home_timeline_file, expected_home_statuses, "status id: ");
 					verify_file(notifications_file, expected_notifications, "notification id: ");
+					verify_file(dms_file, expected_dms, "dm id: ");
 				}
 			}
 		}

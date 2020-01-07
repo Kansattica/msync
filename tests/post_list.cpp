@@ -162,6 +162,7 @@ mastodon_status make_everything()
 
 size_t compare_window(std::string_view expected, std::string_view entire, size_t index)
 {
+	CAPTURE(mismatch_loc(expected, entire));
 	REQUIRE(expected == entire.substr(index, expected.size()));
 	return index + expected.size();
 }
@@ -397,6 +398,129 @@ SCENARIO("post_list correctly serializes lists of notifications.")
 				idx = compare_window(test_case.expected_notif, actual, idx);
 				idx = compare_window(test_case.expected_status, actual, idx);
 				idx = compare_window(other_test_case.expected_notif, actual, idx);
+				idx = compare_window(other_test_case.expected_status, actual, idx);
+				REQUIRE(idx == actual.size());
+			}
+		}
+	}
+}
+
+constexpr std::array<std::string_view, 2> expected_dms =
+{
+	"dm id: firstone\nDirect message with:\n- Alex Humansworth (localhuman)\nLast message in conversation:\n",
+	"dm id: theotherone\nDirect message with:\n- Egg Criminal (remotehuman@crime.egg)\n- Egg Beeps (farbot@crime.egg) [bot]\nLast message in conversation:\n"
+};
+
+std::array<mastodon_dm, 2> make_dms()
+{
+	std::array<mastodon_dm, 2> toreturn;
+
+	toreturn[0].id = "firstone";
+	toreturn[0].accounts.resize(1);
+	toreturn[0].accounts[0].account_name = "localhuman";
+	toreturn[0].accounts[0].display_name = "Alex Humansworth";
+	toreturn[0].accounts[0].is_bot = false;
+	toreturn[0].last_status = make_cw();
+
+	toreturn[1].id = "theotherone";
+	toreturn[1].accounts.resize(2);
+	toreturn[1].accounts[0].account_name = "remotehuman@crime.egg";
+	toreturn[1].accounts[0].display_name = "Egg Criminal";
+	toreturn[1].accounts[0].is_bot = false;
+	toreturn[1].accounts[1].account_name = "farbot@crime.egg";
+	toreturn[1].accounts[1].display_name = "Egg Beeps";
+	toreturn[1].accounts[1].is_bot = true;
+	toreturn[1].last_status = make_attachments();
+
+	return toreturn;
+}
+
+struct dm_test_case
+{
+	const mastodon_dm& dm;
+	const std::string_view expected_dm;
+	const std::string_view expected_status;
+};
+
+SCENARIO("post_list correctly serializes lists of direct messages.")
+{
+	GIVEN("Some DMs to serialize with associated statuses.")
+	{
+		const static auto totest = make_dms();
+
+		const static auto test_cases = std::array<dm_test_case, 2>
+		{
+			dm_test_case{ totest[0], expected_dms[0], expected_content_cw },
+			dm_test_case{ totest[1], expected_dms[1], expected_justattachments }
+		};
+
+		test_file fi{ "postlist.test" };
+		WHEN("One of the DMs is serialized with post_list")
+		{
+			const auto& test_case = GENERATE_REF(from_range(test_cases));
+
+			{
+				post_list<mastodon_dm> list{ fi.filename };
+				list.write(test_case.dm);
+			}
+
+			THEN("The single DM is written as expected.")
+			{
+				const std::string actual = read_file(fi.filename);
+
+				size_t idx = 0;
+				idx = compare_window(test_case.expected_dm, actual, idx);
+				idx = compare_window(test_case.expected_status, actual, idx);
+				REQUIRE(idx == actual.size());
+			}
+		}
+
+		WHEN("Two DMs are serialized with post_list")
+		{
+			const auto& test_case = GENERATE_REF(from_range(test_cases));
+			const auto& other_test_case = GENERATE_REF(from_range(test_cases));
+
+			{
+				post_list<mastodon_dm> list{ fi.filename };
+				list.write(test_case.dm);
+				list.write(other_test_case.dm);
+			}
+
+			THEN("Both DMs are written as expected.")
+			{
+				const std::string actual = read_file(fi.filename);
+
+				size_t idx = 0;
+				idx = compare_window(test_case.expected_dm, actual, idx);
+				idx = compare_window(test_case.expected_status, actual, idx);
+				idx = compare_window(other_test_case.expected_dm, actual, idx);
+				idx = compare_window(other_test_case.expected_status, actual, idx);
+				REQUIRE(idx == actual.size());
+			}
+		}
+
+		WHEN("Two DMs are serialized with post_list destroyed between them")
+		{
+			const auto& test_case = GENERATE_REF(from_range(test_cases));
+			const auto& other_test_case = GENERATE_REF(from_range(test_cases));
+
+			{
+				post_list<mastodon_dm> list{ fi.filename };
+				list.write(test_case.dm);
+			}
+			{
+				post_list<mastodon_dm> list{ fi.filename };
+				list.write(other_test_case.dm);
+			}
+
+			THEN("Both notifications are written as expected.")
+			{
+				const std::string actual = read_file(fi.filename);
+
+				size_t idx = 0;
+				idx = compare_window(test_case.expected_dm, actual, idx);
+				idx = compare_window(test_case.expected_status, actual, idx);
+				idx = compare_window(other_test_case.expected_dm, actual, idx);
 				idx = compare_window(other_test_case.expected_status, actual, idx);
 				REQUIRE(idx == actual.size());
 			}

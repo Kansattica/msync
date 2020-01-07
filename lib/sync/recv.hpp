@@ -45,6 +45,9 @@ public:
 
 		exclude_notif_types = make_excludes(account);
 
+		pl() << "Downloading the direct messages for " << account_name << '\n';
+		update_timeline<to_get::dms, mastodon_dm>(account, user_folder, clamp_or_default(per_call, 40));
+
 		pl() << "Downloading notifications for " << account_name << '\n';
 		update_timeline<to_get::notifications, mastodon_notification, true>(account, user_folder, clamp_or_default(per_call, 30));
 

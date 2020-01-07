@@ -95,3 +95,17 @@ std::ofstream& operator<<(std::ofstream& out, const mastodon_notification& notif
 
 	return out;
 }
+
+std::ofstream& operator<<(std::ofstream& out, const mastodon_dm& dm)
+{
+	out << "dm id: " << dm.id << '\n';
+	out << "Direct message with:\n";
+	for (const auto& author : dm.accounts)
+	{
+		print_author(out, "- ", author.display_name, author.account_name, author.is_bot);
+	}
+	out << "Last message in conversation:\n";
+	out << dm.last_status;
+
+	return out;
+}

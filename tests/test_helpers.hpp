@@ -14,6 +14,7 @@ std::string read_file(const fs::path& file);
 
 void make_status_json(std::string_view id, std::string& to_append);
 void make_notification_json(std::string_view id, std::string& to_append);
+void make_dm_json(std::string_view id, std::string& to_append);
 
 bool flip_coin();
 int zero_to_n(int n);

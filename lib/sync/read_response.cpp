@@ -113,6 +113,13 @@ void from_json(const json& j, mastodon_notification& notif)
 	}
 }
 
+void from_json(const json& j, mastodon_dm& dm)
+{
+	j["id"].get_to(dm.id);
+	j["accounts"].get_to(dm.accounts);
+	j["last_status"].get_to(dm.last_status);
+}
+
 mastodon_status read_status(const std::string_view status_json)
 {
 	return json::parse(status_json).get<mastodon_status>();
@@ -131,6 +138,11 @@ mastodon_notification read_notification(const std::string_view notification_json
 std::vector<mastodon_notification> read_notifications(const std::string_view notifications_json)
 {
 	return json::parse(notifications_json).get<std::vector<mastodon_notification>>();
+}
+
+std::vector<mastodon_dm> read_dms(const std::string_view dm_json)
+{
+	return json::parse(dm_json).get<std::vector<mastodon_dm>>();
 }
 
 std::string read_upload_id(const std::string_view attachment_json)

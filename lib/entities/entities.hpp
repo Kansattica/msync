@@ -62,4 +62,11 @@ struct mastodon_notification
 	std::optional<mastodon_status> status;
 };
 
+struct mastodon_dm
+{
+	std::string id;
+	std::vector<mastodon_account> accounts;
+	mastodon_status last_status;
+};
+
 #endif
