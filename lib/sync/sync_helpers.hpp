@@ -113,7 +113,7 @@ request_response request_with_retries(make_request req, unsigned int retries, St
 			auto parsed_error = read_error(response.message);
 			if (!parsed_error.empty())
 				response.message = std::move(parsed_error);
-			os << response.message << '\n';
+			os << '\n' << response.message << '\n';
 			return request_response{ false, std::move(response.message), i + 1, std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() };
 		}
 
