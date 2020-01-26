@@ -128,13 +128,14 @@ private:
 			print_api_call(url, limit, query_parameters, pl());
 
 			auto response = request_with_retries([&]() { return download(url, access_token, query_parameters, limit); }, retries, pl());
+			print_statistics(pl(), response.time_ms, response.tries);
 
-			if (!response.first)
+			if (!response.success)
 			{
 				break;
 			}
 
-			incoming = deserialize<mastodon_entity>(response.second);
+			incoming = deserialize<mastodon_entity>(response.message);
 
 			plverb() << "Downloaded " << incoming.size() << " posts.\n";
 
@@ -185,12 +186,14 @@ private:
 
 			const auto response = request_with_retries([&]() { return download(url, access_token, query_parameters, limit); }, retries, pl());
 
-			if (!response.first)
+			print_statistics(pl(), response.time_ms, response.tries);
+
+			if (!response.success)
 			{
 				break;
 			}
 
-			incoming = deserialize<mastodon_entity>(response.second);
+			incoming = deserialize<mastodon_entity>(response.message);
 
 			plverb() << "Writing " << incoming.size() << " posts.\n";
 

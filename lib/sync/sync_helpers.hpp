@@ -3,6 +3,7 @@
 
 #include <string_view>
 #include <optional>
+#include <chrono>
 
 #include <filesystem.hpp>
 
@@ -67,14 +68,36 @@ void print_truncated_string(std::string_view toprint, Stream& str)
 		str << "...";
 }
 
-template <typename make_request, typename Stream>
-std::pair<bool, std::string> request_with_retries(make_request req, unsigned int retries, Stream& os)
+template <typename Stream>
+void print_statistics(Stream& os, long long time_ms, unsigned int tries)
 {
+	os << " (" << time_ms << " ms, " << tries;
+	if (tries == 1)
+		os << " try";
+	else
+		os << " tries";
+	os << ")\n";
+}
+
+struct request_response
+{
+	bool success;
+	std::string message;
+	unsigned int tries;
+	long long time_ms;
+};
+
+template <typename make_request, typename Stream>
+request_response request_with_retries(make_request req, unsigned int retries, Stream& os)
+{
+	const auto start_time = std::chrono::steady_clock::now();
 	for (unsigned int i = 0; i < retries; i++)
 	{
 		net_response response = req();
 
 		os << get_error_message(response.status_code, false);
+
+		const auto end_time = std::chrono::steady_clock::now();
 
 		// later, handle what happens if we get rate limited
 
@@ -91,14 +114,16 @@ std::pair<bool, std::string> request_with_retries(make_request req, unsigned int
 			if (!parsed_error.empty())
 				response.message = std::move(parsed_error);
 			os << response.message << '\n';
-			return std::make_pair(false, std::move(response.message));
+			return request_response{ false, std::move(response.message), i + 1, std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() };
 		}
 
 		// must be 200, OK response
-		return std::make_pair(true, std::move(response.message));
+		return request_response{ true, std::move(response.message), i + 1, std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() };
 	}
 
+	const auto end_time = std::chrono::steady_clock::now();
+
 	os << "Maximum retries reached.\n";
-	return std::make_pair(false, "Maximum retries reached.");
+	return request_response{ false,  "Maximum retries reached.", retries, std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() };
 }
 #endif

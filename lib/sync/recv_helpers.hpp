@@ -98,6 +98,6 @@ void print_api_call(std::string_view url, unsigned int limit, const timeline_par
 		}
 	}
 
-	os << '\n';
+	// no newline, print_statistics will do that
 }
 #endif
