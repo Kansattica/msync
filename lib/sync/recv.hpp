@@ -128,6 +128,7 @@ private:
 			print_api_call(url, limit, query_parameters, pl());
 
 			auto response = request_with_retries([&]() { return download(url, access_token, query_parameters, limit); }, retries, pl());
+
 			print_statistics(pl(), response.time_ms, response.tries);
 
 			if (!response.success)
