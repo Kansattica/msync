@@ -7,6 +7,7 @@
 #include "../options/global_options.hpp"
 #include "../postfile/outgoing_post.hpp"
 #include <algorithm>
+#include <array>
 #include <msync_exception.hpp>
 
 
@@ -23,6 +24,16 @@ void unique_file_name(fs::path& path)
 	{
 		path.replace_extension(std::to_string(extensionint++));
 	} while (fs::exists(path));
+}
+
+bool is_supported_file_extension(const fs::path& attachment_extension)
+{
+	static constexpr std::array<std::string_view, 17> allowed_extensions =
+	{ ".png", ".jpg", ".jpeg", ".gif", ".gifv", ".mp4", ".m4v", ".mov", ".webm", ".mp3", ".ogg", ".wav", ".flac", ".opus", ".aac", ".m4a", ".3gp" };
+
+	// this should really be a case insensitive comparison, but, uh, there's no real good portable way to do that with paths
+	return std::any_of(allowed_extensions.begin(), allowed_extensions.end(),
+		[&attachment_extension](const auto& extension) { return extension == attachment_extension; });
 }
 
 void queue_attachments(const fs::path& postfile)
@@ -43,6 +54,16 @@ void queue_attachments(const fs::path& postfile)
 		{
 			pl() << attachpath << " is not a regular file. Skipping.\n";
 			continue;
+		}
+
+		const auto extension = attachpath.extension();
+		if (extension.empty())
+		{
+			pl() << "Warning: File " << attach << " doesn't seem to have an extension. Mastodon might not know what to do with this file.\n";
+		}
+		else if (!is_supported_file_extension(extension))
+		{
+			pl() << "Warning: Mastodon might not support " << extension << " files as attachments.\n";
 		}
 
 		attach = attachpath.string();
