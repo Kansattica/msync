@@ -112,11 +112,10 @@ request_response request_with_retries(make_request req, unsigned int retries, St
 			if (!parsed_error.empty())
 				response.message = std::move(parsed_error);
 			os << "Remote server returned an error: " << response.message;
-			return request_response{ false, std::move(response.message), i + 1, std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() };
 		}
 
 		// must be 200, OK response
-		return request_response{ true, std::move(response.message), i + 1, std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() };
+		return request_response{ response.okay, std::move(response.message), i + 1, std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() };
 	}
 
 	const auto end_time = std::chrono::steady_clock::now();
