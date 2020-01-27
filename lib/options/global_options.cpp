@@ -85,7 +85,8 @@ std::pair<const std::string, user_options>* global_options::select_account(const
 
         // won't have string.starts_with until c++20, so
         // if the name given is a prefix of (or equal to) this entry, it's a candidate
-        if (std::equal(name.begin(), name.end(), entry.first.begin(), [](auto a, auto b) {
+		// unsigned char because https://en.cppreference.com/w/cpp/string/byte/tolower
+        if (std::equal(name.begin(), name.end(), entry.first.begin(), [](unsigned char a, unsigned char b) {
                 return std::tolower(a) == std::tolower(b); //case insensitive
             }))
         {
