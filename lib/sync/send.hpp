@@ -71,14 +71,14 @@ private:
 
 			const std::string requesturl = paramaterize_url(baseurl, id, route<toread>(undo));
 
+			pl() << "POST " << requesturl << ' ';
 			const auto response = request_with_retries([&]() { return post(requesturl, access_token); }, retries, pl());
 			if (response.success)
-			{
-				pl() << "POST " << requesturl << " OK";
-				print_statistics(pl(), response.time_ms, response.tries);
-			}
+				pl() << "OK ";
 			else
 				failedids.push_back(std::move(queuefile.parsed.front()));
+
+			print_statistics(pl(), response.time_ms, response.tries);
 
 			// remove ID from this queue
 			queuefile.parsed.pop_front();
@@ -99,20 +99,20 @@ private:
 				return false;
 			}
 
-			pl() << "Uploading " << attachment.file << "...\n";
+			pl() << "Uploading " << attachment.file << ' ';
 
 			auto request_response = request_with_retries([&]() { return upload(mediaurl, access_token, attachment.file, attachment.description); }, retries, pl());
 			response = std::move(request_response.message);
 			succeeded = request_response.success;
 
+			print_statistics(pl(), request_response.time_ms, request_response.tries);
 			if (succeeded)
 			{
-				pl() << "Uploaded file: " << attachment.file << '\n';
 				params.attachment_ids.push_back(read_upload_id(response));
 			}
 			else
 			{
-				pl() << "Could not upload file. Skipping this post.\n";
+				pl() << "Could not upload file. Skipping this post.";
 				return false;
 			}
 		}
@@ -139,10 +139,11 @@ private:
 			if (undo)
 			{
 				const std::string requesturl = paramaterize_url(statusurl, id, "");
+				pl() << "DELETE " << requesturl;
 				const auto response = request_with_retries([&]() { return del(requesturl, access_token); }, retries, pl());
 				succeeded = response.success;
 				if (succeeded)
-					pl() << "DELETE " << requesturl << " OK";
+					pl() << " OK ";
 				print_statistics(pl(), response.time_ms, response.tries);
 			}
 			else
@@ -179,10 +180,14 @@ private:
 					{
 						fs::remove(file_to_send);
 						auto parsed_status = read_status(response);
-						pl() << "Created post at " << parsed_status.url;
-						print_statistics(pl(), request_response.time_ms, request_response.tries);
+						pl() << "Created post at " << parsed_status.url << ' ';
 						parsed_status_id = std::move(parsed_status.id);
 					}
+					else
+					{
+						pl() << "Failed to create post. ";
+					}
+					print_statistics(pl(), request_response.time_ms, request_response.tries);
 				}
 
 				if (!params.reply_id.empty())
