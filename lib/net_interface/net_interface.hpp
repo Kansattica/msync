@@ -53,7 +53,7 @@ inline constexpr const char* get_error_message(const int status_code, const bool
 	case 403:
 		return "Forbidden. Is your access token correct?\n";
 	case 404:
-		return "Not found, is your instance URL and post ID correct?\n";
+		return "Not found, the post may have been deleted or the ID was incorrect.\n";
 	case 408:
 		return "Request timed out, but may have still gone through.\n";
 	case 429:

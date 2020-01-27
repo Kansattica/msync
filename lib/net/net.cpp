@@ -25,6 +25,8 @@ net_response handle_response(cpr::Response&& response)
 {
 	net_response to_return;
 
+	to_return.status_code = response.status_code;
+
 	to_return.retryable_error = response.error.code == cpr::ErrorCode::OPERATION_TIMEDOUT || (response.status_code >= 500 && response.status_code < 600);
 
 	// I don't think we can trust response.error, it says OK even if the status code is 400 something
