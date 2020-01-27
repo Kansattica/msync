@@ -93,8 +93,6 @@ request_response request_with_retries(make_request req, unsigned int retries, St
 	{
 		net_response response = req();
 
-		os << get_error_message(response.status_code, false);
-
 		const auto end_time = std::chrono::steady_clock::now();
 
 		// later, handle what happens if we get rate limited
@@ -108,6 +106,8 @@ request_response request_with_retries(make_request req, unsigned int retries, St
 		// some other error, assume unrecoverable
 		if (!response.okay)
 		{
+			os << '\n' << get_error_message(response.status_code, false);
+
 			auto parsed_error = read_error(response.message);
 			if (!parsed_error.empty())
 				response.message = std::move(parsed_error);
