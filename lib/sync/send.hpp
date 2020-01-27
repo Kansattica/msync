@@ -143,7 +143,7 @@ private:
 				const auto response = request_with_retries([&]() { return del(requesturl, access_token); }, retries, pl());
 				succeeded = response.success;
 				if (succeeded)
-					pl() << " OK ";
+					pl() << " OK";
 				print_statistics(pl(), response.time_ms, response.tries);
 			}
 			else
@@ -180,12 +180,12 @@ private:
 					{
 						fs::remove(file_to_send);
 						auto parsed_status = read_status(response);
-						pl() << "Created post at " << parsed_status.url << ' ';
+						pl() << "Created post at " << parsed_status.url;
 						parsed_status_id = std::move(parsed_status.id);
 					}
 					else
 					{
-						pl() << "Failed to create post. ";
+						pl() << "Failed to create post.";
 					}
 					print_statistics(pl(), request_response.time_ms, request_response.tries);
 				}
