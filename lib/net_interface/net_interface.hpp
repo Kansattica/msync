@@ -57,7 +57,7 @@ inline constexpr const char* get_error_message(const int status_code, const bool
 	case 408:
 		return "Request timed out, but may have still gone through.\n";
 	case 429:
-		return "Rate limited. Will try again later.\n";
+		return "Rate limited. Try again later.\n";
 
 	case 500:
 	case 501:
