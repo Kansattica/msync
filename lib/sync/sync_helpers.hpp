@@ -71,11 +71,9 @@ void print_truncated_string(std::string_view toprint, Stream& str)
 template <typename Stream>
 void print_statistics(Stream& os, long long time_ms, unsigned int tries)
 {
-	os << " (" << time_ms << " ms, " << tries;
-	if (tries == 1)
-		os << " try";
-	else
-		os << " tries";
+	os << " (" << time_ms << " ms";
+	if (tries != 1)
+		os << tries << " attempts";
 	os << ")\n";
 }
 
