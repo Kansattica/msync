@@ -198,6 +198,8 @@ void verify_file(const fs::path& file, int expected_count, const std::string& id
 
 SCENARIO("Recv downloads and writes the correct number of posts.")
 {
+	logs_off = true;
+
 	static constexpr std::string_view account_name = "user@crime.egg";
 	static constexpr std::string_view expected_notification_endpoint = "https://crime.egg/api/v1/notifications";
 	static constexpr std::string_view expected_home_endpoint = "https://crime.egg/api/v1/timelines/home";
