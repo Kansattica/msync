@@ -62,7 +62,6 @@ std::ofstream& operator<<(std::ofstream& out, const mastodon_status& status)
 	print(out, "boost of: ", status.original_post_url);
 	print(out, "cw: ", status.content_warning);
 	print(out, "body: ", status.content);
-	print(out, "visibility: ", status.visibility);
 
 	if (!status.attachments.empty())
 	{
@@ -82,6 +81,7 @@ std::ofstream& operator<<(std::ofstream& out, const mastodon_status& status)
 		out << status.poll.value();
 	}
 
+	print(out, "visibility: ", status.visibility);
 	print(out, "posted on: ", status.created_at);
 	out << status.favorites << " favs | " << status.boosts << " boosts | " << status.replies << " replies";
 

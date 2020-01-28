@@ -53,13 +53,13 @@ reply to: 123456
 boost of: https://different.website.egg/goodpost
 cw: Wow! A post!
 body: Imagine: a post for you. :blobcat:
-visibility: direct
 attachments:
 https://fake.website.egg/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.png?1573544488
 this is a description
 with a newline
 https://another.site/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.mp3?1573544488
 I am also a description!
+visibility: direct
 posted on: 10:57AM 11-14-2019
 8 favs | 99 boosts | 100000 replies
 --------------
@@ -69,11 +69,11 @@ constexpr std::string_view expected_expired_poll = R"(status id: gottapoll
 url: https://website.egg/gottapoll
 author: Normal Person (regular@website.egg)
 body: what's the deal with airline food
-visibility: public
 poll id: isapoll
 expired at: a time
  good things 4/10 votes (40%) [your vote]
  bad things 6/10 votes (60%)
+visibility: public
 posted on: 10:54AM 11-14-2019
 0 favs | 1 boosts | 2 replies
 --------------
@@ -83,13 +83,13 @@ constexpr std::string_view expected_unexpired_poll = R"(status id: gottafuturepo
 url: https://website.egg/gottafuturepoll
 author: Beepin' Online (someone@online.egg) [bot]
 body: ladies???
-visibility: public
 poll id: isanotherpoll
 expires at: a future time
  hello 3/10 votes (30%)
  sup 3/10 votes (30%)
  nougat 3/10 votes (30%)
  huh 1/10 votes (10%)
+visibility: public
 posted on: 10:54AM 11-14-2019
 6 favs | 42 boosts | 9 replies
 --------------
