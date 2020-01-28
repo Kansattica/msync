@@ -10,6 +10,7 @@
 // these should be ostreams, but I didn't want to pull in the whole iostream library just for this
 std::ofstream& operator<<(std::ofstream& out, const mastodon_status& status);
 std::ofstream& operator<<(std::ofstream& out, const mastodon_notification& notification);
+std::ofstream& operator<<(std::ofstream& out, const mastodon_poll& poll);
 
 // currently supposed to work with statuses and notifications
 template <typename post_type>

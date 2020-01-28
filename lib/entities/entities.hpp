@@ -10,6 +10,23 @@ struct mastodon_account_field
 	std::string value;
 };
 
+struct mastodon_poll_option
+{
+	std::string title;
+	int votes;
+};
+
+struct mastodon_poll
+{
+	std::string id;
+	std::string expires_at;
+	bool expired;
+	int total_votes;
+	bool you_voted;
+	std::vector<int> voted_for;
+	std::vector<mastodon_poll_option> options;
+};
+
 struct mastodon_account
 {
 	std::string id;
@@ -46,11 +63,12 @@ struct mastodon_status
 	unsigned int replies = 0;
 	std::vector<mastodon_attachment> attachments;
 	mastodon_account author;
+	std::optional<mastodon_poll> poll;
 };
 
 enum class notif_type
 {
-	unknown, follow, mention, boost, favorite
+	unknown, follow, mention, boost, favorite, poll
 };
 
 struct mastodon_notification

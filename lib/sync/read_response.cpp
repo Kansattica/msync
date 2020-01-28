@@ -32,6 +32,24 @@ std::string read_error(const std::string_view response_json)
 	return get_if_set<std::string>(parsed, "error"sv);
 }
 
+void from_json(const json& j, mastodon_poll_option& option)
+{
+	j["title"].get_to(option.title);
+	j["votes_count"].get_to(option.votes);
+
+}
+
+void from_json(const json& j, mastodon_poll& poll)
+{
+	j["id"].get_to(poll.id);
+	j["expires_at"].get_to(poll.expires_at);
+	j["expired"].get_to(poll.expired);
+	j["votes_count"].get_to(poll.total_votes);
+	j["voted"].get_to(poll.you_voted);
+	j["own_votes"].get_to(poll.voted_for);
+	j["options"].get_to(poll.options);
+}
+
 void from_json(const json& j, mastodon_account_field& field)
 {
 	j["name"].get_to(field.name);
@@ -90,6 +108,12 @@ void from_json(const json& j, mastodon_status& status)
 
 	post->at("media_attachments").get_to(status.attachments);
 	post->at("account").get_to(status.author);
+
+	const auto poll = j.find("poll"sv);
+	if (poll != j.end() && poll->is_object())
+	{
+		status.poll = poll->get<mastodon_poll>();
+	}
 }
 
 NLOHMANN_JSON_SERIALIZE_ENUM(notif_type, {

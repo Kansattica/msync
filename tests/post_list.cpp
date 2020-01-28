@@ -65,6 +65,36 @@ posted on: 10:57AM 11-14-2019
 --------------
 )";
 
+constexpr std::string_view expected_expired_poll = R"(status id: gottapoll
+url: https://website.egg/gottapoll
+author: Normal Person (regular@website.egg)
+body: what's the deal with airline food
+visibility: public
+poll id: isapoll
+expired at: a time
+ good things 4/10 votes (40%) [your vote]
+ bad things 6/10 votes (60%)
+posted on: 10:54AM 11-14-2019
+0 favs | 1 boosts | 2 replies
+--------------
+)";
+
+constexpr std::string_view expected_unexpired_poll = R"(status id: gottafuturepoll
+url: https://website.egg/gottafuturepoll
+author: Beepin' Online (someone@online.egg) [bot]
+body: ladies???
+visibility: public
+poll id: isanotherpoll
+expires at: a future time
+ hello 3/10 votes (30%)
+ sup 3/10 votes (30%)
+ nougat 3/10 votes (30%)
+ huh 1/10 votes (10%)
+posted on: 10:54AM 11-14-2019
+6 favs | 42 boosts | 9 replies
+--------------
+)";
+
 struct status_test_case
 {
 	const mastodon_status& status;
@@ -95,8 +125,8 @@ mastodon_status make_nocw()
 	content_nocw.favorites = 0;
 	content_nocw.boosts = 1;
 	content_nocw.replies = 2;
-	content_nocw.author.account_name =  "regular@website.egg";
-	content_nocw.author.display_name =  "Normal Person";
+	content_nocw.author.account_name = "regular@website.egg";
+	content_nocw.author.display_name = "Normal Person";
 	content_nocw.author.is_bot = false;
 	return content_nocw;
 }
@@ -160,6 +190,66 @@ mastodon_status make_everything()
 	return everything;
 }
 
+mastodon_status make_expiredpoll()
+{
+	mastodon_status expiredpoll;
+	expiredpoll.id = "gottapoll";
+	expiredpoll.url = "https://website.egg/gottapoll";
+	expiredpoll.content = "what's the deal with airline food";
+	expiredpoll.visibility = "public";
+	expiredpoll.created_at = "10:54AM 11-14-2019";
+	expiredpoll.favorites = 0;
+	expiredpoll.boosts = 1;
+	expiredpoll.replies = 2;
+	expiredpoll.author.account_name = "regular@website.egg";
+	expiredpoll.author.display_name = "Normal Person";
+	expiredpoll.author.is_bot = false;
+	expiredpoll.poll = mastodon_poll{};
+	expiredpoll.poll->id = "isapoll";
+	expiredpoll.poll->expired = true;
+	expiredpoll.poll->expires_at = "a time";
+	expiredpoll.poll->total_votes = 10;
+	expiredpoll.poll->voted_for = { 0 };
+	expiredpoll.poll->you_voted = true;
+	expiredpoll.poll->options = {
+		{"good things", 4},
+		{"bad things", 6},
+	};
+
+	return expiredpoll;
+}
+
+mastodon_status make_unexpiredpoll()
+{
+	mastodon_status unexpiredpoll;
+	unexpiredpoll.id = "gottafuturepoll";
+	unexpiredpoll.url = "https://website.egg/gottafuturepoll";
+	unexpiredpoll.content = "ladies???";
+	unexpiredpoll.visibility = "public";
+	unexpiredpoll.created_at = "10:54AM 11-14-2019";
+	unexpiredpoll.favorites = 6;
+	unexpiredpoll.boosts = 42;
+	unexpiredpoll.replies = 9;
+	unexpiredpoll.author.account_name = "someone@online.egg";
+	unexpiredpoll.author.display_name = "Beepin' Online";
+	unexpiredpoll.author.is_bot = true;
+	unexpiredpoll.poll = mastodon_poll{};
+	unexpiredpoll.poll->id = "isanotherpoll";
+	unexpiredpoll.poll->expired = false;
+	unexpiredpoll.poll->expires_at = "a future time";
+	unexpiredpoll.poll->total_votes = 10;
+	unexpiredpoll.poll->voted_for = {};
+	unexpiredpoll.poll->you_voted = false;
+	unexpiredpoll.poll->options = {
+		{"hello", 3},
+		{"sup", 3},
+		{"nougat", 3},
+		{"huh", 1},
+	};
+
+	return unexpiredpoll;
+}
+
 size_t compare_window(std::string_view expected, std::string_view entire, size_t index)
 {
 	REQUIRE(expected == entire.substr(index, expected.size()));
@@ -174,13 +264,17 @@ SCENARIO("post_list correctly serializes lists of statuses.")
 		const static mastodon_status content_cw = make_cw();
 		const static mastodon_status justattachments = make_attachments();
 		const static mastodon_status everything = make_everything();
+		const static mastodon_status expired_poll = make_expiredpoll();
+		const static mastodon_status unexpired_poll = make_unexpiredpoll();
 
-		const static std::array<status_test_case, 4> statuses
+		const static std::array<status_test_case, 6> statuses
 		{
 			status_test_case{ content_nocw, expected_content_nocw },
 			status_test_case{ content_cw, expected_content_cw },
 			status_test_case{ justattachments, expected_justattachments },
-			status_test_case{ everything, expected_everything }
+			status_test_case{ everything, expected_everything },
+			status_test_case{ expired_poll,  expected_expired_poll },
+			status_test_case{ unexpired_poll, expected_unexpired_poll }
 		};
 
 		test_file fi{ "postlist.test" };
@@ -254,6 +348,7 @@ constexpr std::string_view expected_fav = "notification id: 12345\nat 10:50 AM 1
 constexpr std::string_view expected_boost = "notification id: 67890\nat 10:51 AM 11/15/2019, Chad Beeps (localbot) [bot] boosted your post:\n";
 constexpr std::string_view expected_mention = "notification id: 2567893344\nat 10:52 AM 11/15/2019, Egg Criminal (remotehuman@crime.egg) mentioned you:\n";
 constexpr std::string_view expected_follow = "notification id: 9802347509287\nat 10:53 AM 11/15/2019, Electronic Egg Criminal (remotebot@crime.egg) [bot] followed you.";
+constexpr std::string_view expected_poll = "notification id: 3412341\nat 10:53 AM 11/15/2019, Questionperson (quizboy@web.egg)'s poll ended:\n";
 
 struct notif_test_case
 {
@@ -313,6 +408,19 @@ mastodon_notification make_follow()
 	return notif;
 }
 
+mastodon_notification make_poll()
+{
+	mastodon_notification notif;
+	notif.id = "3412341";
+	notif.account.account_name = "quizboy@web.egg";
+	notif.account.display_name = "Questionperson";
+	notif.account.is_bot = false;
+	notif.created_at = "10:53 AM 11/15/2019";
+	notif.status = make_expiredpoll();
+	notif.type = notif_type::poll;
+	return notif;
+}
+
 SCENARIO("post_list correctly serializes lists of notifications.")
 {
 	GIVEN("Some notifications to serialize with associated statuses.")
@@ -321,13 +429,15 @@ SCENARIO("post_list correctly serializes lists of notifications.")
 		const static auto boost = make_boost();
 		const static auto mention = make_mention();
 		const static auto follow = make_follow();
+		const static auto poll = make_poll();
 
-		const static std::array<notif_test_case, 4> notifs
+		const static std::array<notif_test_case, 5> notifs
 		{
 			notif_test_case{ fav, expected_fav, expected_content_nocw },
 			notif_test_case{ boost, expected_boost, expected_content_cw },
 			notif_test_case{ mention, expected_mention, expected_justattachments },
-			notif_test_case{ follow, expected_follow, "\n--------------\n" }
+			notif_test_case{ follow, expected_follow, "\n--------------\n" },
+			notif_test_case{ poll, expected_poll, expected_expired_poll },
 		};
 
 		test_file fi{ "postlist.test" };

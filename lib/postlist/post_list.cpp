@@ -1,5 +1,7 @@
 #include "post_list.hpp"
 
+#include <algorithm>
+
 void print(std::ofstream& out, const char* key, const std::string& val, bool newline = true)
 {
 	if (!val.empty())
@@ -32,6 +34,24 @@ void print(std::ofstream& out, const char* key, bool val, bool newline = true)
 	}
 }
 
+std::ofstream& operator<<(std::ofstream& out, const mastodon_poll& poll)
+{
+	print(out, "poll id: ", poll.id);
+	print(out, poll.expired ? "expired at: " : "expires at: ", poll.expires_at);
+	for (size_t i = 0; i < poll.options.size(); ++i)
+	{
+		out << ' ' << poll.options[i].title << ' ' << 
+			poll.options[i].votes << '/' << poll.total_votes << " votes (" << ((double)poll.options[i].votes / poll.total_votes) * 100 << "%)";
+		if (std::find(poll.voted_for.begin(), poll.voted_for.end(), i) != poll.voted_for.end())
+		{
+			out << " [your vote]";
+		}
+		out << '\n';
+	}
+
+	return out;
+}
+
 std::ofstream& operator<<(std::ofstream& out, const mastodon_status& status)
 {
 	print(out, "status id: ", status.id);
@@ -57,6 +77,11 @@ std::ofstream& operator<<(std::ofstream& out, const mastodon_status& status)
 		}
 	}
 
+	if (status.poll.has_value())
+	{
+		out << status.poll.value();
+	}
+
 	print(out, "posted on: ", status.created_at);
 	out << status.favorites << " favs | " << status.boosts << " boosts | " << status.replies << " replies";
 
@@ -75,6 +100,8 @@ const char* notification_verb(notif_type t)
 		return " mentioned you:";
 	case notif_type::follow:
 		return " followed you.";
+	case notif_type::poll:
+		return "'s poll ended:";
 	default:
 		return " ??? ";
 	}
