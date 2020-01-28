@@ -121,6 +121,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM(notif_type, {
 		{ notif_type::follow, "follow" },
 		{ notif_type::mention, "mention" },
 		{ notif_type::boost, "reblog" },
+		{ notif_type::poll, "poll" },
 		{ notif_type::favorite, "favourite" },
 	});
 
