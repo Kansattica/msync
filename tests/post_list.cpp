@@ -35,11 +35,11 @@ posted on: 10:55AM 11-14-2019
 constexpr std::string_view expected_justattachments = R"(status id: justattachments
 url: https://website.egg/justattachments
 author: Beepin' Online (someone@online.egg) [bot]
-visibility: private
 attachments:
 https://fake.website.egg/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.png?1573544488
 this is a description
 https://another.site/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.mp3?1573544488
+visibility: private
 posted on: 10:56AM 11-14-2019
 50 favs | 600 boosts | 7000 replies
 --------------
