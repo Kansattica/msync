@@ -26,14 +26,55 @@ void unique_file_name(fs::path& path)
 	} while (fs::exists(path));
 }
 
-bool is_supported_file_extension(const fs::path& attachment_extension)
+bool validate_file(const fs::path& attachpath)
 {
-	static constexpr std::array<std::string_view, 17> allowed_extensions =
-	{ ".png", ".jpg", ".jpeg", ".gif", ".gifv", ".mp4", ".m4v", ".mov", ".webm", ".mp3", ".ogg", ".wav", ".flac", ".opus", ".aac", ".m4a", ".3gp" };
+	static constexpr std::array<std::string_view, 4> image_extensions = { ".png", ".jpg", ".jpeg", ".gif" };
+
+	static constexpr std::array<std::string_view, 13> audiovisual_extensions =
+	{ ".gifv", ".mp4", ".m4v", ".mov", ".webm", ".mp3", ".ogg", ".wav", ".flac", ".opus", ".aac", ".m4a", ".3gp" };
+
+	constexpr auto eight_megabytes = 8 * 1024 * 1024;
+	constexpr auto forty_megabytes = 40 * 1024 * 1024;
+
+	if (!fs::is_regular_file(attachpath))
+	{
+		pl() << attachpath << " is not a regular file. Skipping.\n";
+		return false;
+	}
+
+	const auto extension = attachpath.extension();
 
 	// this should really be a case insensitive comparison, but, uh, there's no real good portable way to do that with paths
-	return std::any_of(allowed_extensions.begin(), allowed_extensions.end(),
-		[&attachment_extension](const auto& extension) { return extension == attachment_extension; });
+	const auto compare_extension = [&extension](const auto& allowed_extension) { return extension == allowed_extension; };
+
+	const auto file_size = fs::file_size(attachpath);
+
+	bool is_image = std::any_of(image_extensions.begin(), image_extensions.end(), compare_extension), is_av = false;
+	
+	if (!is_image)
+	{
+		is_av = std::any_of(audiovisual_extensions.begin(), audiovisual_extensions.end(), compare_extension);
+	}
+
+	if (extension.empty())
+	{
+		pl() << "Warning: File " << attachpath << " doesn't seem to have an extension. Mastodon might not know what to do with this file.\n";
+	}
+	else if (is_image && file_size > eight_megabytes)
+	{
+		pl() << "Warning: File " << attachpath << " is an image over eight megabytes. Vanilla Mastodon may not accept it.\n";
+	}
+	else if (is_av && file_size > forty_megabytes)
+	{
+		pl() << "Warning: File " << attachpath << " is an audio or video file over forty megabytes. Vanilla Mastodon may not accept it.\n";
+	}
+	else if (!is_image && !is_av)
+	{
+		pl() << "Warning: Mastodon might not support " << extension << " files as attachments.\n";
+	}
+
+
+	return true;
 }
 
 void queue_attachments(const fs::path& postfile)
@@ -50,21 +91,9 @@ void queue_attachments(const fs::path& postfile)
 			continue;
 		}
 
-		if (!fs::is_regular_file(attachpath))
-		{
-			pl() << attachpath << " is not a regular file. Skipping.\n";
+		if (!validate_file(attachpath))
 			continue;
-		}
 
-		const auto extension = attachpath.extension();
-		if (extension.empty())
-		{
-			pl() << "Warning: File " << attach << " doesn't seem to have an extension. Mastodon might not know what to do with this file.\n";
-		}
-		else if (!is_supported_file_extension(extension))
-		{
-			pl() << "Warning: Mastodon might not support " << extension << " files as attachments.\n";
-		}
 
 		attach = attachpath.string();
 
@@ -151,7 +180,7 @@ void enqueue(const queues toenqueue, const std::string_view account, const std::
 	// but "unboost and reboost", for example, is a valid thing to want to do.
 }
 
-void dequeue_post(const fs::path &queuedir, const fs::path& filename)
+void dequeue_post(const fs::path& queuedir, const fs::path& filename)
 {
 	if (!fs::remove(queuedir / filename))
 	{
@@ -184,8 +213,8 @@ void dequeue(queues todequeue, const std::string_view account, std::vector<std::
 
 	// put the ones to keep first, and the ones to remove last
 	const auto removefrom_pivot = std::stable_partition(toremovefrom.parsed.begin(), toremovefrom.parsed.end(),
-		[&toremove](const auto& id) { 
-			return std::find(toremove.begin(), toremove.end(), id) == toremove.end(); 
+		[&toremove](const auto& id) {
+			return std::find(toremove.begin(), toremove.end(), id) == toremove.end();
 		});
 
 
@@ -196,8 +225,8 @@ void dequeue(queues todequeue, const std::string_view account, std::vector<std::
 	// but these should be relatively small and so I highly doubt it's going to matter. If it does,
 	// I could copy the things that'll be removed from the queue to an unordered set. Again, overkill for this.
 	const auto toremove_pivot = std::stable_partition(toremove.begin(), toremove.end(),
-		[&toremovefrom, removefrom_pivot](const auto& id) { 
-			return std::find(removefrom_pivot, toremovefrom.parsed.end(), id) != toremovefrom.parsed.end(); 
+		[&toremovefrom, removefrom_pivot](const auto& id) {
+			return std::find(removefrom_pivot, toremovefrom.parsed.end(), id) != toremovefrom.parsed.end();
 		});
 
 	if (todequeue == queues::post)
@@ -211,7 +240,7 @@ void dequeue(queues todequeue, const std::string_view account, std::vector<std::
 
 	//basically, if a thing isn't in the queue, enqueue removing that thing. unboosting, unfaving, deleting a post
 	//consider removing duplicate removes?
-	std::for_each(toremove_pivot, toremove.end(), 
+	std::for_each(toremove_pivot, toremove.end(),
 		[&toremovefrom](auto& queuedel) { queuedel.push_back('-'); toremovefrom.parsed.push_back(std::move(queuedel)); });
 }
 
