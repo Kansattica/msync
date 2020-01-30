@@ -36,9 +36,11 @@ bool validate_file(const fs::path& attachpath)
 	constexpr auto eight_megabytes = 8 * 1024 * 1024;
 	constexpr auto forty_megabytes = 40 * 1024 * 1024;
 
+	//basically, if you don't do this .string() thing when printing a path, Windows wraps it in quotes and escapes the backslashes
+	//I think .native() avoids an allocation, but that doesn't actually compile on MSVC when I tried
 	if (!fs::is_regular_file(attachpath))
 	{
-		pl() << attachpath << " is not a regular file. Skipping.\n";
+		pl() << attachpath.string() << " is not a regular file. Skipping.\n";
 		return false;
 	}
 
@@ -58,15 +60,15 @@ bool validate_file(const fs::path& attachpath)
 
 	if (extension.empty())
 	{
-		pl() << "Warning: File " << attachpath << " doesn't seem to have an extension. Vanilla Mastodon might not know what to do with it.\n";
+		pl() << "Warning: " << attachpath.string() << " doesn't seem to have an extension. Vanilla Mastodon might not know what to do with it.\n";
 	}
 	else if (is_image && file_size > eight_megabytes)
 	{
-		pl() << "Warning: File " << attachpath << " is an image over eight megabytes. Vanilla Mastodon may not accept it.\n";
+		pl() << "Warning: " << attachpath.string() << " is an image over eight megabytes. Vanilla Mastodon may not accept it.\n";
 	}
 	else if (is_av && file_size > forty_megabytes)
 	{
-		pl() << "Warning: File " << attachpath << " is an audio or video file over forty megabytes. Vanilla Mastodon may not accept it.\n";
+		pl() << "Warning: " << attachpath.string() << " is an audio or video file over forty megabytes. Vanilla Mastodon may not accept it.\n";
 	}
 	else if (!is_image && !is_av)
 	{
@@ -94,7 +96,6 @@ void queue_attachments(const fs::path& postfile)
 		if (!validate_file(attachpath))
 			continue;
 
-
 		attach = attachpath.string();
 
 		err.clear();
@@ -107,23 +108,23 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 
 	if (!fs::exists(postfile))
 	{
-		pl() << "Could not find " << postfile << ". Skipping.\n";
-		return "";
+		pl() << "Could not find " << postfile.string() << ". Skipping.\n";
+		return {};
 	}
 
 	if (!fs::is_regular_file(postfile))
 	{
-		pl() << postfile << " is not a file. Skipping.\n";
-		return "";
+		pl() << postfile.string() << " is not a file. Skipping.\n";
+		return {};
 	}
 
 	fs::path copyto = queuedir / postfile.filename();
 
 	if (fs::exists(copyto))
 	{
-		pl() << copyto << " already exists. " << postfile << " will be saved as ";
+		pl() << copyto.string() << " already exists. " << postfile.string() << " will be saved to ";
 		unique_file_name(copyto);
-		pl() << copyto << '\n';
+		pl() << copyto.string() << '\n';
 	}
 
 	fs::copy(postfile, copyto);
