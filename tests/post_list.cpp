@@ -71,8 +71,8 @@ author: Normal Person (@regular@website.egg)
 body: what's the deal with airline food
 poll id: isapoll
 expired at: a time
- good things 4/10 votes (40%) [your vote]
- bad things 6/10 votes (60%)
+ - good things 4/10 votes (40%) [your vote]
+ - bad things 6/10 votes (60%)
 visibility: public
 posted on: 10:54AM 11-14-2019
 0 favs | 1 boosts | 2 replies
@@ -85,10 +85,10 @@ author: Beepin' Online (@someone@online.egg) [bot]
 body: ladies???
 poll id: isanotherpoll
 expires at: a future time
- hello 3/10 votes (30%)
- sup 3/10 votes (30%)
- nougat 3/10 votes (30%)
- huh 1/10 votes (10%)
+ - hello 3/10 votes (30%)
+ - sup 3/10 votes (30%)
+ - nougat 3/10 votes (30%)
+ - huh 1/10 votes (10%)
 visibility: public
 posted on: 10:54AM 11-14-2019
 6 favs | 42 boosts | 9 replies

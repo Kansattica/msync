@@ -40,7 +40,7 @@ std::ofstream& operator<<(std::ofstream& out, const mastodon_poll& poll)
 	print(out, poll.expired ? "expired at: " : "expires at: ", poll.expires_at);
 	for (size_t i = 0; i < poll.options.size(); ++i)
 	{
-		out << ' ' << poll.options[i].title << ' ' << 
+		out << " - " << poll.options[i].title << ' ' << 
 			poll.options[i].votes << '/' << poll.total_votes << " votes (" << ((double)poll.options[i].votes / poll.total_votes) * 100 << "%)";
 		if (std::find(poll.voted_for.begin(), poll.voted_for.end(), i) != poll.voted_for.end())
 		{
