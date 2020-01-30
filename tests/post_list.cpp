@@ -12,7 +12,7 @@
 
 constexpr std::string_view expected_content_nocw = R"(status id: contentnocw
 url: https://website.egg/contentnocw
-author: Normal Person (regular@website.egg)
+author: Normal Person (@regular@website.egg)
 body: This is a...
  test post.
 visibility: public
@@ -23,7 +23,7 @@ posted on: 10:54AM 11-14-2019
 
 constexpr std::string_view expected_content_cw = R"(status id: contentcw
 url: https://website.egg/contentcw
-author: Alex Friendford (afriend)
+author: Alex Friendford (@afriend)
 cw: test inside
 body: This is another test post.
 visibility: unlisted
@@ -34,7 +34,7 @@ posted on: 10:55AM 11-14-2019
 
 constexpr std::string_view expected_justattachments = R"(status id: justattachments
 url: https://website.egg/justattachments
-author: Beepin' Online (someone@online.egg) [bot]
+author: Beepin' Online (@someone@online.egg) [bot]
 attachments:
 https://fake.website.egg/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.png?1573544488
 this is a description
@@ -47,8 +47,8 @@ posted on: 10:56AM 11-14-2019
 
 constexpr std::string_view expected_everything = R"(status id: everything
 url: https://website.egg/everything
-author: Cyberfriend: The Friendening (cyberfriend) [bot]
-boosted by: Meat Boosterson (meatbooster@different.website.egg)
+author: Cyberfriend: The Friendening (@cyberfriend) [bot]
+boosted by: Meat Boosterson (@meatbooster@different.website.egg)
 reply to: 123456
 boost of: https://different.website.egg/goodpost
 cw: Wow! A post!
@@ -67,7 +67,7 @@ posted on: 10:57AM 11-14-2019
 
 constexpr std::string_view expected_expired_poll = R"(status id: gottapoll
 url: https://website.egg/gottapoll
-author: Normal Person (regular@website.egg)
+author: Normal Person (@regular@website.egg)
 body: what's the deal with airline food
 poll id: isapoll
 expired at: a time
@@ -81,7 +81,7 @@ posted on: 10:54AM 11-14-2019
 
 constexpr std::string_view expected_unexpired_poll = R"(status id: gottafuturepoll
 url: https://website.egg/gottafuturepoll
-author: Beepin' Online (someone@online.egg) [bot]
+author: Beepin' Online (@someone@online.egg) [bot]
 body: ladies???
 poll id: isanotherpoll
 expires at: a future time
@@ -344,11 +344,11 @@ SCENARIO("post_list correctly serializes lists of statuses.")
 	}
 }
 
-constexpr std::string_view expected_fav = "notification id: 12345\nat 10:50 AM 11/15/2019, Alex Humansworth (localhuman) favorited your post:\n";
-constexpr std::string_view expected_boost = "notification id: 67890\nat 10:51 AM 11/15/2019, Chad Beeps (localbot) [bot] boosted your post:\n";
-constexpr std::string_view expected_mention = "notification id: 2567893344\nat 10:52 AM 11/15/2019, Egg Criminal (remotehuman@crime.egg) mentioned you:\n";
-constexpr std::string_view expected_follow = "notification id: 9802347509287\nat 10:53 AM 11/15/2019, Electronic Egg Criminal (remotebot@crime.egg) [bot] followed you.";
-constexpr std::string_view expected_poll = "notification id: 3412341\nat 10:53 AM 11/15/2019, Questionperson (quizboy@web.egg)'s poll ended:\n";
+constexpr std::string_view expected_fav = "notification id: 12345\nat 10:50 AM 11/15/2019, Alex Humansworth (@localhuman) favorited your post:\n";
+constexpr std::string_view expected_boost = "notification id: 67890\nat 10:51 AM 11/15/2019, Chad Beeps (@localbot) [bot] boosted your post:\n";
+constexpr std::string_view expected_mention = "notification id: 2567893344\nat 10:52 AM 11/15/2019, Egg Criminal (@remotehuman@crime.egg) mentioned you:\n";
+constexpr std::string_view expected_follow = "notification id: 9802347509287\nat 10:53 AM 11/15/2019, Electronic Egg Criminal (@remotebot@crime.egg) [bot] followed you.";
+constexpr std::string_view expected_poll = "notification id: 3412341\nat 10:53 AM 11/15/2019, Questionperson (@quizboy@web.egg)'s poll ended:\n";
 
 struct notif_test_case
 {

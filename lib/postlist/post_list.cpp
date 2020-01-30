@@ -16,7 +16,7 @@ void print_author(std::ofstream& out, const char* key, const std::string& displa
 {
 	if (!display_name.empty())
 	{
-		out << key << display_name << " (" << account << ')';
+		out << key << display_name << " (@" << account << ')';
 
 		if (bot) out << " [bot]";
 
