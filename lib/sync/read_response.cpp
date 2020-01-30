@@ -36,7 +36,6 @@ void from_json(const json& j, mastodon_poll_option& option)
 {
 	j["title"].get_to(option.title);
 	j["votes_count"].get_to(option.votes);
-
 }
 
 void from_json(const json& j, mastodon_poll& poll)
@@ -45,9 +44,20 @@ void from_json(const json& j, mastodon_poll& poll)
 	j["expires_at"].get_to(poll.expires_at);
 	j["expired"].get_to(poll.expired);
 	j["votes_count"].get_to(poll.total_votes);
-	j["voted"].get_to(poll.you_voted);
-	j["own_votes"].get_to(poll.voted_for);
 	j["options"].get_to(poll.options);
+
+	const auto voted = j.find("voted"sv);
+	if (voted != j.end() && voted->is_boolean())
+	{
+		voted->get_to(poll.you_voted);
+	}
+
+	// this ones can be missing on your own polls
+	const auto own_votes = j.find("own_votes"sv);
+	if (own_votes != j.end() && own_votes->is_array())
+	{
+		own_votes->get_to(poll.voted_for);
+	}
 }
 
 void from_json(const json& j, mastodon_account_field& field)

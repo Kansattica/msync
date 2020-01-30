@@ -13,16 +13,16 @@ struct mastodon_account_field
 struct mastodon_poll_option
 {
 	std::string title;
-	int votes;
+	int votes = 0;
 };
 
 struct mastodon_poll
 {
 	std::string id;
 	std::string expires_at;
-	bool expired;
-	int total_votes;
-	bool you_voted;
+	bool expired = true;
+	int total_votes = 0;
+	bool you_voted = false;
 	std::vector<int> voted_for;
 	std::vector<mastodon_poll_option> options;
 };
