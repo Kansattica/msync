@@ -30,7 +30,7 @@ I currently build and ensure all tests pass on Linux with both clang and gcc, as
 ### Roadmap (things for later)
 - [ ] Queue and send profile updates
 - [ ] Download individual posts and threads by URL or ID
-- [ ] Poll support
+- [X] Poll support (polls download and render properly, voting not implemented yet)
 - [ ] Nicer UI, like a minimal webpage to show downloaded posts in.
 - [ ] A proper manual for the weirder ins and outs of msync
 
