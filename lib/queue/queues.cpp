@@ -58,7 +58,7 @@ bool validate_file(const fs::path& attachpath)
 
 	if (extension.empty())
 	{
-		pl() << "Warning: File " << attachpath << " doesn't seem to have an extension. Mastodon might not know what to do with this file.\n";
+		pl() << "Warning: File " << attachpath << " doesn't seem to have an extension. Vanilla Mastodon might not know what to do with it.\n";
 	}
 	else if (is_image && file_size > eight_megabytes)
 	{
@@ -70,7 +70,7 @@ bool validate_file(const fs::path& attachpath)
 	}
 	else if (!is_image && !is_av)
 	{
-		pl() << "Warning: Mastodon might not support " << extension << " files as attachments.\n";
+		pl() << "Warning: Vanilla Mastodon might not support " << extension << " files as attachments.\n";
 	}
 
 
