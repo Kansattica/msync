@@ -185,7 +185,7 @@ void dequeue_post(const fs::path& queuedir, const fs::path& filename)
 {
 	if (!fs::remove(queuedir / filename))
 	{
-		pl() << "Could not delete " << filename << ", could not find it in " << queuedir << '\n';
+		pl() << "Could not delete " << filename << ", could not find it in " << queuedir.string() << '\n';
 	}
 }
 
