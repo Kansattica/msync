@@ -160,7 +160,11 @@ int main(int argc, const char* argv[])
 	catch (const std::exception& e)
 	{
 		pl() << "An error occurred: " << e.what();
-		pl() << "\nFor account: " << parsed.account;
+		pl() << "\nFor account: ";
+		if (parsed.account.empty())
+			pl() << "[default]";
+		else
+			pl() << parsed.account;
 	}
 
 	if (should_print_newline)
