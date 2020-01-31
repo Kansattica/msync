@@ -363,6 +363,8 @@ SCENARIO("bulk_replace finds and replaces all its arguments in a string in place
 		auto test_case = GENERATE(
 			bulk_replace_test_case{ "This is a string", { {"a", "an excellent"} }, "This is an excellent string" },
 			bulk_replace_test_case{ "", { {"a", "an excellent"} }, "" },
+			bulk_replace_test_case{ "", {}, "" },
+			bulk_replace_test_case{ ":)", {}, ":)" },
 			bulk_replace_test_case{ "big", { {"big", "extremely large"} }, "extremely large" },
 			bulk_replace_test_case{ "@spanky", { {"spanky", "spanky"} }, "@spanky" },
 			bulk_replace_test_case{ "@spanky", { {"spanky", "spanky@website.egg"} }, "@spanky@website.egg" },
