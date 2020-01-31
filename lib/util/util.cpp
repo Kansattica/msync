@@ -51,3 +51,24 @@ std::string clean_up_html(std::string_view to_strip)
 	output_buffer.resize(decoded_length);
 	return output_buffer;
 }
+
+std::string& bulk_replace(std::string& str, const std::vector<std::pair<std::string_view, std::string_view>>& to_replace)
+{
+	for (const auto& pair : to_replace)
+	{
+		size_t mention_loc = 0;
+		do
+		{
+			mention_loc = str.find(pair.first, mention_loc);
+
+			if (mention_loc != std::string::npos)
+			{
+				str.replace(mention_loc, pair.first.size(), pair.second);
+				mention_loc += pair.second.size();
+			}
+
+		} while (mention_loc != std::string::npos);
+	}
+
+	return str;
+}

@@ -348,3 +348,46 @@ SCENARIO("clean_up_html removes HTML tags and entities.")
 		}
 	}
 }
+
+struct bulk_replace_test_case
+{
+	std::string input;
+	std::vector<std::pair<std::string_view, std::string_view>> to_replace;
+	std::string expected;
+};
+
+SCENARIO("bulk_replace finds and replaces all its arguments in a string in place.")
+{
+	GIVEN("An input string and a set of substrings to find and replace.")
+	{
+		auto test_case = GENERATE(
+			bulk_replace_test_case{ "This is a string", { {"a", "an excellent"} }, "This is an excellent string" },
+			bulk_replace_test_case{ "", { {"a", "an excellent"} }, "" },
+			bulk_replace_test_case{ "big", { {"big", "extremely large"} }, "extremely large" },
+			bulk_replace_test_case{ "@spanky", { {"spanky", "spanky"} }, "@spanky" },
+			bulk_replace_test_case{ "@spanky", { {"spanky", "spanky@website.egg"} }, "@spanky@website.egg" },
+			bulk_replace_test_case{ "hey, @spanky, what's up", { {"spanky", "spanky@website.egg"} }, "hey, @spanky@website.egg, what's up" },
+			bulk_replace_test_case{ "@mike @bike @spike heckthread @marge", 
+				{ {"mike", "mike@website.egg"}, {"spike", "spike"},  {"bike", "bike@crime.egg"}, {"marge", "marge@in.charge"} },
+				"@mike@website.egg @bike@crime.egg @spike heckthread @marge@in.charge" }
+		);
+
+		WHEN("The string is replaced on.")
+		{
+			const auto& replaced = bulk_replace(test_case.input, test_case.to_replace);
+
+			THEN("The input is replaced in-place.")
+			{
+				REQUIRE(replaced == test_case.input);
+				REQUIRE(&replaced == &test_case.input);
+			}
+
+			THEN("The output is as expected.")
+			{
+				REQUIRE(replaced == test_case.expected);
+				REQUIRE(test_case.input == test_case.expected);
+			}
+		}
+
+	}
+}
