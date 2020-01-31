@@ -28,6 +28,8 @@ extern "C" size_t decode_html_entities_utf8(char *dest, const char *src);
 
 std::string clean_up_html(std::string_view to_strip)
 {
+	if (to_strip.empty()) { return {}; }
+
 	const static std::regex remove_tags{ "<[^<]*>" };
 	const static std::regex replace_newlines{ "</p><p>|<br */?>" };
 
