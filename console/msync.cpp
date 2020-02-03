@@ -94,6 +94,7 @@ int main(int argc, const char* argv[])
 			break;
 		case mode::queue:
 			uniqueify(parsed.queue_opt.queued);
+			should_print_newline = false;
 			switch (parsed.queue_opt.to_do)
 			{
 			case queue_action::add:
@@ -109,7 +110,6 @@ int main(int argc, const char* argv[])
 				print_iterable(print(parsed.queue_opt.selected, assume_account(user).first));
 				break;
 			}
-			should_print_newline = false;
 			break;
 		case mode::gen:
 		{ //notice the braces- this is a scope
