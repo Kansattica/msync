@@ -173,9 +173,19 @@ void enqueue(const queues toenqueue, const std::string_view account, const std::
 	}
 	else
 	{
-		toaddto.parsed.insert(toaddto.parsed.end(), add.begin(), add.end());
-	}
+		// hm, this is (add.size() * toaddto.size()) string compares, which isn't great, performance-wise
+		// but I think it's worth it to eliminate duplicates from the queue, since that saves network requests down the line.
+		// I do it like this because std::unique only works on adjacent duplicates, and sorting the list would destroy the order
+		// I might be able to get a speedup by coping toaddto into a std::unordered_set, but I'm not sure adding a bunch of
+		// allocations to the mix really helps for the small input sizes msync deals with. 
 
+		const auto does_not_contain = [&toaddto](const std::string& adding)
+		{
+			return std::find(toaddto.parsed.begin(), toaddto.parsed.end(), adding) == toaddto.parsed.end();
+		};
+
+		std::copy_if(add.begin(), add.end(), std::back_inserter(toaddto.parsed), does_not_contain);
+	}
 
 	// consider looking for those "delete" guys, the ones with the - at the end, and having this cancel them out, 
 	// but "unboost and reboost", for example, is a valid thing to want to do.

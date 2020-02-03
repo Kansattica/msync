@@ -93,7 +93,6 @@ int main(int argc, const char* argv[])
 			should_print_newline = false;
 			break;
 		case mode::queue:
-			uniqueify(parsed.queue_opt.queued);
 			should_print_newline = false;
 			switch (parsed.queue_opt.to_do)
 			{
@@ -171,12 +170,6 @@ int main(int argc, const char* argv[])
 		pl() << '\n';
 
 	plfile() << "--- msync finished normally ---\n";
-}
-
-template <typename T>
-void uniqueify(T& toprint)
-{
-	toprint.erase(std::unique(toprint.begin(), toprint.end()), toprint.end());
 }
 
 std::pair<const std::string, user_options>& assume_account(std::pair<const std::string, user_options>* user)
