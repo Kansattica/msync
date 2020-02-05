@@ -122,9 +122,9 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 
 	if (fs::exists(copyto))
 	{
-		pl() << copyto.string() << " already exists. " << postfile.string() << " will be saved to ";
+		plverb() << copyto.string() << " already exists. " << postfile.string() << " will be saved to ";
 		unique_file_name(copyto);
-		pl() << copyto.string() << '\n';
+		plverb() << copyto.string() << '\n';
 	}
 
 	fs::copy(postfile, copyto);
