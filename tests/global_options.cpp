@@ -5,7 +5,7 @@
 #include "../lib/options/global_options.hpp"
 
 #include <string>
-using namespace std::string_literals;
+using namespace std::string_view_literals;
 
 SCENARIO("add_new_account correctly handles input.")
 {
@@ -113,6 +113,23 @@ SCENARIO("read_accounts correctly fills global_options on construction.")
 			}
 		}
 
+		WHEN("a given account is looked up with a leading @")
+		{
+			const auto found = opt.select_account("@coolaccount@website.com");
+
+			THEN("something was found")
+			{
+				REQUIRE(found != nullptr);
+			}
+
+			THEN("it was what we expected")
+			{
+				REQUIRE(found->first == "coolaccount@website.com");
+				REQUIRE(found->second.get_option(user_option::account_name) == "coolaccount");
+				REQUIRE(found->second.get_option(user_option::instance_url) == "website.com");
+			}
+		}
+
 		WHEN("an incorrect account is looked up")
 		{
 			const auto found = opt.select_account("boringaccount@badsize.pling");
@@ -204,7 +221,18 @@ SCENARIO("select_account selects exactly one account.")
 
 		WHEN("select_account is given a non-empty string to search on that's a valid prefix, but capitalized differently")
 		{
-			auto searchon = GENERATE("Some"s, "sOme", "SOme", "soME", "SOME", "somE");
+			auto searchon = GENERATE("Some"sv, "sOme", "SOme", "soME", "SOME", "somE");
+			auto account = options.select_account(searchon);
+
+			THEN("a user_options is returned.")
+			{
+				REQUIRE_FALSE(account == nullptr);
+			}
+		}
+
+		WHEN("select_account is given a non-empty string to search on that's a valid prefix, including an @, but capitalized differently")
+		{
+			auto searchon = GENERATE("@Some"sv, "@sOme", "@SOme", "@soME", "@SOME", "@somE");
 			auto account = options.select_account(searchon);
 
 			THEN("a user_options is returned.")
@@ -284,9 +312,41 @@ SCENARIO("select_account selects exactly one account.")
 			}
 		}
 
+		WHEN("select_account is given a non-empty string to search on that's an unambiguous prefix with a leading @")
+		{
+			const auto account = options.select_account("@someother");
+
+			THEN("a user_options is returned.")
+			{
+				REQUIRE_FALSE(account == nullptr);
+			}
+
+			THEN("the user_options is the correct one.")
+			{
+				const std::string& account_name = account->second.get_option(user_option::account_name);
+				REQUIRE(account_name == "someotheraccount@place2.egg");
+			}
+		}
+
 		WHEN("select_account is given a non-empty string to search on that's an unambiguous prefix, but capitalized differently")
 		{
-			const auto searchon = GENERATE("someotheR"s, "SomEOThEr", "SoMeOtHeR", "Someother");
+			const auto searchon = GENERATE("someotheR"sv, "SomEOThEr", "SoMeOtHeR", "Someother");
+			const auto account = options.select_account(searchon);
+
+			THEN("a user_options is returned.")
+			{
+				REQUIRE_FALSE(account == nullptr);
+			}
+
+			THEN("the user_options is the correct one.")
+			{
+				REQUIRE(account->second.get_option(user_option::account_name) == "someotheraccount@place2.egg");
+			}
+		}
+
+		WHEN("select_account is given a non-empty string to search on that's an unambiguous prefix with an @, but capitalized differently")
+		{
+			const auto searchon = GENERATE("@someotheR"sv, "@SomEOThEr", "@SoMeOtHeR", "@Someother");
 			const auto account = options.select_account(searchon);
 
 			THEN("a user_options is returned.")
