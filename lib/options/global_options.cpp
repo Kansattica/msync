@@ -73,9 +73,12 @@ std::pair<const std::string, user_options>& global_options::add_new_account(std:
 	return accounts.emplace_back(std::move(name), user_options{ std::move(user_path) });
 }
 
-std::pair<const std::string, user_options>* global_options::select_account(const std::string_view name)
+std::pair<const std::string, user_options>* global_options::select_account(std::string_view name)
 {
+	if (name.front() == '@') { name.remove_prefix(1); } //remove leading @s
+
 	std::pair<const std::string, user_options>* candidate = nullptr;
+
     for (auto& entry : accounts)
     {
         // if name is longer than the entry, we'll step off the end of entry and segfault
