@@ -108,10 +108,8 @@ std::pair<const std::string, user_options>* global_options::select_account(std::
 
 void global_options::clear_accounts()
 {
-	for (const auto& account : accounts)
-	{
-		fs::remove_all(account_directory_location / account.first);
-	}
+	std::for_each(accounts.begin(), accounts.end(), 
+		[this](const auto& account) { fs::remove_all(account_directory_location / account.first); });
 
 	accounts.clear();
 }
