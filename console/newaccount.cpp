@@ -124,7 +124,7 @@ void make_new_account(const std::string& accountname)
 
     const json parsed = json::parse(response.text);
     useraccount.set_option(user_option::access_token, parsed["access_token"].get<std::string>());
-    pl() << "Done! You're ready to start using this account."; //main will ad its own newline before it exits.
+    pl() << "Done! You're ready to start using this account."; //main will add its own newline before it exits.
 
     //don't need these any more once we're good
     useraccount.set_option(user_option::client_id, "");
