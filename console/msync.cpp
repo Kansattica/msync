@@ -48,6 +48,17 @@ int main(int argc, const char* argv[])
 			print_stringptr(assume_account(user).second.try_get_option(parsed.toset));
 			break;
 		case mode::showallopt:
+			should_print_newline = false;
+			pl() << "Accounts registered:\n";
+			{
+				const auto accountnames = options().all_accounts();
+				if (accountnames.empty())
+				{
+					pl() << "None. Run msync new --account [username@instance.url] to register an account with msync.\n";
+					break;
+				}
+				join_iterable(accountnames.begin(), accountnames.end(), '\n', pl());
+			}
 			for (auto opt = user_option(0); opt <= user_option::pull_notifications; opt = user_option(static_cast<int>(opt) + 1))
 			{
 				const auto option_name = USER_OPTION_NAMES[static_cast<int>(opt)];
@@ -73,11 +84,6 @@ int main(int argc, const char* argv[])
 				{
 					pl() << option_name << ": " << SYNC_SETTING_NAMES[static_cast<int>(assume_account(user).second.get_sync_option(opt))] << '\n';
 				}
-			}
-			pl() << "Accounts registered:\n";
-			{
-				const auto accountnames = options().all_accounts();
-				join_iterable(accountnames.begin(), accountnames.end(), '\n', pl());
 			}
 			break;
 		case mode::config:
