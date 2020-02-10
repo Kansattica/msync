@@ -25,7 +25,11 @@ This will register msync with your instance and give you a URL to visit in your 
 
 Once you see `Done! You're ready to start using this account`, you're ready to go. Notice that `msync` has created an `msync_accounts` directory in the same directory as itself. Keep this somewhere safe, because it now contains a password-equivalent access token! This `msync_accounts` directory contains everything msync knows: your account name, your settings, anything you've queued but haven't sent, and, once you synchronize with the server, it will contain local copies of your notifications and home timeline. To move or copy your `msync` installation to another computer, simply copy that `msync_accounts` folder.
 
-If you want to add another account, `msync` can handle as many accounts as you're willing to throw at it. Just do the same thing.
+#### A note on multiple accounts.
+
+If you want to add another account, `msync` can handle as many accounts as you're willing to throw at it. Run `msync new --account anotherusername@some.instance` and follow the on-screen instructions for each account you'd like to add. Most of `msync`'s commands only operate on one account at a time, so you'll have to specify an account with the `--account` or `-a` switch if you have more than one. Only `msync sync` and the account-listing part of `msync config showall` will work without specifying an account.
+
+To remove an account from msync, simply delete its folder from `msync_accounts`.
 
 ### How to use msync
 
