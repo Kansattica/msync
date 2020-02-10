@@ -24,9 +24,6 @@ bool is_sensitive(user_option opt);
 void print_sensitive(std::string_view name, const std::string* value);
 
 template <typename T>
-void uniqueify(T& toprint);
-
-template <typename T>
 void print_iterable(const T& vec);
 
 int main(int argc, const char* argv[])
@@ -48,6 +45,17 @@ int main(int argc, const char* argv[])
 			print_stringptr(assume_account(user).second.try_get_option(parsed.toset));
 			break;
 		case mode::showallopt:
+			should_print_newline = false;
+			pl() << "Accounts registered:\n";
+			{
+				const auto accountnames = options().all_accounts();
+				if (accountnames.empty())
+				{
+					pl() << "None. Run msync new --account [username@instance.url] to register an account with msync.\n";
+					break;
+				}
+				std::for_each(accountnames.begin(), accountnames.end(), [](const auto& accountname) { pl() << accountname << '\n'; });
+			}
 			for (auto opt = user_option(0); opt <= user_option::pull_notifications; opt = user_option(static_cast<int>(opt) + 1))
 			{
 				const auto option_name = USER_OPTION_NAMES[static_cast<int>(opt)];
@@ -74,11 +82,6 @@ int main(int argc, const char* argv[])
 					pl() << option_name << ": " << SYNC_SETTING_NAMES[static_cast<int>(assume_account(user).second.get_sync_option(opt))] << '\n';
 				}
 			}
-			pl() << "Accounts registered:\n";
-			{
-				const auto accountnames = options().all_accounts();
-				join_iterable(accountnames.begin(), accountnames.end(), '\n', pl());
-			}
 			break;
 		case mode::config:
 			assume_account(user).second.set_option(parsed.toset, parsed.optionval);
@@ -93,7 +96,7 @@ int main(int argc, const char* argv[])
 			should_print_newline = false;
 			break;
 		case mode::queue:
-			uniqueify(parsed.queue_opt.queued);
+			should_print_newline = false;
 			switch (parsed.queue_opt.to_do)
 			{
 			case queue_action::add:
@@ -109,7 +112,6 @@ int main(int argc, const char* argv[])
 				print_iterable(print(parsed.queue_opt.selected, assume_account(user).first));
 				break;
 			}
-			should_print_newline = false;
 			break;
 		case mode::gen:
 		{ //notice the braces- this is a scope
@@ -171,12 +173,6 @@ int main(int argc, const char* argv[])
 		pl() << '\n';
 
 	plfile() << "--- msync finished normally ---\n";
-}
-
-template <typename T>
-void uniqueify(T& toprint)
-{
-	toprint.erase(std::unique(toprint.begin(), toprint.end()), toprint.end());
 }
 
 std::pair<const std::string, user_options>& assume_account(std::pair<const std::string, user_options>* user)

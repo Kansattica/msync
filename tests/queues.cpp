@@ -29,7 +29,7 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 				std::make_pair(queues::fav, Fav_Queue_Filename)
 			);
 
-			const std::vector<std::string> someids{ "12345", "67890", "123123123123123123123", "longtextboy", "friend" };
+			const static std::vector<std::string> someids{ "12345", "67890", "123123123123123123123", "longtextboy", "friend" };
 			enqueue(totest.first, account, someids);
 
 			THEN("the items are written immediately.")
@@ -71,6 +71,35 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 					REQUIRE(lines[2] == "friend");
 					REQUIRE(lines[3] == "not in the queue-");
 					REQUIRE(lines[4] == "other-");
+				}
+			}
+
+			AND_WHEN("some ids that were already in the queue are queued again")
+			{
+				enqueue(totest.first, account, std::vector<std::string> {"12345", "friend", "longtextboy"});
+
+				THEN("the duplicates aren't added to the queue and order is preserved.")
+				{
+					const auto lines = print(totest.first, account);
+					REQUIRE(lines.size() == 5);
+					REQUIRE(lines == someids);
+				}
+			}
+
+			AND_WHEN("a mix of ids that were already in the queue and new ones are queued")
+			{
+				enqueue(totest.first, account, std::vector<std::string> {"12345", "a new friend", "longtextboy", "a new friend"});
+
+				THEN("the duplicates aren't added to the queue and order is preserved.")
+				{
+					const auto lines = print(totest.first, account);
+					REQUIRE(lines.size() == 6);
+					REQUIRE(lines[0] == "12345");
+					REQUIRE(lines[1] == "67890");
+					REQUIRE(lines[2] == "123123123123123123123");
+					REQUIRE(lines[3] == "longtextboy");
+					REQUIRE(lines[4] == "friend");
+					REQUIRE(lines[5] == "a new friend");
 				}
 			}
 

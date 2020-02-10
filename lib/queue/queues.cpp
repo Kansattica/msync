@@ -122,9 +122,9 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 
 	if (fs::exists(copyto))
 	{
-		pl() << copyto.string() << " already exists. " << postfile.string() << " will be saved to ";
+		plverb() << copyto.string() << " already exists. " << postfile.string() << " will be saved to ";
 		unique_file_name(copyto);
-		pl() << copyto.string() << '\n';
+		plverb() << copyto.string() << '\n';
 	}
 
 	fs::copy(postfile, copyto);
@@ -173,9 +173,28 @@ void enqueue(const queues toenqueue, const std::string_view account, const std::
 	}
 	else
 	{
-		toaddto.parsed.insert(toaddto.parsed.end(), add.begin(), add.end());
-	}
+		// hm, this is (add.size() * toaddto.size()) string compares, which isn't great, performance-wise
+		// but I think it's worth it to eliminate duplicates from the queue, since that saves network requests down the line.
+		// I do it like this because std::unique only works on adjacent duplicates, and sorting the list would destroy the order
+		// I might be able to get a speedup by copying toaddto into a std::unordered_set, but I'm not sure adding a bunch of
+		// allocations to the mix really helps for the small input sizes msync deals with. 
+		// similar to the dequeue situation
 
+		// you could argue that order doesn't matter for favs and boosts, and I think that, too, but 
+		// - it absolutely matters for posts, especially since posts can be replies to others
+		// - if this part of the program is called 'queue', it should implement a queue
+		// - if I had to write this again, I'd probably not have separate queues for boosts and favs, and just
+		// have it be a big list of API calls to make. I'm probably going to revisit that decision once I start 
+		// adding profile updates, poll voting, and other stuff that can get the "fire and forget" treatment like
+		// favs and boosts do
+
+		const auto does_not_contain = [&toaddto](const std::string& adding)
+		{
+			return std::find(toaddto.parsed.begin(), toaddto.parsed.end(), adding) == toaddto.parsed.end();
+		};
+
+		std::copy_if(add.begin(), add.end(), std::back_inserter(toaddto.parsed), does_not_contain);
+	}
 
 	// consider looking for those "delete" guys, the ones with the - at the end, and having this cancel them out, 
 	// but "unboost and reboost", for example, is a valid thing to want to do.
