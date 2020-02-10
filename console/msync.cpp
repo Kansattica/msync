@@ -24,9 +24,6 @@ bool is_sensitive(user_option opt);
 void print_sensitive(std::string_view name, const std::string* value);
 
 template <typename T>
-void uniqueify(T& toprint);
-
-template <typename T>
 void print_iterable(const T& vec);
 
 int main(int argc, const char* argv[])
@@ -57,7 +54,7 @@ int main(int argc, const char* argv[])
 					pl() << "None. Run msync new --account [username@instance.url] to register an account with msync.\n";
 					break;
 				}
-				join_iterable(accountnames.begin(), accountnames.end(), '\n', pl());
+				std::for_each(accountnames.begin(), accountnames.end(), [](const auto& accountname) { pl() << accountname << '\n'; });
 			}
 			for (auto opt = user_option(0); opt <= user_option::pull_notifications; opt = user_option(static_cast<int>(opt) + 1))
 			{
