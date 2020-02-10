@@ -88,7 +88,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 			 (option("-p", "--privacy", "--visibility") & visibilities).doc("Set the post's visibility.")
 			) % "generate options");
 
-	const auto queueMode = (command("q", "queue").set(ret.selected, mode::queue).doc("Manage queued favs, boosts, and posts") &
+	const auto queueMode = (command("queue", "q").set(ret.selected, mode::queue).doc("Manage queued favs, boosts, and posts") &
 			one_of(option("-r", "--remove").set(ret.queue_opt.to_do, queue_action::remove).doc("Remove the post ids or filenames from the queue instead of adding them. If not in the queue, queue unfaving, unboosting, or deleting the post so it happens on next sync."),
 				option("-c", "--clear").set(ret.queue_opt.to_do, queue_action::clear).doc("Remove everything in the specified queue."),
 				option("-p", "--print").set(ret.queue_opt.to_do, queue_action::print).doc("Print everything in the specified queue. The first item is on top.")) %
