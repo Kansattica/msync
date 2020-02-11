@@ -84,6 +84,22 @@ void from_json(const json& j, mastodon_attachment& attachment)
 	attachment.description = get_if_set<std::string>(j, "description"sv);
 }
 
+std::vector<std::pair<std::string_view, std::string_view>> get_mentions(const json& j)
+{
+	std::vector<std::pair<std::string_view, std::string_view>> to_return;
+
+	const auto& mentions = j["mentions"];
+
+	if (mentions.is_null() || !mentions.is_array()) { return to_return; }
+
+	for (const auto& mention : mentions)
+	{
+		to_return.emplace_back(mention["username"].get<std::string_view>(), mention["acct"].get<std::string_view>());
+	}
+
+	return to_return;
+}
+
 void from_json(const json& j, mastodon_status& status)
 {
 	j["id"].get_to(status.id);
@@ -93,7 +109,8 @@ void from_json(const json& j, mastodon_status& status)
 	// it also says that spoiler_text won't have html, but I'm not sure how correct that is
 	// i suspect it might at least have HTML entities that have to be cleaned up
 	status.content_warning = clean_up_html(get_if_set<std::string_view>(j, "spoiler_text"sv));
-	status.content = clean_up_html(fix_mentions(get_if_set<std::string>(j, "content"sv)));
+	status.content = clean_up_html(get_if_set<std::string_view>(j, "content"sv));
+	bulk_replace_mentions(status.content, get_mentions(j));
 
 	j["visibility"].get_to(status.visibility);
 	

@@ -52,16 +52,6 @@ std::string clean_up_html(std::string_view to_strip)
 	return output_buffer;
 }
 
-std::string fix_mentions(const std::string& to_fix)
-{
-	if (to_fix.empty()) { return {}; }
-
-	const static std::regex extract_account{ R"abc(<a href="((?:https?:\/\/)([-_~a-z0-9-]+\.[-_~a-z0-9-]+(?:\.[-_~a-z0-9-]+)?))\/(?:[^@].*?\/)*@?([-_~a-z0-9]*)".*?>.*?</a>)abc", std::regex::ECMAScript | std::regex::icase};
-	const static std::string replacement{ "@$3@$2" };
-	
-	return std::regex_replace(to_fix, extract_account, replacement, std::regex_constants::format_default);
-}
-
 std::string& bulk_replace_mentions(std::string& str, const std::vector<std::pair<std::string_view, std::string_view>>& to_replace)
 {
 	size_t match_idx = 0;
