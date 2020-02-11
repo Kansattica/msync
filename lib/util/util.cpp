@@ -56,7 +56,7 @@ std::string fix_mentions(std::string_view to_strip)
 {
 	if (to_strip.empty()) { return {}; }
 
-	const static std::regex extract_account{ R"abc(<a href="((?:https?:\/\/)([-_~a-z0-9-]+\.[-_~a-z0-9-]+(?:\.[-_~a-z0-9-]+)?))\/(@[-_~a-z0-9]*)".*>)abc", std::regex::ECMAScript | std::regex::icase};
+	const static std::regex extract_account{ R"abc(<a href="((?:https?:\/\/)([-_~a-z0-9-]+\.[-_~a-z0-9-]+(?:\.[-_~a-z0-9-]+)?))\/(@[-_~a-z0-9]*)".*?>.*?</a>)abc", std::regex::ECMAScript | std::regex::icase};
 	const static std::string replacement{ "$3@$2" };
 	
 	//could be dangerous, since string_view's .data() isn't guaranteed to be null terminated, so might just have to take a std::string

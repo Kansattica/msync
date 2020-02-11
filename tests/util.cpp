@@ -400,7 +400,8 @@ SCENARIO("fix_mentions correctly fixes up HTML mentions.")
 	{
 		auto test_case = GENERATE(
 																	//notice that this is having the preprocessor merge the strings so that there's not a // comment character in the middle of the string
-			std::make_pair("<p><span class=\"h - card\"><a href=\"https:/""/something.egg/@person\" class=\"u-url mention\">@<span>person</span></a></span> Why, thank you!"sv, "<p><span class=\"h - card\">@person@something.egg Why, thank you!"sv),
+			std::make_pair("<p><span class=\"h - card\"><a href=\"https:/""/something.egg/@person\" class=\"u-url mention\">@<span>person</span></a></span> Why, thank you!"sv, "<p><span class=\"h - card\">@person@something.egg</span> Why, thank you!"sv),
+			std::make_pair("<p><span class=\"h-card\"><a href=\"https:\/\/crime.egg\/@BestGirlGrace\" class=\"u-url mention\" rel=\"nofollow noopener noreferrer\" target=\"_blank\">@<span>BestGirlGrace<\/span><\/a><\/span> <span class=\"h-card\"><a href=\"https:\/\/web.site\/@cool\" class=\"u-url mention\" rel=\"nofollow noopener noreferrer\" target=\"_blank\">@<span>cool<\/span><\/a><\/span> it doesn't,"sv, "<p><span class=\"h-card\">@BestGirlGrace@crime.egg</span> <span class=\"h-card\">@cool@web.site<\/span> it doesn't,"sv),
 			std::make_pair("", ""),
 			std::make_pair("something", "something"),
 			std::make_pair("<p>", "<p>")
