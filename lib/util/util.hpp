@@ -17,6 +17,7 @@ struct parsed_account
 std::optional<parsed_account> parse_account_name(const std::string& name);
 
 std::string clean_up_html(std::string_view to_strip);
+std::string fix_mentions(std::string_view to_strip);
 std::string& bulk_replace(std::string& str, const std::vector<std::pair<std::string_view, std::string_view>>& to_replace);
 
 template <bool allowEmpty = false>

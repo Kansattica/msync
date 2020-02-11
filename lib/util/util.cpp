@@ -12,7 +12,7 @@ std::string make_api_url(const std::string_view instance_url, const std::string_
 
 std::optional<parsed_account> parse_account_name(const std::string& name)
 {
-    const static std::regex account_name{R"(@?([_a-z0-9]+)@(?:https?://)?([a-z0-9-]+\.[a-z0-9-]+(?:\.[a-z0-9-]+)?)[, =/\\?]*$)", std::regex::ECMAScript | std::regex::icase};
+    const static std::regex account_name{R"(@?([-_~a-z0-9]+)@(?:https?://)?([-_~a-z0-9-]+\.[-_~a-z0-9-]+(?:\.[-_~a-z0-9-]+)?)[, =/\\?]*$)", std::regex::ECMAScript | std::regex::icase};
 
     std::smatch results;
     if (std::regex_match(name, results, account_name))
@@ -50,6 +50,17 @@ std::string clean_up_html(std::string_view to_strip)
 
 	output_buffer.resize(decoded_length);
 	return output_buffer;
+}
+
+std::string fix_mentions(std::string_view to_strip)
+{
+	if (to_strip.empty()) { return {}; }
+
+	const static std::regex extract_account{ R"abc(<a href="((?:https?:\/\/)([-_~a-z0-9-]+\.[-_~a-z0-9-]+(?:\.[-_~a-z0-9-]+)?))\/(@[-_~a-z0-9]*)".*>)abc", std::regex::ECMAScript | std::regex::icase};
+	const static std::string replacement{ "$3@$2" };
+	
+	//could be dangerous, since string_view's .data() isn't guaranteed to be null terminated, so might just have to take a std::string
+	return std::regex_replace(to_strip.data(), extract_account, replacement, std::regex_constants::format_default);
 }
 
 std::string& bulk_replace(std::string& str, const std::vector<std::pair<std::string_view, std::string_view>>& to_replace)

@@ -393,3 +393,27 @@ SCENARIO("bulk_replace finds and replaces all its arguments in a string in place
 
 	}
 }
+
+SCENARIO("fix_mentions correctly fixes up HTML mentions.")
+{
+	GIVEN("An input string with some HTML mentions.")
+	{
+		auto test_case = GENERATE(
+			std::make_pair("<p><span class=\"h - card\"><a href=\"https:\/\/something.egg/@person\" class=\"u-url mention\">@<span>person</span></a></span> Why, thank you!"sv, "<p><span class=\"h - card\">@person@something.egg Why, thank you!"sv),
+			std::make_pair("", ""),
+			std::make_pair("something", "something"),
+			std::make_pair("<p>", "<p>")
+		);
+
+		WHEN("The string's mentions are fixed.")
+		{
+			const auto fixed = fix_mentions(test_case.first);
+
+			THEN("The output is as expected.")
+			{
+				REQUIRE(fixed == test_case.second);
+			}
+		}
+
+	}
+}
