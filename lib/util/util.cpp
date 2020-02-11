@@ -4,27 +4,27 @@
 
 std::string make_api_url(const std::string_view instance_url, const std::string_view api_route)
 {
-    std::string to_return{"https://"};
-    to_return.reserve(instance_url.size() + api_route.size() + to_return.size());
-    to_return.append(instance_url).append(api_route);
-    return to_return;
+	std::string to_return{ "https://" };
+	to_return.reserve(instance_url.size() + api_route.size() + to_return.size());
+	to_return.append(instance_url).append(api_route);
+	return to_return;
 }
 
 std::optional<parsed_account> parse_account_name(const std::string& name)
 {
-    const static std::regex account_name{R"(@?([-_~a-z0-9]+)@(?:https?://)?([-_~a-z0-9-]+\.[-_~a-z0-9-]+(?:\.[-_~a-z0-9-]+)?)[, =/\\?]*$)", std::regex::ECMAScript | std::regex::icase};
+	const static std::regex account_name{ R"(@?([-_~a-z0-9]+)@(?:https?://)?([-_~a-z0-9-]+\.[-_~a-z0-9-]+(?:\.[-_~a-z0-9-]+)?)[, =/\\?]*$)", std::regex::ECMAScript | std::regex::icase };
 
-    std::smatch results;
-    if (std::regex_match(name, results, account_name))
-    {
-        return parsed_account{results[1], results[2]};
-    }
+	std::smatch results;
+	if (std::regex_match(name, results, account_name))
+	{
+		return parsed_account{ results[1], results[2] };
+	}
 
-    return {};
+	return {};
 }
 
 // if src is null, modifies dest in place
-extern "C" size_t decode_html_entities_utf8(char *dest, const char *src);
+extern "C" size_t decode_html_entities_utf8(char* dest, const char* src);
 
 std::string clean_up_html(std::string_view to_strip)
 {
