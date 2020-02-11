@@ -110,11 +110,8 @@ void from_json(const json& j, mastodon_status& status)
 	// i suspect it might at least have HTML entities that have to be cleaned up
 	status.content_warning = clean_up_html(get_if_set<std::string_view>(j, "spoiler_text"sv));
 	status.content = clean_up_html(get_if_set<std::string_view>(j, "content"sv));
-	bulk_replace_mentions(status.content, get_mentions(j));
 
 	j["visibility"].get_to(status.visibility);
-	
-	status.reply_to_post_id = get_if_set<std::string>(j, "in_reply_to_id"sv);
 
 	// basically, if this post is a reblog, we want to get the rest of the stuff out of the nested reblog object.
 
@@ -128,6 +125,10 @@ void from_json(const json& j, mastodon_status& status)
 		j["account"]["display_name"].get_to(status.boosted_by_display_name);
 		post->at("uri").get_to(status.original_post_url);
 	}
+
+	bulk_replace_mentions(status.content, get_mentions(*post));
+	status.reply_to_post_id = get_if_set<std::string>(*post, "in_reply_to_id"sv);
+
 	post->at("created_at").get_to(status.created_at);
 	post->at("favourites_count").get_to(status.favorites);
 	post->at("reblogs_count").get_to(status.boosts);
