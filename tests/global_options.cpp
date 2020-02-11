@@ -201,7 +201,8 @@ SCENARIO("select_account selects exactly one account.")
 
 		WHEN("select_account is given an empty string to search on")
 		{
-			auto account = options.select_account("");
+			REQUIRE_NOTHROW(options.select_account(""));
+		 	auto account = options.select_account("");
 
 			THEN("a user_options is returned.")
 			{

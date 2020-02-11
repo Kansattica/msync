@@ -75,7 +75,7 @@ std::pair<const std::string, user_options>& global_options::add_new_account(std:
 
 std::pair<const std::string, user_options>* global_options::select_account(std::string_view name)
 {
-	if (name.front() == '@') { name.remove_prefix(1); } //remove leading @s
+	if (!name.empty() && name.front() == '@') { name.remove_prefix(1); } //remove leading @s
 
 	std::pair<const std::string, user_options>* candidate = nullptr;
 
