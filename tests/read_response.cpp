@@ -201,6 +201,43 @@ SCENARIO("read_status correctly reads and cleans the relevant fields from a JSON
 			}
 		}
 	}
+
+	GIVEN("A json string representing a status with some mentions.")
+	{
+		static constexpr std::string_view status_json = R"({"id":"103642574110813163","created_at":"2020-02-11T22:29:36.278Z","in_reply_to_id":null,"in_reply_to_account_id":null,"sensitive":false,"spoiler_text":"","visibility":"unlisted","language":"en","uri":"https://test.website.egg/users/BestGirlGrace/statuses/103642574110813163","url":"https://test.website.egg/@BestGirlGrace/103642574110813163","replies_count":0,"reblogs_count":0,"favourites_count":0,"content":"\u003cp\u003e\u003cspan class=\"h-card\"\u003e\u003ca href=\"https://crime.egg/users/GoddessGrace\" class=\"u-url mention\"\u003e@\u003cspan\u003eGoddessGrace\u003c/span\u003e\u003c/a\u003e\u003c/span\u003e \u003cspan class=\"h-card\"\u003e\u003ca href=\"https://test.website.egg/@grace_ebooks\" class=\"u-url mention\"\u003e@\u003cspan\u003egrace_ebooks\u003c/span\u003e\u003c/a\u003e\u003c/span\u003e this is a test, please ignore \u003cspan class=\"h-card\"\u003e\u003ca href=\"https://botsin.space/@tmnt\" class=\"u-url mention\"\u003e@\u003cspan\u003etmnt\u003c/span\u003e\u003c/a\u003e\u003c/span\u003e @fakemention \u003cspan class=\"h-card\"\u003e\u003ca href=\"https://test.website.egg/@wifelife\" class=\"u-url mention\"\u003e@\u003cspan\u003ewifelife\u003c/span\u003e\u003c/a\u003e\u003c/span\u003e\u003c/p\u003e","reblog":null,"application":{"name":"msync","website":"https://github.com/kansattica/msync"},"account":{"id":"1","username":"BestGirlGrace","acct":"BestGirlGrace","display_name":"Vx. Modemoiselle :qvp:","locked":false,"bot":false,"discoverable":true,"group":false,"created_at":"2018-08-16T04:45:49.523Z","note":"\u003cp\u003eThe buzz in your brain, the tingle behind your eyes, the good girl sneaking through your thoughts. Your favorite free-floating, reality-hacking, mind-tweaking, shitposting, horny, skunky, viral, infowitch.\u003c/p\u003e\u003cp\u003eHeader by @CorruptveSpirit@twitter, avi by @dogscribss@twitter\u003c/p\u003e","url":"https://test.website.egg/@BestGirlGrace","avatar":"https://test.website.egg/system/accounts/avatars/000/000/001/original/2c3b6b7ff75a3d40.gif?1573254299","avatar_static":"https://test.website.egg/system/accounts/avatars/000/000/001/static/2c3b6b7ff75a3d40.png?1573254299","header":"https://test.website.egg/system/accounts/headers/000/000/001/original/ba0b91a0c6545d9a.gif?1536301933","header_static":"https://test.website.egg/system/accounts/headers/000/000/001/static/ba0b91a0c6545d9a.png?1536301933","followers_count":1547,"following_count":733,"statuses_count":52495,"last_status_at":"2020-02-11","emojis":[{"shortcode":"qvp","url":"https://test.website.egg/system/custom_emojis/images/000/036/475/original/3470be8e5f2bf943.png?1564727510","static_url":"https://test.website.egg/system/custom_emojis/images/000/036/475/static/3470be8e5f2bf943.png?1564727510","visible_in_picker":true}],"fields":[{"name":"Pronouns","value":"she/her","verified_at":null},{"name":"Hornt Writing","value":"\u003ca href=\"https://perfect.hypnovir.us\" rel=\"me nofollow noopener noreferrer\" target=\"_blank\"\u003e\u003cspan class=\"invisible\"\u003ehttps://\u003c/span\u003e\u003cspan class=\"\"\u003eperfect.hypnovir.us\u003c/span\u003e\u003cspan class=\"invisible\"\u003e\u003c/span\u003e\u003c/a\u003e","verified_at":"2019-07-08T07:50:47.669+00:00"},{"name":"Fax Number","value":"(580) 4-GRACE-5","verified_at":null},{"name":"I made","value":"\u003ca href=\"https://github.com/Kansattica/Fluency\" rel=\"me nofollow noopener noreferrer\" target=\"_blank\"\u003e\u003cspan class=\"invisible\"\u003ehttps://\u003c/span\u003e\u003cspan class=\"\"\u003egithub.com/Kansattica/Fluency\u003c/span\u003e\u003cspan class=\"invisible\"\u003e\u003c/span\u003e\u003c/a\u003e","verified_at":null}]},"media_attachments":[],"mentions":[{"id":"38135","username":"GoddessGrace","url":"https://crime.egg/users/GoddessGrace","acct":"GoddessGrace@crime.egg"},{"id":"11561","username":"grace_ebooks","url":"https://test.website.egg/@grace_ebooks","acct":"grace_ebooks"},{"id":"51096","username":"tmnt","url":"https://botsin.space/@tmnt","acct":"tmnt@botsin.space"},{"id":"39813","username":"wifelife","url":"https://test.website.egg/@wifelife","acct":"wifelife"}],"tags":[],"emojis":[],"card":null,"poll":null})";
+		WHEN("The status is read.")
+		{
+			const auto status = read_status(status_json);
+
+			THEN("The result is as expected.")
+			{
+				REQUIRE(status.id == "103642574110813163");
+				REQUIRE(status.url == "https://test.website.egg/users/BestGirlGrace/statuses/103642574110813163");
+				REQUIRE(status.content_warning.empty());
+				REQUIRE(status.content == "@GoddessGrace@crime.egg @grace_ebooks this is a test, please ignore @tmnt@botsin.space @fakemention @wifelife");
+				REQUIRE(status.visibility == "unlisted");
+				REQUIRE(status.created_at == "2020-02-11T22:29:36.278Z");
+				REQUIRE(status.reply_to_post_id.empty());
+				REQUIRE(status.original_post_url.empty());
+				REQUIRE(status.boosted_by.empty());
+				REQUIRE(status.favorites == 0);
+				REQUIRE(status.boosts == 0);
+				REQUIRE(status.replies == 0);
+				REQUIRE(status.attachments.empty());
+
+				REQUIRE(status.author.id == "1");
+				REQUIRE(status.author.account_name == "BestGirlGrace");
+				REQUIRE(status.author.display_name == "Vx. Modemoiselle :qvp:");
+				REQUIRE(status.author.note == "The buzz in your brain, the tingle behind your eyes, the good girl sneaking through your thoughts. Your favorite free-floating, reality-hacking, mind-tweaking, shitposting, horny, skunky, viral, infowitch.\nHeader by @CorruptveSpirit@twitter, avi by @dogscribss@twitter");
+				REQUIRE(status.author.url == "https://test.website.egg/@BestGirlGrace");
+				REQUIRE(status.author.avatar == "https://test.website.egg/system/accounts/avatars/000/000/001/original/2c3b6b7ff75a3d40.gif?1573254299");
+				REQUIRE(status.author.fields == expected_fields);
+				REQUIRE(status.author.is_bot == false);
+
+				REQUIRE_FALSE(status.poll.has_value());
+			}
+		}
+	}
 }
 
 SCENARIO("read_statuses correctly reads and cleans the relevant fields from an array of JSON statuses.")
