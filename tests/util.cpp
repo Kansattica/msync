@@ -401,6 +401,7 @@ SCENARIO("fix_mentions correctly fixes up HTML mentions.")
 		auto test_case = GENERATE(
 			std::make_pair("<p><span class=\"h - card\"><a href=\"https://something.egg/@person\" class=\"u-url mention\">@<span>person</span></a></span> Why, thank you!", "<p><span class=\"h - card\">@person@something.egg</span> Why, thank you!"),
 			std::make_pair("<p><span class=\"h-card\"><a href=\"https://crime.egg/@BestGirlGrace\" class=\"u-url mention\" rel=\"nofollow noopener noreferrer\" target=\"_blank\">@<span>BestGirlGrace</span></a></span> <span class=\"h-card\"><a href=\"https://web.site/@cool\" class=\"u-url mention\" rel=\"nofollow noopener noreferrer\" target=\"_blank\">@<span>cool</span></a></span> it doesn't,", "<p><span class=\"h-card\">@BestGirlGrace@crime.egg</span> <span class=\"h-card\">@cool@web.site</span> it doesn't,"),
+			std::make_pair("<p>this is a <span class=\"h-card\"><a href=\"https://goodchristian.website/users/GoddessGrace\" class=\"u-url mention\">@<span>GoddessGrace</span></a></span> test</p>", "<p>this is a <span class=\"h-card\">@GoddessGrace@goodchristian.website</span> test</p>"),
 			std::make_pair("", ""),
 			std::make_pair("something", "something"),
 			std::make_pair("<p>", "<p>")
