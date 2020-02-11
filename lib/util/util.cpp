@@ -62,22 +62,19 @@ std::string fix_mentions(const std::string& to_fix)
 	return std::regex_replace(to_fix, extract_account, replacement, std::regex_constants::format_default);
 }
 
-std::string& bulk_replace(std::string& str, const std::vector<std::pair<std::string_view, std::string_view>>& to_replace)
+std::string& bulk_replace_mentions(std::string& str, const std::vector<std::pair<std::string_view, std::string_view>>& to_replace)
 {
+	size_t match_idx = 0;
 	for (const auto& pair : to_replace)
 	{
-		size_t match_idx = 0;
-		do
+		match_idx = str.find(pair.first, match_idx);
+
+		//  only do this if a match was found AND it has an @ beforehand. 
+		if (match_idx != std::string::npos && match_idx != 0 && str[match_idx - 1] == '@')
 		{
-			match_idx = str.find(pair.first, match_idx);
-
-			if (match_idx != std::string::npos)
-			{
-				str.replace(match_idx, pair.first.size(), pair.second);
-				match_idx += pair.second.size();
-			}
-
-		} while (match_idx != std::string::npos);
+			str.replace(match_idx, pair.first.size(), pair.second);
+			match_idx += pair.second.size();
+		}
 	}
 
 	return str;

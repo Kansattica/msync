@@ -356,27 +356,26 @@ struct bulk_replace_test_case
 	std::string expected;
 };
 
-SCENARIO("bulk_replace finds and replaces all its arguments in a string in place.")
+SCENARIO("bulk_replace_mentions finds and replaces all its arguments in a string in place.")
 {
 	GIVEN("An input string and a set of substrings to find and replace.")
 	{
 		auto test_case = GENERATE(
-			bulk_replace_test_case{ "This is a string", { {"a", "an excellent"} }, "This is an excellent string" },
-			bulk_replace_test_case{ "", { {"a", "an excellent"} }, "" },
-			bulk_replace_test_case{ "", {}, "" },
-			bulk_replace_test_case{ ":)", {}, ":)" },
-			bulk_replace_test_case{ "big", { {"big", "extremely large"} }, "extremely large" },
+			bulk_replace_test_case{ "", { {"", ""} }, "" },
+			bulk_replace_test_case{ "", { {"asdf", "hjkl"} }, "" },
 			bulk_replace_test_case{ "@spanky", { {"spanky", "spanky"} }, "@spanky" },
+			bulk_replace_test_case{ "spanky @spanky", { {"spanky", "spanky"} }, "spanky @spanky" },
 			bulk_replace_test_case{ "@spanky", { {"spanky", "spanky@website.egg"} }, "@spanky@website.egg" },
 			bulk_replace_test_case{ "hey, @spanky, what's up", { {"spanky", "spanky@website.egg"} }, "hey, @spanky@website.egg, what's up" },
+			bulk_replace_test_case{ "hey, @spanky, what's up. sincerely, @spanky", { {"spanky", "spanky@website.egg"}, {"spanky", "spanky@illegal.egg" } }, "hey, @spanky@website.egg, what's up. sincerely, @spanky@illegal.egg" },
 			bulk_replace_test_case{ "@mike @bike @spike heckthread @marge", 
-				{ {"mike", "mike@website.egg"}, {"spike", "spike"},  {"bike", "bike@crime.egg"}, {"marge", "marge@in.charge"} },
+				{ {"mike", "mike@website.egg"}, {"bike", "bike@crime.egg"}, {"spike", "spike"}, {"marge", "marge@in.charge"} },
 				"@mike@website.egg @bike@crime.egg @spike heckthread @marge@in.charge" }
 		);
 
 		WHEN("The string is replaced on.")
 		{
-			const auto& replaced = bulk_replace(test_case.input, test_case.to_replace);
+			const auto& replaced = bulk_replace_mentions(test_case.input, test_case.to_replace);
 
 			THEN("The input is replaced in-place.")
 			{

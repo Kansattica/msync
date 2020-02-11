@@ -18,7 +18,7 @@ std::optional<parsed_account> parse_account_name(const std::string& name);
 
 std::string clean_up_html(std::string_view to_strip);
 std::string fix_mentions(const std::string& to_fix);
-std::string& bulk_replace(std::string& str, const std::vector<std::pair<std::string_view, std::string_view>>& to_replace);
+std::string& bulk_replace_mentions(std::string& str, const std::vector<std::pair<std::string_view, std::string_view>>& to_replace);
 
 template <bool allowEmpty = false>
 std::vector<std::string_view> split_string(const std::string_view tosplit, const char on)
