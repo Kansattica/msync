@@ -52,33 +52,32 @@ std::string clean_up_html(std::string_view to_strip)
 	return output_buffer;
 }
 
-std::string fix_mentions(std::string_view to_strip)
+std::string fix_mentions(const std::string& to_fix)
 {
-	if (to_strip.empty()) { return {}; }
+	if (to_fix.empty()) { return {}; }
 
 	const static std::regex extract_account{ R"abc(<a href="((?:https?:\/\/)([-_~a-z0-9-]+\.[-_~a-z0-9-]+(?:\.[-_~a-z0-9-]+)?))\/(@[-_~a-z0-9]*)".*?>.*?</a>)abc", std::regex::ECMAScript | std::regex::icase};
 	const static std::string replacement{ "$3@$2" };
 	
-	//could be dangerous, since string_view's .data() isn't guaranteed to be null terminated, so might just have to take a std::string
-	return std::regex_replace(to_strip.data(), extract_account, replacement, std::regex_constants::format_default);
+	return std::regex_replace(to_fix, extract_account, replacement, std::regex_constants::format_default);
 }
 
 std::string& bulk_replace(std::string& str, const std::vector<std::pair<std::string_view, std::string_view>>& to_replace)
 {
 	for (const auto& pair : to_replace)
 	{
-		size_t mention_loc = 0;
+		size_t match_idx = 0;
 		do
 		{
-			mention_loc = str.find(pair.first, mention_loc);
+			match_idx = str.find(pair.first, match_idx);
 
-			if (mention_loc != std::string::npos)
+			if (match_idx != std::string::npos)
 			{
-				str.replace(mention_loc, pair.first.size(), pair.second);
-				mention_loc += pair.second.size();
+				str.replace(match_idx, pair.first.size(), pair.second);
+				match_idx += pair.second.size();
 			}
 
-		} while (mention_loc != std::string::npos);
+		} while (match_idx != std::string::npos);
 	}
 
 	return str;

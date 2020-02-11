@@ -93,7 +93,7 @@ void from_json(const json& j, mastodon_status& status)
 	// it also says that spoiler_text won't have html, but I'm not sure how correct that is
 	// i suspect it might at least have HTML entities that have to be cleaned up
 	status.content_warning = clean_up_html(get_if_set<std::string_view>(j, "spoiler_text"sv));
-	status.content = clean_up_html(fix_mentions(get_if_set<std::string_view>(j, "content"sv)));
+	status.content = clean_up_html(fix_mentions(get_if_set<std::string>(j, "content"sv)));
 
 	j["visibility"].get_to(status.visibility);
 	
