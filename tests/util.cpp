@@ -399,7 +399,8 @@ SCENARIO("fix_mentions correctly fixes up HTML mentions.")
 	GIVEN("An input string with some HTML mentions.")
 	{
 		auto test_case = GENERATE(
-			std::make_pair("<p><span class=\"h - card\"><a href=\"https:\/\/something.egg/@person\" class=\"u-url mention\">@<span>person</span></a></span> Why, thank you!"sv, "<p><span class=\"h - card\">@person@something.egg Why, thank you!"sv),
+																	//notice that this is having the preprocessor merge the strings so that there's not a // comment character in the middle of the string
+			std::make_pair("<p><span class=\"h - card\"><a href=\"https:/""/something.egg/@person\" class=\"u-url mention\">@<span>person</span></a></span> Why, thank you!"sv, "<p><span class=\"h - card\">@person@something.egg Why, thank you!"sv),
 			std::make_pair("", ""),
 			std::make_pair("something", "something"),
 			std::make_pair("<p>", "<p>")
