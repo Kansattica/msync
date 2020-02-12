@@ -13,7 +13,10 @@ void print(std::ofstream& out, const char* key, const std::string& val, bool new
 }
 
 void print_author(std::ofstream& out, const char* key, const std::string& display_name, const std::string& account, bool bot, bool newline = true)
-{
+{ 
+	// this is so that posts that aren't boosts don't print that boosted_by section
+	if (account.empty()) { return; }
+
 	out << key << display_name << " (@" << account << ')';
 
 	if (bot) out << " [bot]";
