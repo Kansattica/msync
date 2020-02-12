@@ -23,7 +23,7 @@ posted on: 10:54AM 11-14-2019
 
 constexpr std::string_view expected_content_nocw_nodisplayname = R"(status id: contentnocw
 url: https://website.egg/contentnocw
-author: (@invisible@website.egg)
+author:  (@invisible@website.egg)
 body: This is a...
  test post.
 visibility: public
