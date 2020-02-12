@@ -21,6 +21,17 @@ posted on: 10:54AM 11-14-2019
 --------------
 )";
 
+constexpr std::string_view expected_content_nocw_nodisplayname = R"(status id: contentnocw
+url: https://website.egg/contentnocw
+author: (@invisible@website.egg)
+body: This is a...
+ test post.
+visibility: public
+posted on: 10:54AM 11-14-2019
+0 favs | 1 boosts | 2 replies
+--------------
+)";
+
 constexpr std::string_view expected_content_cw = R"(status id: contentcw
 url: https://website.egg/contentcw
 author: Alex Friendford (@afriend)
@@ -127,6 +138,23 @@ mastodon_status make_nocw()
 	content_nocw.replies = 2;
 	content_nocw.author.account_name = "regular@website.egg";
 	content_nocw.author.display_name = "Normal Person";
+	content_nocw.author.is_bot = false;
+	return content_nocw;
+}
+
+mastodon_status make_nocw_nodisplayname()
+{
+	mastodon_status content_nocw;
+	content_nocw.id = "contentnocw";
+	content_nocw.url = "https://website.egg/contentnocw";
+	content_nocw.content = "This is a...\n test post.";
+	content_nocw.visibility = "public";
+	content_nocw.created_at = "10:54AM 11-14-2019";
+	content_nocw.favorites = 0;
+	content_nocw.boosts = 1;
+	content_nocw.replies = 2;
+	content_nocw.author.account_name = "invisible@website.egg";
+	content_nocw.author.display_name = "";
 	content_nocw.author.is_bot = false;
 	return content_nocw;
 }
@@ -261,15 +289,17 @@ SCENARIO("post_list correctly serializes lists of statuses.")
 	GIVEN("Some mastodon_statuses and authors to serialize")
 	{
 		const static mastodon_status content_nocw = make_nocw();
+		const static mastodon_status content_nocw_nodisplayname = make_nocw_nodisplayname();
 		const static mastodon_status content_cw = make_cw();
 		const static mastodon_status justattachments = make_attachments();
 		const static mastodon_status everything = make_everything();
 		const static mastodon_status expired_poll = make_expiredpoll();
 		const static mastodon_status unexpired_poll = make_unexpiredpoll();
 
-		const static std::array<status_test_case, 6> statuses
+		const static std::array<status_test_case, 7> statuses
 		{
 			status_test_case{ content_nocw, expected_content_nocw },
+			status_test_case{ content_nocw_nodisplayname, expected_content_nocw_nodisplayname },
 			status_test_case{ content_cw, expected_content_cw },
 			status_test_case{ justattachments, expected_justattachments },
 			status_test_case{ everything, expected_everything },

@@ -14,14 +14,11 @@ void print(std::ofstream& out, const char* key, const std::string& val, bool new
 
 void print_author(std::ofstream& out, const char* key, const std::string& display_name, const std::string& account, bool bot, bool newline = true)
 {
-	if (!display_name.empty())
-	{
-		out << key << display_name << " (@" << account << ')';
+	out << key << display_name << " (@" << account << ')';
 
-		if (bot) out << " [bot]";
+	if (bot) out << " [bot]";
 
-		if (newline) out << '\n';
-	}
+	if (newline) out << '\n';
 }
 
 void print(std::ofstream& out, const char* key, bool val, bool newline = true)
