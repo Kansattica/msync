@@ -4,30 +4,32 @@
 
 std::string make_api_url(const std::string_view instance_url, const std::string_view api_route)
 {
-    std::string to_return{"https://"};
-    to_return.reserve(instance_url.size() + api_route.size() + to_return.size());
-    to_return.append(instance_url).append(api_route);
-    return to_return;
+	std::string to_return{ "https://" };
+	to_return.reserve(instance_url.size() + api_route.size() + to_return.size());
+	to_return.append(instance_url).append(api_route);
+	return to_return;
 }
 
 std::optional<parsed_account> parse_account_name(const std::string& name)
 {
-    const static std::regex account_name{R"(@?([_a-z0-9]+)@(?:https?://)?([a-z0-9-]+\.[a-z0-9-]+(?:\.[a-z0-9-]+)?)[, =/\\?]*$)", std::regex::ECMAScript | std::regex::icase};
+	const static std::regex account_name{ R"(@?([-_~a-z0-9]+)@(?:https?://)?([-_~a-z0-9-]+\.[-_~a-z0-9-]+(?:\.[-_~a-z0-9-]+)?)[, =/\\?]*$)", std::regex::ECMAScript | std::regex::icase };
 
-    std::smatch results;
-    if (std::regex_match(name, results, account_name))
-    {
-        return parsed_account{results[1], results[2]};
-    }
+	std::smatch results;
+	if (std::regex_match(name, results, account_name))
+	{
+		return parsed_account{ results[1], results[2] };
+	}
 
-    return {};
+	return {};
 }
 
 // if src is null, modifies dest in place
-extern "C" size_t decode_html_entities_utf8(char *dest, const char *src);
+extern "C" size_t decode_html_entities_utf8(char* dest, const char* src);
 
 std::string clean_up_html(std::string_view to_strip)
 {
+	if (to_strip.empty()) { return {}; }
+
 	const static std::regex remove_tags{ "<[^<]*>" };
 	const static std::regex replace_newlines{ "</p><p>|<br */?>" };
 
@@ -48,4 +50,22 @@ std::string clean_up_html(std::string_view to_strip)
 
 	output_buffer.resize(decoded_length);
 	return output_buffer;
+}
+
+std::string& bulk_replace_mentions(std::string& str, const std::vector<std::pair<std::string_view, std::string_view>>& to_replace)
+{
+	size_t match_idx = 0;
+	for (const auto& pair : to_replace)
+	{
+		match_idx = str.find(pair.first, match_idx);
+
+		//  only do this if a match was found AND it has an @ beforehand. 
+		if (match_idx != std::string::npos && match_idx != 0 && str[match_idx - 1] == '@')
+		{
+			str.replace(match_idx, pair.first.size(), pair.second);
+			match_idx += pair.second.size();
+		}
+	}
+
+	return str;
 }
