@@ -80,6 +80,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 	const auto genMode = (command("gen", "generate").set(ret.selected, mode::gen).doc("Generate a post template in the current folder. Edit this file afterwards to add a body.") &
 			(
 			 (option("-o", "--output") & value("filename", ret.gen_opt.filename)).doc("Specify an output file. Default is new_post."),
+			 (option("-b", "--body", "--content") & value("body", ret.gen_opt.post.text)).doc("Specify a body for the post."),
 			 (option("-c", "--content-warning", "--cw") & value("warning", ret.gen_opt.post.content_warning)).doc("Set a content warning (or subject) for the post."),
 			 (option("-p", "--privacy", "--visibility") & visibilities).doc("Set the post's visibility."),
 			 (option("-f", "--file", "--attach") & values(match::prefix_not("-"), "file path", ret.gen_opt.post.attachments)).doc("Attach these files to the post."),

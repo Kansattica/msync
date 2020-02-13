@@ -1136,7 +1136,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 	GIVEN("A combination of options for the file generator")
 	{
 		// try every combination of bits. note that the ranges are half-open, including the 0 and excluding the maximum.
-		const auto combination = GENERATE(range(0, 0b1111 + 1));
+		const auto combination = GENERATE(range(0, 0b11111 + 1));
 		const auto longcommand = GENERATE(true, false);
 		const auto attach = GENERATE(0, 1, 2, 3);
 		const auto description = GENERATE(0, 1, 2);
@@ -1236,6 +1236,27 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 
 			opt.options.push_back("76543");
 			expected.post.reply_id = "76543";
+			options.push_back(std::move(opt));
+		}
+
+		if (flag_set(combination, 4))
+		{
+			command_line_option opt;
+			switch (zero_to_n(2))
+			{
+			case 0:
+				opt.options.push_back("-b");
+				break;
+			case 1:
+				opt.options.push_back("--body");
+				break;
+			case 2:
+				opt.options.push_back("--content");
+				break;
+			}
+
+			opt.options.push_back("@someguy@website.com");
+			expected.post.text = "@someguy@website.com";
 			options.push_back(std::move(opt));
 		}
 
