@@ -75,12 +75,12 @@ void user_options::set_option(user_option opt, sync_settings value)
 	backing.parsed.insert_or_assign(std::string{ USER_OPTION_NAMES[static_cast<size_t>(opt)] }, std::string{ SYNC_SETTING_NAMES[static_cast<size_t>(value)] });
 }
 
-// this should save a strlen call at runtime
-constexpr std::string_view true_sv = "true";
-constexpr std::string_view false_sv = "false";
 
 // I have to call it set_bool_option or else c++ will try to use this overload with char* string literals
 void user_options::set_bool_option(user_option opt, bool value)
 {
+	// this should save a strlen call at runtime
+	static constexpr std::string_view true_sv = "true";
+	static constexpr std::string_view false_sv = "false";
 	backing.parsed.insert_or_assign(std::string{ USER_OPTION_NAMES[static_cast<size_t>(opt)] }, std::string{ value ? true_sv : false_sv });
 }

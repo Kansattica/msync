@@ -42,9 +42,10 @@ SCENARIO("option_files save their data when destroyed.")
 
                 const auto lines = read_lines(tf.filename);
 
-                REQUIRE(lines.size() == 2);
+                REQUIRE(lines.size() == 3);
                 REQUIRE(lines[0] == "atestoption=coolstuff");
-                REQUIRE(lines[1] == "test=time");
+                REQUIRE(lines[1] == "file_version=1");
+                REQUIRE(lines[2] == "test=time");
             }
         }
 
@@ -60,9 +61,10 @@ SCENARIO("option_files save their data when destroyed.")
 
                 const auto lines = read_lines(tf.filename);
 
-                REQUIRE(lines.size() == 2);
+                REQUIRE(lines.size() == 3);
                 REQUIRE(lines[0] == "atestoption=coolstuff");
-                REQUIRE(lines[1] == "test=time");
+                REQUIRE(lines[1] == "file_version=1");
+                REQUIRE(lines[2] == "test=time");
             }
         }
 
@@ -80,8 +82,33 @@ SCENARIO("option_files save their data when destroyed.")
 
                 const auto lines = read_lines(tf.filename);
 
-                REQUIRE(lines.size() == 1);
+                REQUIRE(lines.size() == 2);
                 REQUIRE(lines[0] == "atestoption=coolstuff");
+                REQUIRE(lines[1] == "file_version=1");
+            }
+        }
+    }
+
+    GIVEN("An empty option_file.")
+    {
+        const test_file tf("testfileopt");
+
+		option_file opts{ tf.filename };
+
+        WHEN("The option_file is moved from and destroyed")
+        {
+            {
+				option_file newopts = std::move(opts);
+            }
+
+            THEN("A file_version is still added.")
+            {
+                REQUIRE(fs::exists(tf.filename));
+
+                const auto lines = read_lines(tf.filename);
+
+                REQUIRE(lines.size() == 1);
+                REQUIRE(lines[0] == "file_version=1");
             }
         }
     }
@@ -129,10 +156,11 @@ SCENARIO("option_files read data when created.")
             {
                 const auto lines = read_lines(tf.filename);
 
-                REQUIRE(lines.size() == 3);
+                REQUIRE(lines.size() == 4);
                 REQUIRE(lines[0] == "anotherentry=foryou");
                 REQUIRE(lines[1] == "different=tests");
-                REQUIRE(lines[2] == "somecool=isnowthis");
+                REQUIRE(lines[2] == "file_version=1");
+                REQUIRE(lines[3] == "somecool=isnowthis");
 
                 AND_THEN("The original file is backed up.")
                 {
@@ -191,10 +219,11 @@ SCENARIO("option_files read data when created.")
             {
                 const auto lines = read_lines(tf.filename);
 
-                REQUIRE(lines.size() == 3);
+                REQUIRE(lines.size() == 4);
                 REQUIRE(lines[0] == "anotherentry=foryou");
                 REQUIRE(lines[1] == "different=tests");
-                REQUIRE(lines[2] == "somecool=isnowthis");
+                REQUIRE(lines[2] == "file_version=1");
+                REQUIRE(lines[3] == "somecool=isnowthis");
 
                 AND_THEN("The original file is backed up.")
                 {

@@ -59,7 +59,7 @@ int main(int argc, const char* argv[])
 			for (auto opt = user_option(0); opt <= user_option::pull_notifications; opt = user_option(static_cast<int>(opt) + 1))
 			{
 				const auto option_name = USER_OPTION_NAMES[static_cast<int>(opt)];
-				if (opt < user_option::exclude_follow)
+				if (opt < user_option::exclude_follows)
 				{
 					const auto option_value = assume_account(user).second.try_get_option(opt);
 					if (is_sensitive(opt))
@@ -73,7 +73,7 @@ int main(int argc, const char* argv[])
 						pl() << '\n';
 					}
 				}
-				else if (opt >= user_option::exclude_follow && opt <= user_option::exclude_poll)
+				else if (opt >= user_option::exclude_follows && opt <= user_option::exclude_polls)
 				{
 					pl() << option_name << ": " << (assume_account(user).second.get_bool_option(opt) ? "true" : "false") << '\n';
 				}

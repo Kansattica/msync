@@ -76,16 +76,22 @@ SCENARIO("sync_settings stringify properly.")
     }
 }
 
-CATCH_REGISTER_ENUM(user_option, user_option::account_name, user_option::instance_url, user_option::auth_code,
-                    user_option::access_token, user_option::client_secret, user_option::client_id, user_option::pull_home, user_option::pull_dms, user_option::pull_notifications)
+CATCH_REGISTER_ENUM(user_option, user_option::file_version, user_option::account_name, user_option::instance_url, user_option::auth_code,
+                    user_option::access_token, user_option::client_secret, user_option::client_id, 
+					user_option::last_home_id, user_option::last_dm_id, user_option::last_notification_id,
+					user_option::exclude_follows, user_option::exclude_favs, user_option::exclude_boosts, user_option::exclude_mentions, user_option::exclude_polls,
+					user_option::pull_home, user_option::pull_dms, user_option::pull_notifications)
 
 SCENARIO("user_option values stringify properly.")
 {
     Catch::StringMaker<user_option> sm;
     GIVEN("A user_option")
     {
-        auto val = GENERATE(user_option::account_name, user_option::instance_url, user_option::auth_code,
-                            user_option::access_token, user_option::client_secret, user_option::client_id, user_option::pull_home, user_option::pull_dms, user_option::pull_notifications);
+		auto val = GENERATE(user_option::file_version, user_option::account_name, user_option::instance_url, user_option::auth_code,
+                    user_option::access_token, user_option::client_secret, user_option::client_id, 
+					user_option::last_home_id, user_option::last_dm_id, user_option::last_notification_id,
+					user_option::exclude_follows, user_option::exclude_favs, user_option::exclude_boosts, user_option::exclude_mentions, user_option::exclude_polls,
+					user_option::pull_home, user_option::pull_dms, user_option::pull_notifications);
 
         WHEN("that user_option is looked up in its array")
         {

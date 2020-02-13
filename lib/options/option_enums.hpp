@@ -32,6 +32,7 @@ constexpr auto SYNC_SETTING_NAMES =
 
 enum class user_option
 {
+    file_version,
     account_name,
     instance_url,
     auth_code,
@@ -41,11 +42,11 @@ enum class user_option
 	last_home_id,
 	last_dm_id,
 	last_notification_id,
-	exclude_follow,
-	exclude_fav,
-    exclude_boost,
-    exclude_mention,
-    exclude_poll,
+	exclude_follows,
+	exclude_favs,
+    exclude_boosts,
+    exclude_mentions,
+    exclude_polls,
     pull_home,
     pull_dms,
     pull_notifications,
@@ -54,7 +55,7 @@ enum class user_option
 constexpr auto USER_OPTION_NAMES =
     std::array<std::string_view,
                static_cast<int>(user_option::pull_notifications) + 1>(
-        {"account_name", "instance_url", "auth_code", "access_token", "client_secret", "client_id",
+        {"file_version", "account_name", "instance_url", "auth_code", "access_token", "client_secret", "client_id",
 				   "last_home_id", "last_dm_id", "last_notification_id", 
                    "exclude_follows", "exclude_favs", "exclude_boosts", "exclude_mentions", "exclude_polls",
          "pull_home", "pull_dms", "pull_notifications"});

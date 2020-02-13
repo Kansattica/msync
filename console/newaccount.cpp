@@ -40,6 +40,7 @@ void make_new_account(const std::string& accountname)
         useraccountpair = &options().add_new_account(accountname);
         useraccountpair->second.set_option(user_option::account_name, parsed->username);
         useraccountpair->second.set_option(user_option::instance_url, parsed->instance);
+        useraccountpair->second.set_option(user_option::file_version, "1");
     }
     else
     {

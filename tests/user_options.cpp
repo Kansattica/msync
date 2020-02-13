@@ -118,10 +118,11 @@ SCENARIO("An empty user_options writes to a file when destroyed")
 
                 const auto lines = read_lines(fi.filename);
 
-                REQUIRE(lines.size() == 3);
+                REQUIRE(lines.size() == 4);
                 REQUIRE(lines[0] == "account_name=somejerk");
-                REQUIRE(lines[1] == "instance_url=rude.website");
-                REQUIRE(lines[2] == "pull_dms=newest_first");
+                REQUIRE(lines[1] == "file_version=1");
+                REQUIRE(lines[2] == "instance_url=rude.website");
+                REQUIRE(lines[3] == "pull_dms=newest_first");
             }
 
             THEN("No .bak file is created.")
@@ -231,8 +232,9 @@ SCENARIO("The enum overload for get_option works.")
             {
                 auto lines = read_lines(fi.filename);
 
-                REQUIRE(lines.size() == 1);
-                REQUIRE(lines[0] == "pull_home=oldest_first");
+                REQUIRE(lines.size() == 2);
+                REQUIRE(lines[0] == "file_version=1");
+                REQUIRE(lines[1] == "pull_home=oldest_first");
             }
 
             AND_WHEN("a new user_options is created from that file")
@@ -259,8 +261,8 @@ SCENARIO("The boolean overload for get_option works.")
 
         WHEN("one of the five boolean options is asked for.")
         {
-            const auto option = GENERATE(user_option::exclude_boost, user_option::exclude_fav,
-                user_option::exclude_follow, user_option::exclude_mention, user_option::exclude_poll);
+            const auto option = GENERATE(user_option::exclude_boosts, user_option::exclude_favs,
+                user_option::exclude_follows, user_option::exclude_mentions, user_option::exclude_polls);
 
             const auto result = opt.get_bool_option(option);
 
@@ -277,8 +279,8 @@ SCENARIO("The boolean overload for get_option works.")
 
         WHEN("one of the five boolean options is set to 'true' or 'yes'.")
         {
-            const auto option = GENERATE(user_option::exclude_boost, user_option::exclude_fav,
-                user_option::exclude_follow, user_option::exclude_mention, user_option::exclude_poll);
+            const auto option = GENERATE(user_option::exclude_boosts, user_option::exclude_favs,
+                user_option::exclude_follows, user_option::exclude_mentions, user_option::exclude_polls);
 
             const auto value = GENERATE(as<std::string>{}, "true", "True", "TRUE", "yes", "Yes", "YES", "Yeehaw", "yeehaw", "t", "T", "y", "Y");
 
@@ -293,8 +295,8 @@ SCENARIO("The boolean overload for get_option works.")
 
         WHEN("one of the five boolean options is set to anything else")
         {
-            const auto option = GENERATE(user_option::exclude_boost, user_option::exclude_fav,
-                user_option::exclude_follow, user_option::exclude_mention, user_option::exclude_poll);
+            const auto option = GENERATE(user_option::exclude_boosts, user_option::exclude_favs,
+                user_option::exclude_follows, user_option::exclude_mentions, user_option::exclude_polls);
 
             const auto value = GENERATE(as<std::string>{}, "false", "no", "knock it off", "", ":(", "No");
 
@@ -311,18 +313,18 @@ SCENARIO("The boolean overload for get_option works.")
     GIVEN("A user_options with some of the exclude options set.")
     {
         user_options opt{fi.filename};
-        opt.set_bool_option(user_option::exclude_boost, true);
+        opt.set_bool_option(user_option::exclude_boosts, true);
 
         WHEN("one of the options that have boolean settings is asked for.")
         {
-			const auto option = GENERATE(user_option::exclude_boost, user_option::exclude_fav,
-                user_option::exclude_follow, user_option::exclude_mention, user_option::exclude_poll);
+			const auto option = GENERATE(user_option::exclude_boosts, user_option::exclude_favs,
+                user_option::exclude_follows, user_option::exclude_mentions, user_option::exclude_polls);
 
             const auto result = opt.get_bool_option(option);
 
             THEN("the result has the correct set or default value.")
             {
-                if (option == user_option::exclude_boost)
+                if (option == user_option::exclude_boosts)
                 {
                     REQUIRE(result == true);
                 }
@@ -343,8 +345,9 @@ SCENARIO("The boolean overload for get_option works.")
             {
                 auto lines = read_lines(fi.filename);
 
-                REQUIRE(lines.size() == 1);
+                REQUIRE(lines.size() == 2);
                 REQUIRE(lines[0] == "exclude_boosts=true");
+                REQUIRE(lines[1] == "file_version=1");
             }
 
             AND_WHEN("a new user_options is created from that file")
@@ -353,9 +356,9 @@ SCENARIO("The boolean overload for get_option works.")
 
                 THEN("it has the correct value.")
                 {
-                    REQUIRE(neweropt.get_bool_option(user_option::exclude_boost) == true);
-                    REQUIRE(*neweropt.try_get_option(user_option::exclude_boost) == "true");
-                    REQUIRE(neweropt.get_option(user_option::exclude_boost) == "true");
+                    REQUIRE(neweropt.get_bool_option(user_option::exclude_boosts) == true);
+                    REQUIRE(*neweropt.try_get_option(user_option::exclude_boosts) == "true");
+                    REQUIRE(neweropt.get_option(user_option::exclude_boosts) == "true");
                 }
             }
         }

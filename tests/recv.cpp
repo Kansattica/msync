@@ -298,9 +298,9 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 
 	GIVEN("A user account that excludes some notification types.")
 	{
-		account.second.set_bool_option(user_option::exclude_boost, true);
-		account.second.set_bool_option(user_option::exclude_follow, true);
-		account.second.set_bool_option(user_option::exclude_fav, false);
+		account.second.set_bool_option(user_option::exclude_boosts, true);
+		account.second.set_bool_option(user_option::exclude_follows, true);
+		account.second.set_bool_option(user_option::exclude_favs, false);
 
 		WHEN("That account is given to recv and told to update.")
 		{

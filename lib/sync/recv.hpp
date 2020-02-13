@@ -218,11 +218,11 @@ private:
 	{
 		static constexpr std::array<std::pair<user_option, std::string_view>, 5> option_name_pairs =
 		{
-			std::make_pair(user_option::exclude_follow, "follow"),
-			std::make_pair(user_option::exclude_fav, "favourite"),
-			std::make_pair(user_option::exclude_boost, "reblog"),
-			std::make_pair(user_option::exclude_mention, "mention"),
-			std::make_pair(user_option::exclude_poll, "poll")
+			std::make_pair(user_option::exclude_follows, "follow"),
+			std::make_pair(user_option::exclude_favs, "favourite"),
+			std::make_pair(user_option::exclude_boosts, "reblog"),
+			std::make_pair(user_option::exclude_mentions, "mention"),
+			std::make_pair(user_option::exclude_polls, "poll")
 		};
 
 		std::vector<std::string_view> toreturn;
