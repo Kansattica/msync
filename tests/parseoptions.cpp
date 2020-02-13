@@ -1283,11 +1283,13 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 
 				THEN("the options are parsed as expected")
 				{
+					CAPTURE(argv);
 					REQUIRE(parsed.okay);
 					REQUIRE(parsed.selected == mode::gen);
 					REQUIRE(parsed.account.empty());
 
 					REQUIRE(expected.filename == parsed.gen_opt.filename);
+					REQUIRE(expected.post.text == parsed.gen_opt.post.text);
 					REQUIRE(expected.post.attachments == parsed.gen_opt.post.attachments);
 					REQUIRE(expected.post.vis == parsed.gen_opt.post.vis);
 					REQUIRE(expected.post.descriptions == parsed.gen_opt.post.descriptions);
