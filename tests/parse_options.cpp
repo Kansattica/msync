@@ -6,7 +6,7 @@
 
 #include "test_helpers.hpp"
 
-#include "../console/optionparsing/parseoptions.hpp"
+#include "../console/optionparsing/parse_options.hpp"
 
 SCENARIO("The command line parser recognizes when the user wants to start a new account.")
 {
@@ -1133,7 +1133,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 
 		gen_options expected;
 		std::vector<command_line_option> options;
-		options.reserve(7);
+		options.reserve(8);
 
 		if (vis.first[0] != '\0')
 		{

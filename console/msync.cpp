@@ -14,8 +14,8 @@
 #include "../lib/sync/recv.hpp"
 #include "../lib/net/net.hpp"
 #include "../lib/util/util.hpp"
-#include "newaccount.hpp"
-#include "optionparsing/parseoptions.hpp"
+#include "new_account.hpp"
+#include "optionparsing/parse_options.hpp"
 
 std::pair<const std::string, user_options>& assume_account(std::pair<const std::string, user_options>* user);
 

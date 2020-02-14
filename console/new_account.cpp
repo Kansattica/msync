@@ -1,4 +1,4 @@
-#include "newaccount.hpp"
+#include "new_account.hpp"
 
 #include "../lib/options/global_options.hpp"
 #include "../lib/util/util.hpp"

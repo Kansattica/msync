@@ -1,7 +1,7 @@
 
 target_sources_local(optionparsing
 	PRIVATE
-        parseoptions.cpp
-        parseoptions.hpp
+        parse_options.cpp
+        parse_options.hpp
         selection_types.hpp
 )
