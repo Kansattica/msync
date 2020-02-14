@@ -1287,7 +1287,10 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 
 		WHEN("the command line is parsed")
 		{
-			std::vector<const char*> argv;
+			// static and doing the pass-by-mutable-ref thing because there's really no sense in 
+			// freeing and reallocating for every test case
+			// check_parse clears it every time, but keeps the capacity
+			 static std::vector<const char*> argv;
 
 			// exhaustively trying every permutation takes far too long once you get past 7 or 8
 			// so if there's more than that, randomly shuffle instead
