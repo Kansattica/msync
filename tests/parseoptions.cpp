@@ -1023,8 +1023,8 @@ bool flag_set(int combo, int position)
 
 struct command_line_option
 {
-	unsigned int order = 1000;
 	std::vector<const char*> options;
+	unsigned int order = 1000;
 
 	friend bool operator< (const command_line_option& lhs, const command_line_option& rhs)
 	{
@@ -1032,27 +1032,22 @@ struct command_line_option
 	}
 };
 
-command_line_option pick_attachment(int number, gen_options& expected)
+void pick_attachment(int number, gen_options& expected, std::vector<command_line_option>& options)
 {
-	command_line_option opt;
-
 	switch (number)
 	{
 	case 0:
-		opt.options.push_back("-f");
-		opt.options.push_back("someattach");
+		options.push_back(command_line_option{ {"-f", "someattach"} });
 		expected.post.attachments.push_back("someattach");
 		break;
 	case 1:
-		opt.options.push_back("--attach");
-		opt.options.push_back("attacher");
-		opt.options.push_back("somefile");
+		options.push_back(command_line_option{ {"--attach", "attacher"} });
+		options.push_back(command_line_option{ {"-f", "somefile"} });
 		expected.post.attachments.push_back("attacher");
 		expected.post.attachments.push_back("somefile");
 		break;
 	case 2:
-		opt.options.push_back("--file");
-		opt.options.push_back("filey");
+		options.push_back(command_line_option{ {"--file", "filey"} });
 		expected.post.attachments.push_back("filey");
 		break;
 	case 3:
@@ -1065,24 +1060,19 @@ command_line_option pick_attachment(int number, gen_options& expected)
 		//	expected.post.attachments.push_back("thirdattach");
 		//	break;
 	}
-	return opt;
 }
 
-command_line_option pick_description(int number, gen_options& expected)
+void pick_description(int number, gen_options& expected, std::vector<command_line_option>& options)
 {
-	command_line_option opt;
-
 	switch (number)
 	{
 	case 0:
-		opt.options.push_back("-d");
-		opt.options.push_back("somedescrip");
+		options.push_back(command_line_option{ {"-d", "somedescrip"} });
 		expected.post.descriptions.push_back("somedescrip");
 		break;
 	case 1:
-		opt.options.push_back("--description");
-		opt.options.push_back("describer");
-		opt.options.push_back("some file!");
+		options.push_back(command_line_option{ {"--description", "describer"} });
+		options.push_back(command_line_option{ {"-d", "some file!"} });
 		expected.post.descriptions.push_back("describer");
 		expected.post.descriptions.push_back("some file!");
 		break;
@@ -1101,7 +1091,6 @@ command_line_option pick_description(int number, gen_options& expected)
 	case 2:
 		break;
 	}
-	return opt;
 }
 
 auto pick_visibility()
@@ -1170,12 +1159,12 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 
 		if (attach != 3)
 		{
-			options.push_back(pick_attachment(attach, expected));
+			pick_attachment(attach, expected, options);
 		}
 
 		if (description != 2)
 		{
-			options.push_back(pick_description(description, expected));
+			pick_description(description, expected, options);
 		}
 
 		if (flag_set(combination, 0))

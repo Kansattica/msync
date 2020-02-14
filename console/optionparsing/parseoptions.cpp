@@ -83,8 +83,8 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 			 (option("-b", "--body", "--content") & value("body", ret.gen_opt.post.text)).doc("Specify a body for the post."),
 			 (option("-c", "--content-warning", "--cw") & value("warning", ret.gen_opt.post.content_warning)).doc("Set a content warning (or subject) for the post."),
 			 (option("-p", "--privacy", "--visibility") & visibilities).doc("Set the post's visibility."),
-			 (option("-f", "--file", "--attach") & values(match::prefix_not("-"), "file path", ret.gen_opt.post.attachments)).doc("Attach these files to the post."),
-			 (option("-d", "--description") & values("file description", ret.gen_opt.post.descriptions)).doc("Associate this description with the corresponding file."),
+			 repeatable(option("-f", "--file", "--attach") & value(match::prefix_not("-"), "file path", ret.gen_opt.post.attachments)).doc("Attach these files to the post."),
+			 repeatable(option("-d", "--description") & value(match::prefix_not("-"), "file description", ret.gen_opt.post.descriptions)).doc("Associate this description with the corresponding file."),
 			 (option("-r", "--reply-to") & value("reply_to", ret.gen_opt.post.reply_to_id)).doc("Reply to the specified post ID."),
 			 (option("-i", "--reply-id") & value("id", ret.gen_opt.post.reply_id)).doc("Set an ID so that this post can be replied to with --reply-to.")
 			) % "generate options");
