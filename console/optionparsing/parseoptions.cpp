@@ -85,7 +85,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 			 in_sequence(option("-r", "--reply-to"), value("reply_to", ret.gen_opt.post.reply_to_id)).doc("Reply to the specified post ID."),
 			 in_sequence(option("-i", "--reply-id"), value("id", ret.gen_opt.post.reply_id)).doc("Set an ID so that this post can be replied to with --reply-to."),
 			 in_sequence(option("-c", "--content-warning", "--cw"), value("warning", ret.gen_opt.post.content_warning)).doc("Set a content warning (or subject) for the post."),
-			 in_sequence(option("-b", "--body"), value("body", ret.gen_opt.post.text)).doc("Specify a body for the post."),
+			 in_sequence(option("-b", "--body", "--content"), value("body", ret.gen_opt.post.text)).doc("Specify a body for the post."),
 			 in_sequence(option("-p", "--privacy", "--visibility"), visibilities).doc("Set the post's visibility.")
 			) % "generate options");
 
