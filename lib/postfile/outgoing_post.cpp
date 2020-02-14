@@ -116,13 +116,17 @@ void Write(post_content&& post, std::ofstream& of)
 
 	fix_descriptions(post);
 
-	// maybe interleave attachment and description together?
+	// interleave attachment and description together
 	// so the description is next to the thing it describes
-	for (const auto& attachment : post.attachments)
-		of << "attach=" << attachment << '\n';
 
-	for (const auto& description : post.descriptions)
-		of << "description=" << description << '\n';
+	for (auto i = 0; i < post.attachments.size(); i++)
+	{
+		of << "attach=" << post.attachments[i] << '\n';
+
+		if (i < post.descriptions.size())
+			of << "description=" << post.descriptions[i] << '\n';
+
+	}
 
 	of << "visibility=" << VISIBILITIES[(int)post.vis][0] << '\n';
 
