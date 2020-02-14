@@ -16,7 +16,7 @@ constexpr std::array<std::array<std::string_view, 2>, 5> VISIBILITIES = { {
 } };
 
 constexpr std::array<std::string_view, 6> OPTIONS = {
-	"visibility", "cw", "reply_to", "attach", "descriptions", "reply_id"
+	"visibility", "cw", "reply_to", "attach", "description", "reply_id"
 };
 
 std::string post_content::visibility_string() const
@@ -115,20 +115,18 @@ void Write(post_content&& post, std::ofstream& of)
 	}
 
 	fix_descriptions(post);
-	if (!post.attachments.empty())
-	{
-		of << "attach=";
-		join_iterable(post.attachments.begin(), post.attachments.end(), vector_delimiter, of);
-		of << '\n';
-	}
 
-	if (!post.descriptions.empty())
-	{
-		of << "descriptions=";
-		join_iterable(post.descriptions.begin(), post.descriptions.end(), vector_delimiter, of);
-		of << '\n';
-	}
+	// interleave attachment and description together
+	// so the description is next to the thing it describes
 
+	for (auto i = 0; i < post.attachments.size(); i++)
+	{
+		of << "attach=" << post.attachments[i] << '\n';
+
+		if (i < post.descriptions.size())
+			of << "description=" << post.descriptions[i] << '\n';
+
+	}
 
 	of << "visibility=" << VISIBILITIES[(int)post.vis][0] << '\n';
 
@@ -211,11 +209,9 @@ void store_string(std::string& store_in, std::string_view value)
 	store_in = std::string{ value };
 }
 
-template <bool keepEmpty>
 void store_vector(std::vector<std::string>& store_in, const std::string_view value)
 {
-	const auto split = split_string<keepEmpty>(value, vector_delimiter);
-	store_in.insert(store_in.end(), split.begin(), split.end());
+	store_in.push_back(std::string{ value });
 }
 
 void parse_option(post_content& post, size_t option_index, const std::string_view value)
@@ -225,7 +221,7 @@ void parse_option(post_content& post, size_t option_index, const std::string_vie
 	static_assert(OPTIONS[1] == "cw");
 	static_assert(OPTIONS[2] == "reply_to");
 	static_assert(OPTIONS[3] == "attach");
-	static_assert(OPTIONS[4] == "descriptions");
+	static_assert(OPTIONS[4] == "description");
 	static_assert(OPTIONS[5] == "reply_id");
 
 	switch (option_index)
@@ -241,13 +237,14 @@ void parse_option(post_content& post, size_t option_index, const std::string_vie
 		store_string(post.reply_to_id, value);
 		break;
 	case 3:
-		// attachments are a comma-separated list
-		store_vector<false>(post.attachments, value);
+		// there can be multiple attachments
+		if (!value.empty())
+			store_vector(post.attachments, value);
 		break;
 	case 4:
-		// so are descriptions
+		// same with descriptions
 		// note that it's okay to have an empty description, but not an empty attachment
-		store_vector<true>(post.descriptions, value);
+		store_vector(post.descriptions, value);
 		break;
 	case 5:
 		// reply_ids are just strings
