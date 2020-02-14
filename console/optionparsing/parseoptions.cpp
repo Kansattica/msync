@@ -79,14 +79,14 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 
 	const auto genMode = (command("gen", "generate").set(ret.selected, mode::gen).doc("Generate a post template in the current folder. Edit this file afterwards to add a body.") &
 			(
-			 (option("-o", "--output") & value("filename", ret.gen_opt.filename)).doc("Specify an output file. Default is new_post."),
-			 (option("-b", "--body", "--content") & value("body", ret.gen_opt.post.text)).doc("Specify a body for the post."),
-			 (option("-c", "--content-warning", "--cw") & value("warning", ret.gen_opt.post.content_warning)).doc("Set a content warning (or subject) for the post."),
-			 (option("-p", "--privacy", "--visibility") & visibilities).doc("Set the post's visibility."),
-			 repeatable(option("-f", "--file", "--attach") & value(match::prefix_not("-"), "file path", ret.gen_opt.post.attachments)).doc("Attach these files to the post."),
-			 repeatable(option("-d", "--description") & value(match::prefix_not("-"), "file description", ret.gen_opt.post.descriptions)).doc("Associate this description with the corresponding file."),
-			 (option("-r", "--reply-to") & value("reply_to", ret.gen_opt.post.reply_to_id)).doc("Reply to the specified post ID."),
-			 (option("-i", "--reply-id") & value("id", ret.gen_opt.post.reply_id)).doc("Set an ID so that this post can be replied to with --reply-to.")
+			 repeatable(in_sequence(option("-d", "--description") & value("file description", ret.gen_opt.post.descriptions))).doc("Associate this description with the corresponding file."),
+			 repeatable(in_sequence(option("-f", "--file", "--attach") & value("file path", ret.gen_opt.post.attachments))).doc("Attach these files to the post."),
+			 in_sequence(option("-o", "--output"), value("filename", ret.gen_opt.filename)).doc("Specify an output file. Default is new_post."),
+			 in_sequence(option("-r", "--reply-to"), value("reply_to", ret.gen_opt.post.reply_to_id)).doc("Reply to the specified post ID."),
+			 in_sequence(option("-i", "--reply-id"), value("id", ret.gen_opt.post.reply_id)).doc("Set an ID so that this post can be replied to with --reply-to."),
+			 in_sequence(option("-c", "--content-warning", "--cw"), value("warning", ret.gen_opt.post.content_warning)).doc("Set a content warning (or subject) for the post."),
+			 in_sequence(option("-b", "--body"), value("body", ret.gen_opt.post.text)).doc("Specify a body for the post."),
+			 in_sequence(option("-p", "--privacy", "--visibility"), visibilities).doc("Set the post's visibility.")
 			) % "generate options");
 
 	const auto queueMode = (command("queue", "q").set(ret.selected, mode::queue).doc("Manage queued favs, boosts, and posts") &
