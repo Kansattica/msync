@@ -169,24 +169,15 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 			if (visibility.first[0] != '\0')
 				of << "visibility=" << visibility.first << '\n';
 
-			if (!attachments.empty())
+
+			for (const auto& attach : attachments)
 			{
-				of << "attach=";
-				for (const auto& attach : attachments)
-				{
-					of << attach << '`';
-				}
-				of << '\n';
+				of << "attach=" << attach << '\n';
 			}
 
-			if (!descriptions.empty())
+			for (const auto& describe : descriptions)
 			{
-				of << "descriptions=";
-				for (const auto& describe : descriptions)
-				{
-					of << describe << '`';
-				}
-				of << '\n';
+				of << "description=" << describe << '\n';
 			}
 
 			if (snip)
@@ -234,12 +225,6 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 
 					if (attachments.size() < descriptions.size())
 						descriptions.resize(attachments.size());
-
-					// if the last description is empty, that's okay, just remove it
-					// an attachment with an empty description is the same as an attachment with no description
-					// but we want to honor empty descriptions in the middle in case some attachments have descriptions and some don't.
-					if (!descriptions.empty() && descriptions.back().empty())
-						descriptions.pop_back();
 
 					REQUIRE(result.parsed.descriptions == descriptions);
 
