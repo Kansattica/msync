@@ -1,6 +1,7 @@
 #include <catch2/catch.hpp>
 
 #include <vector>
+#include <random>
 #include <algorithm>
 #include <utility>
 
@@ -1119,6 +1120,37 @@ auto pick_visibility()
 	return std::make_pair("Well, this shouldn't happen.", visibility::default_vis);
 }
 
+void check_parse(std::vector<const char*>& argv, const std::vector<command_line_option>& options, const gen_options& expected)
+{
+	if (flip_coin())
+		argv = { "msync", "gen" };
+	else
+		argv = { "msync", "generate" };
+
+	for (const auto& option : options)
+	{
+		argv.insert(argv.end(), option.options.begin(), option.options.end());
+	}
+
+	const auto parsed = parse((int)argv.size(), argv.data());
+
+	THEN("the options are parsed as expected")
+	{
+		CAPTURE(argv);
+		REQUIRE(parsed.okay);
+		REQUIRE(parsed.selected == mode::gen);
+		REQUIRE(parsed.account.empty());
+
+		REQUIRE(expected.filename == parsed.gen_opt.filename);
+		REQUIRE(expected.post.text == parsed.gen_opt.post.text);
+		REQUIRE(expected.post.attachments == parsed.gen_opt.post.attachments);
+		REQUIRE(expected.post.vis == parsed.gen_opt.post.vis);
+		REQUIRE(expected.post.descriptions == parsed.gen_opt.post.descriptions);
+		REQUIRE(expected.post.content_warning == parsed.gen_opt.post.content_warning);
+		REQUIRE(expected.post.reply_to_id == parsed.gen_opt.post.reply_to_id);
+		REQUIRE(expected.post.reply_id == parsed.gen_opt.post.reply_id);
+	}
+}
 
 SCENARIO("The command line parser recognizes when the user wants to generate a file.", "[long_run]")
 {
@@ -1126,7 +1158,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 	{
 		// try every combination of bits. note that the ranges are half-open, including the 0 and excluding the maximum.
 		// this test isn't as exhaustive as it could be, because if it was, it'd take forever to run
-		const auto combination = GENERATE(range(0, 0b1111 + 1));
+		const auto combination = GENERATE(range(0, 0b11111 + 1));
 		const auto attach = GENERATE(0, 1, 2, 3);
 		const auto description = GENERATE(0, 1, 2);
 		const auto vis = pick_visibility();
@@ -1215,7 +1247,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 			options.push_back(std::move(opt));
 		}
 
-		if (flip_coin())
+		if (flag_set(combination, 3))
 		{
 			command_line_option opt;
 			if (flip_coin())
@@ -1228,7 +1260,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 			options.push_back(std::move(opt));
 		}
 
-		if (flag_set(combination, 3))
+		if (flag_set(combination, 4))
 		{
 			command_line_option opt;
 			switch (zero_to_n(2))
@@ -1252,42 +1284,30 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		for (unsigned int i = 0; i < options.size(); i++)
 			options[i].order = i;
 
-		std::vector<const char*> argv;
 
 		WHEN("the command line is parsed")
 		{
-			do
+			std::vector<const char*> argv;
+
+			// exhaustively trying every permutation takes far too long once you get past 7 or 8
+			// so if there's more than that, randomly shuffle instead
+			if (options.size() <= 7)
 			{
-				if (flip_coin())
-					argv = { "msync", "gen" };
-				else
-					argv = { "msync", "generate" };
-
-				for (const auto& option : options)
+				do
 				{
-					argv.insert(argv.end(), option.options.begin(), option.options.end());
-				}
-
-				const auto parsed = parse((int)argv.size(), argv.data());
-
-				THEN("the options are parsed as expected")
+					check_parse(argv, options, expected);
+				} while (std::next_permutation(options.begin(), options.end()));
+			}
+			else
+			{
+				static std::random_device rd;
+				static std::mt19937 g(rd());
+				for (int i = 0; i < 5000; i++)
 				{
-					CAPTURE(argv);
-					REQUIRE(parsed.okay);
-					REQUIRE(parsed.selected == mode::gen);
-					REQUIRE(parsed.account.empty());
-
-					REQUIRE(expected.filename == parsed.gen_opt.filename);
-					REQUIRE(expected.post.text == parsed.gen_opt.post.text);
-					REQUIRE(expected.post.attachments == parsed.gen_opt.post.attachments);
-					REQUIRE(expected.post.vis == parsed.gen_opt.post.vis);
-					REQUIRE(expected.post.descriptions == parsed.gen_opt.post.descriptions);
-					REQUIRE(expected.post.content_warning == parsed.gen_opt.post.content_warning);
-					REQUIRE(expected.post.reply_to_id == parsed.gen_opt.post.reply_to_id);
-					REQUIRE(expected.post.reply_id == parsed.gen_opt.post.reply_id);
+					check_parse(argv, options, expected);
+					std::shuffle(options.begin(), options.end(), g);
 				}
-
-			} while (std::next_permutation(options.begin(), options.end()));
+			}
 
 		}
 	}
