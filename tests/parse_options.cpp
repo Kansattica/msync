@@ -1125,8 +1125,8 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 	GIVEN("A combination of options for the file generator")
 	{
 		// try every combination of bits. note that the ranges are half-open, including the 0 and excluding the maximum.
-		const auto combination = GENERATE(range(0, 0b11111 + 1));
-		const auto longcommand = GENERATE(true, false);
+		// this test isn't as exhaustive as it could be, because if it was, it'd take forever to run
+		const auto combination = GENERATE(range(0, 0b1111 + 1));
 		const auto attach = GENERATE(0, 1, 2, 3);
 		const auto description = GENERATE(0, 1, 2);
 		const auto vis = pick_visibility();
@@ -1215,7 +1215,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 			options.push_back(std::move(opt));
 		}
 
-		if (flag_set(combination, 3))
+		if (flip_coin())
 		{
 			command_line_option opt;
 			if (flip_coin())
@@ -1228,7 +1228,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 			options.push_back(std::move(opt));
 		}
 
-		if (flag_set(combination, 4))
+		if (flag_set(combination, 3))
 		{
 			command_line_option opt;
 			switch (zero_to_n(2))
@@ -1258,7 +1258,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		{
 			do
 			{
-				if (longcommand)
+				if (flip_coin())
 					argv = { "msync", "gen" };
 				else
 					argv = { "msync", "generate" };
