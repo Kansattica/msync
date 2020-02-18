@@ -69,7 +69,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 	GIVEN("A command line setting an option without an account.")
 	{
 		int argc = 4;
-		char const* argv[]{ "msync", "config", "accesstoken", "sometoken" };
+		char const* argv[]{ "msync", "config", "access_token", "sometoken" };
 
 		WHEN("the command line is parsed")
 		{
@@ -105,7 +105,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 	GIVEN("A command line setting an option with an account.")
 	{
 		int argc = 6;
-		char const* argv[]{ "msync", "config", "clientsecret", "asecret!", "-a", "jerk@fun.website" };
+		char const* argv[]{ "msync", "config", "client_secret", "asecret!", "-a", "jerk@fun.website" };
 
 		WHEN("the command line is parsed")
 		{
@@ -141,7 +141,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 	GIVEN("A command line reading an option without an account.")
 	{
 		int argc = 3;
-		char const* argv[]{ "msync", "config", "accountname" };
+		char const* argv[]{ "msync", "config", "account_name" };
 
 		WHEN("the command line is parsed")
 		{
@@ -177,7 +177,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 	GIVEN("A command line reading an option with an account.")
 	{
 		int argc = 5;
-		char const* argv[]{ "msync", "config", "instanceurl", "-a", "niceperson@impolite.egg" };
+		char const* argv[]{ "msync", "config", "instance_url", "-a", "niceperson@impolite.egg" };
 
 		WHEN("the command line is parsed")
 		{

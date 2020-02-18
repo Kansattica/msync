@@ -88,7 +88,7 @@ void make_new_account(const std::string& accountname)
            << "https://" << instanceurl << "/oauth/authorize?response_type=code&client_id=" << *client_id
            << "&redirect_uri=" << redirect_uri << "&scope=" << urlscopes << '\n'
            << "Enter your authorization code like so:\n"
-           << "msync config authcode <the authorization code from the site> -a " << foundaccountname << "@" << instanceurl << '\n'
+           << "msync config auth_code <the authorization code from the site> -a " << foundaccountname << "@" << instanceurl << '\n'
            << "then run this again:\n"
            << "msync new -a " << foundaccountname << "@" << instanceurl << '\n'
            << "You can shorten the username part, as long as msync can figure out which registered account you're talking about.\n"

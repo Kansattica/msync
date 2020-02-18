@@ -25,17 +25,17 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 	parse_result ret;
 
 	const auto settableoptions = (one_of(
-				command("accesstoken").set(ret.toset, user_option::access_token).set(ret.selected, mode::showopt),
-				command("authcode").set(ret.toset, user_option::auth_code).set(ret.selected, mode::showopt),
-				command("accountname").set(ret.toset, user_option::account_name).set(ret.selected, mode::showopt),
-				command("instanceurl").set(ret.toset, user_option::instance_url).set(ret.selected, mode::showopt),
-				command("clientid").set(ret.toset, user_option::client_id).set(ret.selected, mode::showopt),
-				command("clientsecret").set(ret.toset, user_option::client_secret).set(ret.selected, mode::showopt),
-				command("excludeboosts").set(ret.toset, user_option::exclude_boosts).set(ret.selected, mode::showopt),
-				command("excludefavs").set(ret.toset, user_option::exclude_favs).set(ret.selected, mode::showopt),
-				command("excludefollows").set(ret.toset, user_option::exclude_follows).set(ret.selected, mode::showopt),
-				command("excludementions").set(ret.toset, user_option::exclude_mentions).set(ret.selected, mode::showopt),
-				command("excludepolls").set(ret.toset, user_option::exclude_polls).set(ret.selected, mode::showopt)));
+				command("access_token").set(ret.toset, user_option::access_token).set(ret.selected, mode::showopt),
+				command("auth_code").set(ret.toset, user_option::auth_code).set(ret.selected, mode::showopt),
+				command("account_name").set(ret.toset, user_option::account_name).set(ret.selected, mode::showopt),
+				command("instance_url").set(ret.toset, user_option::instance_url).set(ret.selected, mode::showopt),
+				command("client_id").set(ret.toset, user_option::client_id).set(ret.selected, mode::showopt),
+				command("client_secret").set(ret.toset, user_option::client_secret).set(ret.selected, mode::showopt),
+				command("exclude_boosts").set(ret.toset, user_option::exclude_boosts).set(ret.selected, mode::showopt),
+				command("exclude_favs").set(ret.toset, user_option::exclude_favs).set(ret.selected, mode::showopt),
+				command("exclude_follows").set(ret.toset, user_option::exclude_follows).set(ret.selected, mode::showopt),
+				command("exclude_mentions").set(ret.toset, user_option::exclude_mentions).set(ret.selected, mode::showopt),
+				command("exclude_polls").set(ret.toset, user_option::exclude_polls).set(ret.selected, mode::showopt)));
 
 	const auto newaccount = (command("new").set(ret.selected, mode::newuser)).doc("Register a new account with msync. Start here.");
 	const auto configMode = (command("config").set(ret.selected, mode::config).doc("Set and show account-specific options.") &
