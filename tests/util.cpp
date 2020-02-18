@@ -292,10 +292,12 @@ SCENARIO("clean_up_html removes HTML tags and entities.")
 	GIVEN("A string with some HTML tags and/or entities in it.")
 	{
 		const auto tostrip = GENERATE(
-			std::make_tuple("<p>this is what</p><p>line breaks look like</p>", "this is what\nline breaks look like"),
+			std::make_tuple("<p>this is what</p><p>line breaks look like</p>", "this is what\n\nline breaks look like"),
 			std::make_tuple("this is what<br><br/>line breaks look like", "this is what\n\nline breaks look like"),
 			std::make_tuple("<p>this is a test<br />ignore this</p>", "this is a test\nignore this"),
 			std::make_tuple("<p>this is a test<br/><br /><br  />ignore this</p>", "this is a test\n\n\nignore this"),
+			std::make_tuple("<p>paragraph tags can have</p> <p>space between</p>\t <p>them.</p>", "paragraph tags can have\n\nspace between\n\nthem."),
+			std::make_tuple("<p>paragraph tags<br/>can<br>have</p> <p><br>space between</p>\t <p>them.</p>", "paragraph tags\ncan\nhave\n\n\nspace between\n\nthem."),
 			std::make_tuple("<p>hello there</p>", "hello there"),
 			std::make_tuple("<p>I'm here</p><div> for you</dove>", "I'm here for you"),
 			std::make_tuple("<p>I&apos;m here</p><div> for you</dove>", "I'm here for you"),

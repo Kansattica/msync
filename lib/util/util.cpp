@@ -31,20 +31,26 @@ std::string clean_up_html(std::string_view to_strip)
 	if (to_strip.empty()) { return {}; }
 
 	const static std::regex remove_tags{ "<[^<]*>" };
-	const static std::regex replace_newlines{ "</p><p>|<br */?>" };
+	const static std::regex replace_line_breaks{ "<br */?>" };
+	const static std::regex replace_paragraph_breaks{ "</p>\\s*<p>" };
 
 	// regex_replace will always keep the string the same length or make it shorter, so it won't cause an overflow
 	// the author of decode_html_entities says the same thing
 	// I think the +1 here is necessary because .size() doesn't account for the null terminator that decode_html_entities will want.
 	// either way, one extra byte won't hurt
 
-	std::string temp_buffer(to_strip.size() + 1, '\0');
+	//
 
-	const auto end_of_output = std::regex_replace(&temp_buffer[0], to_strip.begin(), to_strip.end(), replace_newlines, "\n");
+	std::string line_break_temp_buffer(to_strip.size() + 1, '\0');
 
-	temp_buffer.resize(end_of_output - &temp_buffer[0]);
+	auto end_of_output = std::regex_replace(&line_break_temp_buffer[0], to_strip.begin(), to_strip.end(), replace_line_breaks, "\n");
 
-	std::string output_buffer = std::regex_replace(temp_buffer, remove_tags, "");
+	std::string par_break_temp_buffer(line_break_temp_buffer.size() + 1, '\0');
+
+	end_of_output = std::regex_replace(&par_break_temp_buffer[0], &line_break_temp_buffer[0], end_of_output, replace_paragraph_breaks, "\n\n");
+	par_break_temp_buffer.resize(end_of_output - &par_break_temp_buffer[0]);
+
+	std::string output_buffer = std::regex_replace(par_break_temp_buffer, remove_tags, "");
 
 	const size_t decoded_length = decode_html_entities_utf8(&output_buffer[0], nullptr);
 
