@@ -26,7 +26,7 @@ std::optional<parsed_account> parse_account_name(const std::string& name)
 // if src is null, modifies dest in place
 extern "C" size_t decode_html_entities_utf8(char* dest, const char* src);
 
-std::string clean_up_html(std::string_view to_strip)
+std::string clean_up_html(const std::string_view to_strip)
 {
 	if (to_strip.empty()) { return {}; }
 
@@ -39,7 +39,9 @@ std::string clean_up_html(std::string_view to_strip)
 	// I think the +1 here is necessary because .size() doesn't account for the null terminator that decode_html_entities will want.
 	// either way, one extra byte won't hurt
 
-	//
+	// this is kind of a rat's nest both to avoid allocations (each regex replace requires one, but decode_html_entities is in-place)
+	// and because we have to jump through some hoops in order to read from a string_view, because std::regex doesn't know about string views
+	// (we take a string_view to avoid an allocation on the way in, at least)
 
 	std::string line_break_temp_buffer(to_strip.size() + 1, '\0');
 

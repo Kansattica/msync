@@ -60,7 +60,7 @@ SCENARIO("read_status correctly reads and cleans the relevant fields from a JSON
 				REQUIRE(status.author.id == "1");
 				REQUIRE(status.author.account_name == "BestGirlGrace");
 				REQUIRE(status.author.display_name == "Secret Government Grace :qvp:");
-				REQUIRE(status.author.note == "The buzz in your brain, the tingle behind your eyes, the good girl sneaking through your thoughts. Your favorite free-floating, reality-hacking, mind-tweaking, shitposting, horny, skunky, viral, infowitch.\nHeader by @CorruptveSpirit@twitter, avi by @dogscribss@twitter");
+				REQUIRE(status.author.note == "The buzz in your brain, the tingle behind your eyes, the good girl sneaking through your thoughts. Your favorite free-floating, reality-hacking, mind-tweaking, shitposting, horny, skunky, viral, infowitch.\n\nHeader by @CorruptveSpirit@twitter, avi by @dogscribss@twitter");
 				REQUIRE(status.author.url == "https://test.website.egg/@BestGirlGrace");
 				REQUIRE(status.author.avatar == "https://test.website.egg/system/accounts/avatars/000/000/001/original/2c3b6b7ff75a3d40.gif?1573254299");
 				REQUIRE(status.author.fields == expected_fields);
@@ -139,7 +139,7 @@ SCENARIO("read_status correctly reads and cleans the relevant fields from a JSON
 				REQUIRE(status.author.id == "1");
 				REQUIRE(status.author.account_name == "BestGirlGrace");
 				REQUIRE(status.author.display_name == "Vx. Modemoiselle :qvp:");
-				REQUIRE(status.author.note == "The buzz in your brain, the tingle behind your eyes, the good girl sneaking through your thoughts. Your favorite free-floating, reality-hacking, mind-tweaking, shitposting, horny, skunky, viral, infowitch.\nHeader by @CorruptveSpirit@twitter, avi by @dogscribss@twitter");
+				REQUIRE(status.author.note == "The buzz in your brain, the tingle behind your eyes, the good girl sneaking through your thoughts. Your favorite free-floating, reality-hacking, mind-tweaking, shitposting, horny, skunky, viral, infowitch.\n\nHeader by @CorruptveSpirit@twitter, avi by @dogscribss@twitter");
 				REQUIRE(status.author.url == "https://test.website.egg/@BestGirlGrace");
 				REQUIRE(status.author.avatar == "https://test.website.egg/system/accounts/avatars/000/000/001/original/2c3b6b7ff75a3d40.gif?1573254299");
 				REQUIRE(status.author.fields == expected_fields);
@@ -184,7 +184,7 @@ SCENARIO("read_status correctly reads and cleans the relevant fields from a JSON
 				REQUIRE(status.author.id == "1");
 				REQUIRE(status.author.account_name == "BestGirlGrace");
 				REQUIRE(status.author.display_name == "Vx. Modemoiselle :qvp:");
-				REQUIRE(status.author.note == "The buzz in your brain, the tingle behind your eyes, the good girl sneaking through your thoughts. Your favorite free-floating, reality-hacking, mind-tweaking, shitposting, horny, skunky, viral, infowitch.\nHeader by @CorruptveSpirit@twitter, avi by @dogscribss@twitter");
+				REQUIRE(status.author.note == "The buzz in your brain, the tingle behind your eyes, the good girl sneaking through your thoughts. Your favorite free-floating, reality-hacking, mind-tweaking, shitposting, horny, skunky, viral, infowitch.\n\nHeader by @CorruptveSpirit@twitter, avi by @dogscribss@twitter");
 				REQUIRE(status.author.url == "https://test.website.egg/@BestGirlGrace");
 				REQUIRE(status.author.avatar == "https://test.website.egg/system/accounts/avatars/000/000/001/original/2c3b6b7ff75a3d40.gif?1573254299");
 				REQUIRE(status.author.fields == expected_fields);
@@ -228,7 +228,7 @@ SCENARIO("read_status correctly reads and cleans the relevant fields from a JSON
 				REQUIRE(status.author.id == "1");
 				REQUIRE(status.author.account_name == "BestGirlGrace");
 				REQUIRE(status.author.display_name == "Vx. Modemoiselle :qvp:");
-				REQUIRE(status.author.note == "The buzz in your brain, the tingle behind your eyes, the good girl sneaking through your thoughts. Your favorite free-floating, reality-hacking, mind-tweaking, shitposting, horny, skunky, viral, infowitch.\nHeader by @CorruptveSpirit@twitter, avi by @dogscribss@twitter");
+				REQUIRE(status.author.note == "The buzz in your brain, the tingle behind your eyes, the good girl sneaking through your thoughts. Your favorite free-floating, reality-hacking, mind-tweaking, shitposting, horny, skunky, viral, infowitch.\n\nHeader by @CorruptveSpirit@twitter, avi by @dogscribss@twitter");
 				REQUIRE(status.author.url == "https://test.website.egg/@BestGirlGrace");
 				REQUIRE(status.author.avatar == "https://test.website.egg/system/accounts/avatars/000/000/001/original/2c3b6b7ff75a3d40.gif?1573254299");
 				REQUIRE(status.author.fields == expected_fields);
@@ -271,7 +271,7 @@ SCENARIO("read_statuses correctly reads and cleans the relevant fields from an a
 				REQUIRE(statuses[0].author.id == "1");
 				REQUIRE(statuses[0].author.account_name == "BestGirlGrace");
 				REQUIRE(statuses[0].author.display_name == "Secret Government Grace :qvp:");
-				REQUIRE(statuses[0].author.note == "The buzz in your brain, the tingle behind your eyes, the good girl sneaking through your thoughts. Your favorite free-floating, reality-hacking, mind-tweaking, shitposting, horny, skunky, viral, infowitch.\nHeader by @CorruptveSpirit@twitter, avi by @dogscribss@twitter");
+				REQUIRE(statuses[0].author.note == "The buzz in your brain, the tingle behind your eyes, the good girl sneaking through your thoughts. Your favorite free-floating, reality-hacking, mind-tweaking, shitposting, horny, skunky, viral, infowitch.\n\nHeader by @CorruptveSpirit@twitter, avi by @dogscribss@twitter");
 				REQUIRE(statuses[0].author.url == "https://test.website.egg/@BestGirlGrace");
 				REQUIRE(statuses[0].author.avatar == "https://test.website.egg/system/accounts/avatars/000/000/001/original/2c3b6b7ff75a3d40.gif?1573254299");
 				REQUIRE(statuses[0].author.fields == expected_fields);
