@@ -52,16 +52,16 @@ int main(int argc, const char* argv[])
 			show_all_options(options().select_account(parsed.account), parsed);
 			break;
 		case mode::config:
-			assume_account(parsed.account).second.set_option(parsed.toset, parsed.optionval);
 			should_print_newline = false;
+			assume_account(parsed.account).second.set_option(parsed.toset, parsed.optionval);
 			break;
 		case mode::configsync:
-			assume_account(parsed.account).second.set_option(parsed.toset, parsed.sync_opts.mode);
 			should_print_newline = false;
+			assume_account(parsed.account).second.set_option(parsed.toset, parsed.sync_opts.mode);
 			break;
 		case mode::configlist:
-			assume_account(parsed.account).second.set_option(parsed.toset, parsed.listops);
 			should_print_newline = false;
+			assume_account(parsed.account).second.set_option(parsed.toset, parsed.listops);
 			break;
 		case mode::queue:
 			should_print_newline = false;
@@ -89,8 +89,8 @@ int main(int argc, const char* argv[])
 		pl() << "Wrote post template to " << parsed.gen_opt.filename;
 		break;
 		case mode::sync:
-			do_sync(parsed);
 			should_print_newline = false;
+			do_sync(parsed);
 			break;
 		case mode::help:
 			should_print_newline = false;
