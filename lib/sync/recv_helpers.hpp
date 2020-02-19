@@ -4,6 +4,8 @@
 #include <string_view>
 #include <string>
 
+#include "../options/user_options.hpp"
+
 #include "../constants/constants.hpp"
 
 #include "read_response.hpp"
