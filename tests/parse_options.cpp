@@ -1290,7 +1290,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 			// static and doing the pass-by-mutable-ref thing because there's really no sense in 
 			// freeing and reallocating for every test case
 			// check_parse clears it every time, but keeps the capacity
-			 static std::vector<const char*> argv;
+			static std::vector<const char*> argv;
 
 			// exhaustively trying every permutation takes far too long once you get past 7 or 8
 			// so if there's more than that, randomly shuffle instead
@@ -1303,9 +1303,8 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 			}
 			else
 			{
-				static std::random_device rd;
-				static std::mt19937 g(rd());
-				for (int i = 0; i < 5000; i++)
+				static std::mt19937 g(std::random_device{}());
+				for (int i = 0; i < 6000; i++)
 				{
 					check_parse(argv, options, expected);
 					std::shuffle(options.begin(), options.end(), g);
