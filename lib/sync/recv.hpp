@@ -213,28 +213,6 @@ private:
 
 		return highest_id_seen;
 	}
-
-	std::vector<std::string_view> make_excludes(const user_options& account)
-	{
-		static constexpr std::array<std::pair<user_option, std::string_view>, 5> option_name_pairs =
-		{
-			std::make_pair(user_option::exclude_follows, "follow"),
-			std::make_pair(user_option::exclude_favs, "favourite"),
-			std::make_pair(user_option::exclude_boosts, "reblog"),
-			std::make_pair(user_option::exclude_mentions, "mention"),
-			std::make_pair(user_option::exclude_polls, "poll")
-		};
-
-		std::vector<std::string_view> toreturn;
-
-		for (const auto& pair : option_name_pairs)
-		{
-			if (account.get_bool_option(pair.first))
-				toreturn.push_back(pair.second);
-		}
-
-		return toreturn;
-	}
 };
 
 #endif
