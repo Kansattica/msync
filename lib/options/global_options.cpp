@@ -37,9 +37,9 @@ global_options::global_options() : account_directory_location(get_exe_location()
 
 	for (const auto& userfolder : fs::directory_iterator(account_directory_location))
 	{
-		if (!fs::is_directory(userfolder))
+		if (!userfolder.is_directory())
 		{
-			plverb() << userfolder << " is not a directory. Skipping.\n";
+			plverb() << userfolder.path() << " is not a directory. Skipping.\n";
 			continue;
 		}
 
