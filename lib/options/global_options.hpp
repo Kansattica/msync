@@ -8,6 +8,7 @@
 #include <string_view>
 #include <utility>
 #include <algorithm>
+#include <vector>
 
 struct global_options
 {
