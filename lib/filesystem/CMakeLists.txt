@@ -13,11 +13,12 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 		message (WARNING "MSVC version is under 1910 (detected ${MSVC_VERSION}), so you might not have the std::filesystem support msync requires." )
     endif()
 else()
-	find_package(Filesystem REQUIRED)
+	find_package(Filesystem)
 
     if (NOT CXX_FILESYSTEM_HAVE_FS)
 		#see https://en.cppreference.com/w/cpp/compiler_support
 		message (WARNING "msync requires std::filesystem support (gcc 8+, clang 7+, or MSVC 2017+) and couldn't find it. Will try to continue anyways." )
+		target_link_libraries(filesystem INTERFACE -lstdc++fs)
     else ()
         target_link_libraries(filesystem INTERFACE ${CXX_FILESYSTEM_NAMESPACE})
 	endif()
