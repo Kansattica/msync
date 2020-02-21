@@ -77,3 +77,10 @@ Posts are a little different. You still queue them up to be sent when you next `
     - use the same (or whatever necessary) visibility setting- msync will default to whatever your account's default visibility setting is. 
     - include their @ handle in the body
     - include a CW, if needed
+- If you'd like to queue up a thread of posts all at once, you can use `msync`'s reply ID feature. It works like this:
+    - If you'd like to reply to a post, assign it a reply ID. You can do this by passing the `--reply-id <id>` option to `msync gen`. The ID can be any string, but for this to work, you must reproduce it exactly, including any spaces.  I like to use `first`, `second`, `third`, and so on.
+    - If you'd like a post to be a reply, pass the `--reply-to <id>` option to `msync gen`. There are two valid values for `reply_to`:
+        - The status ID of a post that's already been published.
+        - The `reply_id` of a post queued in front of this one. 
+    - Basically, when you run `msync sync`, your queued posts are sent as normal. If a post has a `reply_id`, after it's published, any posts with a `reply_to` equal to that `reply_id` will have their `reply_to` set to the actual published ID of that post. This will persist even if the subsequent post fails to send for some reason. 
+    - If a post has an invalid `reply_to`, the remote server won't accept it. You can edit the queued version of the post in `msync_accounts/<username@instance.url>/queuedposts` and sync again.
