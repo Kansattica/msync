@@ -19,7 +19,7 @@ matrix:
 before_install:
   - if [ "$TRAVIS_COMPILER" = "gcc" ]; then sudo -E apt-get -yqq --no-install-suggests --no-install-recommends install g++-8 && CC=gcc-8 && CXX=g++-8; fi
   - if [ "$TRAVIS_COMPILER" = "clang" ]; then sudo -E apt-get -yqq --no-install-suggests --no-install-recommends install clang-7 llvm-7-dev && CC="/usr/bin/clang-7" && CXX="/usr/bin/clang++-7"; fi
-  #- if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo -E apt -yqq install --fix-missing libstdc++-8-dev; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo -E apt -yqq install --fix-missing libstdc++-8-dev; fi
 
 script:
   - mkdir build
