@@ -5,3 +5,7 @@ target_link_libraries(tests PRIVATE Catch2::Catch2 options optionparsing constan
 add_executable(net_tests "")
 target_sources_local(net_tests PRIVATE main.cpp test_https.cpp)
 target_link_libraries(net_tests PRIVATE Catch2::Catch2 ${CPR_LIBRARIES})
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	set_target_properties(net_tests PROPERTIES LINK_FLAGS "-Wno-odr")
+endif()

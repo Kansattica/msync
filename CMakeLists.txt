@@ -72,6 +72,10 @@ target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options queue 
 
 target_link_libraries(msync PRIVATE options optionparsing printlog ${CPR_LIBRARIES} util nlohmann_json::nlohmann_json exception postfile queue sync net netinterface)
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	set_target_properties(msync PROPERTIES LINK_FLAGS "-Wno-odr")
+endif()
+
 if (MSYNC_BUILD_TESTS)
 	add_subdirectory(tests)
 endif()
