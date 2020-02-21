@@ -109,7 +109,7 @@ if(NOT libcpr_POPULATED)
 	#target_compile_definitions(${CPR_LIBRARIES} PUBLIC "CURL_STATICLIB")
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		target_compile_options(${CPR_LIBRARIES} PRIVATE "-Wno-odr")
-		target_link_libraries(${CPR_LIBRARIES} PRIVATE "-Wno-odr")
+		target_link_libraries(${CPR_LIBRARIES} "-Wno-odr")
 	endif()
 endif()
 
