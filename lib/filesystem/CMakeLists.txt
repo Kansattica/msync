@@ -15,7 +15,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 else()
 	find_package(Filesystem)
 
-    if (NOT CXX_FILESYSTEM_HAVE_FS)
+    if (NOT CXX_FILESYSTEM_HAVE_FS OR NOT Filesystem_FOUND)
 		#see https://en.cppreference.com/w/cpp/compiler_support
 		message (WARNING "msync requires std::filesystem support (gcc 8+, clang 7+, or MSVC 2017+) and couldn't find it. Will try to continue anyways." )
 		target_link_libraries(filesystem INTERFACE -lstdc++fs)
