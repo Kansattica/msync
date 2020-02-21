@@ -108,9 +108,8 @@ if(NOT libcpr_POPULATED)
 	message(STATUS "Prepared CPR libraries ${CPR_LIBRARIES}")
 	#target_compile_definitions(${CPR_LIBRARIES} PUBLIC "CURL_STATICLIB")
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-		target_compile_options(${CPR_LIBRARIES} PRIVATE "-Wno-odr")
-		# cmake 3.11 doesn't have this
-	#	target_link_options(${CPR_LIBRARIES} PRIVATE "-Wno-odr")
+	#	target_compile_options(${CPR_LIBRARIES} PRIVATE "-Wno-odr")
+		set_target_properties(${CPR_LIBRARIES} PROPERTIES LINK_FLAGS -Wno-odr)
 	endif()
 endif()
 
