@@ -17,7 +17,7 @@ else()
 
     if (NOT CXX_FILESYSTEM_HAVE_FS OR NOT Filesystem_FOUND)
 		#see https://en.cppreference.com/w/cpp/compiler_support
-		message (WARNING "msync requires std::filesystem support (gcc 8+, clang 7+, or MSVC 2017+) and couldn't find it. Will try to continue anyways." )
+		message (WARNING "msync requires std::filesystem support (gcc libstdc++ 8, clang libc++ 7, MSVC 2017 15.7, or Xcode 11.0) and couldn't find it. Will try to continue anyways." )
 		target_link_libraries(filesystem INTERFACE -lstdc++fs)
     else ()
         target_link_libraries(filesystem INTERFACE ${CXX_FILESYSTEM_NAMESPACE})
