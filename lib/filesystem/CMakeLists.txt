@@ -6,6 +6,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 find_package(Filesystem)
 
 if (NOT CXX_FILESYSTEM_HAVE_FS OR NOT Filesystem_FOUND)
+	# The only time we should wind up in here now is if the host machine actually doesn't have std::filesystem support
+	# I'd like to take this logic out at a future date, once I'm a little more confident that the issues curl was causing with it are fixed.
+
 	#see https://en.cppreference.com/w/cpp/compiler_support
 	message (WARNING "msync requires std::filesystem support (gcc libstdc++ 8, clang libc++ 7, MSVC 2017 15.7, or Xcode 11.0) and couldn't find it. Will try to continue anyways." )
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
