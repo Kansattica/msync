@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.12..3.15)
+
 project (msync VERSION 0.1
 	DESCRIPTION "Store and forward messages with a Mastodon API-compatible server."
 	LANGUAGES CXX C)
@@ -6,12 +7,18 @@ project (msync VERSION 0.1
 option(MSYNC_BUILD_TESTS "Download catch2 and build tests with it." ON)
 
 set(CMAKE_POLICY_DEFAULT_CMP0069 NEW) #enable interprocedural optimization for all projects
+
 include(cmake/linktimeoptimization.cmake)
 
+# Okay, so, I lost a lot of time on this, so:
+# - if you wind up building curl from source, curl's cmake build does something that... captures or messes up the policy settings
+# that make it so that FindFilesystem later on doesn't use the right policies (CMP0056, 66 and 67). Including it here fixes that.
+include(CheckCXXSourceCompiles)
 include(cmake/packages.cmake)
 
 set (CMAKE_CXX_STANDARD 17)
-set (CMAKE_CXX_EXTENSIONS off)
+set (CMAKE_CXX_STANDARD_REQUIRED ON)
+set (CMAKE_CXX_EXTENSIONS OFF)
 
 add_library(queue STATIC "")
 add_library(sync STATIC "")
