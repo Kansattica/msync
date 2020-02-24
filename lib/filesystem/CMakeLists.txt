@@ -2,7 +2,6 @@ add_library(filesystem INTERFACE)
 
 target_compile_features(filesystem INTERFACE cxx_std_17)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 
 # for some reason, this find_filesystem script doesn't think MSVC has filesystem support when it does.
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -13,6 +12,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 		message (WARNING "MSVC version is under 1910 (detected ${MSVC_VERSION}), so you might not have the std::filesystem support msync requires." )
     endif()
 else()
+	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 	find_package(Filesystem)
 
     if (NOT CXX_FILESYSTEM_HAVE_FS OR NOT Filesystem_FOUND)
