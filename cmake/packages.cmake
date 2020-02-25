@@ -3,8 +3,8 @@ include(FetchContent)
 message(STATUS "Downloading nlohmann json...")
 FetchContent_Declare(
 	njson
-	URL 		https://github.com/nlohmann/json/archive/v3.7.0.zip
-	URL_HASH 	SHA512=dc39328ba58806dc92234becf14ee3ca3279d4fad33c1cfa12d63ded94b859d98bc21d4fd247eaf68fca8a03a4b7de771e6673c7ecd52803678e584b7d8901ab
+	URL 		https://github.com/nlohmann/json/archive/v3.7.3.zip
+	URL_HASH 	SHA512=b47a07de9a071cce645a173d084df5dd31f7669154fc00f6c99e0506474d30e8376acaee1d3c79a50def4f25a36042951bfa4fca9a704687e59c368d05053158
 	)
 
 option(JSON_BuildTests "" OFF)
@@ -69,7 +69,12 @@ if(USE_SYSTEM_CURL)
 endif()
 
 if (NOT USE_SYSTEM_CURL OR NOT CURL_FOUND)
-       set (USE_SYSTEM_CURL OFF CACHE BOOL "Don't use system curl if we don't have it." FORCE)
+	# Okay, I lost a lot of time on this, so:
+	# - if you wind up building curl from source, curl's cmake build does something that... captures or messes up the policy settings
+	# that make it so that FindFilesystem later on doesn't use the right policies (CMP0056, 66 and 67). Including it here fixes that.
+	include(CheckCXXSourceCompiles)
+
+	set (USE_SYSTEM_CURL OFF CACHE BOOL "Don't use system curl if we don't have it." FORCE)
 endif()
 
 #unset these because CPR's build will run its own find_package(CURL)

@@ -10,10 +10,6 @@ set(CMAKE_POLICY_DEFAULT_CMP0069 NEW) #enable interprocedural optimization for a
 
 include(cmake/linktimeoptimization.cmake)
 
-# Okay, I lost a lot of time on this, so:
-# - if you wind up building curl from source, curl's cmake build does something that... captures or messes up the policy settings
-# that make it so that FindFilesystem later on doesn't use the right policies (CMP0056, 66 and 67). Including it here fixes that.
-include(CheckCXXSourceCompiles)
 include(cmake/packages.cmake)
 
 set (CMAKE_CXX_STANDARD 17)
