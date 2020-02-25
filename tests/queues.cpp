@@ -356,4 +356,104 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 			}
 		}
 	}
+
+	GIVEN("Two different posts with the same base name, but one ends in .bak")
+	{
+		const test_file postfiles[]{ "thisisapost", "thisisapost.bak" };
+
+		int postno = 1;
+		for (const auto& fi : postfiles)
+		{
+			std::ofstream of{ fi.filename };
+			of << "I'm number " << postno++ << '\n';
+		}
+
+		WHEN("both are enqueued")
+		{
+			enqueue(queues::post, account, std::vector<std::string>{ postfiles, postfiles + 2 });
+
+			const fs::path unsuffixedname = file_queue_dir / "thisisapost";
+			const fs::path suffixedname = file_queue_dir / "thisisapost.1";
+
+			THEN("one file goes in with the original name, one goes in with a new suffix.")
+			{
+				REQUIRE(fs::exists(unsuffixedname));
+				REQUIRE(fs::exists(suffixedname));
+			}
+
+			THEN("the file contents are correct.")
+			{
+				const auto unsuflines = outgoing_post(unsuffixedname);
+				REQUIRE(unsuflines.parsed.text == "I'm number 1");
+
+				const auto suflines = outgoing_post(suffixedname);
+				REQUIRE(suflines.parsed.text == "I'm number 2");
+			}
+
+			THEN("the queue file is correct.")
+			{
+				const auto lines = read_lines(post_queue_file);
+				REQUIRE(lines.size() == 2);
+				REQUIRE(lines[0] == "thisisapost");
+				REQUIRE(lines[1] == "thisisapost.1");
+			}
+
+			THEN("print returns the correct output.")
+			{
+				const auto lines = print(queues::post, account);
+				REQUIRE(lines.size() == 2);
+				REQUIRE(lines[0] == "thisisapost");
+				REQUIRE(lines[1] == "thisisapost.1");
+			}
+
+			AND_WHEN("one is removed")
+			{
+				const auto idx = GENERATE(0, 1);
+
+				std::string thisfile = idx == 0 ? "thisisapost" : "thisisapost.1";
+				std::string otherfile = idx == 1 ? "thisisapost" : "thisisapost.1";
+
+				dequeue(queues::post, account, std::vector<std::string> { thisfile });
+
+				THEN("msync's copy of the dequeued file is deleted.")
+				{
+					REQUIRE_FALSE(fs::exists(file_queue_dir / thisfile));
+				}
+
+				THEN("msync's copy of the other file is still there.")
+				{
+					REQUIRE(fs::exists(file_queue_dir / otherfile));
+				}
+
+				THEN("the queue file is updated correctly.")
+				{
+					const auto lines = read_lines(post_queue_file);
+					REQUIRE(lines.size() == 1);
+					REQUIRE(lines[0] == otherfile);
+				}
+
+				THEN("both original files are still there")
+				{
+					REQUIRE(fs::exists(postfiles[0].filename));
+					REQUIRE(fs::exists(postfiles[1].filename));
+				}
+			}
+
+			AND_WHEN("the list is cleared")
+			{
+				clear(queues::post, account);
+
+				THEN("the queue file is empty.")
+				{
+					const auto lines = read_lines(post_queue_file);
+					REQUIRE(lines.size() == 0);
+				}
+
+				THEN("the queue directory has been erased.")
+				{
+					REQUIRE_FALSE(fs::exists(file_queue_dir));
+				}
+			}
+		}
+	}
 }

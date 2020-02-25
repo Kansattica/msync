@@ -120,6 +120,12 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 
 	fs::path copyto = queuedir / postfile.filename();
 
+	if (copyto.extension() == ".bak")
+	{
+		plverb() << "Filenames ending in '.bak' can cause issues for msync. Removing it for msync's copy.\n";
+		copyto.replace_extension();
+	}
+
 	if (fs::exists(copyto))
 	{
 		plverb() << copyto.string() << " already exists. " << postfile.string() << " will be saved to ";
