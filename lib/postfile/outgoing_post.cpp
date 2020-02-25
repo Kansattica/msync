@@ -191,7 +191,7 @@ visibility parse_visibility(std::string_view value)
 		}
 	}
 
-	pl() << "Bad visibility option: " << value << ". Defaulting to public. Valid options are:\n";
+	pl() << "Bad visibility option: " << value << ". Defaulting to default. Valid options are:\n";
 	for (const auto& vis : VISIBILITIES)
 	{
 		pl() << vis[0];
@@ -201,7 +201,7 @@ visibility parse_visibility(std::string_view value)
 		}
 		pl() << '\n';
 	}
-	return visibility::pub;
+	return visibility::default_vis;
 }
 
 void store_string(std::string& store_in, std::string_view value)
