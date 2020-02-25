@@ -119,7 +119,7 @@ void Write(post_content&& post, std::ofstream& of)
 	// interleave attachment and description together
 	// so the description is next to the thing it describes
 
-	for (auto i = 0; i < post.attachments.size(); i++)
+	for (size_t i = 0; i < post.attachments.size(); i++)
 	{
 		of << "attach=" << post.attachments[i] << '\n';
 
