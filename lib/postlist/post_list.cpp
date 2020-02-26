@@ -41,7 +41,7 @@ std::ofstream& operator<<(std::ofstream& out, const mastodon_poll& poll)
 	for (size_t i = 0; i < poll.options.size(); ++i)
 	{
 		out << " - " << poll.options[i].title << ' ' << 
-			poll.options[i].votes << '/' << poll.total_votes << " votes (" << ((double)poll.options[i].votes / poll.total_votes) * 100 << "%)";
+			poll.options[i].votes << '/' << poll.total_votes << " votes (" << (poll.total_votes == 0 ? 0 : ((double)poll.options[i].votes / poll.total_votes) * 100) << "%)";
 		if (std::find(poll.voted_for.begin(), poll.voted_for.end(), i) != poll.voted_for.end())
 		{
 			out << " [your vote]";
