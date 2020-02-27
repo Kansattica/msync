@@ -63,16 +63,12 @@ std::ofstream& operator<<(std::ofstream& out, const mastodon_status& status)
 	print(out, "cw: ", status.content_warning);
 	print(out, "body: ", status.content);
 
-	if (!status.attachments.empty())
+	for (const auto& attachment : status.attachments)
 	{
-		out << "attachments:\n";
-		for (const auto& attachment : status.attachments)
+		out << "attached: " << attachment.url << '\n';
+		if (!attachment.description.empty())
 		{
-			out << attachment.url << '\n';
-			if (!attachment.description.empty())
-			{
-				out << attachment.description << '\n';
-			}
+			out << "description: " << attachment.description << '\n';
 		}
 	}
 

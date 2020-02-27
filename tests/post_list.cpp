@@ -46,10 +46,9 @@ posted on: 10:55AM 11-14-2019
 constexpr std::string_view expected_justattachments = R"(status id: justattachments
 url: https://website.egg/justattachments
 author: Beepin' Online (@someone@online.egg) [bot]
-attachments:
-https://fake.website.egg/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.png?1573544488
-this is a description
-https://another.site/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.mp3?1573544488
+attached: https://fake.website.egg/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.png?1573544488
+description: this is a description
+attached: https://another.site/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.mp3?1573544488
 visibility: private
 posted on: 10:56AM 11-14-2019
 50 favs | 600 boosts | 7000 replies
@@ -64,12 +63,11 @@ reply to: 123456
 boost of: https://different.website.egg/goodpost
 cw: Wow! A post!
 body: Imagine: a post for you. :blobcat:
-attachments:
-https://fake.website.egg/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.png?1573544488
-this is a description
+attached: https://fake.website.egg/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.png?1573544488
+description: this is a description
 with a newline
-https://another.site/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.mp3?1573544488
-I am also a description!
+attached: https://another.site/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.mp3?1573544488
+description: I am also a description!
 visibility: direct
 posted on: 10:57AM 11-14-2019
 8 favs | 99 boosts | 100000 replies
@@ -111,7 +109,6 @@ struct status_test_case
 	const mastodon_status& status;
 	const std::string_view expected;
 };
-
 
 template <typename LHS, typename RHS>
 size_t mismatch_loc(const LHS& lhs, const RHS& rhs)
