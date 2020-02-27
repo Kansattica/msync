@@ -74,7 +74,7 @@ enum class notif_type
 struct mastodon_notification
 {
 	std::string id;
-	notif_type type;
+	notif_type type = notif_type::unknown;
 	std::string created_at;
 	mastodon_account account;
 	std::optional<mastodon_status> status;
