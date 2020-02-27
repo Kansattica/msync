@@ -3,8 +3,9 @@ include(FetchContent)
 message(STATUS "Downloading nlohmann json...")
 FetchContent_Declare(
 	njson
-	URL 		https://github.com/nlohmann/json/archive/v3.7.3.zip
-	URL_HASH 	SHA512=b47a07de9a071cce645a173d084df5dd31f7669154fc00f6c99e0506474d30e8376acaee1d3c79a50def4f25a36042951bfa4fca9a704687e59c368d05053158
+	GIT_REPOSITORY https://github.com/nlohmann/json.git
+	GIT_TAG		   v3.7.3
+	GIT_SHALLOW	   TRUE
 	)
 
 option(JSON_BuildTests "" OFF)
@@ -41,8 +42,7 @@ message(STATUS "Downloading whereami...")
 FetchContent_Declare(
 	whereamilib
 	GIT_REPOSITORY https://github.com/gpakosz/whereami.git
-	GIT_TAG		   f3a86fdf17b49c434a16bb4d9e45a135d4cc25f9
-	GIT_PROGRESS   FALSE
+	GIT_TAG	       6a8536a8b2d8c1903f22333c1a130a142f6d31de
 	)
 
 FetchContent_GetProperties(whereamilib)
@@ -118,8 +118,9 @@ if (MSYNC_BUILD_TESTS)
 	message(STATUS "Downloading catch2...")
 	FetchContent_Declare(
 		catch2lib
-		GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-		GIT_TAG 			d10b9bd02e098476670f5eb0527d2c7281476e8a
+		GIT_REPOSITORY	https://github.com/catchorg/Catch2.git
+		GIT_TAG 		v2.11.1
+		GIT_SHALLOW		TRUE
 		)
 
 	FetchContent_GetProperties(catch2lib)
