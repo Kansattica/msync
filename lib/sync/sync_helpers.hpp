@@ -72,7 +72,7 @@ template <typename Stream>
 void print_statistics(Stream& os, long long time_ms, unsigned int tries)
 {
 	os << " (" << time_ms << " ms";
-	if (tries != 1) { os << tries << " attempts"; }
+	if (tries != 1) { os << ", " << tries << " attempts"; }
 	os << ")\n";
 }
 
