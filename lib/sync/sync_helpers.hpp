@@ -119,7 +119,7 @@ request_response request_with_retries(make_request req, unsigned int retries, St
 
 	const auto end_time = std::chrono::steady_clock::now();
 
-	os << " Maximum retries reached.\n";
+	os << " Maximum retries reached.";
 	return request_response{ false,  "Maximum retries reached.", retries, std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() };
 }
 #endif
