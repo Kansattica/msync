@@ -183,10 +183,6 @@ private:
 						pl() << "Created post at " << parsed_status.url;
 						parsed_status_id = std::move(parsed_status.id);
 					}
-					else
-					{
-						pl() << "Failed to create post.";
-					}
 					print_statistics(pl(), request_response.time_ms, request_response.tries);
 				}
 
