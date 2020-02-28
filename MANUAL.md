@@ -56,12 +56,12 @@ After your account is set up, running `msync sync --verbose` will connect to you
 If you'd also like to download images, you can run a little shell script like the following after syncing. I recommend `aria2`, available from your Linux distribution's package manager or as a Windows binary, because it supports parallel downloads and doesn't leave the query string (that annoying `?1582789450` thing) in the filenames like wget does.
 
 ```
-grep "^attached: " msync_accounts/username@instance.egg/home.list | sed 's/attached: //' | sort | uniq | aria2c -d downloaded_images -i -
+grep "^attached: " msync_accounts/username@instance.egg/home.list | sed 's/attached: //' | sort | uniq | aria2c -c -d downloaded_images -i -
 ```
 Or, if you prefer `wget`:
 
 ```
-grep "^attached: " msync_accounts/username@instance.egg/home.list | sed 's/attached: //' | sort | uniq | wget --content-disposition -P downloaded_images -i -
+grep "^attached: " msync_accounts/username@instance.egg/home.list | sed 's/attached: //' | sort | uniq | wget -c --content-disposition -P downloaded_images -i -
 ```
 
 The `--content-disposition` flag here ensures `wget` fixes up the filename in some cases, but still leaves the query strings in the file name.
@@ -69,16 +69,18 @@ The `--content-disposition` flag here ensures `wget` fixes up the filename in so
 On Windows, you can use a pure Powershell solution like this:
 
 ```
-New-Item -Type Directory downloaded_images;  Get-Content .\home.list | Select-String -Pattern "^attached: " | ForEach-Object { $_ -replace "^attached: ", "" } | ForEach-Object { Invoke-WebRequest -UseBasicParsing -Uri $_ -OutFile "downloaded_images/$((Split-Path -Leaf $_).Split('?')[0])" }
+New-Item -Type Directory downloaded_images;  Get-Content .\home.list | Select-String -Pattern "^attached: " | ForEach-Object { $_ -replace "^attached: ", "" } | Where-Object { !(Test-Path -Path "downloaded_images/$((Split-Path -Leaf $_).Split('?')[0])" -PathType Leaf) } | Sort-Object -Unique | ForEach-Object { Invoke-WebRequest -UseBasicParsing -Uri $_ -OutFile "downloaded_images/$((Split-Path -Leaf $_).Split('?')[0])" }
 ```
 
 `Invoke-WebRequest` is pretty slow, though, so you should try using BITS if you have it:
 
 ```
-New-Item -Type Directory downloaded_images;  Get-Content .\home.list | Select-String -Pattern "^attached: " | ForEach-Object { $_ -replace "^attached: ", "" } | ForEach-Object { New-Object psobject -Property @{Source = $_;Destination = "downloaded_images/$((Split-Path -Leaf $_).Split('?')[0])" } } | Start-BitsTransfer -TransferType Download
+New-Item -Type Directory downloaded_images;  Get-Content .\home.list | Select-String -Pattern "^attached: " | ForEach-Object { $_ -replace "^attached: ", "" } | Where-Object { !(Test-Path -Path "downloaded_images/$((Split-Path -Leaf $_).Split('?')[0])" -PathType Leaf) } | Sort-Object -Unique | ForEach-Object { New-Object psobject -Property @{Source = $_;Destination = "downloaded_images/$((Split-Path -Leaf $_).Split('?')[0])" } } | Start-BitsTransfer -TransferType Download
 ```
 
 Or you can replace the last step in either of these chains with `wget` or `aria2c`, if you're willing to install those on Windows.
+
+All of these skip downloading files you've already downloaded, so feel free to always run them after syncing- perhaps by saving them into a shell script and running `msync sync; ./get_images.sh` or whatever.
 
 #### Queueing
 
