@@ -56,7 +56,7 @@ The instructions for building on Linux should mostly work, though note that Appl
 #### Building on Windows
 On Windows, you'll want Visual Studio with the C++ development workload and Cmake installed. After that, `git clone https://github.com/Kansattica/msync.git`, then open Visual Studio and go to `File > Open > CMake...` (some versions just have `File > Open > Folder...` instead, this will also work) and choose the `msync` repo you just downloaded. Visual Studio will take a while to download and configure everything, and then you should be able to pick `x64-Release` from the dropdown at the top, make sure the `msync.exe` target is selected, and build from there. 
 
-If you want something lighter weight, I suspect you can install the [build tools for Visual Studio](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019) and build from the command line. I don't have as much experience with this, but the cmake commands should be the same as the Linux commands up above.
+If you want something lighter weight, I suspect you can install the [build tools for Visual Studio](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019) and build from the command line. I don't have as much experience with this, but you typically have to open the start menu, search for something called "developer command prompt", and then the cmake commands should be the same as the Linux commands up above.
 
 I currently build and ensure all tests pass on Linux with both clang and gcc, as well as the Microsoft compiler on Windows.
 
@@ -72,4 +72,4 @@ You can verify that your setup works by building tests and running `net_tests`.
 - [clipp](https://github.com/muellan/clipp)
 - [CPR](https://github.com/whoshuu/cpr)
 - [curl](https://github.com/curl/curl)
-- [catch2](https://github.com/catchorg/Catch2) if MSYNC_BUILD_TESTS is set.
+- [catch2](https://github.com/catchorg/Catch2) if MSYNC_BUILD_TESTS is true.
