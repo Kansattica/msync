@@ -49,7 +49,6 @@ add_subdirectory(lib/exception)
 add_subdirectory(lib/printlog)
 add_subdirectory(lib/util)
 
-
 target_include_directories(netinterface INTERFACE lib/net_interface)
 target_link_libraries(netinterface INTERFACE filesystem)
 
@@ -75,6 +74,8 @@ target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options queue 
 
 target_link_libraries(msync PRIVATE options optionparsing printlog ${CPR_LIBRARIES} util nlohmann_json::nlohmann_json exception postfile queue sync net netinterface)
 
+# basically, if you compile CPR with LTO enabled, the gnu compiler emits a bunch of spurious ODR warnings for every library that includes CPR.
+# this quiets that down.
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	set_target_properties(msync PROPERTIES LINK_FLAGS "-Wno-odr")
 endif()
