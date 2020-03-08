@@ -1,6 +1,6 @@
 language: cpp
 env:
-  - BUILDTYPE=Release
+  - BUILDTYPE=Release 
   #- BUILDTYPE=MinSizeRel
 os: linux
 dist: bionic
@@ -10,8 +10,11 @@ compiler:
 matrix:
   include:
   - os: windows
-    compiler: msvc
-    env: BUILDTYPE=Release
+    compiler: cl.exe
+    env: BUILDTYPE=Release CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64
+  - os: windows
+    compiler: cl.exe
+    env: BUILDTYPE=Release CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=Win32
   #- os: windows
     #compiler: msvc
     #env: BUILDTYPE=MinSizeRel 

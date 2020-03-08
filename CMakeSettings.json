@@ -15,6 +15,11 @@
           "name": "CMAKE_CXX_FLAGS",
           "value": "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /Zc:__cplusplus",
           "type": "STRING"
+        },
+        {
+          "name": "MSYNC_DOWNLOAD_ZLIB",
+          "value": "False",
+          "type": "BOOL"
         }
       ]
     },

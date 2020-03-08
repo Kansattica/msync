@@ -60,6 +60,7 @@ FetchContent_Declare(
 	GIT_SHALLOW		TRUE 	
 )
 option(USE_SYSTEM_CURL "Try to use the system's libcurl instead of downloading and statically linking." ON)
+option(MSYNC_DOWNLOAD_ZLIB "If downloading and building curl on Windows, try to download zlib as well." ON)
 option(BUILD_CPR_TESTS "" OFF)
 set (BUILD_TESTING OFF CACHE BOOL "If you must build curl from source, don't build the tests." FORCE)
 set (BUILD_SHARED_LIBS OFF CACHE BOOL "Build static libcurl and cpr." FORCE)
@@ -75,6 +76,41 @@ if (NOT USE_SYSTEM_CURL OR NOT CURL_FOUND)
 	include(CheckCXXSourceCompiles)
 
 	set (USE_SYSTEM_CURL OFF CACHE BOOL "Don't use system curl if we don't have it." FORCE)
+
+	if (MSVC AND MSYNC_DOWNLOAD_ZLIB)
+		set(CMAKE_POLICY_DEFAULT_CMP0074 NEW) #force curl to honor ZLIB_ROOT
+		set(ZLIB_DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/depends/zlib)
+		set(ZLIB_HEADER_DIR ${CMAKE_SOURCE_DIR}/external/zlib/include)
+		file(MAKE_DIRECTORY ${ZLIB_DOWNLOAD_DIR})
+
+		file(COPY ${ZLIB_HEADER_DIR}
+			DESTINATION
+			${ZLIB_DOWNLOAD_DIR})
+
+		set(MSYNC_ZLIB_BITNESS ${CMAKE_SYSTEM_PROCESSOR})
+		if (DEFINED CMAKE_VS_PLATFORM_NAME)
+			if (CMAKE_VS_PLATFORM_NAME MATCHES "x64")
+				set(MSYNC_ZLIB_BITNESS "AMD64")
+			else()
+				set(MSYNC_ZLIB_BITNESS "x86")
+			endif()
+		endif()
+
+		if(${MSYNC_ZLIB_BITNESS} MATCHES "AMD64")
+			message(STATUS "Downloading 64-bit zlib...")
+			file(DOWNLOAD "https://kansattica.github.io/msync_deps/zlib1.2.11-winx64.lib"
+				${ZLIB_DOWNLOAD_DIR}/lib/zlibstatic.lib
+				EXPECTED_HASH SHA256=d65fe524750d8f6001c5b3f0a3cbac56c17f27bf5ff1f86d1bc9e20ae1d5abc7)
+		else()
+			message(STATUS "Downloading 32-bit zlib...")
+			file(DOWNLOAD "https://kansattica.github.io/msync_deps/zlib1.2.11-winx86.lib"
+				${ZLIB_DOWNLOAD_DIR}/lib/zlibstatic.lib
+				EXPECTED_HASH SHA256=f28f0bed6ec9868e14a3f0a62e53fd9d15473a35d832194c0f12cd6d5c284f34)
+		endif()
+
+		set(ZLIB_ROOT ${ZLIB_DOWNLOAD_DIR})
+		find_package(ZLIB)
+    endif()
 endif()
 
 #unset these because CPR's build will run its own find_package(CURL)
@@ -102,6 +138,7 @@ if (MSVC)
 	set (CMAKE_USE_WINSSL ON CACHE BOOL "Use winssl" FORCE)
 	set (CMAKE_USE_OPENSSL OFF CACHE BOOL "Don't use openssl" FORCE)
 endif()
+
 FetchContent_GetProperties(libcpr)
 if(NOT libcpr_POPULATED)
 	message(STATUS "Configuring CPR...")
