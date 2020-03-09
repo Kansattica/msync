@@ -3,7 +3,7 @@ target_sources_local(tests PRIVATE main.cpp option_file.cpp test_helpers.hpp tes
 target_link_libraries(tests PRIVATE Catch2::Catch2 options optionparsing constants util filesystem queue printlog postfile sync netinterface whereami postlist entities exception)
 
 add_executable(net_tests "")
-target_sources_local(net_tests PRIVATE main.cpp test_https.cpp)
+target_sources_local(net_tests PRIVATE main.cpp https_and_gzip.cpp)
 target_link_libraries(net_tests PRIVATE Catch2::Catch2 ${CPR_LIBRARIES})
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
