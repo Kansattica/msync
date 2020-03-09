@@ -29,6 +29,18 @@ Once you see `Done! You're ready to start using this account`, you're ready to g
 
 If you want to add another account, `msync` can handle as many accounts as you're willing to throw at it. Run `msync new --account anotherusername@some.instance` and follow the on-screen instructions for each account you'd like to add. Most of `msync`'s commands only operate on one account at a time, so you'll have to specify an account with the `--account` or `-a` switch if you have more than one. Only `msync sync` and the account-listing part of `msync config showall` will work without specifying an account.
 
+When running with multiple accounts, you only have to specify a minimal prefix of the account. For example, if you have two accounts, `SomeCoolGirl@crime.egg` and `HeyAnotherPerson@illegal.egg`, registered with msync, you only have to specify `-a s` or `-a h` to choose the account. Note that the search is also case-insensitive. So, to queue a post for the `SomeCoolGirl` account, use:
+
+```
+msync queue post new_post -a s
+```
+
+And to show all settings for the `HeyAnotherPerson` account, use:
+
+```
+msync config showall -a h
+```
+
 To remove an account from msync, simply delete its folder from `msync_accounts`.
 
 ### How to use msync
