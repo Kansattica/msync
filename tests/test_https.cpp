@@ -32,7 +32,8 @@ SCENARIO("Can make SSL requests to a site.")
 				if (val == response.header.end())
 				{
 					WARN("Response has no Content-Encoding header. msync will work fine, but server responses will not be compressed."); 
-				} else if (val->second != "gzip")
+				}
+				else if (val->second != "gzip")
 				{
 					WARN("Response from server was not gzipped. Content-Encoding is: " << val->second);
 				}
