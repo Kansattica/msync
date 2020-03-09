@@ -5,34 +5,15 @@
 
 `msync` currently supports queueing and sending posts, boosts, and favorites for any number of accounts, as well as downloading the home timeline and notifications.
 
-### Features (that are implemented or coming soon)
-- [X] Multiple account support
-- [X] Queue posts, boosts, and favs
-- [X] Queue up threads before sending.
-- [X] Send posts, boosts, and favs
-- [X] Download posts from home timeline
-- [ ] Download direct messages
-- [X] Download notifications
-- [ ] Download posts from lists
-- [ ] Download posts from your profile
-- [X] Post template file generation
-- [X] Attachment support
-- [X] Ability to exclude notifications by type.
-- [ ] Nicknames for accounts
-
-### Roadmap (things for later)
-- [ ] Queue and send profile updates
-- [ ] Download individual posts and threads by URL or ID
-- [X] Poll support (polls download and render properly, voting not implemented yet)
-- [ ] Nicer UI, like a minimal webpage to show downloaded posts in.
-- [ ] A proper manual for the weirder ins and outs of msync
-
-
 ### Get msync
 Once `msync` has a stable release, I'll have releases available for download. For now, it has to be built with cmake. If you have a fairly recent version of cmake (3.12 or later), you can simply clone the repo, make a `build` directory, run cmake inside, and cmake will download and build `msync` and its dependencies automatically. 
 
 On Linux systems, it works a lot better if it can link in your system's openssl (or whatever other TLS implementation cURL knows how to use) and, if you have it, libcurl. Consider installing these through your package manager. For example, I install `libcurl4-openssl-dev` on Debian.
 
+##### Notes on libcurl 
+
+- Some systems come with `libcurl4-gnutls-dev` preinstalled. This works as well- no need to uninstall it for the openssl version.
+- If you'd rather have msync compile curl into itself, add `-DUSE_SYSTEM_CURL=OFF` after `-DCMAKE_BUILD_TYPE=Release`. This will automatically download and configure curl as part of the build process. If you go this route, I suggest having zlib (e.g. `zlib1g-dev`, optional but highly recommended) and an ssl library (e.g. `libssl-dev`, required) installed where curl can find them.
 
 #### Building on Linux
 On a new Debian-like system, the setup process looks something like this:
@@ -60,10 +41,38 @@ If you want something lighter weight, I suspect you can install the [build tools
 
 I currently build and ensure all tests pass on Linux with both clang and gcc, as well as the Microsoft compiler on Windows.
 
+#### Testing your build
+
+To ensure that `msync` found and compiled its network dependencies correctly, run the cmake commands above without `-DMSYNC_BUILD_TESTS=FALSE` (or, equivalently, `-DMSYNC_BUILD_TESTS=TRUE`). Then, run `./tests/net_tests`. This will determine whether `msync` can correctly make authenticated HTTPS requests and will print warnings if it cannot request and recieve gzipped responses.
+
+### Next steps
+
 Once you have `msync` compiled, check out [MANUAL.md](manual.md) for usage information.
 
+### Features (that are implemented or coming soon)
+- [X] Multiple account support
+- [X] Queue posts, boosts, and favs
+- [X] Queue up threads before sending.
+- [X] Send posts, boosts, and favs
+- [X] Download posts from home timeline
+- [ ] Download direct messages
+- [X] Download notifications
+- [ ] Download posts from lists
+- [ ] Download posts from your profile
+- [X] Post template file generation
+- [X] Attachment support
+- [X] Ability to exclude notifications by type.
+- [ ] Nicknames for accounts
+
+### Roadmap (things for later)
+- [ ] Queue and send profile updates
+- [ ] Download individual posts and threads by URL or ID
+- [X] Poll support (polls download and render properly, voting not implemented yet)
+- [ ] Nicer UI, like a minimal webpage to show downloaded posts in.
+- [ ] [A proper manual for the weirder ins and outs of msync](MANUAL.md)
+
 ### Build Dependencies
-Cmake will download all of these for you, except it'll use your system's libcurl if you have it. I recommend at least having an SSL/TLS library for cmake to find and dynamically link.
+Cmake will download all of these for you, except it'll use your system's libcurl if you have it and can't update your compiler or standard library. I recommend at least having an SSL/TLS library for cmake to find and dynamically link.
 You can verify that your setup works by building tests and running `net_tests`.
 - a compiler with C++17 support
 - a standard library with std::filesystem support (gcc libstdc++ 8, clang libc++ 7, MSVC 2017 15.7, or Xcode 11.0)
@@ -72,4 +81,5 @@ You can verify that your setup works by building tests and running `net_tests`.
 - [clipp](https://github.com/muellan/clipp)
 - [CPR](https://github.com/whoshuu/cpr)
 - [curl](https://github.com/curl/curl)
-- [catch2](https://github.com/catchorg/Catch2) if MSYNC_BUILD_TESTS is true.
+- [zlib](https://www.zlib.net/) is downloaded on Windows if `MSYNC_DOWNLOAD_ZLIB` is true (defaults to true).
+- [catch2](https://github.com/catchorg/Catch2) if `MSYNC_BUILD_TESTS` is true (defaults to true).
