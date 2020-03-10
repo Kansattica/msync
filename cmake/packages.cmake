@@ -96,6 +96,7 @@ if (NOT USE_SYSTEM_CURL OR NOT CURL_FOUND)
 			endif()
 		endif()
 
+		# did you know that the only way I could get up-to-date static zlib was compiling it myself?
 		if(${MSYNC_ZLIB_BITNESS} MATCHES "AMD64")
 			message(STATUS "Downloading 64-bit zlib...")
 			file(DOWNLOAD "https://kansattica.github.io/msync_deps/zlib1.2.11-winx64.lib"
