@@ -41,7 +41,6 @@ And to show all settings for the `HeyAnotherPerson` account, use:
 msync config showall -a h
 ```
 
-
 To remove an account from msync, simply delete its folder from `msync_accounts`.
 
 ### How to use msync
