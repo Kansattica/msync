@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12..3.15)
 
-project (msync VERSION 0.1
+project (msync VERSION 0.8
 	DESCRIPTION "Store and forward messages with a Mastodon API-compatible server."
 	LANGUAGES CXX C)
 
