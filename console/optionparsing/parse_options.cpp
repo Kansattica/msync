@@ -16,6 +16,8 @@ If this is your first time, try running:
 msync new -a [account name]
 
 New account names must be fully specified, like: GoddessGrace@goodchristian.website
+
+For more information, consult the manual: https://raw.githubusercontent.com/Kansattica/msync/master/MANUAL.md
 )";
 
 parse_result parse(const int argc, const char* argv[], const bool silent)
