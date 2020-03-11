@@ -29,7 +29,7 @@ Once you see `Done! You're ready to start using this account`, you're ready to g
 
 If you want to add another account, `msync` can handle as many accounts as you're willing to throw at it. Run `msync new --account anotherusername@some.instance` and follow the on-screen instructions for each account you'd like to add. Most of `msync`'s commands only operate on one account at a time, so you'll have to specify an account with the `--account` or `-a` switch if you have more than one. Only `msync sync` and the account-listing part of `msync config showall` will work without specifying an account.
 
-When running with multiple accounts, you only have to specify a minimal prefix of the account. For example, if you have two accounts, `SomeCoolGirl@crime.egg` and `HeyAnotherPerson@illegal.egg`, registered with msync, you only have to specify `-a s` or `-a h` to choose the account. Note that the search is also case-insensitive. So, to queue a post for the `SomeCoolGirl` account, use:
+When running with multiple accounts, you only have to specify the shortest unique prefix of an account to select it. For example, if you have two accounts, `SomeCoolGirl@crime.egg` and `HeyAnotherPerson@illegal.egg`, registered with msync, you only have to specify `-a s` or `-a h` to choose the account. Note that the search is also case-insensitive. So, to queue a post for the `SomeCoolGirl` account, use:
 
 ```
 msync queue post new_post -a s
@@ -40,6 +40,22 @@ And to show all settings for the `HeyAnotherPerson` account, use:
 ```
 msync config showall -a h
 ```
+
+However, if your accounts were `SomeCoolGirl@crime.egg` and `SomebodyOnce@Toldme.egg`, you would have to specify:
+
+```
+msync queue post new_post -a somec
+```
+
+or
+
+```
+msync sync --max-requests 6 -a someb
+```
+
+Note that the `-a` flag must always go last, after all other flags and arguments.
+
+Note also that `msync sync` doesn't have to take an `--account` flag. You can use `msync sync` with an account to sync only that account, or omit the account flag to sync all your accounts.
 
 To remove an account from msync, simply delete its folder from `msync_accounts`.
 
@@ -60,7 +76,7 @@ After your account is set up, running `msync sync --verbose` will connect to you
 - Especially when using `--max-requests`, tell `msync` whether you want it to get the newest posts first or the oldest by using `msync config sync (home|notifications) (newest|oldest|off)`
 - If you plan on always syncing every message every time, instead of using `--max-requests`, I suggest using `oldest` instead of `newest`. When syncing oldest-first, msync can write the messages to disk as they come in, letting you see the files update immediately AND not having to store every message in memory until the end.
 - Note that you can also not sync a timeline at all with `msync config sync home off`
-- If you don't care about a specific type of notification, you can stop `msync` from retrieving them when you sync with `msync config exclude_boosts true`, and same for `favs`, `follows`, `mentions`, and `polls`. `msync` treats anything start with a `t`, `T`, `y`, or `Y` as truthy, and everything else as falsy. So `exclude_favs true` and `exclude_favs YES` are equivalent.
+- If you don't care about a specific type of notification, you can stop `msync` from retrieving them when you sync with `msync config exclude_boosts true`, and same for `favs`, `follows`, `mentions`, and `polls`. `msync` treats anything start with a `t`, `T`, `y`, or `Y` as truthy, and everything else as falsy. So `exclude_favs true`, `exclude_favs YES`, and `exclude_favs Yeehaw` are equivalent.
 - I'll write more about configuration later, but for now, you can see all your settings and registered accounts with `msync config showall`.
 
 
