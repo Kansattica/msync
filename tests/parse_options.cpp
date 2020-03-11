@@ -1017,6 +1017,31 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 	}
 }
 
+SCENARIO("The command line parser recognizes when the user requests msync's version.")
+{
+	GIVEN("A command line requesting the version.")
+	{
+		const auto version = GENERATE(as<const char*>{}, "version", "--version");
+
+		char const* argv[] { "msync", version };
+
+		WHEN("the command line is parsed")
+		{
+			const auto result = parse(2, argv);
+
+			THEN("the parse is good.")
+			{
+				REQUIRE(result.okay);
+			}
+
+			THEN("the correct action is selected.")
+			{
+				REQUIRE(result.selected == mode::version);
+			}
+		}
+	}
+}
+
 bool flag_set(int combo, int position)
 {
 	return combo & (1 << position);

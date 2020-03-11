@@ -5,6 +5,7 @@
 #include <string_view>
 #include <algorithm>
 
+#include "version.hpp"
 #include "../lib/options/global_options.hpp"
 #include "../lib/options/option_enums.hpp"
 #include "../lib/options/user_options.hpp"
@@ -94,6 +95,9 @@ int main(int argc, const char* argv[])
 			break;
 		case mode::help:
 			should_print_newline = false;
+			break;
+		case mode::version:
+			pl() << "msync version " << MSYNC_VERSION;
 			break;
 		default:
 			pl() << "[option not implemented]";

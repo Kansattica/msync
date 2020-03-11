@@ -12,7 +12,8 @@ enum class mode
     sync,
     gen,
     queue,
-    help
+    help,
+    version
 };
 
 struct parse_result

@@ -105,7 +105,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 	const auto universalOptions = ((option("-a", "--account") & value("account", ret.account)).doc("The account name to operate on."),
 			option("-v", "--verbose").set(verbose_logs).doc("Verbose mode. Program will be more chatty."));
 
-	const auto cli = (newaccount | configMode | syncMode | genMode | queueMode | (command("help").set(ret.selected, mode::help)), universalOptions);
+	const auto cli = (newaccount | configMode | syncMode | genMode | queueMode | command("version", "--version").set(ret.selected, mode::version) | (command("help").set(ret.selected, mode::help)), universalOptions);
 
 	//skip the first result.
 	//we do it this way because C++11 and later don't like it when you turn a string literal into a char*, so we have to use the iterator interface

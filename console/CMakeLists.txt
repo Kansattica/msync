@@ -3,4 +3,5 @@ target_sources_local(msync
         msync.cpp
         new_account.hpp
         new_account.cpp
+        version.hpp
 )
