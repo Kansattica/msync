@@ -76,6 +76,7 @@ if (NOT USE_SYSTEM_CURL OR NOT CURL_FOUND)
 	include(CheckCXXSourceCompiles)
 
 	set (USE_SYSTEM_CURL OFF CACHE BOOL "Don't use system curl if we don't have it." FORCE)
+	set (ENABLE_MANUAL OFF CACHE BOOL "Tell curl not to bother trying to make the manual." FORCE)
 
 	if (MSVC AND MSYNC_DOWNLOAD_ZLIB)
 		set(CMAKE_POLICY_DEFAULT_CMP0074 NEW) #force curl to honor ZLIB_ROOT
