@@ -58,8 +58,9 @@ After your account is set up, running `msync sync --verbose` will connect to you
 - `msync` does not care about the contents of these files. It simply appends posts and notifications to them. You can delete these files, edit them, move them elsewhere, msync doesn't care.
 - When you first sync up, `msync` will get five chunks of statuses or notifications. In the future, `msync` will default to downloading until it's "caught up", and has downloaded everything since the last post it saw. To change this behavior, use the ` --max-requests <integer>` option when calling `msync sync`. 
 - Especially when using `--max-requests`, tell `msync` whether you want it to get the newest posts first or the oldest by using `msync config sync (home|notifications) (newest|oldest|off)`
-- If you plan on always syncing every message every time, instead of using `--max-requests`, I suggest using `oldest` over `newest`. When syncing oldest-first, msync can write the messages to disk as they come in, letting you see the files update as they download AND not having to store every message in memory until the end.
+- If you plan on always syncing every message every time, instead of using `--max-requests`, I suggest using `oldest` instead of `newest`. When syncing oldest-first, msync can write the messages to disk as they come in, letting you see the files update immediately AND not having to store every message in memory until the end.
 - Note that you can also not sync a timeline at all with `msync config sync home off`
+- If you don't care about a specific type of notification, you can stop `msync` from retrieving them when you sync with `msync config exclude_boosts true`, and same for `favs`, `follows`, `mentions`, and `polls`. `msync` treats anything start with a `t`, `T`, `y`, or `Y` as truthy, and everything else as falsy. So `exclude_favs true` and `exclude_favs YES` are equivalent.
 - I'll write more about configuration later, but for now, you can see all your settings and registered accounts with `msync config showall`.
 
 
@@ -103,3 +104,7 @@ Posts are a little different. You still queue them up to be sent when you next `
         - The `reply_id` of a post queued in front of this one. 
     - Basically, when you run `msync sync`, your queued posts are sent as normal. If a post has a `reply_id`, after it's published, any posts with a `reply_to` equal to that `reply_id` will have their `reply_to` set to the actual published ID of that post. This will persist even if the subsequent post fails to send for some reason. 
     - If a post has an invalid `reply_to`, the remote server won't accept it. You can edit the queued version of the post in `msync_accounts/<username@instance.url>/queuedposts` and sync again.
+
+#### A note on UTF-8, Unicode, and Emojis
+
+`msync` tries its best not to touch the bytes that it sends to or from the server. This means that posts are sent to the server and written to the local timelines as close to as is as possible. Emojis and other non-ASCII characters should work fine, as long as you send and read UTF-8. Some terminal emulators have a hard time displaying UTF-8, and you may wind up having to change some setting or use a different font. I know that running `[Console]::OutputEncoding = [Text.UTF8Encoding]::UTF8` can help on Powershell. In addition, characters may show weird on the terminal, but go over the wire fine. 
