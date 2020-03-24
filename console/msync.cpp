@@ -69,7 +69,7 @@ int main(int argc, const char* argv[])
 			switch (parsed.queue_opt.to_do)
 			{
 			case queue_action::add:
-				enqueue(parsed.queue_opt.selected, assume_account(parsed.account).first, parsed.queue_opt.queued);
+				enqueue(parsed.queue_opt.selected, assume_account(parsed.account).first, std::move(parsed.queue_opt.queued));
 				break;
 			case queue_action::remove:
 				dequeue(parsed.queue_opt.selected, assume_account(parsed.account).first, std::move(parsed.queue_opt.queued));

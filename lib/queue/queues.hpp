@@ -16,14 +16,14 @@ enum class queues
 
 fs::path get_file_queue_directory(std::string_view account);
 
-void enqueue(queues toenqueue, const std::string_view account, const std::vector<std::string>& add);
-
-// dequeue mutates and moves from the vector for efficiency
+// enqueue and dequeue mutate and move from the vector for efficiency
+void enqueue(queues toenqueue, const std::string_view account, std::vector<std::string>&& add);
 void dequeue(queues todequeue, const std::string_view account, std::vector<std::string>&& remove);
+
 void clear(queues toclear, const std::string_view account);
 
-queue_list get(queues toget, const std::string_view account);
+queue_list get(const std::string_view account);
 
-std::vector<std::string> print(queues toprint, const std::string_view account);
+std::vector<std::string> print(const std::string_view account);
 
 #endif

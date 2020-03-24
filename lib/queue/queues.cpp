@@ -102,6 +102,22 @@ void queue_attachments(const fs::path& postfile)
 	}
 }
 
+
+api_route get_route(const queues queue, const bool remove)
+{
+	switch (queue)
+	{
+	case queues::boost:
+		return remove ? api_route::unboost : api_route::boost;
+	case queues::fav:
+		return remove ? api_route::unfav : api_route::fav;
+	case queues::post:
+		return remove ? api_route::unpost : api_route::post;
+	}
+
+	throw msync_exception("Whoops, that shouldn't happen in this get_route business.");
+}
+
 std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 {
 	fs::create_directories(queuedir);
@@ -141,40 +157,24 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 }
 
 template <typename queue_t = queue_list>
-queue_t open_queue(const queues to_open, const std::string_view account)
+queue_t open_queue(const std::string_view account)
 {
 	fs::path qfile = options().account_directory_location / account;
 	fs::create_directories(qfile);
-	const std::string_view to_append = [to_open]() {
-		switch (to_open)
-		{
-		case queues::fav:
-			return Fav_Queue_Filename;
-			break;
-		case queues::boost:
-			return Boost_Queue_Filename;
-			break;
-		case queues::post:
-			return Post_Queue_Filename;
-			break;
-		default:
-			throw msync_exception("whoops, this shouldn't happen.");
-		}
-	}();
-
-	return queue_t{ qfile / to_append };
+	return queue_t{ qfile / Queue_Filename };
 }
 
-void enqueue(const queues toenqueue, const std::string_view account, const std::vector<std::string>& add)
+void enqueue(const queues toenqueue, const std::string_view account, std::vector<std::string>&& add)
 {
-	queue_list toaddto = open_queue(toenqueue, account);
+	queue_list toaddto = open_queue(account);
+	const auto target_route = get_route(toenqueue, false);
 
 	if (toenqueue == queues::post)
 	{
 		const fs::path filequeuedir = get_file_queue_directory(account);
 		std::transform(add.begin(), add.end(), std::back_inserter(toaddto.parsed), [&filequeuedir](const auto& id)
 			{
-				return queue_post(filequeuedir, id);
+				return api_call{ target_route, queue_post(filequeuedir, id) };
 			});
 	}
 	else
@@ -194,9 +194,18 @@ void enqueue(const queues toenqueue, const std::string_view account, const std::
 		// adding profile updates, poll voting, and other stuff that can get the "fire and forget" treatment like
 		// favs and boosts do
 
-		const auto does_not_contain = [&toaddto](const std::string& adding)
+		std::vector<api_call> to_add;
+		to_add.reserve(add.size());
+		std::transform(std::make_move_iterator(add.begin()), std::make_move_iterator(add.end()),
+			std::back_inserter(to_add), [target_route](std::string&& id)
+			{
+				return api_call{ target_route, std::move(id) };
+			});
+
+		const auto does_not_contain = [&toaddto, target_route](const std::string& adding)
 		{
-			return std::find(toaddto.parsed.begin(), toaddto.parsed.end(), adding) == toaddto.parsed.end();
+			return std::any_of(toaddto.parsed.begin(), toaddto.parsed.end(), 
+				[&adding, target_route](const api_call& inqueue) { inqueue.queued_call == target_route && inqueue.argument == adding });
 		};
 
 		std::copy_if(add.begin(), add.end(), std::back_inserter(toaddto.parsed), does_not_contain);
@@ -216,7 +225,7 @@ void dequeue_post(const fs::path& queuedir, const fs::path& filename)
 
 void dequeue(queues todequeue, const std::string_view account, std::vector<std::string>&& toremove)
 {
-	queue_list toremovefrom = open_queue(todequeue, account);
+	queue_list toremovefrom = open_queue(account);
 
 	if (todequeue == queues::post)
 	{
@@ -272,7 +281,7 @@ void dequeue(queues todequeue, const std::string_view account, std::vector<std::
 
 void clear(queues toclear, const std::string_view account)
 {
-	queue_list clearthis = open_queue(toclear, account);
+	queue_list clearthis = open_queue(account);
 
 	clearthis.parsed.clear();
 
@@ -282,15 +291,15 @@ void clear(queues toclear, const std::string_view account)
 	}
 }
 
-queue_list get(queues toget, const std::string_view account)
+queue_list get(const std::string_view account)
 {
-	return open_queue(toget, account);
+	return open_queue(account);
 }
 
-std::vector<std::string> print(queues toprint, const std::string_view account)
+std::vector<std::string> print(const std::string_view account)
 {
 	//prettyprint posts
-	const readonly_queue_list printthis = open_queue<readonly_queue_list>(toprint, account);
+	const readonly_queue_list printthis = open_queue<readonly_queue_list>(account);
 	std::vector<std::string> toreturn(printthis.parsed.size());
 	std::move(printthis.parsed.begin(), printthis.parsed.end(), toreturn.begin());
 	return toreturn;
