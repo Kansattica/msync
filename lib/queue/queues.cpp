@@ -292,8 +292,14 @@ void dequeue(queues todequeue, const std::string_view account, std::vector<std::
 void clear(queues toclear, const std::string_view account)
 {
 	queue_list clearthis = open_queue(account);
+	const auto toclearinsert = get_route(toclear, true);
+	const auto toclearremove = get_route(toclear, false);
 
-	clearthis.parsed.clear();
+	clearthis.parsed.erase(std::remove_if(clearthis.parsed.begin(), clearthis.parsed.end(), [toclearinsert, toclearremove](const api_call& call)
+		{
+			return call.queued_call == toclearinsert || call.queued_call == toclearremove;
+		}), clearthis.parsed.end());
+
 
 	if (toclear == queues::post)
 	{

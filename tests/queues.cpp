@@ -6,12 +6,31 @@
 #include <vector>
 #include <string>
 #include <string_view>
+#include <algorithm>
 
 #include "../lib/queue/queues.hpp"
 #include "../lib/constants/constants.hpp"
 #include "../lib/options/global_options.hpp"
 #include "../lib/printlog/print_logger.hpp"
 #include "../postfile/outgoing_post.hpp"
+
+using namespace std::string_view_literals;
+
+std::vector<std::string> make_expected_ids(const std::vector<std::string>& ids, std::string_view prefix)
+{
+	std::vector<std::string> toreturn(ids.size());
+	std::transform(ids.begin(), ids.end(), toreturn.begin(), [&prefix](const std::string& id) 
+		{
+			return std::string{ id }.insert(0, prefix);
+		});
+	return toreturn;
+}
+
+bool prefix_match(std::string_view actual, std::string_view prefix, std::string_view expected)
+{
+	return std::equal(actual.begin(), actual.begin() + prefix.length(), prefix.begin(), prefix.end()) &&
+		std::equal(actual.begin() + prefix.length(), actual.end(), expected.begin(), expected.end());
+}
 
 SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 {
@@ -25,92 +44,93 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 		WHEN("some items are enqueued")
 		{
 			const auto totest = GENERATE(
-				std::make_pair(queues::boost, Boost_Queue_Filename),
-				std::make_pair(queues::fav, Fav_Queue_Filename)
-			);
+				std::make_tuple(queues::boost, "BOOST "sv, "UNBOOST "sv),
+				std::make_tuple(queues::fav, "FAV "sv, "UNFAV "sv)
+				);
 
-			const static std::vector<std::string> someids{ "12345", "67890", "123123123123123123123", "longtextboy", "friend" };
-			enqueue(totest.first, account, someids);
+			std::vector<std::string> someids{ "12345", "67890", "123123123123123123123", "longtextboy", "friend" };
+
+			enqueue(std::get<0>(totest), account, std::move(someids));
 
 			THEN("the items are written immediately.")
 			{
-				const auto lines = print(totest.first, account);
+				const auto lines = print(account);
 				REQUIRE(lines.size() == 5);
-				REQUIRE(lines == someids);
+				REQUIRE(lines == make_expected_ids(someids, std::get<1>(totest)));
 			}
 
 			THEN("the file exists.")
 			{
-				REQUIRE(fs::exists(accountdir.filename / totest.second));
+				REQUIRE(fs::exists(accountdir.filename / std::get<1>(totest)));
 			}
 
 			AND_WHEN("some of those are dequeued")
 			{
-				dequeue(totest.first, account, std::vector<std::string>{ "12345", "longtextboy" });
+				dequeue(std::get<0>(totest), account, std::vector<std::string>{ "12345", "longtextboy" });
 
 				THEN("they're removed from the file.")
 				{
-					const auto lines = print(totest.first, account);
+					const auto lines = print(account);
 					REQUIRE(lines.size() == 3);
-					REQUIRE(lines[0] == "67890");
-					REQUIRE(lines[1] == "123123123123123123123");
-					REQUIRE(lines[2] == "friend");
+					REQUIRE(prefix_match(lines[0], std::get<1>(totest), "67890"));
+					REQUIRE(prefix_match(lines[1], std::get<1>(totest), "123123123123123123123"));
+					REQUIRE(prefix_match(lines[2], std::get<1>(totest), "friend"));
 				}
 			}
 
 			AND_WHEN("some of those are dequeued and some aren't in the queue")
 			{
-				dequeue(totest.first, account, std::vector<std::string>{ "12345", "longtextboy", "not in the queue", "other" });
+				dequeue(std::get<0>(totest), account, std::vector<std::string>{ "12345", "longtextboy", "not in the queue", "other" });
 
 				THEN("the ones in the queue are removed from the file, the ones not in the queue are appended.")
 				{
-					const auto lines = print(totest.first, account);
+					const auto lines = print(account);
 					REQUIRE(lines.size() == 5);
-					REQUIRE(lines[0] == "67890");
-					REQUIRE(lines[1] == "123123123123123123123");
-					REQUIRE(lines[2] == "friend");
-					REQUIRE(lines[3] == "not in the queue-");
-					REQUIRE(lines[4] == "other-");
+					REQUIRE(prefix_match(lines[0], std::get<1>(totest), "67890"));
+					REQUIRE(prefix_match(lines[1], std::get<1>(totest), "123123123123123123123"));
+					REQUIRE(prefix_match(lines[2], std::get<1>(totest), "friend"));
+					REQUIRE(prefix_match(lines[3], std::get<2>(totest), "not in the queue"));
+					REQUIRE(prefix_match(lines[4], std::get<2>(totest), "other"));
 				}
 			}
 
 			AND_WHEN("some ids that were already in the queue are queued again")
 			{
-				enqueue(totest.first, account, std::vector<std::string> {"12345", "friend", "longtextboy"});
+				enqueue(std::get<0>(totest), account, std::vector<std::string> {"12345", "friend", "longtextboy"});
 
 				THEN("the duplicates aren't added to the queue and order is preserved.")
 				{
-					const auto lines = print(totest.first, account);
+					const auto lines = print(account);
 					REQUIRE(lines.size() == 5);
-					REQUIRE(lines == someids);
+					REQUIRE(lines == make_expected_ids(someids, std::get<1>(totest)));
 				}
 			}
 
 			AND_WHEN("a mix of ids that were already in the queue and new ones are queued")
 			{
-				enqueue(totest.first, account, std::vector<std::string> {"12345", "a new friend", "longtextboy", "a new friend"});
+				enqueue(std::get<0>(totest), account, std::vector<std::string> {"12345", "a new friend", "longtextboy", "a new friend"});
 
 				THEN("the duplicates aren't added to the queue and order is preserved.")
 				{
-					const auto lines = print(totest.first, account);
+					const auto lines = print(account);
 					REQUIRE(lines.size() == 6);
-					REQUIRE(lines[0] == "12345");
-					REQUIRE(lines[1] == "67890");
-					REQUIRE(lines[2] == "123123123123123123123");
-					REQUIRE(lines[3] == "longtextboy");
-					REQUIRE(lines[4] == "friend");
-					REQUIRE(lines[5] == "a new friend");
+					REQUIRE(prefix_match(lines[0], std::get<1>(totest), "12345"));
+					REQUIRE(prefix_match(lines[1], std::get<1>(totest), "67890"));
+					REQUIRE(prefix_match(lines[2], std::get<1>(totest), "123123123123123123123"));
+					REQUIRE(prefix_match(lines[3], std::get<1>(totest), "longtextboy"));
+					REQUIRE(prefix_match(lines[4], std::get<1>(totest), "friend"));
+					REQUIRE(prefix_match(lines[5], std::get<1>(totest), "a new friend"));
 				}
 			}
 
 			AND_WHEN("the queue is cleared")
 			{
-				clear(totest.first, account);
+				clear(std::get<0>(totest), account);
 
 				THEN("The file is empty, but exists.")
 				{
-					const auto lines = print(totest.first, account);
-					REQUIRE(fs::exists(accountdir.filename / totest.second));
+					const auto lines = print(account);
+					REQUIRE(fs::exists(accountdir.filename / std::get<1>(totest)));
 					REQUIRE(lines.size() == 0);
 				}
 			}
@@ -136,9 +156,9 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 	constexpr static std::string_view account = "queueboy@website.egg";
 	test_file allaccounts = account_directory(); //make sure this gets cleaned up, too
 	test_file accountdir = allaccounts.filename / account;
-	
+
 	const fs::path file_queue_dir = accountdir.filename / File_Queue_Directory;
-	const fs::path post_queue_file = accountdir.filename / Post_Queue_Filename;
+	const fs::path post_queue_file = accountdir.filename / Queue_Filename;
 
 	GIVEN("Some posts to enqueue")
 	{
@@ -155,7 +175,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 			std::vector<std::string> toq{ postfiles[idx].filename.string() };
 			std::string justfilename = postfiles[idx].filename.filename().string();
 
-			enqueue(queues::post, account, toq);
+			enqueue(queues::post, account, std::vector<std::string>{toq});
 
 			THEN("the post is copied to the user's account folder")
 			{
@@ -164,9 +184,9 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 			THEN("the queue post file is filled correctly")
 			{
-				const auto lines = print(queues::post, account);
+				const auto lines = print(account);
 				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0] == justfilename);
+				REQUIRE(prefix_match(lines[0], "POST ", justfilename));
 			}
 
 			AND_WHEN("that post is dequeued")
@@ -294,16 +314,16 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 			{
 				const auto lines = read_lines(post_queue_file);
 				REQUIRE(lines.size() == 2);
-				REQUIRE(lines[0] == "thisisapost.hi");
-				REQUIRE(lines[1] == "thisisapost.hi.1");
+				REQUIRE(lines[0] == "POST thisisapost.hi");
+				REQUIRE(lines[1] == "POST thisisapost.hi.1");
 			}
 
 			THEN("print returns the correct output.")
 			{
-				const auto lines = print(queues::post, account);
+				const auto lines = print(account);
 				REQUIRE(lines.size() == 2);
-				REQUIRE(lines[0] == "thisisapost.hi");
-				REQUIRE(lines[1] == "thisisapost.hi.1");
+				REQUIRE(lines[0] == "POST thisisapost.hi");
+				REQUIRE(lines[1] == "POST thisisapost.hi.1");
 			}
 
 			AND_WHEN("one is removed")
@@ -394,16 +414,16 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 			{
 				const auto lines = read_lines(post_queue_file);
 				REQUIRE(lines.size() == 2);
-				REQUIRE(lines[0] == "thisisapost");
-				REQUIRE(lines[1] == "thisisapost.1");
+				REQUIRE(lines[0] == "POST thisisapost");
+				REQUIRE(lines[1] == "POST thisisapost.1");
 			}
 
 			THEN("print returns the correct output.")
 			{
-				const auto lines = print(queues::post, account);
+				const auto lines = print(account);
 				REQUIRE(lines.size() == 2);
-				REQUIRE(lines[0] == "thisisapost");
-				REQUIRE(lines[1] == "thisisapost.1");
+				REQUIRE(lines[0] == "POST thisisapost");
+				REQUIRE(lines[1] == "POST thisisapost.1");
 			}
 
 			AND_WHEN("one is removed")

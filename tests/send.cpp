@@ -163,7 +163,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 	GIVEN("A queue with some ids to add and a good connection")
 	{
-		enqueue(std::get<0>(queue), account, testvect);
+		enqueue(std::get<0>(queue), account, std::vector<std::string>{testvect});
 
 		WHEN("the queue is sent")
 		{
@@ -178,7 +178,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("the queue is now empty.")
 			{
-				REQUIRE(print(std::get<0>(queue), account).empty());
+				REQUIRE(print(account).empty());
 			}
 
 			THEN("one call per ID was made.")
@@ -214,7 +214,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 		std::vector<std::string> toremove{ testvect };
 		std::for_each(toremove.begin(), toremove.end(), [](auto& str) { str.push_back('-'); });
 
-		enqueue(std::get<0>(queue), account, toremove);
+		enqueue(std::get<0>(queue), account, std::vector<std::string>{toremove});
 
 		WHEN("the queue is sent")
 		{
@@ -229,7 +229,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("the queue is now empty.")
 			{
-				REQUIRE(print(std::get<0>(queue), account).empty());
+				REQUIRE(print(account).empty());
 			}
 
 			THEN("one call per ID was made.")
@@ -274,7 +274,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			std::make_pair(0, 3),
 			std::make_pair(-1, 3));
 
-		enqueue(std::get<0>(queue), account, testvect);
+		enqueue(std::get<0>(queue), account, std::vector<std::string>{testvect});
 
 		WHEN("the queue is sent")
 		{
@@ -293,7 +293,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("the queue is now empty.")
 			{
-				REQUIRE(print(std::get<0>(queue), account).empty());
+				REQUIRE(print(account).empty());
 			}
 
 			THEN("each ID was tried the correct number of times.")
@@ -339,7 +339,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			std::make_pair(-1, 3));
 
 
-		enqueue(std::get<0>(queue), account, testvect);
+		enqueue(std::get<0>(queue), account, std::vector<std::string>{testvect});
 
 		WHEN("the queue is sent")
 		{
@@ -359,7 +359,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("the queue hasn't changed.")
 			{
-				REQUIRE(print(std::get<0>(queue), account) == testvect);
+				REQUIRE(print( account) == testvect);
 			}
 
 			THEN("each ID was tried once.")
@@ -439,7 +439,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 			fourth.parsed.vis = visibility::unlisted;
 		}
 
-		enqueue(queues::post, account, expected_files);
+		enqueue(queues::post, account, std::vector<std::string>{expected_files});
 
 		mock_network_post mockpost;
 		mock_network_delete mockdel;
@@ -454,7 +454,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 
 			THEN("the queue and post directory is now empty.")
 			{
-				REQUIRE(print(queues::post, account).empty());
+				REQUIRE(print(account).empty());
 
 				// it'll leave the .bak files behind
 				REQUIRE(count_files_in_directory(queue_directory) == 4);
@@ -546,7 +546,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 
 			THEN("the queue and post directory removes the successfully sent posts.")
 			{
-				REQUIRE(print(queues::post, account) == std::vector<std::string>{ "second.post", "another kind of post" });
+				REQUIRE(print(account) == std::vector<std::string>{ "POST second.post", "POST another kind of post" });
 
 				// 4 bak files, 2 regular
 				REQUIRE(count_files_in_directory(queue_directory) == 6);
@@ -643,7 +643,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 
 			THEN("the queue and post directories are not empty.")
 			{
-				REQUIRE(print(queues::post, account) == expected_files);
+				REQUIRE(print(account) == expected_files);
 
 				// queueing the posts makes a .bak file for them
 				REQUIRE(count_files_in_directory(queue_directory) == 8);
@@ -721,7 +721,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 
 			THEN("the queue and post directories are emptied.")
 			{
-				REQUIRE(print(queues::post, account).empty());
+				REQUIRE(print(account).empty());
 
 				// queueing the posts makes a .bak file for them
 				REQUIRE(count_files_in_directory(queue_directory) == 4);
