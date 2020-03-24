@@ -78,7 +78,7 @@ int main(int argc, const char* argv[])
 				clear(parsed.queue_opt.selected, assume_account(parsed.account).first);
 				break;
 			case queue_action::print:
-				print_iterable(print(parsed.queue_opt.selected, assume_account(parsed.account).first));
+				print_iterable(print(assume_account(parsed.account).first));
 				break;
 			}
 			break;

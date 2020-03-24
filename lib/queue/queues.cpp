@@ -164,6 +164,19 @@ queue_t open_queue(const std::string_view account)
 	return queue_t{ qfile / Queue_Filename };
 }
 
+std::vector<api_call> to_api_calls(std::vector<std::string>&& add, api_route target_route)
+{
+	std::vector<api_call> to_return;
+	to_return.reserve(add.size());
+	std::transform(std::make_move_iterator(add.begin()), std::make_move_iterator(add.end()),
+		std::back_inserter(to_return), [target_route](std::string&& id)
+		{
+			return api_call{ target_route, std::move(id) };
+		});
+
+	return to_return;
+}
+
 void enqueue(const queues toenqueue, const std::string_view account, std::vector<std::string>&& add)
 {
 	queue_list toaddto = open_queue(account);
@@ -172,7 +185,7 @@ void enqueue(const queues toenqueue, const std::string_view account, std::vector
 	if (toenqueue == queues::post)
 	{
 		const fs::path filequeuedir = get_file_queue_directory(account);
-		std::transform(add.begin(), add.end(), std::back_inserter(toaddto.parsed), [&filequeuedir](const auto& id)
+		std::transform(add.begin(), add.end(), std::back_inserter(toaddto.parsed), [&filequeuedir, target_route](const auto& id)
 			{
 				return api_call{ target_route, queue_post(filequeuedir, id) };
 			});
@@ -194,21 +207,14 @@ void enqueue(const queues toenqueue, const std::string_view account, std::vector
 		// adding profile updates, poll voting, and other stuff that can get the "fire and forget" treatment like
 		// favs and boosts do
 
-		std::vector<api_call> to_add;
-		to_add.reserve(add.size());
-		std::transform(std::make_move_iterator(add.begin()), std::make_move_iterator(add.end()),
-			std::back_inserter(to_add), [target_route](std::string&& id)
-			{
-				return api_call{ target_route, std::move(id) };
-			});
 
-		const auto does_not_contain = [&toaddto, target_route](const std::string& adding)
+		for (api_call& incoming_call : to_api_calls(std::move(add), target_route))
 		{
-			return std::any_of(toaddto.parsed.begin(), toaddto.parsed.end(), 
-				[&adding, target_route](const api_call& inqueue) { inqueue.queued_call == target_route && inqueue.argument == adding });
-		};
-
-		std::copy_if(add.begin(), add.end(), std::back_inserter(toaddto.parsed), does_not_contain);
+			if (std::find(toaddto.parsed.begin(), toaddto.parsed.end(), incoming_call) == toaddto.parsed.end())
+			{
+				toaddto.parsed.push_back(std::move(incoming_call));
+			}
+		}
 	}
 
 	// consider looking for those "delete" guys, the ones with the - at the end, and having this cancel them out, 
@@ -223,15 +229,17 @@ void dequeue_post(const fs::path& queuedir, const fs::path& filename)
 	}
 }
 
-void dequeue(queues todequeue, const std::string_view account, std::vector<std::string>&& toremove)
+void dequeue(queues todequeue, const std::string_view account, std::vector<std::string>&& remove)
 {
 	queue_list toremovefrom = open_queue(account);
 
 	if (todequeue == queues::post)
 	{
 		// trim path names 
-		std::transform(toremove.begin(), toremove.end(), toremove.begin(), [](const auto& path) { return fs::path(path).filename().string(); });
+		std::transform(remove.begin(), remove.end(), remove.begin(), [](const auto& path) { return fs::path(path).filename().string(); });
 	}
+
+	auto toremove = to_api_calls(std::move(remove), get_route(todequeue, false));
 
 	// stable_partition is O(n) (assuming it can allocate a temporary buffer)
 	// but doing a O(n) find call for each one makes it O(n^2)
@@ -268,15 +276,17 @@ void dequeue(queues todequeue, const std::string_view account, std::vector<std::
 	{
 		const fs::path filequeuedir = get_file_queue_directory(account);
 		std::for_each(toremove.begin(), toremove_pivot,
-			[&filequeuedir](const auto& filepath) { dequeue_post(filequeuedir, filepath); });
+			[&filequeuedir](const auto& apicall) { dequeue_post(filequeuedir, apicall.argument); });
 	}
 
 	toremovefrom.parsed.erase(removefrom_pivot, toremovefrom.parsed.end());
 
 	//basically, if a thing isn't in the queue, enqueue removing that thing. unboosting, unfaving, deleting a post
 	//consider removing duplicate removes?
+
+	const auto remove_route = get_route(todequeue, true);
 	std::for_each(toremove_pivot, toremove.end(),
-		[&toremovefrom](auto& queuedel) { queuedel.push_back('-'); toremovefrom.parsed.push_back(std::move(queuedel)); });
+		[&toremovefrom, remove_route](api_call& queuedel) { toremovefrom.parsed.push_back(api_call{ remove_route, std::move(queuedel.argument) }); });
 }
 
 void clear(queues toclear, const std::string_view account)
@@ -299,8 +309,16 @@ queue_list get(const std::string_view account)
 std::vector<std::string> print(const std::string_view account)
 {
 	//prettyprint posts
-	const readonly_queue_list printthis = open_queue<readonly_queue_list>(account);
+	readonly_queue_list printthis = open_queue<readonly_queue_list>(account);
 	std::vector<std::string> toreturn(printthis.parsed.size());
-	std::move(printthis.parsed.begin(), printthis.parsed.end(), toreturn.begin());
+	std::transform(std::make_move_iterator(printthis.parsed.begin()), std::make_move_iterator(printthis.parsed.end()),
+		toreturn.begin(), [](api_call&& call) 
+		{
+			const auto route_name = print_route(call.queued_call);
+			std::string toreturn = std::move(call.argument);
+			call.argument.insert(0, route_name.size() + 1, ' ');
+			call.argument.replace(0, route_name.size(), route_name);
+			return toreturn;
+		});
 	return toreturn;
 }

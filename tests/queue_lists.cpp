@@ -9,11 +9,6 @@
 #include <fstream>
 #include <string>
 
-bool operator== (const api_call& rhs, const api_call& lhs)
-{
-    return rhs.queued_call == lhs.queued_call && rhs.argument == lhs.argument;
-}
-
 SCENARIO("queue_lists save their data when destroyed.")
 {
     GIVEN("An queue_list with some values.")

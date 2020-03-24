@@ -23,6 +23,10 @@ struct api_call
 	std::string argument;
 };
 
+bool operator== (const api_call& rhs, const api_call& lhs);
+
+constexpr std::string_view print_route(api_route route);
+
 bool Read(std::deque<api_call>&, std::string&&);
 void Write(std::deque<api_call>&&, std::ofstream&);
 
