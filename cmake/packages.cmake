@@ -88,14 +88,8 @@ if (NOT USE_SYSTEM_CURL OR NOT CURL_FOUND)
 			DESTINATION
 			${ZLIB_DOWNLOAD_DIR})
 
-		if (CMAKE_SIZEOF_VOID_P MATCHES "8")
-			set(MSYNC_ZLIB_BITNESS "AMD64")
-		else()
-			set(MSYNC_ZLIB_BITNESS "x86")
-		endif()
-
 		# did you know that the only way I could get up-to-date static zlib was compiling it myself?
-		if(${MSYNC_ZLIB_BITNESS} MATCHES "AMD64")
+		if (CMAKE_SIZEOF_VOID_P MATCHES "8")
 			message(STATUS "Downloading 64-bit zlib...")
 			file(DOWNLOAD "https://kansattica.github.io/msync_deps/zlib1.2.11-winx64.lib"
 				${ZLIB_DOWNLOAD_DIR}/lib/zlibstatic.lib
