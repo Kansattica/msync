@@ -50,7 +50,7 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 
 			std::vector<std::string> someids{ "12345", "67890", "123123123123123123123", "longtextboy", "friend" };
 
-			enqueue(std::get<0>(totest), account, std::move(someids));
+			enqueue(std::get<0>(totest), account, std::vector<std::string> { someids });
 
 			THEN("the items are written immediately.")
 			{

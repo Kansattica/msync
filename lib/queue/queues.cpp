@@ -322,8 +322,8 @@ std::vector<std::string> print(const std::string_view account)
 		{
 			const auto route_name = print_route(call.queued_call);
 			std::string toreturn = std::move(call.argument);
-			call.argument.insert(0, route_name.size() + 1, ' ');
-			call.argument.replace(0, route_name.size(), route_name);
+			toreturn.insert(0, route_name.size() + 1, ' ');
+			toreturn.replace(0, route_name.size(), route_name);
 			return toreturn;
 		});
 	return toreturn;

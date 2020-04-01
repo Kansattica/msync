@@ -50,6 +50,8 @@ void Write(std::deque<api_call>&& que, std::ofstream& of)
 
 		if (!call.argument.empty())
 			of << ' ' << call.argument;
+
+		of << '\n';
 	}
 }
 
