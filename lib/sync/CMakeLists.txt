@@ -7,4 +7,5 @@ target_sources_local(sync
 	sync_helpers.cpp
 	sync_helpers.hpp
 	recv_helpers.hpp
+	send_helpers.hpp
 	)

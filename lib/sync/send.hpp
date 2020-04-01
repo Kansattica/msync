@@ -20,6 +20,7 @@
 
 #include "read_response.hpp"
 #include "sync_helpers.hpp"
+#include "send_helpers.hpp"
 
 template <typename post_request, typename delete_request, typename post_new_status, typename upload_attachments>
 struct send_posts
