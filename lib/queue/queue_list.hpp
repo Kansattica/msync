@@ -14,6 +14,7 @@ enum class api_route : uint8_t
 	unboost,
 	post,
 	unpost, // you might call it "delete post"
+	upload_media, //this one's a bit of an oddball
 	unknown,
 };
 

@@ -16,8 +16,8 @@ SCENARIO("queue_lists save their data when destroyed.")
         const test_file tf("testfileopt");
 
         queue_list opts(tf.filename);
-        opts.parsed.emplace_back(api_route::fav, "thingone");
-        opts.parsed.emplace_back(api_route::unboost, "thingtwo");
+        opts.parsed.push_back(api_call{ api_route::fav, "thingone" });
+        opts.parsed.push_back(api_call{ api_route::unboost, "thingtwo" });
 
         REQUIRE(opts.parsed.size() == 2);
 
@@ -122,8 +122,8 @@ SCENARIO("queue_lists read data when created.")
                 queue_list testfi(tf.filename);
 
                 testfi.parsed.pop_front();
-                testfi.parsed.emplace_back(api_route::fav, ":) :)");
-                testfi.parsed.emplace_back(api_route::unfav, ":) :4");
+                testfi.parsed.push_back(api_call{ api_route::fav, ":) :)" });
+                testfi.parsed.push_back(api_call{ api_route::unfav, ":) :4" });
                 REQUIRE(testfi.parsed.size() == 4);
             }
 
@@ -186,8 +186,8 @@ SCENARIO("queue_lists read data when created.")
                 queue_list testfi(tf.filename);
 
                 testfi.parsed.pop_front();
-                testfi.parsed.emplace_back(api_route::fav, ":) :)");
-                testfi.parsed.emplace_back(api_route::post, ":) :4");
+                testfi.parsed.push_back(api_call{ api_route::fav, ":) :)" });
+				testfi.parsed.push_back(api_call{ api_route::post, ":) :4" });
                 REQUIRE(testfi.parsed.size() == 4);
             }
 

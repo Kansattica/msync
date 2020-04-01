@@ -10,7 +10,6 @@
 #include "../net_interface/net_interface.hpp"
 #include "read_response.hpp"
 
-constexpr std::string_view status_route{ "/api/v1/statuses/" };
 constexpr std::string_view media_route{ "/api/v1/media" };
 
 constexpr std::pair<std::string_view, std::string_view> favroutepost{ "/favourite", "/unfavourite" };
