@@ -39,7 +39,7 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 	GIVEN("An empty queue")
 	{
 		const test_file allaccounts = account_directory(); //make sure this gets cleaned up, too
-		const test_file accountdir = allaccounts.filename / account;
+		const fs::path queue_file = allaccounts.filename / account / Queue_Filename;
 
 		WHEN("some items are enqueued")
 		{
@@ -61,7 +61,7 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 
 			THEN("the file exists.")
 			{
-				REQUIRE(fs::exists(accountdir.filename / std::get<1>(totest)));
+				REQUIRE(fs::exists(queue_file));
 			}
 
 			AND_WHEN("some of those are dequeued")
@@ -130,7 +130,7 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 				THEN("The file is empty, but exists.")
 				{
 					const auto lines = print(account);
-					REQUIRE(fs::exists(accountdir.filename / std::get<1>(totest)));
+					REQUIRE(fs::exists(queue_file));
 					REQUIRE(lines.size() == 0);
 				}
 			}
@@ -349,7 +349,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 				{
 					const auto lines = read_lines(post_queue_file);
 					REQUIRE(lines.size() == 1);
-					REQUIRE(lines[0] == otherfile);
+					REQUIRE(lines[0] == otherfile.insert(0, "POST "));
 				}
 
 				THEN("both original files are still there")
@@ -449,7 +449,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 				{
 					const auto lines = read_lines(post_queue_file);
 					REQUIRE(lines.size() == 1);
-					REQUIRE(lines[0] == otherfile);
+					REQUIRE(lines[0] == otherfile.insert(0, "POST "));
 				}
 
 				THEN("both original files are still there")
