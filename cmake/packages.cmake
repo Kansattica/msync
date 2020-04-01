@@ -88,13 +88,10 @@ if (NOT USE_SYSTEM_CURL OR NOT CURL_FOUND)
 			DESTINATION
 			${ZLIB_DOWNLOAD_DIR})
 
-		set(MSYNC_ZLIB_BITNESS ${CMAKE_SYSTEM_PROCESSOR})
-		if (DEFINED CMAKE_VS_PLATFORM_NAME)
-			if (CMAKE_VS_PLATFORM_NAME MATCHES "x64")
-				set(MSYNC_ZLIB_BITNESS "AMD64")
-			else()
-				set(MSYNC_ZLIB_BITNESS "x86")
-			endif()
+		if (CMAKE_SIZEOF_VOID_P MATCHES "8")
+			set(MSYNC_ZLIB_BITNESS "AMD64")
+		else()
+			set(MSYNC_ZLIB_BITNESS "x86")
 		endif()
 
 		# did you know that the only way I could get up-to-date static zlib was compiling it myself?
