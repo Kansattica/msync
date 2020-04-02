@@ -16,12 +16,12 @@ matrix:
     compiler: cl.exe
     env: BUILDTYPE=Release CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=Win32
   - os: osx
-    osx_image: xcode11.3	
-#addons:
-#  homebrew:
-#    packages:
-#    - llvm
-#    - cmake
+    osx_image: xcode11.3
+    env: BUILDTYPE=Release LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib" CPPFLAGS="-I/usr/local/opt/llvm/include" 
+addons:
+  homebrew:
+    packages:
+    - llvm
 
 before_install:
   - if [ "$TRAVIS_COMPILER" = "gcc" ] && [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo -E apt-get -yqq --no-install-suggests --no-install-recommends install g++-8 && CC=gcc-8 && CXX=g++-8; fi
