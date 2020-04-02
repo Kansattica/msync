@@ -8,6 +8,8 @@
 
 #include <fstream>
 #include <string>
+#include <array>
+#include <algorithm>
 
 SCENARIO("queue_lists save their data when destroyed.")
 {
@@ -216,6 +218,44 @@ SCENARIO("queue_lists read data when created.")
                 }
             }
         }
+    }
+}
+
+SCENARIO("queue_list can handle a long queue with a lot of items.")
+{
+    constexpr unsigned int size = 10000;
+    constexpr std::array<api_route, 6> routes = { api_route::fav, api_route::unfav,
+		api_route::boost, api_route::unboost, api_route::post, api_route::unpost };
+
+    GIVEN("A bunch of API calls to enqueue and an empty queue_list.")
+    {
+        test_file queuefile{ "somequeuefile" };
+
+		std::vector<api_call> expected;
+		expected.reserve(size);
+
+        queue_list actual(queuefile.filename);
+
+		for (unsigned int i = 0; i < size; i++)
+		{
+            expected.push_back(api_call{ routes[i % routes.size()], "a string" });
+            actual.parsed.push_back(api_call{ routes[i % routes.size()], "a string" });
+		}
+
+        WHEN("The queue is moved from and destroyed.")
+        {
+            {
+                queue_list newqueue = std::move(actual);
+            }
+
+            THEN("Reading the queue again is as expected.")
+            {
+                queue_list readqueue(queuefile.filename);
+
+                REQUIRE(std::equal(readqueue.parsed.begin(), readqueue.parsed.end(), expected.begin(), expected.end()));
+            }
+        }
+
     }
 }
 
