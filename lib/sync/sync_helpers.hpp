@@ -9,6 +9,8 @@
 
 #include "../net_interface/net_interface.hpp"
 
+#include "read_response.hpp"
+
 template <typename message_type, typename stream_output>
 unsigned int set_default(unsigned int value, unsigned int default_value, const message_type& message, stream_output& out)
 {
