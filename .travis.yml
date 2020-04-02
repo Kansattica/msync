@@ -17,7 +17,7 @@ matrix:
     env: BUILDTYPE=Release CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=Win32
   - os: osx
     osx_image: xcode11.3
-    env: BUILDTYPE=Release LDFLAGS="-L/usr/local/opt/llvm/lib" CPPFLAGS="-I/usr/local/opt/llvm/include" 
+    env: BUILDTYPE=Release LDFLAGS="-L/usr/local/opt/llvm/lib" CPPFLAGS="-I/usr/local/opt/llvm/include" CC=clang CXX=clang++ PATH="/usr/local/opt/llvm/bin:$PATH"
 addons:
   homebrew:
     packages:
