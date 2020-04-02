@@ -17,10 +17,10 @@ matrix:
     env: BUILDTYPE=Release CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=Win32
   - os: osx
     osx_image: xcode11.3	
-addons:
-  homebrew:
-    packages:
-    - llvm
+#addons:
+#  homebrew:
+#    packages:
+#    - llvm
 #    - cmake
 
 before_install:
