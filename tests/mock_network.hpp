@@ -18,6 +18,7 @@ protected:
 
 struct basic_mock_args
 {
+	unsigned int sequence;
 	std::string url;
 	std::string access_token;
 };

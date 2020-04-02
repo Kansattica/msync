@@ -81,7 +81,7 @@ struct mock_network_get : public mock_network
 
 	net_response operator()(std::string_view url, std::string_view access_token, const timeline_params& params, unsigned int limit)
 	{
-		arguments.push_back(get_mock_args{ std::string{url}, std::string{access_token}, 
+		arguments.push_back(get_mock_args{ 0, std::string{url}, std::string{access_token}, 
 			std::string{params.min_id}, std::string{params.max_id}, std::string{params.since_id}, copy_excludes(params.exclude_notifs), limit });
 
 		net_response toreturn;

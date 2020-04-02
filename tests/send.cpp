@@ -21,13 +21,15 @@ struct id_mock_args : public basic_mock_args
 	std::string id;
 };
 
+unsigned int sequence = 0;
+
 struct mock_network_post : public mock_network
 {
 	std::vector<basic_mock_args> arguments;
 
 	net_response operator()(std::string_view url, std::string_view access_token)
 	{
-		arguments.push_back(basic_mock_args{ std::string {url}, std::string { access_token } });
+		arguments.push_back(basic_mock_args{ ++sequence, std::string {url}, std::string { access_token } });
 
 		net_response toreturn;
 		toreturn.retryable_error = (--succeed_after > 0);
@@ -46,7 +48,7 @@ struct mock_network_delete : public mock_network
 
 	net_response operator()(std::string_view url, std::string_view access_token)
 	{
-		arguments.push_back(basic_mock_args{ std::string {url}, std::string { access_token } });
+		arguments.push_back(basic_mock_args{ ++sequence, std::string {url}, std::string { access_token } });
 
 		net_response toreturn;
 		toreturn.retryable_error = (--succeed_after > 0);
@@ -88,7 +90,7 @@ struct mock_network_new_status : public mock_network
 		else
 			make_status_json(str_id, toreturn.message);
 
-		arguments.push_back(status_mock_args{ std::string {url}, std::string { access_token }, std::move(str_id), params});
+		arguments.push_back(status_mock_args{ ++sequence, std::string {url}, std::string { access_token }, std::move(str_id), params});
 
 		return toreturn;
 	}
@@ -116,7 +118,7 @@ struct mock_network_upload : public mock_network
 		toreturn.message += str_id;
 		toreturn.message += "\"}";
 
-		arguments.push_back(upload_mock_args{ std::string {url}, std::string { access_token }, std::move(str_id),
+		arguments.push_back(upload_mock_args{ ++sequence, std::string {url}, std::string { access_token }, std::move(str_id),
 			attachment{file, description} });
 
 		return toreturn;
@@ -839,3 +841,81 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 		}
 	}
 }
+
+SCENARIO("Send correctly sends from and modifies a queue of mixed API calls.")
+{
+	logs_off = true;
+
+	const test_file fi = account_directory();
+	constexpr std::string_view account = "prettynormal@website.egg";
+	constexpr std::string_view instanceurl = "website.egg";
+	constexpr std::string_view accesstoken = "someothertoken";
+
+	GIVEN("A queue with some ids to add and a good connection")
+	{
+		dequeue(queues::boost, account, { "worstpost" });
+		enqueue(queues::boost, account, { "somekindapost", "anotherkindapost" });
+		enqueue(queues::fav, account, { "somekindapost", "mrs. goodpost" });
+		dequeue(queues::post, account, { "real stinker" });
+		dequeue(queues::fav, account, { "badpost" });
+
+		WHEN("the queue is sent")
+		{
+			mock_network_post mockpost;
+			mock_network_delete mockdel;
+			mock_network_new_status mocknew;
+			mock_network_upload mockupload;
+
+			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload };
+
+			sequence = 0;
+			send.send(account, instanceurl, accesstoken);
+
+			THEN("the queue is empty.")
+			{
+				REQUIRE(read_file(fi.filename / account / Queue_Filename).empty());
+			}
+
+			THEN("the correct number of calls were made.")
+			{
+				REQUIRE(mockpost.arguments.size() == 6);
+				REQUIRE(mockdel.arguments.size() == 1);
+				REQUIRE(mocknew.arguments.size() == 0);
+				REQUIRE(mockupload.arguments.size() == 0);
+			}
+
+			THEN("the correct calls were made")
+			{
+				REQUIRE(mockpost.arguments[0].access_token == accesstoken);
+				REQUIRE(mockpost.arguments[0].sequence == 1);
+				REQUIRE(mockpost.arguments[0].url == make_expected_url("worstpost", "/unreblog", instanceurl));
+
+				REQUIRE(mockpost.arguments[1].access_token == accesstoken);
+				REQUIRE(mockpost.arguments[1].sequence == 2);
+				REQUIRE(mockpost.arguments[1].url == make_expected_url("somekindapost", "/reblog", instanceurl));
+
+				REQUIRE(mockpost.arguments[2].access_token == accesstoken);
+				REQUIRE(mockpost.arguments[2].sequence == 3);
+				REQUIRE(mockpost.arguments[2].url == make_expected_url("anotherkindapost", "/reblog", instanceurl));
+
+				REQUIRE(mockpost.arguments[3].access_token == accesstoken);
+				REQUIRE(mockpost.arguments[3].sequence == 4);
+				REQUIRE(mockpost.arguments[3].url == make_expected_url("somekindapost", "/favourite", instanceurl));
+
+				REQUIRE(mockpost.arguments[4].access_token == accesstoken);
+				REQUIRE(mockpost.arguments[4].sequence == 5);
+				REQUIRE(mockpost.arguments[4].url == make_expected_url("mrs. goodpost", "/favourite", instanceurl));
+
+				REQUIRE(mockdel.arguments[0].access_token == accesstoken);
+				REQUIRE(mockdel.arguments[0].sequence == 6);
+				REQUIRE(mockdel.arguments[0].url == make_expected_url("real stinker", "", instanceurl));
+
+				REQUIRE(mockpost.arguments[5].access_token == accesstoken);
+				REQUIRE(mockpost.arguments[5].sequence == 7);
+				REQUIRE(mockpost.arguments[5].url == make_expected_url("badpost", "/unfavourite", instanceurl));
+
+			}
+		}
+	}
+}
+
