@@ -467,3 +467,87 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 		}
 	}
 }
+
+SCENARIO("Queues can handle a mix of different queued calls.")
+{
+	constexpr static std::string_view account = "funnybone@typical.egg";
+	test_file allaccounts = account_directory(); //make sure this gets cleaned up, too
+	test_file accountdir = allaccounts.filename / account;
+
+	const fs::path file_queue_dir = accountdir.filename / File_Queue_Directory;
+	const fs::path queue_file = accountdir.filename / Queue_Filename;
+
+	GIVEN("An empty queue and some some posts to enqueue.")
+	{
+		const test_file to_queue[] { "one post", "another.post!" };
+
+		int postno = 1;
+		for (const auto& fi : to_queue)
+		{
+			std::ofstream of{ fi.filename };
+			of << "hey, I'm number " << postno++ << '\n';
+		}
+
+		WHEN("A mix of favs, boosts, and posts are added and removed, the file reflects that.")
+		{
+			REQUIRE(!fs::exists(queue_file));
+
+			dequeue(queues::post, account, { "69420", "somepost", "a real lousy one" });
+
+			REQUIRE(read_lines(queue_file) == std::vector<std::string>{"UNPOST 69420", "UNPOST somepost", "UNPOST a real lousy one"});
+
+			enqueue(queues::boost, account, { "boosty", "cool guy", "friend!", "someone else" });
+
+			REQUIRE(read_lines(queue_file) == 
+				std::vector<std::string>{"UNPOST 69420", "UNPOST somepost", "UNPOST a real lousy one",
+					"BOOST boosty", "BOOST cool guy", "BOOST friend!", "BOOST someone else" });
+
+			enqueue(queues::fav, account, { "favvy", "cool guy", "friend!" });
+
+			REQUIRE(read_lines(queue_file) == 
+				std::vector<std::string>{"UNPOST 69420", "UNPOST somepost", "UNPOST a real lousy one",
+					"BOOST boosty", "BOOST cool guy", "BOOST friend!", "BOOST someone else",
+					"FAV favvy", "FAV cool guy", "FAV friend!" });
+
+			dequeue(queues::boost, account, { "someone else", "cool guy", "whoopsie" });
+
+			REQUIRE(read_lines(queue_file) == 
+				std::vector<std::string>{"UNPOST 69420", "UNPOST somepost", "UNPOST a real lousy one",
+					"BOOST boosty", "BOOST friend!",
+					"FAV favvy", "FAV cool guy", "FAV friend!",
+					"UNBOOST whoopsie"});
+
+			enqueue(queues::post, account, { "one post" });
+
+			REQUIRE(read_lines(queue_file) == 
+				std::vector<std::string>{"UNPOST 69420", "UNPOST somepost", "UNPOST a real lousy one",
+					"BOOST boosty", "BOOST friend!",
+					"FAV favvy", "FAV cool guy", "FAV friend!",
+					"UNBOOST whoopsie",
+					"POST one post"});
+
+			REQUIRE(read_lines(file_queue_dir / "one post") == std::vector<std::string> { "visibility=default", "--- post body below this line ---", "hey, I'm number 1" });
+
+			dequeue(queues::fav, account, { "friend!", "whoopsie", "sorry about that" });
+
+			REQUIRE(read_lines(queue_file) == 
+				std::vector<std::string>{"UNPOST 69420", "UNPOST somepost", "UNPOST a real lousy one",
+					"BOOST boosty", "BOOST friend!",
+					"FAV favvy", "FAV cool guy",
+					"UNBOOST whoopsie",
+					"POST one post",
+					"UNFAV whoopsie", "UNFAV sorry about that"});
+
+			enqueue(queues::fav, account, { "sorry about that" });
+
+			REQUIRE(read_lines(queue_file) == 
+				std::vector<std::string>{"UNPOST 69420", "UNPOST somepost", "UNPOST a real lousy one",
+					"BOOST boosty", "BOOST friend!",
+					"FAV favvy", "FAV cool guy",
+					"UNBOOST whoopsie",
+					"POST one post",
+					"UNFAV whoopsie", "UNFAV sorry about that",
+					"FAV sorry about that"});
+		}
+	}
+}
