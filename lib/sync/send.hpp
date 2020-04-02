@@ -35,19 +35,17 @@ public:
 	{
 		retries = set_default(retries, 3, "Number of retries cannot be zero or less. Resetting to 3.\n", pl());
 
-		process_queue(account, instance_url);
+		process_queue(account, instance_url, access_token);
 	}
 
 
 private:
-	std::string_view access_token;
-
 	post_request& post;
 	delete_request& del;
 	post_new_status& new_status;
 	upload_attachments& upload;
 
-	bool make_api_call(const api_call& to_make, std::string_view instance_url, std::string_view account)
+	bool make_api_call(const api_call& to_make, std::string_view instance_url, std::string_view account, std::string_view access_token)
 	{
 		switch (to_make.queued_call)
 		{
@@ -58,7 +56,7 @@ private:
 			return simple_call(post, "POST", retries, make_lookup_url(instance_url, to_make.queued_call) + to_make.argument, access_token);
 		case api_route::post:
 			// posts are a little trickier
-			return send_post(account, make_lookup_url(instance_url, api_route::post), make_lookup_url(instance_url, api_route::upload_media), to_make.argument);
+			return send_post(account, access_token, make_lookup_url(instance_url, api_route::post), make_lookup_url(instance_url, api_route::upload_media), to_make.argument);
 		case api_route::unpost:
 			return simple_call(del, "DELETE", retries, make_lookup_url(instance_url, to_make.queued_call) + to_make.argument, access_token);
 		default:
@@ -66,7 +64,7 @@ private:
 		}
 	}
 
-	void process_queue(const std::string_view account, const std::string_view instance_url)
+	void process_queue(const std::string_view account, const std::string_view instance_url, const std::string_view access_token)
 	{
 		auto queuelist = get(account);
 
@@ -74,7 +72,7 @@ private:
 
 		while (!queuelist.parsed.empty())
 		{
-			if (!make_api_call(queuelist.parsed.front(), instance_url, account))
+			if (!make_api_call(queuelist.parsed.front(), instance_url, account, access_token))
 				failed.push_back(std::move(queuelist.parsed.front()));
 			queuelist.parsed.pop_front();
 		}
@@ -82,7 +80,7 @@ private:
 		queuelist.parsed = std::move(failed);
 	}
 
-	bool send_attachments(file_status_params& params, const std::string& mediaurl)
+	bool send_attachments(file_status_params& params, const std::string& mediaurl, std::string_view access_token)
 	{
 		bool succeeded;
 		std::string response;
@@ -127,7 +125,7 @@ private:
 		return (file_queue_dir_cache.insert({ account, get_file_queue_directory(account) })).first->second;
 	}
 
-	bool send_post(const std::string_view account, const std::string& statusurl, const std::string& mediaurl, const std::string& post_filename)
+	bool send_post(const std::string_view account, const std::string_view access_token, const std::string& statusurl, const std::string& mediaurl, const std::string& post_filename)
 	{
 		const fs::path file_to_send = get_cached_file_queue_dir(account) / post_filename;
 
@@ -142,7 +140,7 @@ private:
 
 		if (succeeded)
 		{
-			succeeded = send_attachments(params, mediaurl);
+			succeeded = send_attachments(params, mediaurl, access_token);
 		}
 
 		std::string parsed_status_id;
