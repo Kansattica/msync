@@ -86,7 +86,9 @@ To do other useful stuff with msync, you'll have to use queues. The `msync queue
 
 To queue up favorites, run `msync queue fav <any number of status IDs>`. You can get these status IDs from downloaded posts and notifications. They're always on a line that starts with `status id:` in `home.list` and `notifications.list`- don't put any other ID numbers into this! Boosts are the same: `msync queue boost <any number of status ids>`
 
-If you accidentally favorited or boosted a toot you'd rather not have, run `msync queue --remove fav <any number of status IDs>`. This works for favorites and boosts that you haven't sent yet (which will be removed immediately) and for ones that have already been sent (which will be removed the next time you `msync sync`). You can check the status of your queues and see what will be sent next time you sync up with `msync queue --print fav` (or `boost` or `post`)
+If you accidentally favorited or boosted a toot you'd rather not have, run `msync queue --remove fav <any number of status IDs>`. This works for favorites and boosts that you haven't sent yet (which will be removed immediately) and for ones that have already been sent (which will be removed the next time you `msync sync`).
+
+You can check the status of your queues and see what will be sent next time you sync up with `msync queue print`
 
 If you want to just clear that queue, possibly because there's a typo'd ID in there- you can run `msync queue --clear fav` (or `boost` or `post`).
 
@@ -100,7 +102,7 @@ Posts are a little different. You still queue them up to be sent when you next `
     msync sync
 ```
 
-- `msync` will copy the files you specify into your `msync_accounts` folder, so don't feel obligated to keep them around after you queue them.
+- `msync queue post` will copy the files you specify into your `msync_accounts` folder, so don't feel obligated to keep them around after you queue them.
 - `msync` does *not* copy attachments when you queue them. Attachment paths are converted to absolute file paths and uploaded in place when you `msync sync` up next.
 - The `--body` option to `msync gen` can be useful, especially for prefilling someone's handle in the body of a post, but be careful- your shell might do unwanted things with characters like `!` and `$`. 
 - If you're replying to someone else's post, make sure you:

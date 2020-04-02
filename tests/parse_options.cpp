@@ -962,11 +962,11 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 		}
 	}
 
-	GIVEN("A command line that prints the post queue.")
+	GIVEN("A command line that prints the current queue.")
 	{
 		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
-		int argc = 4;
-		char const* argv[]{ "msync", qcommand, "-p", "post" };
+		int argc = 3;
+		char const* argv[]{ "msync", qcommand, "print" };
 
 		WHEN("the command line is parsed")
 		{
@@ -977,11 +977,6 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 				REQUIRE(result.okay);
 			}
 
-			THEN("the correct queue is selected")
-			{
-				REQUIRE(result.queue_opt.selected == queues::post);
-			}
-
 			THEN("the correct action is selected.")
 			{
 				REQUIRE(result.queue_opt.to_do == queue_action::print);
@@ -989,32 +984,6 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 		}
 	}
 
-	GIVEN("A command line that prints the post queue with long options.")
-	{
-		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
-		int argc = 4;
-		char const* argv[]{ "msync", qcommand, "--print", "post" };
-
-		WHEN("the command line is parsed")
-		{
-			auto result = parse(argc, argv);
-
-			THEN("the parse is good.")
-			{
-				REQUIRE(result.okay);
-			}
-
-			THEN("the correct queue is selected")
-			{
-				REQUIRE(result.queue_opt.selected == queues::post);
-			}
-
-			THEN("the correct action is selected.")
-			{
-				REQUIRE(result.queue_opt.to_do == queue_action::print);
-			}
-		}
-	}
 }
 
 SCENARIO("The command line parser recognizes when the user requests msync's version.")
