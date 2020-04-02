@@ -114,3 +114,12 @@ void make_notification_json(std::string_view id, std::string& to_append)
 	to_append += '}';
 }
 
+std::vector<std::string> make_expected_ids(const std::vector<std::string>& ids, std::string_view prefix)
+{
+	std::vector<std::string> toreturn(ids.size());
+	std::transform(ids.begin(), ids.end(), toreturn.begin(), [&prefix](const std::string& id) 
+		{
+			return std::string{ id }.insert(0, prefix);
+		});
+	return toreturn;
+}

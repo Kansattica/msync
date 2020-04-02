@@ -153,8 +153,8 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 	constexpr std::string_view accesstoken = "sometoken";
 
 	const auto queue = GENERATE(
-		std::make_tuple(queues::fav, "/favourite", "/unfavourite"),
-		std::make_tuple(queues::boost, "/reblog", "/unreblog"));
+		std::make_tuple(queues::fav, "/favourite", "/unfavourite", "FAV "),
+		std::make_tuple(queues::boost, "/reblog", "/unreblog", "BOOST "));
 
 	const std::vector<std::string> testvect = GENERATE(
 		std::vector<std::string>{ "someid", "someotherid", "mrid" },
@@ -211,10 +211,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 	GIVEN("A queue with some ids to remove and a good connection")
 	{
-		std::vector<std::string> toremove{ testvect };
-		std::for_each(toremove.begin(), toremove.end(), [](auto& str) { str.push_back('-'); });
-
-		enqueue(std::get<0>(queue), account, std::vector<std::string>{toremove});
+		dequeue(std::get<0>(queue), account, std::vector<std::string>{testvect});
 
 		WHEN("the queue is sent")
 		{
@@ -234,7 +231,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("one call per ID was made.")
 			{
-				REQUIRE(mockpost.arguments.size() == toremove.size());
+				REQUIRE(mockpost.arguments.size() == testvect.size());
 			}
 
 			THEN("the access token was passed in.")
@@ -244,7 +241,6 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("the URLs are as expected.")
 			{
-				//testvect doesn't have the trailing minus signs, which is what we want for this test.
 				REQUIRE(testvect.size() == mockpost.arguments.size());
 				for (unsigned int i = 0; i < testvect.size(); i++)
 				{
@@ -359,7 +355,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("the queue hasn't changed.")
 			{
-				REQUIRE(print( account) == testvect);
+				REQUIRE(print(account) == make_expected_ids(testvect, std::get<3>(queue)));
 			}
 
 			THEN("each ID was tried once.")
@@ -643,7 +639,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 
 			THEN("the queue and post directories are not empty.")
 			{
-				REQUIRE(print(account) == expected_files);
+				REQUIRE(print(account) == make_expected_ids(expected_files, "POST "));
 
 				// queueing the posts makes a .bak file for them
 				REQUIRE(count_files_in_directory(queue_directory) == 8);

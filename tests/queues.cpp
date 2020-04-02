@@ -16,16 +16,6 @@
 
 using namespace std::string_view_literals;
 
-std::vector<std::string> make_expected_ids(const std::vector<std::string>& ids, std::string_view prefix)
-{
-	std::vector<std::string> toreturn(ids.size());
-	std::transform(ids.begin(), ids.end(), toreturn.begin(), [&prefix](const std::string& id) 
-		{
-			return std::string{ id }.insert(0, prefix);
-		});
-	return toreturn;
-}
-
 bool prefix_match(std::string_view actual, std::string_view prefix, std::string_view expected)
 {
 	return std::equal(actual.begin(), actual.begin() + prefix.length(), prefix.begin(), prefix.end()) &&
