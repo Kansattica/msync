@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iterator>
 #include <array>
+#include <algorithm>
 
 #include "../lib/constants/constants.hpp"
 

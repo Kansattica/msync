@@ -8,7 +8,7 @@ constexpr std::array<std::string_view, static_cast<uint8_t>(api_route::unknown)>
 	"FAV", "UNFAV", "BOOST", "UNBOOST", "POST", "UNPOST"
 };
 
-constexpr std::string_view print_route(api_route route)
+std::string_view print_route(api_route route)
 {
 	return ROUTE_NAMES[static_cast<uint8_t>(route)];
 }
