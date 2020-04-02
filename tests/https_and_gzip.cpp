@@ -6,11 +6,11 @@ SCENARIO("Can make SSL requests to a site.")
 {
 	GIVEN("An HTTPS URL")
 	{
-		auto url = GENERATE(as<const char*>{}, "https://example.com", "https://wikipedia.org", "https://mastodon.social");
+		const auto url = GENERATE(as<const char*>{}, "https://example.com", "https://wikipedia.org", "https://mastodon.social");
 
 		WHEN("a request is made")
 		{
-			auto response = cpr::Get(cpr::Url{ url });
+			const auto response = cpr::Get(cpr::Url{ url });
 
 			THEN("the call is a success.")
 			{
