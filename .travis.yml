@@ -15,6 +15,13 @@ matrix:
   - os: windows
     compiler: cl.exe
     env: BUILDTYPE=Release CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=Win32
+  - os: osx
+  	env: CC=clang CXX=clang++
+
+addons:
+  homebrew:
+    packages:
+	  - llvm
 
 before_install:
   - if [ "$TRAVIS_COMPILER" = "gcc" ]; then sudo -E apt-get -yqq --no-install-suggests --no-install-recommends install g++-8 && CC=gcc-8 && CXX=g++-8; fi
