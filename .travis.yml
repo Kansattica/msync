@@ -30,6 +30,7 @@ before_install:
 script:
   - mkdir build
   - cd build
+  - cmake --version
   - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE ..
   - cmake --build . --config $BUILDTYPE --parallel 2
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then EXELOCATION="./$BUILDTYPE/msync.exe"; else EXELOCATION="./msync"; fi
