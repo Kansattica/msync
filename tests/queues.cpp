@@ -548,6 +548,55 @@ SCENARIO("Queues can handle a mix of different queued calls.")
 					"POST one post",
 					"UNFAV whoopsie", "UNFAV sorry about that",
 					"FAV sorry about that"});
+
+			AND_WHEN("The post queue is cleared.")
+			{
+				clear(queues::post, account);
+
+				THEN("The file is as expected.")
+				{
+					REQUIRE(read_lines(queue_file) == std::vector<std::string>{
+						"BOOST boosty", "BOOST friend!",
+						"FAV favvy", "FAV cool guy",
+						"UNBOOST whoopsie",
+						"UNFAV whoopsie", "UNFAV sorry about that",
+						"FAV sorry about that"});
+				}
+
+				THEN("The corresponding post directory was deleted, too.")
+				{
+					REQUIRE(!fs::exists(file_queue_dir));
+				}
+			}
+
+			AND_WHEN("The fav queue is cleared.")
+			{
+				clear(queues::fav, account);
+
+				THEN("The file is as expected.")
+				{
+					REQUIRE(read_lines(queue_file) ==
+						std::vector<std::string>{"UNPOST 69420", "UNPOST somepost", "UNPOST a real lousy one",
+						"BOOST boosty", "BOOST friend!",
+						"UNBOOST whoopsie",
+						"POST one post"});
+				}
+			}
+
+			AND_WHEN("The boost queue is cleared.")
+			{
+				clear(queues::boost, account);
+
+				THEN("The file is as expected.")
+				{
+					REQUIRE(read_lines(queue_file) ==
+						std::vector<std::string>{"UNPOST 69420", "UNPOST somepost", "UNPOST a real lousy one",
+						"FAV favvy", "FAV cool guy",
+						"POST one post",
+						"UNFAV whoopsie", "UNFAV sorry about that",
+						"FAV sorry about that"});
+				}
+			}
 		}
 	}
 }
