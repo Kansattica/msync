@@ -22,6 +22,7 @@ addons:
   homebrew:
     packages:
 	  - llvm
+	  - cmake
 
 before_install:
   - if [ "$TRAVIS_COMPILER" = "gcc" ]; then sudo -E apt-get -yqq --no-install-suggests --no-install-recommends install g++-8 && CC=gcc-8 && CXX=g++-8; fi
