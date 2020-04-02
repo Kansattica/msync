@@ -36,7 +36,7 @@ bool Read(std::deque<api_call>& queued, std::string&& line)
 	else
 		line.clear();
 
-	queued.emplace_back(api_call{ parsed_route, std::move(line) });
+	queued.push_back(api_call{ parsed_route, std::move(line) });
 	return false;
 }
 
