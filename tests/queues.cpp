@@ -25,7 +25,7 @@ bool prefix_match(std::string_view actual, std::string_view prefix, std::string_
 SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 {
 	logs_off = true;
-	static constexpr std::string_view account = "regularguy@internet.egg";
+	static const std::string account = "regularguy@internet.egg";
 	GIVEN("An empty queue")
 	{
 		const test_file allaccounts = account_directory(); //make sure this gets cleaned up, too
@@ -143,7 +143,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 {
 	logs_off = true; //shut up the printlogger
 
-	constexpr static std::string_view account = "queueboy@website.egg";
+	static const std::string account = "queueboy@website.egg";
 	test_file allaccounts = account_directory(); //make sure this gets cleaned up, too
 	test_file accountdir = allaccounts.filename / account;
 
@@ -470,7 +470,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 SCENARIO("Queues can handle a mix of different queued calls.")
 {
-	constexpr static std::string_view account = "funnybone@typical.egg";
+	static const std::string account = "funnybone@typical.egg";
 	test_file allaccounts = account_directory(); //make sure this gets cleaned up, too
 	test_file accountdir = allaccounts.filename / account;
 
