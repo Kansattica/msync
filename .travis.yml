@@ -21,7 +21,7 @@ matrix:
 addons:
   homebrew:
     packages:
-      - boost
+      - boost-python3
 
 before_install:
   - if [ "$TRAVIS_COMPILER" = "gcc" ] && [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo -E apt-get -yqq --no-install-suggests --no-install-recommends install g++-8 && CC=gcc-8 && CXX=g++-8; fi
