@@ -1,4 +1,4 @@
-﻿#include <exception>
+#include <exception>
 #include <msync_exception.hpp>
 #include <print_logger.hpp>
 #include <string>
