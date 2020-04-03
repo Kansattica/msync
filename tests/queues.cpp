@@ -130,7 +130,7 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 
 }
 
-void files_match(const std::string_view account, const fs::path& original, const std::string_view outfile)
+void files_match(const std::string& account, const fs::path& original, const std::string& outfile)
 {
 	const outgoing_post orig{ original };
 	const outgoing_post newfile{ options().account_directory_location / account / File_Queue_Directory / outfile };
