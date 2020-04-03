@@ -12,7 +12,8 @@ class file_backed
 {
 public:
     Container parsed;
-	file_backed(fs::path filename) : backing(filename)
+
+	file_backed(fs::path filename) : backing(std::move(filename))
 	{
 		std::ifstream backingfile(backing);
 		for (std::string line; getline(backingfile, line);)

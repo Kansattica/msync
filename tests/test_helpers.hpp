@@ -26,10 +26,10 @@ struct test_file
 public:
 	test_file(const char* name) : test_file(fs::path(name)) {};
 	test_file(std::string_view name) : test_file(fs::path(name)) {};
-	test_file(fs::path name) : filename(name)
+	test_file(fs::path name) : filename(std::move(name))
 	{
-		if (!fs::is_directory(name))
-			filenamebak = fs::path{ name }.concat(".bak");
+		if (!fs::is_directory(filename))
+			filenamebak = fs::path{ filename }.concat(".bak");
 
 		fs::remove_all(filename);
 
@@ -57,7 +57,7 @@ struct touch_file
 public:
 	touch_file(const char* name) : touch_file(fs::path(name)) {};
 	touch_file(std::string_view name) : touch_file(fs::path(name)) {};
-	touch_file(fs::path name) : filename(name)
+	touch_file(fs::path name) : filename(std::move(name))
 	{
 		if (!fs::exists(filename))
 			touch(filename);
