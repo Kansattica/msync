@@ -34,7 +34,7 @@ script:
   - cmake --version
   - echo $LDFLAGS
   - echo $CPPFLAGS
-  - ls /usr/local/opt/llvm/lib /usr/local/opt/llvm/include /usr/local/Cellar/llvm/9.0.1
+  - ls /usr/local/opt/llvm/lib /usr/local/opt/llvm/include /usr/local/Cellar/llvm/9.0.1/lib /usr/local/Cellar/llvm/9.0.1/include
   - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE ..
   - cmake --build . --config $BUILDTYPE --parallel 2
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then EXELOCATION="./$BUILDTYPE/msync.exe"; else EXELOCATION="./msync"; fi
