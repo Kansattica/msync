@@ -143,7 +143,12 @@ void do_sync(const parse_result& parsed)
 
 		if (number_of_accounts > 1 && !parsed.account.empty())
 		{
-			pl() << "Ambiguous account. Either run msync sync with no account flag, or specify an unambiguous prefix.\n";
+			pl() << "Ambiguous account. Either run msync sync with no account flag to synchronize all accounts, or specify an unambiguous prefix.\n"
+					"Basically, msync doesn't know which of the following accounts you meant:\n";
+			options().foreach_account([&parsed](const auto& user) {
+				if (std::equal(parsed.account.begin(), parsed.account.end(), user.first.begin(), user.first.begin() + parsed.account.size()))
+					pl() << user.first << '\n';
+				});
 			return;
 		}
 	}
