@@ -6,6 +6,7 @@
 #include <string>
 #define CONSTANT_PATH_TYPE std::string
 #define CONSTANT_PATH_DECLARATION const CONSTANT_PATH_TYPE
+#define CONSTEXPR_IF_NOT_BOOST 
 #else
 #include <string_view>
 #define CONSTANT_PATH_TYPE std::string_view
