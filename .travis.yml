@@ -32,7 +32,6 @@ script:
   - mkdir build
   - cd build
   - cmake --version
-  - ls -R /usr/local/opt/llvm/lib /usr/local/opt/llvm/include 
   - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE -DCMAKE_CXX_FLAGS=$CPPFLAGS -DCMAKE_EXE_LINKER_FLAGS=$LDFLAGS .. 
  # - cmake --build . --config $BUILDTYPE --parallel 2
   - make -j VERBOSE=1
