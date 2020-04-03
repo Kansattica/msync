@@ -8,6 +8,8 @@
 
 #include <fstream>
 #include <string>
+#include <array>
+#include <algorithm>
 
 SCENARIO("queue_lists save their data when destroyed.")
 {
@@ -16,8 +18,8 @@ SCENARIO("queue_lists save their data when destroyed.")
         const test_file tf("testfileopt");
 
         queue_list opts(tf.filename);
-        opts.parsed.push_back("thingone");
-        opts.parsed.push_back("thingtwo");
+        opts.parsed.push_back(api_call{ api_route::fav, "thingone" });
+        opts.parsed.push_back(api_call{ api_route::unboost, "thingtwo" });
 
         REQUIRE(opts.parsed.size() == 2);
 
@@ -44,8 +46,8 @@ SCENARIO("queue_lists save their data when destroyed.")
                 auto lines = read_lines(tf.filename);
 
                 REQUIRE(lines.size() == 2);
-                REQUIRE(lines[0] == "thingone");
-                REQUIRE(lines[1] == "thingtwo");
+                REQUIRE(lines[0] == "FAV thingone");
+                REQUIRE(lines[1] == "UNBOOST thingtwo");
             }
         }
 
@@ -62,8 +64,8 @@ SCENARIO("queue_lists save their data when destroyed.")
                 auto lines = read_lines(tf.filename);
 
                 REQUIRE(lines.size() == 2);
-                REQUIRE(lines[0] == "thingone");
-                REQUIRE(lines[1] == "thingtwo");
+                REQUIRE(lines[0] == "FAV thingone");
+                REQUIRE(lines[1] == "UNBOOST thingtwo");
             }
         }
 
@@ -82,7 +84,7 @@ SCENARIO("queue_lists save their data when destroyed.")
                 auto lines = read_lines(tf.filename);
 
                 REQUIRE(lines.size() == 1);
-                REQUIRE(lines[0] == "thingtwo");
+                REQUIRE(lines[0] == "UNBOOST thingtwo");
             }
         }
     }
@@ -96,9 +98,9 @@ SCENARIO("queue_lists read data when created.")
 
         {
             std::ofstream fout(tf.filename);
-            fout << "firsthing\n";
-            fout << "secondthing\n";
-            fout << "thirdthing\n";
+            fout << "POST firsthing\n";
+            fout << "UNPOST secondthing\n";
+            fout << "UNPOST thirdthing\n";
         }
 
         WHEN("an queue_list is created")
@@ -108,12 +110,11 @@ SCENARIO("queue_lists read data when created.")
             THEN("it has the parsed information from the file.")
             {
                 REQUIRE(testfi.parsed.size() == 3);
-                REQUIRE(testfi.parsed.front() == "firsthing");
+				REQUIRE(testfi.parsed.front() == api_call{ api_route::post, "firsthing" });
                 testfi.parsed.pop_front();
-                REQUIRE(testfi.parsed.front() == "secondthing");
+                REQUIRE(testfi.parsed.front() == api_call{ api_route::unpost, "secondthing" });
                 testfi.parsed.pop_front();
-                REQUIRE(testfi.parsed.front() == "thirdthing");
-                testfi.parsed.pop_front();
+                REQUIRE(testfi.parsed.front() == api_call{ api_route::unpost, "thirdthing" });
             }
         }
 
@@ -123,8 +124,8 @@ SCENARIO("queue_lists read data when created.")
                 queue_list testfi(tf.filename);
 
                 testfi.parsed.pop_front();
-                testfi.parsed.emplace_back(":) :)");
-                testfi.parsed.emplace_back(":) :4");
+                testfi.parsed.push_back(api_call{ api_route::fav, ":) :)" });
+                testfi.parsed.push_back(api_call{ api_route::unfav, ":) :4" });
                 REQUIRE(testfi.parsed.size() == 4);
             }
 
@@ -133,10 +134,10 @@ SCENARIO("queue_lists read data when created.")
                 auto lines = read_lines(tf.filename);
 
                 REQUIRE(lines.size() == 4);
-                REQUIRE(lines[0] == "secondthing");
-                REQUIRE(lines[1] == "thirdthing");
-                REQUIRE(lines[2] == ":) :)");
-                REQUIRE(lines[3] == ":) :4");
+                REQUIRE(lines[0] == "UNPOST secondthing");
+                REQUIRE(lines[1] == "UNPOST thirdthing");
+                REQUIRE(lines[2] == "FAV :) :)");
+                REQUIRE(lines[3] == "UNFAV :) :4");
 
                 AND_THEN("The original file is backed up.")
                 {
@@ -145,9 +146,9 @@ SCENARIO("queue_lists read data when created.")
                     auto linesbak = read_lines(tf.filenamebak);
 
                     REQUIRE(linesbak.size() == 3);
-                    REQUIRE(linesbak[0] == "firsthing");
-                    REQUIRE(linesbak[1] == "secondthing");
-                    REQUIRE(linesbak[2] == "thirdthing");
+                    REQUIRE(linesbak[0] == "POST firsthing");
+                    REQUIRE(linesbak[1] == "UNPOST secondthing");
+                    REQUIRE(linesbak[2] == "UNPOST thirdthing");
                 }
             }
         }
@@ -159,11 +160,11 @@ SCENARIO("queue_lists read data when created.")
 
         {
             std::ofstream fout(tf.filename);
-            fout << "firsthing\n";
+            fout << "POST firsthing\n";
             fout << '\n';
-            fout << "secondthing\n";
+            fout << "BOOST secondthing\n";
             fout << "# some comment for you\n";
-            fout << "thirdthing\n";
+            fout << "FAV thirdthing\n";
         }
 
         WHEN("an queue_list is created")
@@ -173,12 +174,11 @@ SCENARIO("queue_lists read data when created.")
             THEN("it has the parsed information from the file.")
             {
                 REQUIRE(testfi.parsed.size() == 3);
-                REQUIRE(testfi.parsed.front() == "firsthing");
+				REQUIRE(testfi.parsed.front() == api_call{ api_route::post, "firsthing" });
                 testfi.parsed.pop_front();
-                REQUIRE(testfi.parsed.front() == "secondthing");
+                REQUIRE(testfi.parsed.front() == api_call{ api_route::boost, "secondthing" });
                 testfi.parsed.pop_front();
-                REQUIRE(testfi.parsed.front() == "thirdthing");
-                testfi.parsed.pop_front();
+                REQUIRE(testfi.parsed.front() == api_call{ api_route::fav, "thirdthing" });
             }
         }
 
@@ -188,8 +188,8 @@ SCENARIO("queue_lists read data when created.")
                 queue_list testfi(tf.filename);
 
                 testfi.parsed.pop_front();
-                testfi.parsed.push_back(":) :)");
-                testfi.parsed.push_back(":) :4");
+                testfi.parsed.push_back(api_call{ api_route::fav, ":) :)" });
+				testfi.parsed.push_back(api_call{ api_route::post, ":) :4" });
                 REQUIRE(testfi.parsed.size() == 4);
             }
 
@@ -198,10 +198,10 @@ SCENARIO("queue_lists read data when created.")
                 const auto lines = read_lines(tf.filename);
 
                 REQUIRE(lines.size() == 4);
-                REQUIRE(lines[0] == "secondthing");
-                REQUIRE(lines[1] == "thirdthing");
-                REQUIRE(lines[2] == ":) :)");
-                REQUIRE(lines[3] == ":) :4");
+                REQUIRE(lines[0] == "BOOST secondthing");
+                REQUIRE(lines[1] == "FAV thirdthing");
+                REQUIRE(lines[2] == "FAV :) :)");
+                REQUIRE(lines[3] == "POST :) :4");
 
                 AND_THEN("The original file is backed up.")
                 {
@@ -210,14 +210,52 @@ SCENARIO("queue_lists read data when created.")
                     const auto linesbak = read_lines(tf.filenamebak);
 
                     REQUIRE(linesbak.size() == 5);
-                    REQUIRE(linesbak[0] == "firsthing");
+                    REQUIRE(linesbak[0] == "POST firsthing");
                     REQUIRE(linesbak[1] == "");
-                    REQUIRE(linesbak[2] == "secondthing");
+                    REQUIRE(linesbak[2] == "BOOST secondthing");
                     REQUIRE(linesbak[3] == "# some comment for you");
-                    REQUIRE(linesbak[4] == "thirdthing");
+                    REQUIRE(linesbak[4] == "FAV thirdthing");
                 }
             }
         }
+    }
+}
+
+SCENARIO("queue_list can handle a long queue with a lot of items.")
+{
+    constexpr unsigned int size = 10000;
+    constexpr std::array<api_route, 6> routes = { api_route::fav, api_route::unfav,
+		api_route::boost, api_route::unboost, api_route::post, api_route::unpost };
+
+    GIVEN("A bunch of API calls to enqueue and an empty queue_list.")
+    {
+        test_file queuefile{ "somequeuefile" };
+
+		std::vector<api_call> expected;
+		expected.reserve(size);
+
+        queue_list actual(queuefile.filename);
+
+		for (unsigned int i = 0; i < size; i++)
+		{
+            expected.push_back(api_call{ routes[i % routes.size()], "a string" });
+            actual.parsed.push_back(api_call{ routes[i % routes.size()], "a string" });
+		}
+
+        WHEN("The queue is moved from and destroyed.")
+        {
+            {
+                queue_list newqueue = std::move(actual);
+            }
+
+            THEN("Reading the queue again is as expected.")
+            {
+                queue_list readqueue(queuefile.filename);
+
+                REQUIRE(std::equal(readqueue.parsed.begin(), readqueue.parsed.end(), expected.begin(), expected.end()));
+            }
+        }
+
     }
 }
 

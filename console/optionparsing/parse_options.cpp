@@ -93,13 +93,13 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 
 	const auto queueMode = (command("queue", "q").set(ret.selected, mode::queue).doc("Manage queued favs, boosts, and posts") &
 			one_of(option("-r", "--remove").set(ret.queue_opt.to_do, queue_action::remove).doc("Remove the post ids or filenames from the queue instead of adding them. If not in the queue, queue unfaving, unboosting, or deleting the post so it happens on next sync."),
-				option("-c", "--clear").set(ret.queue_opt.to_do, queue_action::clear).doc("Remove everything in the specified queue."),
-				option("-p", "--print").set(ret.queue_opt.to_do, queue_action::print).doc("Print everything in the specified queue. The first item is on top.")) %
+				option("-c", "--clear").set(ret.queue_opt.to_do, queue_action::clear).doc("Remove everything in the specified queue.")) %
 			"queue options",
 			one_of(
 				command("fav").set(ret.queue_opt.selected, queues::fav) & opt_values("post ids", ret.queue_opt.queued),
 				command("boost").set(ret.queue_opt.selected, queues::boost) & opt_values("post ids", ret.queue_opt.queued),
-				command("post").set(ret.queue_opt.selected, queues::post) & opt_values("filenames", ret.queue_opt.queued))
+				command("post").set(ret.queue_opt.selected, queues::post) & opt_values("filenames", ret.queue_opt.queued),
+				command("print").set(ret.queue_opt.to_do, queue_action::print))
 			.doc("queue commands"));
 
 	const auto universalOptions = ((option("-a", "--account") & value("account", ret.account)).doc("The account name to operate on."),

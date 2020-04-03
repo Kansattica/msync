@@ -21,13 +21,15 @@ struct id_mock_args : public basic_mock_args
 	std::string id;
 };
 
+unsigned int sequence = 0;
+
 struct mock_network_post : public mock_network
 {
 	std::vector<basic_mock_args> arguments;
 
 	net_response operator()(std::string_view url, std::string_view access_token)
 	{
-		arguments.push_back(basic_mock_args{ std::string {url}, std::string { access_token } });
+		arguments.push_back(basic_mock_args{ ++sequence, std::string {url}, std::string { access_token } });
 
 		net_response toreturn;
 		toreturn.retryable_error = (--succeed_after > 0);
@@ -46,7 +48,7 @@ struct mock_network_delete : public mock_network
 
 	net_response operator()(std::string_view url, std::string_view access_token)
 	{
-		arguments.push_back(basic_mock_args{ std::string {url}, std::string { access_token } });
+		arguments.push_back(basic_mock_args{ ++sequence, std::string {url}, std::string { access_token } });
 
 		net_response toreturn;
 		toreturn.retryable_error = (--succeed_after > 0);
@@ -88,7 +90,7 @@ struct mock_network_new_status : public mock_network
 		else
 			make_status_json(str_id, toreturn.message);
 
-		arguments.push_back(status_mock_args{ std::string {url}, std::string { access_token }, std::move(str_id), params});
+		arguments.push_back(status_mock_args{ ++sequence, std::string {url}, std::string { access_token }, std::move(str_id), params});
 
 		return toreturn;
 	}
@@ -116,7 +118,7 @@ struct mock_network_upload : public mock_network
 		toreturn.message += str_id;
 		toreturn.message += "\"}";
 
-		arguments.push_back(upload_mock_args{ std::string {url}, std::string { access_token }, std::move(str_id),
+		arguments.push_back(upload_mock_args{ ++sequence, std::string {url}, std::string { access_token }, std::move(str_id),
 			attachment{file, description} });
 
 		return toreturn;
@@ -153,8 +155,8 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 	constexpr std::string_view accesstoken = "sometoken";
 
 	const auto queue = GENERATE(
-		std::make_tuple(queues::fav, "/favourite", "/unfavourite"),
-		std::make_tuple(queues::boost, "/reblog", "/unreblog"));
+		std::make_tuple(queues::fav, "/favourite", "/unfavourite", "FAV "),
+		std::make_tuple(queues::boost, "/reblog", "/unreblog", "BOOST "));
 
 	const std::vector<std::string> testvect = GENERATE(
 		std::vector<std::string>{ "someid", "someotherid", "mrid" },
@@ -163,7 +165,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 	GIVEN("A queue with some ids to add and a good connection")
 	{
-		enqueue(std::get<0>(queue), account, testvect);
+		enqueue(std::get<0>(queue), account, std::vector<std::string>{testvect});
 
 		WHEN("the queue is sent")
 		{
@@ -178,7 +180,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("the queue is now empty.")
 			{
-				REQUIRE(print(std::get<0>(queue), account).empty());
+				REQUIRE(print(account).empty());
 			}
 
 			THEN("one call per ID was made.")
@@ -211,10 +213,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 	GIVEN("A queue with some ids to remove and a good connection")
 	{
-		std::vector<std::string> toremove{ testvect };
-		std::for_each(toremove.begin(), toremove.end(), [](auto& str) { str.push_back('-'); });
-
-		enqueue(std::get<0>(queue), account, toremove);
+		dequeue(std::get<0>(queue), account, std::vector<std::string>{testvect});
 
 		WHEN("the queue is sent")
 		{
@@ -229,12 +228,12 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("the queue is now empty.")
 			{
-				REQUIRE(print(std::get<0>(queue), account).empty());
+				REQUIRE(print(account).empty());
 			}
 
 			THEN("one call per ID was made.")
 			{
-				REQUIRE(mockpost.arguments.size() == toremove.size());
+				REQUIRE(mockpost.arguments.size() == testvect.size());
 			}
 
 			THEN("the access token was passed in.")
@@ -244,7 +243,6 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("the URLs are as expected.")
 			{
-				//testvect doesn't have the trailing minus signs, which is what we want for this test.
 				REQUIRE(testvect.size() == mockpost.arguments.size());
 				for (unsigned int i = 0; i < testvect.size(); i++)
 				{
@@ -274,7 +272,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			std::make_pair(0, 3),
 			std::make_pair(-1, 3));
 
-		enqueue(std::get<0>(queue), account, testvect);
+		enqueue(std::get<0>(queue), account, std::vector<std::string>{testvect});
 
 		WHEN("the queue is sent")
 		{
@@ -293,7 +291,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("the queue is now empty.")
 			{
-				REQUIRE(print(std::get<0>(queue), account).empty());
+				REQUIRE(print(account).empty());
 			}
 
 			THEN("each ID was tried the correct number of times.")
@@ -339,7 +337,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			std::make_pair(-1, 3));
 
 
-		enqueue(std::get<0>(queue), account, testvect);
+		enqueue(std::get<0>(queue), account, std::vector<std::string>{testvect});
 
 		WHEN("the queue is sent")
 		{
@@ -359,7 +357,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 
 			THEN("the queue hasn't changed.")
 			{
-				REQUIRE(print(std::get<0>(queue), account) == testvect);
+				REQUIRE(print(account) == make_expected_ids(testvect, std::get<3>(queue)));
 			}
 
 			THEN("each ID was tried once.")
@@ -439,7 +437,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 			fourth.parsed.vis = visibility::unlisted;
 		}
 
-		enqueue(queues::post, account, expected_files);
+		enqueue(queues::post, account, std::vector<std::string>{expected_files});
 
 		mock_network_post mockpost;
 		mock_network_delete mockdel;
@@ -454,7 +452,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 
 			THEN("the queue and post directory is now empty.")
 			{
-				REQUIRE(print(queues::post, account).empty());
+				REQUIRE(print(account).empty());
 
 				// it'll leave the .bak files behind
 				REQUIRE(count_files_in_directory(queue_directory) == 4);
@@ -546,7 +544,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 
 			THEN("the queue and post directory removes the successfully sent posts.")
 			{
-				REQUIRE(print(queues::post, account) == std::vector<std::string>{ "second.post", "another kind of post" });
+				REQUIRE(print(account) == std::vector<std::string>{ "POST second.post", "POST another kind of post" });
 
 				// 4 bak files, 2 regular
 				REQUIRE(count_files_in_directory(queue_directory) == 6);
@@ -643,7 +641,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 
 			THEN("the queue and post directories are not empty.")
 			{
-				REQUIRE(print(queues::post, account) == expected_files);
+				REQUIRE(print(account) == make_expected_ids(expected_files, "POST "));
 
 				// queueing the posts makes a .bak file for them
 				REQUIRE(count_files_in_directory(queue_directory) == 8);
@@ -721,7 +719,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 
 			THEN("the queue and post directories are emptied.")
 			{
-				REQUIRE(print(queues::post, account).empty());
+				REQUIRE(print(account).empty());
 
 				// queueing the posts makes a .bak file for them
 				REQUIRE(count_files_in_directory(queue_directory) == 4);
@@ -843,3 +841,81 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 		}
 	}
 }
+
+SCENARIO("Send correctly sends from and modifies a queue of mixed API calls.")
+{
+	logs_off = true;
+
+	const test_file fi = account_directory();
+	constexpr std::string_view account = "prettynormal@website.egg";
+	constexpr std::string_view instanceurl = "website.egg";
+	constexpr std::string_view accesstoken = "someothertoken";
+
+	GIVEN("A queue with some ids to add and a good connection")
+	{
+		dequeue(queues::boost, account, { "worstpost" });
+		enqueue(queues::boost, account, { "somekindapost", "anotherkindapost" });
+		enqueue(queues::fav, account, { "somekindapost", "mrs. goodpost" });
+		dequeue(queues::post, account, { "real stinker" });
+		dequeue(queues::fav, account, { "badpost" });
+
+		WHEN("the queue is sent")
+		{
+			mock_network_post mockpost;
+			mock_network_delete mockdel;
+			mock_network_new_status mocknew;
+			mock_network_upload mockupload;
+
+			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload };
+
+			sequence = 0;
+			send.send(account, instanceurl, accesstoken);
+
+			THEN("the queue is empty.")
+			{
+				REQUIRE(read_file(fi.filename / account / Queue_Filename).empty());
+			}
+
+			THEN("the correct number of calls were made.")
+			{
+				REQUIRE(mockpost.arguments.size() == 6);
+				REQUIRE(mockdel.arguments.size() == 1);
+				REQUIRE(mocknew.arguments.size() == 0);
+				REQUIRE(mockupload.arguments.size() == 0);
+			}
+
+			THEN("the correct calls were made")
+			{
+				REQUIRE(mockpost.arguments[0].access_token == accesstoken);
+				REQUIRE(mockpost.arguments[0].sequence == 1);
+				REQUIRE(mockpost.arguments[0].url == make_expected_url("worstpost", "/unreblog", instanceurl));
+
+				REQUIRE(mockpost.arguments[1].access_token == accesstoken);
+				REQUIRE(mockpost.arguments[1].sequence == 2);
+				REQUIRE(mockpost.arguments[1].url == make_expected_url("somekindapost", "/reblog", instanceurl));
+
+				REQUIRE(mockpost.arguments[2].access_token == accesstoken);
+				REQUIRE(mockpost.arguments[2].sequence == 3);
+				REQUIRE(mockpost.arguments[2].url == make_expected_url("anotherkindapost", "/reblog", instanceurl));
+
+				REQUIRE(mockpost.arguments[3].access_token == accesstoken);
+				REQUIRE(mockpost.arguments[3].sequence == 4);
+				REQUIRE(mockpost.arguments[3].url == make_expected_url("somekindapost", "/favourite", instanceurl));
+
+				REQUIRE(mockpost.arguments[4].access_token == accesstoken);
+				REQUIRE(mockpost.arguments[4].sequence == 5);
+				REQUIRE(mockpost.arguments[4].url == make_expected_url("mrs. goodpost", "/favourite", instanceurl));
+
+				REQUIRE(mockdel.arguments[0].access_token == accesstoken);
+				REQUIRE(mockdel.arguments[0].sequence == 6);
+				REQUIRE(mockdel.arguments[0].url == make_expected_url("real stinker", "", instanceurl));
+
+				REQUIRE(mockpost.arguments[5].access_token == accesstoken);
+				REQUIRE(mockpost.arguments[5].sequence == 7);
+				REQUIRE(mockpost.arguments[5].url == make_expected_url("badpost", "/unfavourite", instanceurl));
+
+			}
+		}
+	}
+}
+
