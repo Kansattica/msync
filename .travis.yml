@@ -32,7 +32,7 @@ script:
   - mkdir build
   - cd build
   - cmake --version
-  - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE -DCMAKE_CXX_FLAGS=$CPPFLAGS -DCMAKE_EXE_LINKER_FLAGS=$LDFLAGS .. 
+  - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE -DCMAKE_CXX_FLAGS=$CPPFLAGS -DCMAKE_EXE_LINKER_FLAGS=$LDFLAGS -DCMAKE_OSX_SYSROOT="" .. 
  # - cmake --build . --config $BUILDTYPE --parallel 2
   - make -j VERBOSE=1
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then EXELOCATION="./$BUILDTYPE/msync.exe"; else EXELOCATION="./msync"; fi
