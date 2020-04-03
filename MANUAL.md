@@ -126,3 +126,5 @@ Posts are a little different. You still queue them up to be sent when you next `
 #### A note on UTF-8, Unicode, and Emojis
 
 `msync` tries its best not to touch the bytes that it sends to or from the server. This means that posts are sent to the server and written to the local timelines as close to as is as possible. Emojis and other non-ASCII characters should work fine, as long as you send and read UTF-8. Some terminal emulators have a hard time displaying UTF-8, and you may wind up having to change some setting or use a different font. I know that running `[Console]::OutputEncoding = [Text.UTF8Encoding]::UTF8` can help on Powershell. In addition, characters may show weird on the terminal, but go over the wire fine. 
+
+If you want to test whether your terminal renders UTF-8, running `msync yeehaw` will attempt to print a cowboy emoji (🤠). If it shows up as garbled characters, you'll have to adjust your terminal's encoding settings.

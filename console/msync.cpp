@@ -99,6 +99,13 @@ int main(int argc, const char* argv[])
 		case mode::version:
 			pl() << "msync version " << MSYNC_VERSION;
 			break;
+		case mode::yeehaw:
+			plverb() << " __________\n"
+						"<  yeehaw  >\n"
+						" ----------\n"
+						"  /\n";
+			pl() << u8"🤠";
+			break;
 		default:
 			pl() << "[option not implemented]";
 		}
@@ -122,6 +129,30 @@ int main(int argc, const char* argv[])
 void do_sync(const parse_result& parsed)
 {
 	auto user = options().select_account(parsed.account);
+
+	if (user == nullptr)
+	{
+		int number_of_accounts = 0;
+		options().foreach_account([&number_of_accounts](const auto& _) { number_of_accounts++; });
+
+		if (number_of_accounts == 0)
+		{
+			pl() << "No accounts registered. Run msync new --account [username@instance.url] to register an account with msync.\n";
+			return;
+		}
+
+		if (number_of_accounts > 1 && !parsed.account.empty())
+		{
+			pl() << "Ambiguous account. Either run msync sync with no account flag to synchronize all accounts, or specify an unambiguous prefix.\n"
+					"Basically, msync doesn't know which of the following accounts you meant:\n";
+			options().foreach_account([&parsed](const auto& user) {
+				if (std::equal(parsed.account.begin(), parsed.account.end(), user.first.begin(), user.first.begin() + parsed.account.size()))
+					pl() << user.first << '\n';
+				});
+			return;
+		}
+	}
+
 	if (parsed.sync_opts.send)
 	{
 		send_posts send{ simple_post, simple_delete, new_status, upload_media };
