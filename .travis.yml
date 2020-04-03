@@ -29,7 +29,6 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo -E apt -yqq install --fix-missing libstdc++-8-dev; fi
 
 script:
-  - hash -r
   - mkdir build
   - cd build
   - cmake --version
