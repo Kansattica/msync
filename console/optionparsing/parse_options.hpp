@@ -13,7 +13,8 @@ enum class mode
     gen,
     queue,
     help,
-    version
+    version,
+    yeehaw
 };
 
 struct parse_result

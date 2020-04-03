@@ -1,4 +1,4 @@
-#include <exception>
+﻿#include <exception>
 #include <msync_exception.hpp>
 #include <print_logger.hpp>
 #include <string>
@@ -98,6 +98,16 @@ int main(int argc, const char* argv[])
 			break;
 		case mode::version:
 			pl() << "msync version " << MSYNC_VERSION;
+			break;
+		case mode::yeehaw:
+			if (verbose_logs)
+			{
+				pl() << " __________\n"
+				 	 << "<  yeehaw  >\n"
+					 << " ----------\n"
+					 << "  /\n";
+			}
+			pl() << u8"🤠";
 			break;
 		default:
 			pl() << "[option not implemented]";

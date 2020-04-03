@@ -1017,6 +1017,51 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 	}
 }
 
+SCENARIO("The command line parser recognizes when the user requests yeehaw.")
+{
+	GIVEN("A command line requesting yeehaw.")
+	{
+		char const* argv[] { "msync", "yeehaw" };
+
+		WHEN("the command line is parsed")
+		{
+			const auto result = parse(2, argv);
+
+			THEN("the parse is good.")
+			{
+				REQUIRE(result.okay);
+			}
+
+			THEN("the correct action is selected.")
+			{
+				REQUIRE(result.selected == mode::yeehaw);
+			}
+		}
+	}
+
+	GIVEN("A command line requesting a verbose yeehaw.")
+	{
+		const auto verb = GENERATE("-v", "--verbose");
+
+		char const* argv[] { "msync", "yeehaw", verb };
+
+		WHEN("the command line is parsed")
+		{
+			const auto result = parse(3, argv);
+
+			THEN("the parse is good.")
+			{
+				REQUIRE(result.okay);
+			}
+
+			THEN("the correct action is selected.")
+			{
+				REQUIRE(result.selected == mode::yeehaw);
+			}
+		}
+	}
+}
+
 SCENARIO("The command line parser recognizes when the user requests msync's version.")
 {
 	GIVEN("A command line requesting the version.")
