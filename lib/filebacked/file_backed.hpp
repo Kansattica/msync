@@ -13,13 +13,13 @@ class file_backed
 public:
     Container parsed;
 
-#ifdef MSYNC_USE_BOOST
-	file_backed(fs::path filename) : backing(filename.native())
-#else
 	file_backed(fs::path filename) : backing(filename)
-#endif
 	{
+#ifdef MSYNC_USE_BOOST
+		std::ifstream backingfile(backing.native());
+#else
 		std::ifstream backingfile(backing);
+#endif
 		for (std::string line; getline(backingfile, line);)
 		{
 			const auto first_non_whitespace = line.find_first_not_of(" \t\r\n");
@@ -64,7 +64,11 @@ public:
 			fs::rename(backing, backup);
 		}
 
+#ifdef MSYNC_USE_BOOST
+		std::ofstream of{ backing.native() };
+#else
 		std::ofstream of{ backing };
+#endif
 		Write(std::move(parsed), of);
 	}
 
