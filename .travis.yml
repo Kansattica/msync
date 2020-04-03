@@ -17,7 +17,7 @@ matrix:
     env: BUILDTYPE=Release CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=Win32
   - os: osx
     osx_image: xcode11.3
-    env: BUILDTYPE=Release LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib,/usr/local/Cellar/llvm/9.0.1/lib/" CPPFLAGS="-I/usr/local/opt/llvm/include" CC=clang CXX=clang++ PATH="/usr/local/opt/llvm/bin:$PATH"
+    env: BUILDTYPE=Release LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib" CPPFLAGS="-I/usr/local/opt/llvm/include" CC=clang CXX=clang++ PATH="/usr/local/opt/llvm/bin:$PATH"
 addons:
   homebrew:
     packages:
@@ -34,6 +34,7 @@ script:
   - cmake --version
   - echo $LDFLAGS
   - echo $CPPFLAGS
+  - ls /usr/local/opt/llvm/lib /usr/local/opt/llvm/include /usr/local/Cellar/llvm/9.0.1
   - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE ..
   - cmake --build . --config $BUILDTYPE --parallel 2
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then EXELOCATION="./$BUILDTYPE/msync.exe"; else EXELOCATION="./msync"; fi
