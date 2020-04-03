@@ -100,13 +100,10 @@ int main(int argc, const char* argv[])
 			pl() << "msync version " << MSYNC_VERSION;
 			break;
 		case mode::yeehaw:
-			if (verbose_logs)
-			{
-				pl() << " __________\n"
+			plverb() << " __________\n"
 						"<  yeehaw  >\n"
 						" ----------\n"
 						"  /\n";
-			}
 			pl() << u8"🤠";
 			break;
 		default:
