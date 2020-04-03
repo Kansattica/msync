@@ -33,7 +33,7 @@ public:
 
 	recv_posts(get_posts& post_downloader) : download(post_downloader) {};
 
-	void get(std::string_view account_name, user_options& account)
+	void get(const std::string& account_name, user_options& account)
 	{
 		retries = set_default(retries, 3, "Number of retries cannot be zero or less. Resetting to 3.\n", pl());
 
@@ -59,7 +59,7 @@ private:
 	template <to_get timeline, typename mastodon_entity, bool use_excludes = false>
 	void update_timeline(user_options& account, const fs::path& user_folder, unsigned int limit)
 	{
-		constexpr recv_parameters params = get_parameters<timeline>();
+		const CONSTEXPR_IF_NOT_BOOST recv_parameters params = get_parameters<timeline>();
 
 		const sync_settings sync_method = account.get_sync_option(params.sync_setting);
 

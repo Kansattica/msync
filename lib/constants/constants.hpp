@@ -4,10 +4,13 @@
 // boost doesn't know what to do with std::string_views and paths.
 #ifdef MSYNC_USE_BOOST
 #include <string>
-#define CONSTANT_PATH_DECLARATION const std::string
+#define CONSTANT_PATH_TYPE std::string
+#define CONSTANT_PATH_DECLARATION const CONSTANT_PATH_TYPE
 #else
 #include <string_view>
-#define CONSTANT_PATH_DECLARATION constexpr std::string_view
+#define CONSTANT_PATH_TYPE std::string_view
+#define CONSTANT_PATH_DECLARATION constexpr CONSTANT_PATH_TYPE
+#define CONSTEXPR_IF_NOT_BOOST constexpr
 #endif
 
 
