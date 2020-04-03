@@ -13,7 +13,7 @@ class file_backed
 public:
     Container parsed;
 
-	file_backed(fs::path filename) : backing(filename)
+	file_backed(fs::path filename) : backing(std::move(filename))
 	{
 #ifdef MSYNC_USE_BOOST
 		std::ifstream backingfile(backing.native());
