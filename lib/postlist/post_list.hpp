@@ -18,12 +18,9 @@ class post_list
 {
 public:
 
-//ofstream doesn't know what to do with Boost's filesystem paths
-#ifdef MSYNC_USE_BOOST
-	post_list(const fs::path& filename) : outfile(filename.native(), std::ios::app | std::ios::ate | std::ios::out)
-#else 
-	post_list(const fs::path& filename) : outfile(filename, std::ios::app | std::ios::ate | std::ios::out)
-#endif
+	// ofstream doesn't know what to do with Boost's filesystem paths, so call c_str()
+	// this is harmless with non-Boost filesystems because those just turn around and call .c_str() on the path anyway
+	post_list(const fs::path& filename) : outfile(filename.c_str(), std::ios::app | std::ios::ate | std::ios::out)
 	{
 	}
 

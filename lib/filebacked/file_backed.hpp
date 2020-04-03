@@ -15,11 +15,9 @@ public:
 
 	file_backed(fs::path filename) : backing(std::move(filename))
 	{
-#ifdef MSYNC_USE_BOOST
-		std::ifstream backingfile(backing.native());
-#else
-		std::ifstream backingfile(backing);
-#endif
+		// .c_str() is needed to make Boost happy
+		// the std::filesystem::path overload of this just calls .c_str() on it anyways
+		std::ifstream backingfile(backing.c_str());
 		for (std::string line; getline(backingfile, line);)
 		{
 			const auto first_non_whitespace = line.find_first_not_of(" \t\r\n");
@@ -64,11 +62,7 @@ public:
 			fs::rename(backing, backup);
 		}
 
-#ifdef MSYNC_USE_BOOST
-		std::ofstream of{ backing.native() };
-#else
-		std::ofstream of{ backing };
-#endif
+		std::ofstream of{ backing.c_str() };
 		Write(std::move(parsed), of);
 	}
 
