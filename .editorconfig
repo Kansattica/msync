@@ -1,0 +1,6 @@
+[*.{c,cpp,hpp}]
+charset = utf-8
+
+[.travis.yml]
+indent_style = space
+indent_size = 2
