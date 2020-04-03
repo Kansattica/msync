@@ -83,7 +83,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 			" ---" );
 
 		{
-			std::ofstream of{ fi.filename };
+			std::ofstream of{ fi };
 			of << testtext;
 		}
 
@@ -156,7 +156,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 			);
 
 		{
-			std::ofstream of{ fi.filename };
+			std::ofstream of{ fi };
 			if (!content_warning.empty())
 				of << "cw=" << content_warning << '\n';
 

@@ -155,7 +155,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 		const test_file postfiles[]{ "postboy", "guy.extension", "../up.here", "yeeeeeeehaw" };
 		for (auto& file : postfiles)
 		{
-			std::ofstream of{ file.filename };
+			std::ofstream of{ file };
 			of << "My name is " << file.filename.filename() << "\n";
 		}
 
@@ -274,7 +274,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 		int postno = 1;
 		for (const auto& fi : postfiles)
 		{
-			std::ofstream of{ fi.filename };
+			std::ofstream of{ fi };
 			of << "I'm number " << postno++ << '\n';
 		}
 
@@ -374,7 +374,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 		int postno = 1;
 		for (const auto& fi : postfiles)
 		{
-			std::ofstream of{ fi.filename };
+			std::ofstream of{ fi };
 			of << "I'm number " << postno++ << '\n';
 		}
 
@@ -484,7 +484,7 @@ SCENARIO("Queues can handle a mix of different queued calls.")
 		int postno = 1;
 		for (const auto& fi : to_queue)
 		{
-			std::ofstream of{ fi.filename };
+			std::ofstream of{ fi };
 			of << "hey, I'm number " << postno++ << '\n';
 		}
 

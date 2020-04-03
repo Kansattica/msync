@@ -121,8 +121,7 @@ SCENARIO("option_files read data when created.")
         const test_file tf("testfileoptread");
 
         {
-            // .c_str() to make Boost happy
-            std::ofstream fout(tf.filename.c_str());
+            std::ofstream fout(tf);
             fout << "somecool=teststuff\n";
             fout << "different=tests\n";
             fout << "imgetting=testy\n";
@@ -183,7 +182,7 @@ SCENARIO("option_files read data when created.")
         const test_file tf("testfileoptread");
 
         {
-            std::ofstream fout(tf.filename.c_str());
+            std::ofstream fout(tf);
             fout << "somecool=teststuff\n";
             fout << '\n';
             fout << "different=tests\n";
@@ -193,7 +192,7 @@ SCENARIO("option_files read data when created.")
 
         WHEN("an option_file is created")
         {
-            option_file testfi(tf.filename.c_str());
+            option_file testfi(tf.filename);
 
             THEN("it has the parsed information from the file.")
             {

@@ -45,7 +45,7 @@ public:
 			fs::remove(filenamebak);
 	};
 
-	operator std::string() const { return filename.string(); }
+	operator const std::string () const { return filename.string(); }
 	const fs::path filename;
 	fs::path filenamebak;
 private:
