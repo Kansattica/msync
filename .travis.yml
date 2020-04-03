@@ -22,7 +22,6 @@ addons:
   homebrew:
     packages:
       - llvm
-    update: true
 
 before_install:
   - if [ "$TRAVIS_COMPILER" = "gcc" ] && [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo -E apt-get -yqq --no-install-suggests --no-install-recommends install g++-8 && CC=gcc-8 && CXX=g++-8; fi
@@ -34,10 +33,8 @@ script:
   - mkdir build
   - cd build
   - cmake --version
-  - echo $LDFLAGS
-  - echo $CPPFLAGS
   - ls -R /usr/local/opt/llvm/lib /usr/local/opt/llvm/include 
-  - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE ..
+  - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE -DCMAKE_CXX_FLAGS=$CPPFLAGS -DCMAKE_EXE_LINKER_FLAGS=$LDFLAGS .. 
   - cmake --build . --config $BUILDTYPE --parallel 2
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then EXELOCATION="./$BUILDTYPE/msync.exe"; else EXELOCATION="./msync"; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then TESTLOCATION="./tests/$BUILDTYPE/tests.exe"; else TESTLOCATION="./tests/tests"; fi
