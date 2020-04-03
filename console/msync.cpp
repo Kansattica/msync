@@ -103,9 +103,9 @@ int main(int argc, const char* argv[])
 			if (verbose_logs)
 			{
 				pl() << " __________\n"
-				 	 << "<  yeehaw  >\n"
-					 << " ----------\n"
-					 << "  /\n";
+						"<  yeehaw  >\n"
+						" ----------\n"
+						"  /\n";
 			}
 			pl() << u8"🤠";
 			break;
