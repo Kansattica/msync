@@ -1,7 +1,7 @@
 #ifndef _FS_HPP_
 #define _FS_HPP_
 
-#ifdef MSYNC_USE_BOOST
+#if defined(MSYNC_USE_BOOST) && __has_include(<boost/filesystem.hpp>)
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 #elif __has_include(<filesystem>)
