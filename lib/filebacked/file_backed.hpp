@@ -12,7 +12,12 @@ class file_backed
 {
 public:
     Container parsed;
+
+#ifdef MSYNC_USE_BOOST
+	file_backed(fs::path filename) : backing(filename.native())
+#else
 	file_backed(fs::path filename) : backing(filename)
+#endif
 	{
 		std::ifstream backingfile(backing);
 		for (std::string line; getline(backingfile, line);)

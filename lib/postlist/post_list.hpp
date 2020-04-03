@@ -17,10 +17,12 @@ template <typename post_type>
 class post_list
 {
 public:
-#ifndef MSYNC_USE_BOOST
-	post_list(const fs::path& filename) : outfile(filename, std::ios::app | std::ios::ate | std::ios::out)
-#else //ofstream doesn't know what to do with Boost's filesystem paths
+
+//ofstream doesn't know what to do with Boost's filesystem paths
+#ifdef MSYNC_USE_BOOST
 	post_list(const fs::path& filename) : outfile(filename.native(), std::ios::app | std::ios::ate | std::ios::out)
+#else 
+	post_list(const fs::path& filename) : outfile(filename, std::ios::app | std::ios::ate | std::ios::out)
 #endif
 	{
 	}

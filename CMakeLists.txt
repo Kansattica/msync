@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.12..3.15)
 
-message("${CMAKE_OSX_SYSROOT}")
-
 project (msync VERSION 0.9
 	DESCRIPTION "Store and forward messages with a Mastodon API-compatible server."
 	LANGUAGES CXX C)
