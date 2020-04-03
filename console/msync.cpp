@@ -129,6 +129,25 @@ int main(int argc, const char* argv[])
 void do_sync(const parse_result& parsed)
 {
 	auto user = options().select_account(parsed.account);
+
+	if (user == nullptr)
+	{
+		int number_of_accounts = 0;
+		options().foreach_account([&number_of_accounts](const auto& _) { number_of_accounts++; });
+
+		if (number_of_accounts == 0)
+		{
+			pl() << "No accounts registered. Run msync new --account [username@instance.url] to register an account with msync.\n";
+			return;
+		}
+
+		if (number_of_accounts > 1 && !parsed.account.empty())
+		{
+			pl() << "Ambiguous account. Either run msync sync with no account flag, or specify an unambiguous prefix.\n";
+			return;
+		}
+	}
+
 	if (parsed.sync_opts.send)
 	{
 		send_posts send{ simple_post, simple_delete, new_status, upload_media };
