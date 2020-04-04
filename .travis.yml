@@ -32,7 +32,7 @@ before_install:
   - if [ "$TRAVIS_COMPILER" = "gcc" ] && [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo -E apt-get -yqq --no-install-suggests --no-install-recommends install g++-8 && CC=gcc-8 && CXX=g++-8; fi
   - if [ "$TRAVIS_COMPILER" = "clang" ] && [ "$TRAVIS_OS_NAME" = "linux" ] ; then sudo -E apt-get -yqq --no-install-suggests --no-install-recommends install clang-7 llvm-7-dev && CC="/usr/bin/clang-7" && CXX="/usr/bin/clang++-7"; fi
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo -E apt -yqq install --fix-missing libstdc++-8-dev; fi
-  - if [ "$CXXFLAGS" = "-m32" ]; then sudo -E apt -yqq install --fix-missing gcc-8-multilib g++-8-multilib libstdc++-8-dev-i386-cross; fi
+  - if [ "$CXXFLAGS" = "-m32" ]; then sudo -E apt -yqq install --fix-missing gcc-8-multilib g++-8-multilib libstdc++-8-dev-i386-cross libcurl4-openssl-dev:i386; fi
 
 script:
   - mkdir build
