@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <utility>
 
+#include <iostream>
+
 #include "test_helpers.hpp"
 
 #include "../console/optionparsing/parse_options.hpp"
@@ -1331,6 +1333,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 			// check_parse clears it every time, but keeps the capacity
 			static std::vector<const char*> argv;
 
+			std::cout << "Wish me luck, I'm gonna run through a bunch of combinations for this many options: " << options.size() << '\n';
 			// exhaustively trying every permutation takes far too long once you get past 7 or 8
 			// so if there's more than that, randomly shuffle instead
 			if (options.size() <= 7)
