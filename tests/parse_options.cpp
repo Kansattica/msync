@@ -1191,7 +1191,7 @@ void check_parse(std::vector<const char*>& argv, const std::vector<command_line_
 	}
 }
 
-SCENARIO("The command line parser recognizes when the user wants to generate a file.", "[long_run]")
+SCENARIO("The command line parser recognizes when the user wants to generate a file.", "[long_run][long_run_parseopts]")
 {
 	GIVEN("A combination of options for the file generator")
 	{

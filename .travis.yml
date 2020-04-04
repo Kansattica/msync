@@ -41,7 +41,8 @@ script:
   - $EXELOCATION yeehaw
   - $NETTESTLOCATION
   - $TESTLOCATION ~[long_run]
-  - $TESTLOCATION [long_run]
+  - $TESTLOCATION [long_run_outgoingpost]
+  - $TESTLOCATION [long_run_parseopts]
 
 after_success:
   - echo "Binary size:"
