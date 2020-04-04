@@ -32,7 +32,7 @@ The last two steps will take a while, but when you're done, you should see a `ms
 
 #### Building on macOS
 
-The instructions for building on Linux should mostly work, though note that Apple only officially supports std::filesystem on Xcode 11.1 and Catalina/10.15 and up. You might have better luck installing `clang` through homebrew, but that's a little outside my area of expertise.
+The instructions for building on Linux should mostly work, though note that Apple only officially supports std::filesystem on Xcode 11.1 and Catalina/10.15 and up. 
 
 #### Building on Windows
 On Windows, you'll want Visual Studio with the C++ development workload and Cmake installed. After that, `git clone https://github.com/Kansattica/msync.git`, then open Visual Studio and go to `File > Open > CMake...` (some versions just have `File > Open > Folder...` instead, this will also work) and choose the `msync` repo you just downloaded. Visual Studio will take a while to download and configure everything, and then you should be able to pick `x64-Release` from the dropdown at the top, make sure the `msync.exe` target is selected, and build from there. 
