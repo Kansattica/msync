@@ -13,15 +13,23 @@
 #include <vector>
 #include <algorithm>
 #include <string_view>
-#include <charconv>
 #include <system_error>
 #include <tuple>
+
+#ifdef MSYNC_USE_BOOST
+#include <cstdio>
+#else
+#include <charconv>
+#endif
 
 using namespace std::string_view_literals;
 
 template <typename Number>
 std::string_view sv_to_chars(Number n, std::array<char, 10>& char_buf)
 {
+#ifdef MSYNC_USE_BOOST
+	std::sprintf(char_buf, "%u", n);
+#else
 	// see https://en.cppreference.com/w/cpp/utility/to_chars
 	// this avoids an allocation compared to std::to_string
 
@@ -30,6 +38,8 @@ std::string_view sv_to_chars(Number n, std::array<char, 10>& char_buf)
 
 	const auto [end, err] = std::to_chars(char_buf.data(), char_buf.data() + char_buf.size(), n);
 	if (err != std::errc()) { FAIL("You messed up with to_chars, ya dingus."); }
+#endif
+
 	return std::string_view(char_buf.data(), end - char_buf.data());
 }
 
