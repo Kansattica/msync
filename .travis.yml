@@ -21,7 +21,7 @@ matrix:
   - os: linux
     dist: bionic
     compiler: gcc
-    env: CXXFLAGS="-m32"
+    env: CXXFLAGS="-m32" CFLAGS="-m32"
 addons:
   homebrew:
     packages:
