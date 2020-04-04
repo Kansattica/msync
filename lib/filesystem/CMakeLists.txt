@@ -7,7 +7,6 @@ find_package(Filesystem)
 
 if (NOT CXX_FILESYSTEM_HAVE_FS OR NOT Filesystem_FOUND)
 	# The only time we should wind up in here now is if the host machine actually doesn't have std::filesystem support
-	# I'd like to take this logic out at a future date, once I'm a little more confident that the issues curl was causing with it are fixed.
 
 	message (STATUS "No working std::filesystem implementation found. I'll try to use Boost." )
 	set (Boost_USE_STATIC_LIBS TRUE)
