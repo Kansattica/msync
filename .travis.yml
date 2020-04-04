@@ -48,9 +48,9 @@ script:
 after_success:
   - echo "Binary size:"
   - du -h $EXELOCATION
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then FINISHED_BINARY_NAME="msync-linux-x64-$TRAVIS_COMPILER"; fi
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then FINISHED_BINARY_NAME="msync-windows-$CMAKE_GENERATOR_PLATFORM.exe"; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then FINISHED_BINARY_NAME="msync-osx-x64"; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then FINISHED_BINARY_NAME="msync-$TRAVIS_TAG-linux-x64-$TRAVIS_COMPILER"; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then FINISHED_BINARY_NAME="msync-$TRAVIS_TAG-windows-$CMAKE_GENERATOR_PLATFORM.exe"; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then FINISHED_BINARY_NAME="msync-$TRAVIS_TAG-osx-x64"; fi
   - mv $EXELOCATION $FINISHED_BINARY_NAME
 
 deploy:
