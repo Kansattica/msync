@@ -1,6 +1,6 @@
 language: cpp
 env:
-  - BUILDTYPE=Release 
+  - BUILDTYPE=Release BUILD_ARCH=x64
   #- BUILDTYPE=MinSizeRel
 os: linux
 dist: bionic
@@ -15,7 +15,7 @@ matrix:
   - os: linux
     dist: bionic
     compiler: gcc
-    env: BUILDTYPE=Release CXXFLAGS="-m32" CFLAGS="-m32"
+    env: BUILDTYPE=Release CXXFLAGS="-m32" CFLAGS="-m32" BUILD_ARCH=i386
   - os: windows
     compiler: cl.exe
     env: BUILDTYPE=Release CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64
@@ -32,7 +32,7 @@ before_install:
   - if [ "$TRAVIS_COMPILER" = "gcc" ] && [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo -E apt-get -yqq --no-install-suggests --no-install-recommends install g++-8 && CC=gcc-8 && CXX=g++-8; fi
   - if [ "$TRAVIS_COMPILER" = "clang" ] && [ "$TRAVIS_OS_NAME" = "linux" ] ; then sudo -E apt-get -yqq --no-install-suggests --no-install-recommends install clang-7 llvm-7-dev && CC="/usr/bin/clang-7" && CXX="/usr/bin/clang++-7"; fi
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo -E apt -yqq install --fix-missing libstdc++-8-dev; fi
-  - if [ "$CXXFLAGS" = "-m32" ]; then sudo -E apt -yqq install --fix-missing gcc-8-multilib g++-8-multilib libstdc++-8-dev-i386-cross libcurl4-openssl-dev:i386 linux-libc-dev:i386; fi
+  - if [ "$BUILD_ARCH" = "i386" ]; then sudo -E apt -yqq install --fix-missing gcc-8-multilib g++-8-multilib libstdc++-8-dev-i386-cross libcurl4-openssl-dev:i386 linux-libc-dev:i386; fi
 
 script:
   - mkdir build
@@ -53,7 +53,7 @@ script:
 after_success:
   - echo "Binary size:"
   - du -h $EXELOCATION
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then FINISHED_BINARY_NAME="msync-$TRAVIS_TAG-linux-x64-$TRAVIS_COMPILER"; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then FINISHED_BINARY_NAME="msync-$TRAVIS_TAG-linux-$BUILD_ARCH-$TRAVIS_COMPILER"; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then FINISHED_BINARY_NAME="msync-$TRAVIS_TAG-windows-$CMAKE_GENERATOR_PLATFORM.exe"; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then FINISHED_BINARY_NAME="msync-$TRAVIS_TAG-osx-x64"; fi
   - mv $EXELOCATION $FINISHED_BINARY_NAME
