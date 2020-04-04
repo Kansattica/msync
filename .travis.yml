@@ -12,16 +12,16 @@ matrix:
   - os: osx
     osx_image: xcode11.3
     env: BUILDTYPE=Release LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib" CPPFLAGS="-I/usr/local/opt/llvm/include" PATH="/usr/local/opt/llvm/bin:$PATH" CC=clang CXX=clang++
+  - os: linux
+    dist: bionic
+    compiler: gcc
+    env: BUILDTYPE=Release CXXFLAGS="-m32" CFLAGS="-m32"
   - os: windows
     compiler: cl.exe
     env: BUILDTYPE=Release CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64
   - os: windows
     compiler: cl.exe
     env: BUILDTYPE=Release CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=win32
-  - os: linux
-    dist: bionic
-    compiler: gcc
-    env: CXXFLAGS="-m32" CFLAGS="-m32"
 addons:
   homebrew:
     packages:
