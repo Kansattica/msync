@@ -56,6 +56,7 @@ after_success:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then FINISHED_BINARY_NAME="msync-$TRAVIS_TAG-linux-$BUILD_ARCH-$TRAVIS_COMPILER"; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then FINISHED_BINARY_NAME="msync-$TRAVIS_TAG-windows-$CMAKE_GENERATOR_PLATFORM.exe"; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then FINISHED_BINARY_NAME="msync-$TRAVIS_TAG-osx-x64"; fi
+  - echo $FINISHED_BINARY_NAME
   - mv $EXELOCATION $FINISHED_BINARY_NAME
 
 deploy:
