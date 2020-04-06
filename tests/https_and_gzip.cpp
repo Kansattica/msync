@@ -8,28 +8,20 @@ SCENARIO("Can make SSL requests to a site.")
 	{
 		const auto url = GENERATE(as<const char*>{}, "https://example.com", "https://wikipedia.org", "https://mastodon.social");
 
-		CAPTURE(url);
-
 		WHEN("a request is made")
 		{
 			const auto response = cpr::Get(cpr::Url{ url });
 
-			THEN("the call is a success.")
+			THEN("the call is a success, the body is not empty, and the response is gzipped.")
 			{
+				CAPTURE(url);
 				INFO("Error: " << response.error.message);
 				REQUIRE_FALSE(response.error);
 				REQUIRE(response.status_code == 200);
-			}
 
-			THEN("the body is not empty.")
-			{
-				INFO("Error: " << response.error.message);
 				REQUIRE_FALSE(response.text.empty());
 				REQUIRE(response.text.find("html") != std::string::npos);
-			}
 
-			THEN("The response is gzipped.")
-			{
 				const auto val = response.header.find("Content-Encoding");
 				if (val == response.header.end())
 				{
