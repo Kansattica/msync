@@ -25,7 +25,7 @@ struct test_file
 {
 public:
 	test_file(const char* name) : test_file(fs::path(name)) {};
-	test_file(std::string_view name) : test_file(fs::path(name)) {};
+	test_file(std::string_view name) : test_file(fs::path(name.begin(), name.end())) {}; //use iterator interface for boost's benefit
 	test_file(fs::path name) : filename(std::move(name))
 	{
 		if (!fs::is_directory(filename))
@@ -45,7 +45,7 @@ public:
 			fs::remove(filenamebak);
 	};
 
-	operator std::string() const { return filename.string(); }
+	operator const fs::path::value_type* () const { return filename.c_str(); }
 	const fs::path filename;
 	fs::path filenamebak;
 private:
@@ -56,7 +56,7 @@ struct touch_file
 {
 public:
 	touch_file(const char* name) : touch_file(fs::path(name)) {};
-	touch_file(std::string_view name) : touch_file(fs::path(name)) {};
+	touch_file(std::string_view name) : touch_file(fs::path(name.begin(), name.end())) {};
 	touch_file(fs::path name) : filename(std::move(name))
 	{
 		if (!fs::exists(filename))
@@ -68,9 +68,8 @@ public:
 		fs::remove(filename);
 	};
 
-	operator std::string() const { return filename.string(); }
+	operator const fs::path::value_type* () const { return filename.c_str(); }
 	const fs::path filename;
-private:
 };
 
 test_file account_directory();

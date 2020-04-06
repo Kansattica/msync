@@ -207,11 +207,12 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 
 	const test_file account_dir = account_directory();
 
-	const static auto user_dir = account_dir.filename / account_name;
+	auto& account = options().add_new_account(std::string{ account_name });
+
+	const static auto user_dir = account_dir.filename / account.first;
 	const static auto home_timeline_file = user_dir / Home_Timeline_Filename;
 	const static auto notifications_file = user_dir / Notifications_Filename;
 
-	auto& account = options().add_new_account(std::string{ account_name });
 
 	REQUIRE(account.first == account_name);
 

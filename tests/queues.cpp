@@ -25,7 +25,7 @@ bool prefix_match(std::string_view actual, std::string_view prefix, std::string_
 SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 {
 	logs_off = true;
-	static constexpr std::string_view account = "regularguy@internet.egg";
+	static const std::string account = "regularguy@internet.egg";
 	GIVEN("An empty queue")
 	{
 		const test_file allaccounts = account_directory(); //make sure this gets cleaned up, too
@@ -130,7 +130,7 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 
 }
 
-void files_match(const std::string_view account, const fs::path& original, const std::string_view outfile)
+void files_match(const std::string& account, const fs::path& original, const std::string& outfile)
 {
 	const outgoing_post orig{ original };
 	const outgoing_post newfile{ options().account_directory_location / account / File_Queue_Directory / outfile };
@@ -143,7 +143,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 {
 	logs_off = true; //shut up the printlogger
 
-	constexpr static std::string_view account = "queueboy@website.egg";
+	static const std::string account = "queueboy@website.egg";
 	test_file allaccounts = account_directory(); //make sure this gets cleaned up, too
 	test_file accountdir = allaccounts.filename / account;
 
@@ -155,7 +155,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 		const test_file postfiles[]{ "postboy", "guy.extension", "../up.here", "yeeeeeeehaw" };
 		for (auto& file : postfiles)
 		{
-			std::ofstream of{ file.filename };
+			std::ofstream of{ file };
 			of << "My name is " << file.filename.filename() << "\n";
 		}
 
@@ -274,13 +274,13 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 		int postno = 1;
 		for (const auto& fi : postfiles)
 		{
-			std::ofstream of{ fi.filename };
+			std::ofstream of{ fi };
 			of << "I'm number " << postno++ << '\n';
 		}
 
 		WHEN("both are enqueued")
 		{
-			enqueue(queues::post, account, std::vector<std::string>{ postfiles, postfiles + 2 });
+			enqueue(queues::post, account, std::vector<std::string>{ postfiles[0].filename.string(), postfiles[1].filename.string() });
 
 			const fs::path unsuffixedname = file_queue_dir / "thisisapost.hi";
 			const fs::path suffixedname = file_queue_dir / "thisisapost.hi.1";
@@ -374,13 +374,13 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 		int postno = 1;
 		for (const auto& fi : postfiles)
 		{
-			std::ofstream of{ fi.filename };
+			std::ofstream of{ fi };
 			of << "I'm number " << postno++ << '\n';
 		}
 
 		WHEN("both are enqueued")
 		{
-			enqueue(queues::post, account, std::vector<std::string>{ postfiles, postfiles + 2 });
+			enqueue(queues::post, account, std::vector<std::string>{ postfiles[0].filename.string(), postfiles[1].filename.string() });
 
 			const fs::path unsuffixedname = file_queue_dir / "thisisapost";
 			const fs::path suffixedname = file_queue_dir / "thisisapost.1";
@@ -470,7 +470,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 SCENARIO("Queues can handle a mix of different queued calls.")
 {
-	constexpr static std::string_view account = "funnybone@typical.egg";
+	static const std::string account = "funnybone@typical.egg";
 	test_file allaccounts = account_directory(); //make sure this gets cleaned up, too
 	test_file accountdir = allaccounts.filename / account;
 
@@ -484,7 +484,7 @@ SCENARIO("Queues can handle a mix of different queued calls.")
 		int postno = 1;
 		for (const auto& fi : to_queue)
 		{
-			std::ofstream of{ fi.filename };
+			std::ofstream of{ fi };
 			of << "hey, I'm number " << postno++ << '\n';
 		}
 

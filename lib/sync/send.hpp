@@ -31,7 +31,7 @@ public:
 
 	send_posts(post_request& post, delete_request& del, post_new_status& new_status, upload_attachments& upload) : post(post), del(del), new_status(new_status), upload(upload) { }
 
-	void send(const std::string_view account, const std::string_view instance_url, const std::string_view access_token)
+	void send(const std::string& account, const std::string_view instance_url, const std::string_view access_token)
 	{
 		retries = set_default(retries, 3, "Number of retries cannot be zero or less. Resetting to 3.\n", pl());
 
@@ -45,7 +45,7 @@ private:
 	post_new_status& new_status;
 	upload_attachments& upload;
 
-	bool make_api_call(const api_call& to_make, const std::string& status_url, const std::string& media_url, std::string_view account, std::string_view access_token)
+	bool make_api_call(const api_call& to_make, const std::string& status_url, const std::string& media_url, const std::string& account, std::string_view access_token)
 	{
 		switch (to_make.queued_call)
 		{
@@ -64,7 +64,7 @@ private:
 		}
 	}
 
-	void process_queue(const std::string_view account, const std::string_view instance_url, const std::string_view access_token)
+	void process_queue(const std::string& account, const std::string_view instance_url, const std::string_view access_token)
 	{
 		auto queuelist = get(account);
 
@@ -116,7 +116,7 @@ private:
 		return true;
 	}
 
-	const fs::path& get_cached_file_queue_dir(std::string_view account)
+	const fs::path& get_cached_file_queue_dir(const std::string& account)
 	{
 		static std::unordered_map<std::string_view, fs::path> file_queue_dir_cache;
 
@@ -128,7 +128,7 @@ private:
 		return (file_queue_dir_cache.insert({ account, get_file_queue_directory(account) })).first->second;
 	}
 
-	bool send_post(const std::string_view account, const std::string_view access_token, const std::string& statusurl, const std::string& mediaurl, const std::string& post_filename)
+	bool send_post(const std::string& account, const std::string_view access_token, const std::string& statusurl, const std::string& mediaurl, const std::string& post_filename)
 	{
 		const fs::path file_to_send = get_cached_file_queue_dir(account) / post_filename;
 

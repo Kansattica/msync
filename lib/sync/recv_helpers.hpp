@@ -12,20 +12,20 @@
 
 enum class to_get { notifications, home, dms, lists };
 
-struct recv_parameters { user_option last_id_setting; user_option sync_setting; std::string_view route; std::string_view filename; };
+struct recv_parameters { user_option last_id_setting; user_option sync_setting; std::string_view route; const CONSTANT_PATH_TYPE& filename; };
 
 constexpr std::string_view home_route{ "/api/v1/timelines/home" };
 constexpr std::string_view notifications_route{ "/api/v1/notifications" };
 
 template <to_get timeline>
-constexpr recv_parameters get_parameters()
+CONSTEXPR_IF_NOT_BOOST recv_parameters get_parameters()
 {
-	if constexpr (timeline == to_get::notifications)
+	if CONSTEXPR_IF_NOT_BOOST (timeline == to_get::notifications)
 	{
 		return { user_option::last_notification_id, user_option::pull_notifications, notifications_route, Notifications_Filename };
 	}
 
-	if constexpr (timeline == to_get::home)
+	if CONSTEXPR_IF_NOT_BOOST (timeline == to_get::home)
 	{
 		return { user_option::last_home_id, user_option::pull_home, home_route, Home_Timeline_Filename };
 	}
