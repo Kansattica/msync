@@ -113,7 +113,7 @@ std::ofstream& operator<<(std::ofstream& out, const mastodon_notification& notif
 	if (notification.status.has_value())
 	{
 		out << '\n';
-		out << notification.status.value();
+		out << *notification.status;
 	}
 
 	return out;
