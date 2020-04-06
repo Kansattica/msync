@@ -8,7 +8,7 @@
 `msync` currently supports queueing and sending posts, boosts, and favorites for any number of accounts, as well as downloading the home timeline and notifications.
 
 ### Get msync
-Once `msync` has a stable release, I'll have releases available for download. For now, it has to be built with cmake. If you have a fairly recent version of cmake (3.12 or later), you can simply clone the repo, make a `build` directory, run cmake inside, and cmake will download and build `msync` and its dependencies automatically. 
+Once `msync` has a stable release, I'll have releases available for download. For now, it has to be built with CMake. If you have a fairly recent version of CMake (3.12 or later), you can simply clone the repo, make a `build` directory, run CMake inside, and CMake will download and build `msync` and its dependencies automatically. 
 
 On Linux systems, it works a lot better if it can link in your system's openssl (or whatever other TLS implementation cURL knows how to use) and, if you have it, libcurl. Consider installing these through your package manager. For example, I install `libcurl4-openssl-dev` on Debian.
 
@@ -37,9 +37,9 @@ The last two steps will take a while, but when you're done, you should see a `ms
 The instructions for building on Linux should mostly work, though note that Apple only officially supports std::filesystem on Xcode 11.1 and Catalina/10.15 and up. `msync` does support pre-10.15 versions with Boost::filesystem, which you can install through Homebrew. I don't have a Mac to test on, but I do ensure that it builds and all unit tests pass. I do my testing with the newest version of LLVM installed through Homebrew, because the versions released with OSX often miss stuff I need to run the tests.
 
 #### Building on Windows
-On Windows, you'll want Visual Studio with the C++ development workload and Cmake installed. After that, `git clone https://github.com/Kansattica/msync.git`, then open Visual Studio and go to `File > Open > CMake...` (some versions just have `File > Open > Folder...` instead, this will also work) and choose the `msync` repo you just downloaded. Visual Studio will take a while to download and configure everything, and then you should be able to pick `x64-Release` from the dropdown at the top, make sure the `msync.exe` target is selected, and build from there. 
+On Windows, you'll want Visual Studio with the C++ development workload and CMake installed. After that, `git clone https://github.com/Kansattica/msync.git`, then open Visual Studio and go to `File > Open > CMake...` (some versions just have `File > Open > Folder...` instead, this will also work) and choose the `msync` repo you just downloaded. Visual Studio will take a while to download and configure everything, and then you should be able to pick `x64-Release` from the dropdown at the top, make sure the `msync.exe` target is selected, and build from there. 
 
-If you want something lighter weight, I suspect you can install the [build tools for Visual Studio](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019) and build from the command line. I don't have as much experience with this, but you typically have to open the start menu, search for something called "developer command prompt", and then the cmake commands should be the same as the Linux commands up above.
+If you want something lighter weight, I suspect you can install the [build tools for Visual Studio](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019) and build from the command line. I don't have as much experience with this, but you typically have to open the start menu, search for something called "developer command prompt", and then the CMake commands should be the same as the Linux commands up above.
 
 #### Available builds
 
@@ -52,7 +52,7 @@ If you want something lighter weight, I suspect you can install the [build tools
 
 #### Testing your build
 
-To ensure that `msync` found and compiled its network dependencies correctly, run the cmake commands above without `-DMSYNC_BUILD_TESTS=FALSE` (or, equivalently, `-DMSYNC_BUILD_TESTS=TRUE`). Then, run `./tests/net_tests`. This will determine whether `msync` can correctly make authenticated HTTPS requests and will print warnings if it cannot request and recieve gzipped responses.
+To ensure that `msync` found and compiled its network dependencies correctly, run the CMake commands above without `-DMSYNC_BUILD_TESTS=FALSE` (or, equivalently, `-DMSYNC_BUILD_TESTS=TRUE`). Then, run `./tests/net_tests`. This will determine whether `msync` can correctly make authenticated HTTPS requests and will print warnings if it cannot request and recieve gzipped responses.
 
 ### Next steps
 
@@ -81,8 +81,9 @@ Once you have `msync` compiled, check out [MANUAL.md](manual.md) for installatio
 - [ ] [A proper manual for the weirder ins and outs of msync](MANUAL.md)
 
 ### Build Dependencies
-Cmake will download all of these for you, except it'll use your system's libcurl if you have it and can't update your compiler or standard library. I recommend at least having an SSL/TLS library for cmake to find and dynamically link.
+CMake will download all of these for you, except it'll use your system's libcurl if you have it and can't update your compiler or standard library. I recommend at least having an SSL/TLS library for CMake to find and dynamically link.
 You can verify that your setup works by building tests and running `net_tests`.
+- CMake 3.12 or newer
 - a compiler with C++17 support
 - a standard library with std::filesystem support (gcc libstdc++ 8, clang libc++ 7, MSVC 2017 15.7, or Xcode 11.0) or Boost::filesystem.
 - [Nlohmann Json](https://github.com/nlohmann/json)
