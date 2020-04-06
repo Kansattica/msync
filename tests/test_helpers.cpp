@@ -31,7 +31,8 @@ test_file account_directory()
 
 std::vector<std::string> read_lines(const fs::path& toread)
 {
-	std::ifstream fin(toread);
+	// all these .c_str()s are to make Boost happy.
+	std::ifstream fin(toread.c_str());
 	std::vector<std::string> toreturn;
 
 	for (std::string line; std::getline(fin, line);)
@@ -58,12 +59,12 @@ size_t count_files_in_directory(const fs::path& tocheck)
 
 void touch(const fs::path& totouch)
 {
-	std::ofstream of(totouch, std::ios::out | std::ios::app);
+	std::ofstream of(totouch.c_str(), std::ios::out | std::ios::app);
 }
 
 std::string read_file(const fs::path& file)
 {
-	std::ifstream fi(file, std::ios::ate | std::ios::in);
+	std::ifstream fi(file.c_str(), std::ios::ate | std::ios::in);
 
 	std::string content;
 	content.reserve(fi.tellg());

@@ -121,7 +121,7 @@ SCENARIO("option_files read data when created.")
         const test_file tf("testfileoptread");
 
         {
-            std::ofstream fout(tf.filename);
+            std::ofstream fout(tf);
             fout << "somecool=teststuff\n";
             fout << "different=tests\n";
             fout << "imgetting=testy\n";
@@ -182,7 +182,7 @@ SCENARIO("option_files read data when created.")
         const test_file tf("testfileoptread");
 
         {
-            std::ofstream fout(tf.filename);
+            std::ofstream fout(tf);
             fout << "somecool=teststuff\n";
             fout << '\n';
             fout << "different=tests\n";

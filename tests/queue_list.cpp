@@ -97,7 +97,7 @@ SCENARIO("queue_lists read data when created.")
 		const test_file tf("testfileoptread");
 
         {
-            std::ofstream fout(tf.filename);
+            std::ofstream fout(tf);
             fout << "POST firsthing\n";
             fout << "UNPOST secondthing\n";
             fout << "UNPOST thirdthing\n";
@@ -159,7 +159,7 @@ SCENARIO("queue_lists read data when created.")
 		const test_file tf("testfileoptread");
 
         {
-            std::ofstream fout(tf.filename);
+            std::ofstream fout(tf);
             fout << "POST firsthing\n";
             fout << '\n';
             fout << "BOOST secondthing\n";

@@ -14,7 +14,7 @@ SCENARIO("User_options reads from a file when created")
         const test_file fi("someuser.test");
 
         {
-            std::ofstream maketest(fi.filename);
+            std::ofstream maketest(fi);
 
             maketest << "account_name=sometester\n";
             maketest << "instance_url=website.egg\n";
@@ -53,7 +53,7 @@ SCENARIO("User_options saves changes back to its file")
         const test_file fi("someuser.test");
 
         {
-            std::ofstream maketest(fi.filename);
+            std::ofstream maketest(fi);
 
             maketest << "account_name=sometester\n";
             maketest << "instance_url=website.egg\n";
@@ -140,7 +140,7 @@ SCENARIO("Get and set options manage string references correctly.")
         test_file fi("someuser.test");
 
         {
-            std::ofstream maketest(fi.filename);
+            std::ofstream maketest(fi);
 
             maketest << "account_name=sometester\n";
             maketest << "instance_url=website.egg\n";

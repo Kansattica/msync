@@ -11,7 +11,7 @@
 #include <msync_exception.hpp>
 
 
-fs::path get_file_queue_directory(std::string_view account)
+fs::path get_file_queue_directory(const std::string& account)
 {
 	return options().account_directory_location / account / File_Queue_Directory;
 }
@@ -44,9 +44,12 @@ bool validate_file(const fs::path& attachpath)
 		return false;
 	}
 
-	const auto extension = attachpath.extension();
+	// the .string() turns Windows-style wide chars into regular chars. 
+	// I don't know if it turns non-ASCII characters into nonsense or utf-8 or what, but
+	// it doesn't matter here- if an extension has any of those, it's not gonna match.
+	const auto extension = attachpath.extension().string();
 
-	// this should really be a case insensitive comparison, but, uh, there's no real good portable way to do that with paths
+	// this should really be a case insensitive comparison, but that can wait.
 	const auto compare_extension = [&extension](const auto& allowed_extension) { return extension == allowed_extension; };
 
 	const auto file_size = fs::file_size(attachpath);
@@ -82,7 +85,11 @@ bool validate_file(const fs::path& attachpath)
 void queue_attachments(const fs::path& postfile)
 {
 	outgoing_post post{ postfile };
+#if MSYNC_USE_BOOST
+	boost::system::error_code err;
+#else
 	std::error_code err;
+#endif
 	for (auto& attach : post.parsed.attachments)
 	{
 		const auto attachpath = fs::canonical(attach, err);
@@ -157,7 +164,7 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 }
 
 template <typename queue_t = queue_list>
-queue_t open_queue(const std::string_view account)
+queue_t open_queue(const std::string& account)
 {
 	fs::path qfile = options().account_directory_location / account;
 	fs::create_directories(qfile);
@@ -177,7 +184,7 @@ std::vector<api_call> to_api_calls(std::vector<std::string>&& add, api_route tar
 	return to_return;
 }
 
-void enqueue(const queues toenqueue, const std::string_view account, std::vector<std::string>&& add)
+void enqueue(const queues toenqueue, const std::string& account, std::vector<std::string>&& add)
 {
 	queue_list toaddto = open_queue(account);
 	const auto target_route = get_route(toenqueue, false);
@@ -229,7 +236,7 @@ void dequeue_post(const fs::path& queuedir, const fs::path& filename)
 	}
 }
 
-void dequeue(queues todequeue, const std::string_view account, std::vector<std::string>&& remove)
+void dequeue(queues todequeue, const std::string& account, std::vector<std::string>&& remove)
 {
 	queue_list toremovefrom = open_queue(account);
 
@@ -289,7 +296,7 @@ void dequeue(queues todequeue, const std::string_view account, std::vector<std::
 		[&toremovefrom, remove_route](api_call& queuedel) { toremovefrom.parsed.push_back(api_call{ remove_route, std::move(queuedel.argument) }); });
 }
 
-void clear(queues toclear, const std::string_view account)
+void clear(queues toclear, const std::string& account)
 {
 	queue_list clearthis = open_queue(account);
 	const auto toclearinsert = get_route(toclear, true);
@@ -307,12 +314,12 @@ void clear(queues toclear, const std::string_view account)
 	}
 }
 
-queue_list get(const std::string_view account)
+queue_list get(const std::string& account)
 {
 	return open_queue(account);
 }
 
-std::vector<std::string> print(const std::string_view account)
+std::vector<std::string> print(const std::string& account)
 {
 	//prettyprint posts
 	readonly_queue_list printthis = open_queue<readonly_queue_list>(account);
