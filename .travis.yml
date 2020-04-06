@@ -10,7 +10,6 @@ compiler:
 matrix:
   include:
   - os: osx
-    osx_image: xcode11.3
     env: BUILDTYPE=Release LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib" CPPFLAGS="-I/usr/local/opt/llvm/include" PATH="/usr/local/opt/llvm/bin:$PATH" CC=clang CXX=clang++
   - os: linux
     dist: bionic
