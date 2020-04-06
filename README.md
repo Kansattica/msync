@@ -1,7 +1,7 @@
 # msync
 ## A low bandwidth store and forward Mastodon api client
 
-By <a rel="me" href="https://social.illegalpornography.com/@BestGirlGrace">BestGirlGrace@my.hypnovir.us</a>
+By <a rel="me" href="https://social.illegalpornography.com/@BestGirlGrace">BestGirlGrace at my.hypnovir.us</a>
 
 [![Build Status](https://travis-ci.org/Kansattica/msync.svg?branch=master)](https://travis-ci.org/Kansattica/msync)
 
