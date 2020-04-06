@@ -8,6 +8,8 @@ SCENARIO("Can make SSL requests to a site.")
 	{
 		const auto url = GENERATE(as<const char*>{}, "https://example.com", "https://wikipedia.org", "https://mastodon.social");
 
+		CAPTURE(url);
+
 		WHEN("a request is made")
 		{
 			const auto response = cpr::Get(cpr::Url{ url });
