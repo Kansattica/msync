@@ -85,7 +85,7 @@ bool validate_file(const fs::path& attachpath)
 void queue_attachments(const fs::path& postfile)
 {
 	outgoing_post post{ postfile };
-#ifdef MSYNC_USE_BOOST
+#if MSYNC_USE_BOOST
 	boost::system::error_code err;
 #else
 	std::error_code err;

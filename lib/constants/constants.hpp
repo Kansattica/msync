@@ -2,7 +2,7 @@
 #define _CONSTANTS_HPP_
 
 // boost doesn't know what to do with std::string_views and paths.
-#ifdef MSYNC_USE_BOOST
+#if MSYNC_USE_BOOST
 #include <string>
 #define CONSTANT_PATH_TYPE std::string
 #define CONSTANT_PATH_DECLARATION const CONSTANT_PATH_TYPE
