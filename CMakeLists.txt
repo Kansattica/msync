@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.12..3.15)
 
-project (msync VERSION 0.9
+project (msync VERSION 0.9.2
 	DESCRIPTION "Store and forward messages with a Mastodon API-compatible server."
+	HOMEPAGE_URL "https://github.com/Kansattica/msync"
 	LANGUAGES CXX C)
 
 option(MSYNC_BUILD_TESTS "Download catch2 and build tests with it." ON)
