@@ -8,12 +8,12 @@ Hello! Welcome to the manual for `msync`, a store and forward command line Masto
 
 #### Installing
 
-Once you've compiled msync (see README.md), you have a few options:
+Once you've compiled or downloaded msync (see README.md), you have a few options:
 
 - leave it where it is and use it in place, or copy it to a folder in your home directory and use it from there.
 - copy the compiled `msync` executable to somewhere in your `$PATH`. 
 
-Either option works. The only thing to be aware of is that `msync` will create a `msync_accounts` folder in the same directory as its executable. For the purposes of this guide, commands will be written `msync sync`, but anyone using the first option should type `./msync sync` from the correct folder instead.
+Either option works. The only thing to be aware of is that `msync` will create a `msync_accounts` folder in the same directory as its executable. For the purposes of this guide, commands will be written `msync sync`, but anyone using the first option should type `./msync sync` from the correct folder instead. If you downloaded a prebuilt release, your executable will be called something like `msync-v0.9.1-linux-x64`. Feel free to rename it to simply `msync` or whatever else you like. 
 
 #### Setting up your account
 
