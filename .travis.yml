@@ -10,7 +10,8 @@ compiler:
 matrix:
   include:
   - os: osx
-    env: BUILDTYPE=Release CC=clang CXX=clang++ LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib" CPPFLAGS="-I/usr/local/opt/llvm/include" PATH="/usr/local/opt/llvm/bin:$PATH" 
+    compiler: clang
+    env: BUILDTYPE=Release LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib" CPPFLAGS="-I/usr/local/opt/llvm/include" PATH="/usr/local/opt/llvm/bin:$PATH" 
   - os: linux
     dist: bionic
     compiler: gcc
