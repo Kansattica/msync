@@ -32,7 +32,7 @@ The last two steps will take a while, but when you're done, you should see a `ms
 
 #### Building on macOS
 
-The instructions for building on Linux should mostly work, though note that Apple only officially supports std::filesystem on Xcode 11.1 and Catalina/10.15 and up. 
+The instructions for building on Linux should mostly work, though note that Apple only officially supports std::filesystem on Xcode 11.1 and Catalina/10.15 and up. `msync` does support pre-10.15 versions with boost::filesystem, which you can install through Homebrew.
 
 #### Building on Windows
 On Windows, you'll want Visual Studio with the C++ development workload and Cmake installed. After that, `git clone https://github.com/Kansattica/msync.git`, then open Visual Studio and go to `File > Open > CMake...` (some versions just have `File > Open > Folder...` instead, this will also work) and choose the `msync` repo you just downloaded. Visual Studio will take a while to download and configure everything, and then you should be able to pick `x64-Release` from the dropdown at the top, make sure the `msync.exe` target is selected, and build from there. 
@@ -75,7 +75,7 @@ Once you have `msync` compiled, check out [MANUAL.md](manual.md) for usage infor
 Cmake will download all of these for you, except it'll use your system's libcurl if you have it and can't update your compiler or standard library. I recommend at least having an SSL/TLS library for cmake to find and dynamically link.
 You can verify that your setup works by building tests and running `net_tests`.
 - a compiler with C++17 support
-- a standard library with std::filesystem support (gcc libstdc++ 8, clang libc++ 7, MSVC 2017 15.7, or Xcode 11.0)
+- a standard library with std::filesystem support (gcc libstdc++ 8, clang libc++ 7, MSVC 2017 15.7, or Xcode 11.0) or Boost::filesystem.
 - [Nlohmann Json](https://github.com/nlohmann/json)
 - [whereami](https://github.com/gpakosz/whereami)
 - [clipp](https://github.com/muellan/clipp)

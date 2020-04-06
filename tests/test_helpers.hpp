@@ -45,7 +45,7 @@ public:
 			fs::remove(filenamebak);
 	};
 
-	operator const std::string () const { return filename.string(); }
+	operator const std::filesystem::path::value_type* () const { return filename.c_str(); }
 	const fs::path filename;
 	fs::path filenamebak;
 private:
@@ -68,9 +68,8 @@ public:
 		fs::remove(filename);
 	};
 
-	operator std::string() const { return filename.string(); }
+	operator const std::filesystem::path::value_type* () const { return filename.c_str(); }
 	const fs::path filename;
-private:
 };
 
 test_file account_directory();

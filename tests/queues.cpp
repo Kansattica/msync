@@ -280,7 +280,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 		WHEN("both are enqueued")
 		{
-			enqueue(queues::post, account, std::vector<std::string>{ postfiles, postfiles + 2 });
+			enqueue(queues::post, account, std::vector<std::string>{ postfiles[0].filename.string(), postfiles[1].filename.string() });
 
 			const fs::path unsuffixedname = file_queue_dir / "thisisapost.hi";
 			const fs::path suffixedname = file_queue_dir / "thisisapost.hi.1";
@@ -380,7 +380,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 		WHEN("both are enqueued")
 		{
-			enqueue(queues::post, account, std::vector<std::string>{ postfiles, postfiles + 2 });
+			enqueue(queues::post, account, std::vector<std::string>{ postfiles[0].filename.string(), postfiles[1].filename.string() });
 
 			const fs::path unsuffixedname = file_queue_dir / "thisisapost";
 			const fs::path suffixedname = file_queue_dir / "thisisapost.1";
