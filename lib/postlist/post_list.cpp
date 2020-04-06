@@ -74,7 +74,7 @@ std::ofstream& operator<<(std::ofstream& out, const mastodon_status& status)
 
 	if (status.poll.has_value())
 	{
-		out << status.poll.value();
+		out << *status.poll;
 	}
 
 	print(out, "visibility: ", status.visibility);
