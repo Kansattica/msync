@@ -30,7 +30,6 @@ public:
 	unsigned int max_requests = 0;
 	unsigned int per_call = 0;
 
-
 	recv_posts(get_posts& post_downloader) : download(post_downloader) {};
 
 	void get(const std::string& account_name, user_options& account)
