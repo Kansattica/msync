@@ -68,7 +68,7 @@ public:
 		fs::remove(filename);
 	};
 
-	operator const std::filesystem::path::value_type* () const { return filename.c_str(); }
+	operator const fs::path::value_type* () const { return filename.c_str(); }
 	const fs::path filename;
 };
 
