@@ -56,13 +56,17 @@ message(STATUS "Downloading CPR...")
 FetchContent_Declare(
 	libcpr
 	GIT_REPOSITORY 	https://github.com/kansattica/cpr.git
-	GIT_TAG			e23c9a20b0a1ec06ba995ba04df7f73cbf5ce5d7
+	GIT_TAG			31db80d3c4dd45d736e61a2014f029e89444830c
 )
 option(USE_SYSTEM_CURL "Try to use the system's libcurl instead of downloading and statically linking." ON)
 option(MSYNC_DOWNLOAD_ZLIB "If downloading and building curl on Windows, try to download zlib as well." ON)
 option(BUILD_CPR_TESTS "" OFF)
 set (BUILD_TESTING OFF CACHE BOOL "If you must build curl from source, don't build the tests." FORCE)
 set (BUILD_SHARED_LIBS OFF CACHE BOOL "Build static libcurl and cpr." FORCE)
+
+if (ipo_is_supported)
+	set (CURL_LTO ON CACHE BOOL "Turn on link time optimization for curl" FORCE)
+endif()
 
 if(USE_SYSTEM_CURL)
        find_package(CURL)
