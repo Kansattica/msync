@@ -71,3 +71,4 @@ deploy:
   api_key: $API_KEY
   on:
     tags: true
+    branch: master
