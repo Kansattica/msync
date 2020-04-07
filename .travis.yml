@@ -10,6 +10,7 @@ compiler:
 matrix:
   include:
   - os: osx
+    osx_image: 10.2 # the default takes forever to update homebrew
     compiler: clang
     env: BUILDTYPE=Release LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib" CPPFLAGS="-I/usr/local/opt/llvm/include" PATH="/usr/local/opt/llvm/bin:$PATH" 
   - os: linux
