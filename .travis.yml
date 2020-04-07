@@ -43,7 +43,7 @@ script:
   - cd build
   - cmake --version
   - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE .. 
-  - cmake --build . --config $BUILDTYPE --parallel 2
+  - cmake --build . --config $BUILDTYPE --parallel
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then EXELOCATION="./$BUILDTYPE/msync.exe"; else EXELOCATION="./msync"; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then TESTLOCATION="./tests/$BUILDTYPE/tests.exe"; else TESTLOCATION="./tests/tests"; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then NETTESTLOCATION="./tests/$BUILDTYPE/net_tests.exe"; else NETTESTLOCATION="./tests/net_tests"; fi
