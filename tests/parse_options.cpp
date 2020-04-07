@@ -1203,8 +1203,11 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		const auto vis = pick_visibility();
 
 		gen_options expected;
-		std::vector<command_line_option> options;
-		options.reserve(8);
+
+		// this guy is going to be refilled and emptied a bunch
+		// make 'em static and clear it every time to keep the capacity
+		static std::vector<command_line_option> options;
+		options.clear();
 
 		if (vis.first[0] != '\0')
 		{
