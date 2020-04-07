@@ -99,6 +99,9 @@ int main(int argc, const char* argv[])
 		case mode::version:
 			pl() << "msync version " << MSYNC_VERSION;
 			break;
+		case mode::license:
+			pl() << MSYNC_LICENSE;
+			break;
 		case mode::yeehaw:
 			plverb() << " __________\n"
 						"<  yeehaw  >\n"
