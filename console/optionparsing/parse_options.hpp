@@ -14,7 +14,8 @@ enum class mode
     queue,
     help,
     version,
-    yeehaw
+    yeehaw,
+    license
 };
 
 struct parse_result
