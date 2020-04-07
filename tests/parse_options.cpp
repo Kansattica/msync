@@ -1345,11 +1345,13 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 			}
 			else
 			{
-				static std::mt19937 g(std::random_device{}());
+				static std::minstd_rand g(std::random_device{}());
+				// shuffle once because shuffling is slow
+				std::shuffle(options.begin(), options.end(), g);
 				for (int i = 0; i < 5000; i++)
 				{
 					check_parse(argv, options, expected);
-					std::shuffle(options.begin(), options.end(), g);
+					std::next_permutation(options.begin(), options.end());
 				}
 			}
 
