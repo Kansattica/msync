@@ -1056,6 +1056,31 @@ SCENARIO("The command line parser recognizes when the user requests msync's vers
 	}
 }
 
+SCENARIO("The command line parser recognizes when the user requests msync's license.")
+{
+	GIVEN("A command line requesting the license.")
+	{
+		const auto license = GENERATE(as<const char*>{}, "license", "--license");
+
+		char const* argv[] { "msync", license };
+
+		WHEN("the command line is parsed")
+		{
+			const auto result = parse(2, argv);
+
+			THEN("the parse is good.")
+			{
+				REQUIRE(result.okay);
+			}
+
+			THEN("the correct action is selected.")
+			{
+				REQUIRE(result.selected == mode::license);
+			}
+		}
+	}
+}
+
 bool flag_set(int combo, int position)
 {
 	return combo & (1 << position);
