@@ -1081,8 +1081,7 @@ void pick_attachment(int number, gen_options& expected, std::vector<command_line
 		expected.post.attachments.push_back("someattach");
 		break;
 	case 1:
-		options.push_back(command_line_option{ {"--attach", "attacher"} });
-		options.push_back(command_line_option{ {"-f", "somefile"} });
+		options.push_back(command_line_option{ {"--attach", "attacher", "-f", "somefile"} });
 		expected.post.attachments.push_back("attacher");
 		expected.post.attachments.push_back("somefile");
 		break;
@@ -1111,8 +1110,7 @@ void pick_description(int number, gen_options& expected, std::vector<command_lin
 		expected.post.descriptions.push_back("somedescrip");
 		break;
 	case 1:
-		options.push_back(command_line_option{ {"--description", "describer"} });
-		options.push_back(command_line_option{ {"-d", "some file!"} });
+		options.push_back(command_line_option{ {"--description", "describer", "-d", "some file!"} });
 		expected.post.descriptions.push_back("describer");
 		expected.post.descriptions.push_back("some file!");
 		break;
