@@ -1081,8 +1081,7 @@ void pick_attachment(int number, gen_options& expected, std::vector<command_line
 		expected.post.attachments.push_back("someattach");
 		break;
 	case 1:
-		options.push_back(command_line_option{ {"--attach", "attacher"} });
-		options.push_back(command_line_option{ {"-f", "somefile"} });
+		options.push_back(command_line_option{ {"--attach", "attacher", "-f", "somefile"} });
 		expected.post.attachments.push_back("attacher");
 		expected.post.attachments.push_back("somefile");
 		break;
@@ -1111,8 +1110,7 @@ void pick_description(int number, gen_options& expected, std::vector<command_lin
 		expected.post.descriptions.push_back("somedescrip");
 		break;
 	case 1:
-		options.push_back(command_line_option{ {"--description", "describer"} });
-		options.push_back(command_line_option{ {"-d", "some file!"} });
+		options.push_back(command_line_option{ {"--description", "describer", "-d", "some file!"} });
 		expected.post.descriptions.push_back("describer");
 		expected.post.descriptions.push_back("some file!");
 		break;
@@ -1203,8 +1201,11 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		const auto vis = pick_visibility();
 
 		gen_options expected;
-		std::vector<command_line_option> options;
-		options.reserve(8);
+
+		// this guy is going to be refilled and emptied a bunch
+		// make 'em static and clear it every time to keep the capacity
+		static std::vector<command_line_option> options;
+		options.clear();
 
 		if (vis.first[0] != '\0')
 		{
@@ -1342,11 +1343,13 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 			}
 			else
 			{
-				static std::mt19937 g(std::random_device{}());
+				static std::minstd_rand g(std::random_device{}());
+				// shuffle once because shuffling is slow
+				std::shuffle(options.begin(), options.end(), g);
 				for (int i = 0; i < 5000; i++)
 				{
 					check_parse(argv, options, expected);
-					std::shuffle(options.begin(), options.end(), g);
+					std::next_permutation(options.begin(), options.end());
 				}
 			}
 
