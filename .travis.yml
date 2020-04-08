@@ -1,45 +1,48 @@
 language: cpp
-env:
-  - BUILDTYPE=Release BUILD_ARCH=x64
-  #- BUILDTYPE=MinSizeRel
-os: linux
-dist: bionic
-compiler:
-  - gcc
-  - clang
 matrix:
   include:
-  - os: osx
-    compiler: clang
-    env: BUILDTYPE=Release LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib" CPPFLAGS="-I/usr/local/opt/llvm/include" PATH="/usr/local/opt/llvm/bin:$PATH" 
   - os: linux
     dist: bionic
     compiler: gcc
-    env: BUILDTYPE=Release CXXFLAGS="-m32" CFLAGS="-m32" BUILD_ARCH=i386
+    env: BUILD_ARCH=x64 CC=gcc-8 CXX=g++-8 BUILDTYPE=Release 
+    addons:
+      apt: g++-8 libstdc++-8-dev
+  - os: linux
+    dist: bionic
+    compiler: clang
+    env: BUILD_ARCH=x64 CC="/usr/bin/clang-7" CXX="/usr/bin/clang++-7" BUILDTYPE=Release 
+    addons:
+      apt: clang-7 llvm-7-dev libstdc++-8-dev
+  - os: osx
+    compiler: clang
+    env: LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib" CPPFLAGS="-I/usr/local/opt/llvm/include" PATH="/usr/local/opt/llvm/bin:$PATH" BUILDTYPE=Release 
+    addons: # llvm is needed because it provides an updated version of the standard library needed to run the tests and std::optional
+      homebrew: # the update is because the osx image won't work without it.
+        packages: 
+          - llvm
+        update: true
+  - os: linux
+    dist: bionic
+    compiler: gcc
+    env: CXXFLAGS="-m32" CFLAGS="-m32" BUILD_ARCH=i386 CC=gcc-8 CXX=g++-8 BUILDTYPE=Release 
+    addons:
+      apt: 
+        - g++-8
+        - gcc-8-multilib
+        - g++-8-multilib 
+        - libstdc++-8-dev-i386-cross
+        - libcurl4-openssl-dev:i386
+        - linux-libc-dev:i386
+        - libstdc++-8-dev
   - os: windows
-    compiler: cl.exe
+    compiler: cl64.exe
     env: BUILDTYPE=Release CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64
   - os: windows
-    compiler: cl.exe
+    compiler: cl32.exe
     env: BUILDTYPE=Release CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=win32
 
-# llvm is needed because it provides an updated version of charconv needed to run the tests
-# the update is because the llvm compiler produces code that runs fast enough to finish in time
-# and the updated one runs faster still
-addons:
-  homebrew:
-    packages:
-      - llvm
-    update: true
-
-before_install:
-  - if [ "$TRAVIS_COMPILER" = "gcc" ] && [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo -E apt-get -yqq --no-install-suggests --no-install-recommends install g++-8 && CC=gcc-8 && CXX=g++-8; fi
-  - if [ "$TRAVIS_COMPILER" = "clang" ] && [ "$TRAVIS_OS_NAME" = "linux" ] ; then sudo -E apt-get -yqq --no-install-suggests --no-install-recommends install clang-7 llvm-7-dev && CC="/usr/bin/clang-7" && CXX="/usr/bin/clang++-7"; fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo -E apt -yqq install --fix-missing libstdc++-8-dev; fi
-  - if [ "$BUILD_ARCH" = "i386" ]; then sudo -E apt -yqq install --fix-missing gcc-8-multilib g++-8-multilib libstdc++-8-dev-i386-cross libcurl4-openssl-dev:i386 linux-libc-dev:i386; fi
-
 script:
-  - mkdir build
+  - mkdir -p build
   - cd build
   - cmake --version
   - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE .. 
