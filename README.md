@@ -72,6 +72,7 @@ Once you have `msync` compiled, check out [MANUAL.md](manual.md) for installatio
 - [ ] Download posts from your profile
 - [X] Post template file generation
 - [X] Attachment support
+- [ ] Following support
 - [X] Ability to exclude notifications by type.
 - [ ] Nicknames for accounts
 
