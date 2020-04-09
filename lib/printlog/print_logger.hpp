@@ -20,12 +20,6 @@ struct print_logger
 {
     print_logger(std::ofstream& file) : logfile(file) {}
 
-    void flush()
-    {
-        cout.flush();
-        logfile.flush();
-    }
-
     template <typename T>
     print_logger& operator<<(const T& towrite)
     {
