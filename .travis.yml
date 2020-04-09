@@ -58,6 +58,7 @@ script:
   # Basically, Travis will time out if it doesn't get any output for over ten minutes.
   # Usually, this is fine, but it causes problems because OSX produces binaries that
   # run much slower for some reason.
+  # also, you have to single quote a line ending with an ampersand or the yaml parser gets mad.
   - '{ sleep 9m && echo "Still testing, Travis. Keep going."; } &'
   - '{ sleep 19m && echo "Still testing, Travis. Keep going."; } &'
   - $TESTLOCATION [long_run_parseopts]
