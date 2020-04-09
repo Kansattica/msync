@@ -4,8 +4,6 @@
 #include <iostream>
 #include <fstream>
 
-using std::cout;
-
 enum class logtype
 {
     normal,
@@ -29,11 +27,11 @@ struct print_logger
         if constexpr (isverbose == logtype::verbose)
         {
             if (verbose_logs)
-                cout << towrite;
+                std::cout << towrite;
         }
         else if constexpr (isverbose != logtype::fileonly)
         {
-            cout << towrite;
+            std::cout << towrite;
         }
 
         logfile << towrite;
