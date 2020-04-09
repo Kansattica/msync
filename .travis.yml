@@ -61,7 +61,7 @@ script:
   # also, you have to single quote a line ending with an ampersand or the yaml parser gets mad.
   - '{ sleep 9m && echo "Still testing, Travis. Keep going."; } &'
   - '{ sleep 19m && echo "Still testing, Travis. Keep going."; } &'
-  - $TESTLOCATION [long_run_parseopts]
+  - time $TESTLOCATION [long_run_parseopts]
 
 after_success:
   - echo "Binary size:"
