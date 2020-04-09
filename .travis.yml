@@ -55,7 +55,10 @@ script:
   - $NETTESTLOCATION
   - $TESTLOCATION ~[long_run]
   - $TESTLOCATION [long_run_outgoingpost]
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then { sleep 9m && echo "I'm still testing, Travis. Don't worry."; } &\; ; fi
+  # Basically, Travis will time out if it doesn't get any output for over ten minutes.
+  # Usually, this is fine, but it causes problems because OSX produces binaries that
+  # run much slower for some reason.
+  - { sleep 9m && echo "I'm still testing, Travis. Don't worry."; } &
   - $TESTLOCATION [long_run_parseopts]
 
 after_success:
