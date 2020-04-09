@@ -59,6 +59,7 @@ script:
   # Usually, this is fine, but it causes problems because OSX produces binaries that
   # run much slower for some reason.
   - { sleep 9m && echo "I'm still testing, Travis. Don't worry."; } &
+  - { sleep 19m && echo "I'm still testing, Travis. Don't worry."; } &
   - $TESTLOCATION [long_run_parseopts]
 
 after_success:
