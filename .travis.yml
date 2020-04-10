@@ -39,20 +39,15 @@ matrix:
     compiler: gcc
     arch: arm64
     env: BUILD_ARCH=x64 BUILDTYPE=Release
-    addons:
-      apt:
-        sources:
-          - sourceline: 'deb https://apt.kitware.com/ubuntu/ bionic main'
-            key_url: 'https://apt.kitware.com/keys/kitware-archive-latest.asc'
-        update: true
-        packages: cmake
-
   - os: windows
     compiler: cl64.exe
     env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64
   - os: windows
     compiler: cl32.exe
     env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=win32
+
+before_script:
+  - if [ "$TRAVIS_CPU_ARCH" = "arm64" ]; then pip install cmake; fi
 
 script:
   - export VERBOSE=1 BUILDTYPE=Release
