@@ -51,6 +51,9 @@ matrix:
     compiler: cl32.exe
     env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=win32
 
+before_install:
+  - if [ "$TRAVIS_CPU_ARCH" = "arm64" ]; then pip install scikit-build; pip install cmake; fi
+
 script:
   - export VERBOSE=1 BUILDTYPE=Release
   - mkdir -p build
