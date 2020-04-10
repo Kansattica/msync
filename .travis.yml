@@ -44,8 +44,8 @@ matrix:
         sources:
           - sourceline: 'deb https://apt.kitware.com/ubuntu/ bionic main'
             key_url: 'https://apt.kitware.com/keys/kitware-archive-latest.asc'
-        packages: cmake
         update: true
+        packages: cmake
 
   - os: windows
     compiler: cl64.exe
