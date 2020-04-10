@@ -34,6 +34,11 @@ matrix:
         - libcurl4-openssl-dev:i386
         - linux-libc-dev:i386
         - libstdc++-8-dev
+  - os: linux
+    dist: bionic
+    compiler: gcc
+    arch: arm64
+    env: BUILD_ARCH=x64 BUILDTYPE=Release 
   - os: windows
     compiler: cl64.exe
     env: BUILDTYPE=Release CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64
