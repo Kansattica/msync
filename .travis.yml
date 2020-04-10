@@ -43,7 +43,7 @@ matrix:
     dist: bionic
     compiler: gcc
     arch: arm64
-    env: BUILD_ARCH=x64 BUILDTYPE=Release
+    env: BUILD_ARCH=x64
   - os: windows
     compiler: cl64.exe
     env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64
@@ -53,7 +53,6 @@ matrix:
 
 script:
   - export VERBOSE=1 BUILDTYPE=Release
-  - if [ "$TRAVIS_CPU_ARCH" = "arm64" ]; then sudo -H python -m pip install --upgrade pip; pip install scikit-build; pip install cmake; fi
   - mkdir -p build
   - cd build
   - cmake --version
