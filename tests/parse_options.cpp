@@ -1089,6 +1089,8 @@ bool flag_set(int combo, int position)
 struct command_line_option
 {
 	std::vector<const char*> options;
+	unsigned int attachment_order = 0;
+	unsigned int description_order = 0;
 	unsigned int order = 1000;
 
 	friend bool operator< (const command_line_option& lhs, const command_line_option& rhs)
@@ -1096,6 +1098,7 @@ struct command_line_option
 		return lhs.order < rhs.order;
 	}
 };
+
 
 void pick_attachment(int number, gen_options& expected, std::vector<command_line_option>& options)
 {
@@ -1106,7 +1109,8 @@ void pick_attachment(int number, gen_options& expected, std::vector<command_line
 		expected.post.attachments.push_back("someattach");
 		break;
 	case 1:
-		options.push_back(command_line_option{ {"--attach", "attacher", "-f", "somefile"} });
+		options.push_back(command_line_option{ {"--attach", "attacher"}, 1 });
+		options.push_back(command_line_option{ { "-f", "somefile"}, 2 });
 		expected.post.attachments.push_back("attacher");
 		expected.post.attachments.push_back("somefile");
 		break;
@@ -1135,7 +1139,8 @@ void pick_description(int number, gen_options& expected, std::vector<command_lin
 		expected.post.descriptions.push_back("somedescrip");
 		break;
 	case 1:
-		options.push_back(command_line_option{ {"--description", "describer", "-d", "some file!"} });
+		options.push_back(command_line_option{ {"--description", "describer"}, 0, 1 });
+		options.push_back(command_line_option{ {"-d", "some file!"}, 0, 2 });
 		expected.post.descriptions.push_back("describer");
 		expected.post.descriptions.push_back("some file!");
 		break;
@@ -1182,6 +1187,21 @@ auto pick_visibility()
 	return std::make_pair("Well, this shouldn't happen.", visibility::default_vis);
 }
 
+template <typename get_field>
+bool should_reverse(const std::vector<command_line_option>& options, get_field func)
+{
+	const auto found = std::find_if(options.begin(), options.end(), [func](const auto& opt) { return func(opt) != 0; });
+	if (found == options.end() || func(*found) == 1)
+		return false;
+	return true;
+}
+
+template <typename T>
+std::vector<T> reversed(const std::vector<T>& vec)
+{
+	return std::vector<T> { vec.rbegin(), vec.rend() };
+}
+
 void check_parse(std::vector<const char*>& argv, const std::vector<command_line_option>& options, const gen_options& expected)
 {
 	if (flip_coin())
@@ -1205,12 +1225,21 @@ void check_parse(std::vector<const char*>& argv, const std::vector<command_line_
 
 		REQUIRE(expected.filename == parsed.gen_opt.filename);
 		REQUIRE(expected.post.text == parsed.gen_opt.post.text);
-		REQUIRE(expected.post.attachments == parsed.gen_opt.post.attachments);
 		REQUIRE(expected.post.vis == parsed.gen_opt.post.vis);
-		REQUIRE(expected.post.descriptions == parsed.gen_opt.post.descriptions);
 		REQUIRE(expected.post.content_warning == parsed.gen_opt.post.content_warning);
 		REQUIRE(expected.post.reply_to_id == parsed.gen_opt.post.reply_to_id);
 		REQUIRE(expected.post.reply_id == parsed.gen_opt.post.reply_id);
+
+		// basically, it's possible for these to get permuted so that they're not in the original order.
+		if (should_reverse(options, [](const command_line_option& opt) { return opt.attachment_order; }))
+			REQUIRE(reversed(expected.post.attachments) == parsed.gen_opt.post.attachments);
+		else
+			REQUIRE(expected.post.attachments == parsed.gen_opt.post.attachments);
+
+		if (should_reverse(options, [](const command_line_option& opt) { return opt.description_order; }))
+			REQUIRE(reversed(expected.post.descriptions) == parsed.gen_opt.post.descriptions);
+		else
+			REQUIRE(expected.post.descriptions == parsed.gen_opt.post.descriptions);
 	}
 }
 

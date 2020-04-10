@@ -72,7 +72,7 @@ std::string read_file(const fs::path& file)
 	return content.append(std::istreambuf_iterator(fi), std::istreambuf_iterator<char>());
 }
 
-std::mt19937 gen(std::random_device{}());
+std::minstd_rand gen(std::random_device{}());
 
 bool flip_coin()
 {
