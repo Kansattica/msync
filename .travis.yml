@@ -4,18 +4,18 @@ matrix:
   - os: linux
     dist: bionic
     compiler: gcc
-    env: BUILD_ARCH=x64 CC=gcc-8 CXX=g++-8 BUILDTYPE=Release 
+    env: BUILD_ARCH=x64 CC=gcc-8 CXX=g++-8 
     addons:
       apt: g++-8 libstdc++-8-dev
   - os: linux
     dist: bionic
     compiler: clang
-    env: BUILD_ARCH=x64 CC="/usr/bin/clang-7" CXX="/usr/bin/clang++-7" BUILDTYPE=Release 
+    env: BUILD_ARCH=x64 CC="/usr/bin/clang-7" CXX="/usr/bin/clang++-7"
     addons:
       apt: clang-7 llvm-7-dev libstdc++-8-dev
   - os: osx
     compiler: clang
-    env: LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib" CPPFLAGS="-I/usr/local/opt/llvm/include" PATH="/usr/local/opt/llvm/bin:$PATH" BUILDTYPE=Release 
+    env: LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib" CPPFLAGS="-I/usr/local/opt/llvm/include" PATH="/usr/local/opt/llvm/bin:$PATH"
     addons: # llvm is needed because it provides an updated version of the standard library needed to run the tests and std::optional
       homebrew: # the update is because the osx image won't work without it.
         packages: 
@@ -24,7 +24,7 @@ matrix:
   - os: linux
     dist: bionic
     compiler: gcc
-    env: CXXFLAGS="-m32" CFLAGS="-m32" BUILD_ARCH=i386 CC=gcc-8 CXX=g++-8 BUILDTYPE=Release 
+    env: CXXFLAGS="-m32" CFLAGS="-m32" BUILD_ARCH=i386 CC=gcc-8 CXX=g++-8
     addons:
       apt: 
         - g++-8
@@ -36,12 +36,13 @@ matrix:
         - libstdc++-8-dev
   - os: windows
     compiler: cl64.exe
-    env: BUILDTYPE=Release CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64
+    env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64
   - os: windows
     compiler: cl32.exe
-    env: BUILDTYPE=Release CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=win32
+    env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=win32
 
 script:
+  - export VERBOSE=1 BUILDTYPE=Release
   - mkdir -p build
   - cd build
   - cmake --version
@@ -55,7 +56,11 @@ script:
   - $NETTESTLOCATION
   - $TESTLOCATION ~[long_run]
   - $TESTLOCATION [long_run_outgoingpost]
-  - $TESTLOCATION [long_run_parseopts]
+  # Basically, Travis will time out if it doesn't get any output for over ten minutes.
+  # Usually, this is fine, but it causes problems because OSX produces binaries that
+  # run much slower for some reason.
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ( ( sleep 540 && echo "I'm still testing, Travis. Don't worry." ) & ) ; fi
+  - time $TESTLOCATION [long_run_parseopts]
 
 after_success:
   - echo "Binary size:"
