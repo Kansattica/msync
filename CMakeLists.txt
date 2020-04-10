@@ -64,7 +64,7 @@ target_link_libraries(filebacked INTERFACE filesystem)
 
 target_include_directories(entities INTERFACE lib/entities)
 
-target_link_libraries(sync PRIVATE entities printlog queue util netinterface postfile postlist constants filesystem options nlohmann_json::nlohmann_json)
+target_link_libraries(sync PRIVATE entities printlog queue util netinterface postfile postlist constants filesystem options nlohmannjson)
 
 target_link_libraries(options PRIVATE whereami printlog exception filebacked constants)
 target_link_libraries(options PUBLIC filesystem) 
@@ -77,7 +77,7 @@ target_link_libraries(queue PRIVATE constants printlog options filebacked except
 
 target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options queue postfile)
 
-target_link_libraries(msync PRIVATE options optionparsing printlog ${CPR_LIBRARIES} util nlohmann_json::nlohmann_json exception postfile queue sync net netinterface)
+target_link_libraries(msync PRIVATE options optionparsing printlog ${CPR_LIBRARIES} util nlohmannjson exception postfile queue sync net netinterface)
 
 # basically, if you compile CPR with LTO enabled, the gnu compiler emits a bunch of spurious ODR warnings for every library that includes CPR.
 # this quiets that down.

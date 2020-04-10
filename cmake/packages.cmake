@@ -3,17 +3,16 @@ include(FetchContent)
 message(STATUS "Downloading nlohmann json...")
 FetchContent_Declare(
 	njson
-	GIT_REPOSITORY https://github.com/nlohmann/json.git
-	GIT_TAG		   v3.7.3
-	GIT_SHALLOW	   TRUE
+	URL https://github.com/nlohmann/json/releases/download/v3.7.3/include.zip
+	URL_HASH SHA256=87b5884741427220d3a33df1363ae0e8b898099fbc59f1c451113f6732891014
 	)
 
-option(JSON_BuildTests "" OFF)
 #FetchContent_MakeAvailable(json) Not available in cmake 13
 FetchContent_GetProperties(njson)
 if(NOT njson_POPULATED)
 	FetchContent_Populate(njson)
-	add_subdirectory(${njson_SOURCE_DIR} ${njson_BINARY_DIR})
+	add_library(nlohmannjson INTERFACE)
+	target_include_directories(nlohmannjson INTERFACE ${njson_SOURCE_DIR}/single_include)
 endif()
 
 message(STATUS "Downloading clipp...")
