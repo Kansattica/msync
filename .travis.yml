@@ -1,4 +1,9 @@
 language: cpp
+
+git:
+  depth: 5
+  submodules: false
+
 matrix:
   include:
   - os: linux
