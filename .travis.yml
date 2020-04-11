@@ -44,6 +44,10 @@ matrix:
     compiler: gcc
     arch: arm64
     env: BUILD_ARCH=x64
+    addons:
+      apt:
+        update: true
+        packages: libc6 libstdc++6
   - os: windows
     compiler: cl64.exe
     env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64
