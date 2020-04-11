@@ -44,10 +44,6 @@ matrix:
     compiler: gcc
     arch: arm64
     env: BUILD_ARCH=x64
-    addons:
-      apt:
-        update: true
-        packages: libc6 libstdc++6
   - os: windows
     compiler: cl64.exe
     env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64
@@ -56,7 +52,7 @@ matrix:
     env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=win32
 
 before_install:
-  - if [ "$TRAVIS_CPU_ARCH" = "arm64" ]; then sudo apt -yqq purge cmake; wget http://ports.ubuntu.com/pool/main/c/cmake/cmake_3.13.4-1build1_arm64.deb; wget http://ports.ubuntu.com/pool/main/c/cmake/cmake-data_3.13.4-1build1_all.deb; sudo dpkg -i *.deb; fi
+  - if [ "$TRAVIS_CPU_ARCH" = "arm64" ]; then sudo apt -yqq update; sudo apt -yqq libc6 libstdc++6; sudo apt -yqq purge cmake; wget http://ports.ubuntu.com/pool/main/c/cmake/cmake_3.13.4-1build1_arm64.deb; wget http://ports.ubuntu.com/pool/main/c/cmake/cmake-data_3.13.4-1build1_all.deb; sudo dpkg -i *.deb; fi
 
 script:
   - export VERBOSE=1 BUILDTYPE=Release
