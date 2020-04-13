@@ -8,6 +8,7 @@
 #include <iterator>
 #include <array>
 #include <algorithm>
+#include <iostream>
 
 #include "../lib/constants/constants.hpp"
 
@@ -20,6 +21,9 @@ fs::path _get_exe_location()
 
     int dirname_length;
     wai_getExecutablePath(path.get(), length, &dirname_length);
+
+	std::cout << "I'm going to make a path out of the first " << dirname_length << " characters of this string: " << path.get() << '\n';
+
     return fs::path(path.get(), path.get() + dirname_length);
 }
 
