@@ -43,9 +43,11 @@ matrix:
     dist: bionic
     compiler: gcc
     arch: arm64
-    env: BUILD_ARCH=x64 CC=gcc-8 CXX=g++-8 USE_CACHED_CMAKE=1
+    env: BUILD_ARCH=x64 CC=gcc-8 CXX=g++-8 EXPECTED_CMAKE_DIR=cmake-3.17.1
     addons:
       apt: g++-8 libstdc++-8-dev
+    cache:
+      directories: $EXPECTED_CMAKE_DIR
   - os: windows
     compiler: cl64.exe
     env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64
@@ -54,7 +56,20 @@ matrix:
     env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=win32
 
 before_install:
-  - if [ "$TRAVIS_CPU_ARCH" = "arm64" ]; then sudo apt -yqq purge --auto-remove cmake; wget https://github.com/Kitware/CMake/releases/download/v3.17.1/cmake-3.17.1.tar.gz  -O - | tar -xzf -; cd cmake-3.17.1; ./bootstrap -- '-DCMAKE_BUILD_TYPE:STRING=Release' && make -j && sudo make install; hash -r; cd ..; fi
+  - |
+    if [ -z ${EXPECTED_CMAKE_DIR+x} ]; then
+      sudo apt -yqq purge --auto-remove cmake; 
+      if [ ! -d "$EXPECTED_CMAKE_DIR" ]; then
+        wget https://github.com/Kitware/CMake/releases/download/v3.17.1/cmake-3.17.1.tar.gz  -O - | tar -xzf -;
+        cd "$EXPECTED_CMAKE_DIR";
+        ./bootstrap -- '-DCMAKE_BUILD_TYPE:STRING=Release' && make -j2;
+        rm -rf Source Tests; 
+      else
+        cd "$EXPECTED_CMAKE_DIR";
+      fi
+      sudo make install; hash -r;
+      cd ..;
+    fi
 
 script:
   - export VERBOSE=1 BUILDTYPE=Release
@@ -62,7 +77,7 @@ script:
   - cd build
   - cmake --version
   - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE .. 
-  - cmake --build . --config $BUILDTYPE --parallel
+  - cmake --build . --config $BUILDTYPE --parallel 2
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then EXELOCATION="./$BUILDTYPE/msync.exe"; else EXELOCATION="./msync"; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then TESTLOCATION="./tests/$BUILDTYPE/tests.exe"; else TESTLOCATION="./tests/tests"; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then NETTESTLOCATION="./tests/$BUILDTYPE/net_tests.exe"; else NETTESTLOCATION="./tests/net_tests"; fi
