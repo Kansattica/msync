@@ -43,7 +43,7 @@ matrix:
     dist: bionic
     compiler: gcc
     arch: arm64
-    env: BUILD_ARCH=x64 CC=gcc-8 CXX=g++-8
+    env: BUILD_ARCH=x64 CC=gcc-8 CXX=g++-8 USE_CACHED_CMAKE=1
     addons:
       apt: g++-8 libstdc++-8-dev
   - os: windows
