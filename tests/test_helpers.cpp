@@ -22,7 +22,9 @@ fs::path _get_exe_location()
     int dirname_length;
     wai_getExecutablePath(path.get(), length, &dirname_length);
 
-	std::cout << "I'm going to make a path out of the first " << dirname_length << " characters of this string: " << path.get() << '\n';
+	bool is_null_terminated = path[length - static_cast<size_t>(1)] == '\0';
+	std::cout << "I'm going to make a path out of the first " << dirname_length << " characters of this string, for which I allocated " << length << " bytes. Null termination?" << is_null_terminated  << '\n';
+	std::cout << path.get() << '\n';
 
     return fs::path(path.get(), path.get() + dirname_length);
 }
