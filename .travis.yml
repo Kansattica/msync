@@ -65,7 +65,6 @@ before_install:
         wget https://github.com/Kitware/CMake/releases/download/v3.17.1/cmake-3.17.1.tar.gz  -O - | tar -xzf -;
         cd "$EXPECTED_CMAKE_DIR";
         ./bootstrap '--' '-DCMAKE_BUILD_TYPE:STRING=Release' && make -j2;
-        rm -rf Source Tests; 
       fi
       sudo make install; hash -r;
       cd ..;
