@@ -15,17 +15,15 @@
 fs::path _get_exe_location()
 {
     // see https://github.com/gpakosz/whereami
-    const int length = wai_getModulePath(nullptr, 0, nullptr);
+    const size_t length = wai_getModulePath(nullptr, 0, nullptr);
 
-    auto path = std::make_unique<char[]>(static_cast<size_t>(length) + 1);
+	auto path = std::string(length + 1, '\0');
 
     int dirname_length;
-    wai_getExecutablePath(path.get(), length, &dirname_length);
+    wai_getExecutablePath(&path[0], length, &dirname_length);
 
-	std::cout << "I'm going to make a path out of the first " << dirname_length << " characters of this string, for which I allocated " << length << " bytes.\n";
-	std::cout << path.get() << '\n';
-
-    return fs::path(path.get(), path.get() + dirname_length);
+	path.resize(dirname_length);
+    return path;
 }
 
 const static fs::path _accountdir = _get_exe_location() / Account_Directory;
