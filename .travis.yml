@@ -57,7 +57,7 @@ matrix:
 
 before_install:
   - |
-    if [ -z ${EXPECTED_CMAKE_DIR+x} ]; then
+    if [ ! -z ${EXPECTED_CMAKE_DIR+x} ]; then
       sudo apt -yqq purge --auto-remove cmake; 
       if [ ! -d "$EXPECTED_CMAKE_DIR" ]; then
         wget https://github.com/Kitware/CMake/releases/download/v3.17.1/cmake-3.17.1.tar.gz  -O - | tar -xzf -;
