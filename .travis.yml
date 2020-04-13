@@ -43,7 +43,9 @@ matrix:
     dist: bionic
     compiler: gcc
     arch: arm64
-    env: BUILD_ARCH=x64
+    env: BUILD_ARCH=x64 CC=gcc-8 CXX=g++-8
+    addons:
+      apt: g++-8 libstdc++-8-dev
   - os: windows
     compiler: cl64.exe
     env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64
