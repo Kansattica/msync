@@ -34,6 +34,8 @@ cmake --build . --parallel
 
 The last two steps will take a while, but when you're done, you should see a `msync` executable in your folder, and that's all you need! 
 
+Older Ubuntu releases might require you to `apt install g++-8 libstdc++-8-dev` and run `CC=gcc-8 CXX=g++-8 cmake .. -DCMAKE_BUILD_TYPE=Release -DMSYNC_BUILD_TESTS=FALSE` instead, in order to get and use a version of the standard library that supports std::filesystem.
+
 #### Building on macOS
 
 The instructions for building on Linux should mostly work, though note that Apple only officially supports std::filesystem on Xcode 11.1 and Catalina/10.15 and up. `msync` does support pre-10.15 versions with Boost::filesystem, which you can install through Homebrew. I don't have a Mac to test on, but I do ensure that it builds and all unit tests pass. I do my testing with the newest version of LLVM installed through Homebrew, because the versions released with OSX often miss stuff I need to run the tests.
