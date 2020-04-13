@@ -52,7 +52,7 @@ matrix:
     env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=win32
 
 before_install:
-  - if [ "$TRAVIS_CPU_ARCH" = "arm64" ]; then sudo apt -yqq purge '--auto-remove' cmake; wget https://github.com/Kitware/CMake/releases/download/v3.17.1/cmake-3.17.1.tar.gz  -O - | tar -xzf -; cd cmake-3.17.1; ./bootstrap && make -j2 && sudo make install; cd ..; fi
+  - if [ "$TRAVIS_CPU_ARCH" = "arm64" ]; then sudo apt -yqq purge '--auto-remove' cmake; wget https://github.com/Kitware/CMake/releases/download/v3.17.1/cmake-3.17.1.tar.gz  -O - | tar -xzf -; cd cmake-3.17.1; ./bootstrap && make -j && sudo make install; cd ..; fi
 
 script:
   - export VERBOSE=1 BUILDTYPE=Release
