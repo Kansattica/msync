@@ -58,14 +58,14 @@ matrix:
 before_install:
   - |
     if [ ! -z ${EXPECTED_CMAKE_DIR+x} ]; then
-      sudo apt -yqq purge --auto-remove cmake; 
-      if [ ! -d "$EXPECTED_CMAKE_DIR" ]; then
+      sudo apt -yqq purge '--auto-remove' cmake; 
+      if [ "$(ls -A $EXPECTED_CMAKE_DIR)" ]; then
+        cd "$EXPECTED_CMAKE_DIR";
+      else
         wget https://github.com/Kitware/CMake/releases/download/v3.17.1/cmake-3.17.1.tar.gz  -O - | tar -xzf -;
         cd "$EXPECTED_CMAKE_DIR";
-        ./bootstrap -- '-DCMAKE_BUILD_TYPE:STRING=Release' && make -j2;
+        ./bootstrap '--' '-DCMAKE_BUILD_TYPE:STRING=Release' && make -j2;
         rm -rf Source Tests; 
-      else
-        cd "$EXPECTED_CMAKE_DIR";
       fi
       sudo make install; hash -r;
       cd ..;
