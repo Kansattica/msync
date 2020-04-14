@@ -1,34 +1,15 @@
 #include "test_helpers.hpp"
 
-#include <whereami.h>
-
-#include <memory>
 #include <random>
 #include <fstream>
 #include <iterator>
 #include <array>
 #include <algorithm>
-#include <iostream>
 
 #include "../lib/constants/constants.hpp"
+#include "../lib/executable_location/executable_location.hpp"
 
-fs::path _get_exe_location()
-{
-    // see https://github.com/gpakosz/whereami
-    const int length = wai_getModulePath(nullptr, 0, nullptr);
-
-	std::cout << "The module path is apparently " << length << " characters." << std::endl;
-
-	auto path = std::string(length + 1, '\0');
-
-    int dirname_length;
-    wai_getExecutablePath(&path[0], length, &dirname_length);
-
-	path.resize(dirname_length);
-    return path;
-}
-
-const static fs::path _accountdir = _get_exe_location() / Account_Directory;
+const static fs::path _accountdir = executable_folder() / Account_Directory;
 test_file account_directory()
 {
 	return test_file{ _accountdir };
