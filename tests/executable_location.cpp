@@ -16,7 +16,7 @@ SCENARIO("executable_folder returns the same correct path every time.")
 
 		THEN("tests.exe exists in that folder.")
 		{
-			REQUIRE(fs::exists(folder / "tests.exe"));
+			REQUIRE(fs::exists(folder / filename));
 		}
 
 		THEN("Each subsequent call returns the same path.")
