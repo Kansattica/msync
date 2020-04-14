@@ -3,17 +3,9 @@
 #include <string>
 #include <whereami.h>
 
-fs::path get_executable_folder_fallback()
-{
-
-}
-
 fs::path get_executable_folder()
 {
     const size_t length = wai_getModulePath(nullptr, 0, nullptr);
-
-    if (length == -1)
-        return get_executable_folder_fallback();
 
     auto path = std::string(length + 1, '\0');
 
