@@ -71,7 +71,7 @@ before_install:
     fi
 
 script:
-  - export BUILDTYPE=Release
+  - export BUILDTYPE=Debug
   - mkdir -p build
   - cd build
   - cmake --version
