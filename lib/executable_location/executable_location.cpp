@@ -3,7 +3,7 @@
 
 #ifdef __linux__
 #include <limits.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <memory>
 #else
 #include <string>
