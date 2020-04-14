@@ -2,7 +2,6 @@
 
 #include <whereami.h>
 
-#include <memory>
 #include <random>
 #include <fstream>
 #include <iterator>
@@ -14,13 +13,13 @@
 fs::path _get_exe_location()
 {
     // see https://github.com/gpakosz/whereami
-    const int length = wai_getModulePath(nullptr, 0, nullptr);
+    const size_t length = wai_getModulePath(nullptr, 0, nullptr);
 
-    auto path = std::make_unique<char[]>(static_cast<size_t>(length) + 1);
+    auto path = std::string(length + 1, '\0');
 
     int dirname_length;
-    wai_getExecutablePath(path.get(), length, &dirname_length);
-    return fs::path(path.get(), path.get() + dirname_length);
+    wai_getExecutablePath(&path[0], length, &dirname_length);
+    return fs::path(path.begin(), path.begin() + dirname_length);
 }
 
 const static fs::path _accountdir = _get_exe_location() / Account_Directory;
