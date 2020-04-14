@@ -186,6 +186,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run][long_run
 			of << testtext;
 		}
 
+		CAPTURE(read_file(fi.filename));
 
 		WHEN("A new outgoing_post is made from the same file")
 		{
