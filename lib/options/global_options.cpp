@@ -1,9 +1,9 @@
 #include "global_options.hpp"
 #include "user_options.hpp"
 #include "../constants/constants.hpp"
+#include "../executable_location/executable_location.hpp"
 #include <msync_exception.hpp>
 #include <print_logger.hpp>
-#include <whereami.h>
 #include <algorithm>
 #include <iterator>
 
@@ -15,18 +15,7 @@ global_options& options()
 	return options;
 }
 
-fs::path get_exe_location()
-{
-    const size_t length = wai_getModulePath(nullptr, 0, nullptr);
-
-    auto path = std::string(length + 1, '\0');
-
-    int dirname_length;
-    wai_getExecutablePath(&path[0], length, &dirname_length);
-    return fs::path(path.begin(), path.begin() + dirname_length);
-}
-
-global_options::global_options() : account_directory_location(get_exe_location() / Account_Directory)
+global_options::global_options() : account_directory_location(executable_folder() / Account_Directory)
 {
 	plverb() << "Reading accounts from " << account_directory_location << "\n";
 
