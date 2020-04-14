@@ -8,6 +8,12 @@ SCENARIO("executable_folder returns the same correct path every time.")
 	{
 		const auto& folder = executable_folder();
 
+#ifdef _WIN32
+		constexpr auto filename = "tests.exe";
+#else
+		constexpr auto filename = "tests";
+#endif
+
 		THEN("tests.exe exists in that folder.")
 		{
 			REQUIRE(fs::exists(folder / "tests.exe"));
