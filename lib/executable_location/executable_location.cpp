@@ -16,7 +16,6 @@ fs::path get_executable_folder()
 	// (see https://linux.die.net/man/3/realpath, stackoverflow answers, and blogs that say you shouldn't use PATH_MAX)
     // so use the correct form of realpath on linux and whereami everywhere else
 #ifdef __linux__
-
     // this version of realpath malloc()s a buffer and returns it, so we use unique_ptr to free it automatically.
 	std::unique_ptr<char[]> full_executable_path { realpath("/proc/self/exe", NULL) };
 	fs::path to_return { full_executable_path.get() };
