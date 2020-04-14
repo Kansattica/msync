@@ -17,6 +17,8 @@ fs::path _get_exe_location()
     // see https://github.com/gpakosz/whereami
     const size_t length = wai_getModulePath(nullptr, 0, nullptr);
 
+	std::cout << "The module path is apparently " << length << " characters." << std::endl;
+
 	auto path = std::string(length + 1, '\0');
 
     int dirname_length;
