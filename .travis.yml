@@ -71,7 +71,7 @@ before_install:
     fi
 
 script:
-  - export VERBOSE=1 BUILDTYPE=Release
+  - export BUILDTYPE=Release
   - mkdir -p build
   - cd build
   - cmake --version
