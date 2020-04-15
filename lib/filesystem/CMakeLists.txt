@@ -23,6 +23,6 @@ else ()
 endif()
 
 target_include_directories(filesystem
-        INTERFACE
-        ${CMAKE_CURRENT_LIST_DIR}
+		INTERFACE
+		${CMAKE_CURRENT_LIST_DIR}
 )

@@ -57,6 +57,6 @@ void Write(std::deque<api_call>&& que, std::ofstream& of)
 
 bool operator== (const api_call& rhs, const api_call& lhs)
 {
-    return rhs.queued_call == lhs.queued_call && rhs.argument == lhs.argument;
+	return rhs.queued_call == lhs.queued_call && rhs.argument == lhs.argument;
 }
 
