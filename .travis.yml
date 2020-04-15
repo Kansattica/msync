@@ -43,7 +43,7 @@ matrix:
     dist: bionic
     compiler: gcc
     arch: arm64
-    env: BUILD_ARCH=x64 CC=gcc-8 CXX=g++-8 EXPECTED_CMAKE_DIR=cmake-3.17.1  VERBOSE=1
+    env: BUILD_ARCH=x64 CC=gcc-8 CXX=g++-8 EXPECTED_CMAKE_DIR=cmake-3.17.1
     addons:
       apt: g++-8 libstdc++-8-dev
     cache:
@@ -71,7 +71,7 @@ before_install:
     fi
 
 script:
-  - export BUILDTYPE=Debug
+  - export BUILDTYPE=Debug VERBOSE=1
   - mkdir -p build
   - cd build
   - cmake --version
