@@ -1110,7 +1110,7 @@ void pick_attachment(int number, gen_options& expected, std::vector<command_line
 		break;
 	case 1:
 		options.push_back(command_line_option{ {"--attach", "attacher"}, 1 });
-		options.push_back(command_line_option{ { "-f", "somefile"}, 2 });
+		options.push_back(command_line_option{ { "--attachment", "somefile"}, 2 });
 		expected.post.attachments.push_back("attacher");
 		expected.post.attachments.push_back("somefile");
 		break;
