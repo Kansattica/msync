@@ -82,7 +82,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 	const auto genMode = (command("gen", "generate").set(ret.selected, mode::gen).doc("Generate a post template in the current folder. Edit this file afterwards to add a body.") &
 			(
 			 repeatable(in_sequence(option("-d", "--description") & value("file description", ret.gen_opt.post.descriptions))).doc("Associate this description with the corresponding file."),
-			 repeatable(in_sequence(option("-f", "--file", "--attach") & value("file path", ret.gen_opt.post.attachments))).doc("Attach these files to the post."),
+			 repeatable(in_sequence(option("-f", "--file", "--attach", "--attachment") & value("file path", ret.gen_opt.post.attachments))).doc("Attach these files to the post."),
 			 in_sequence(option("-o", "--output"), value("filename", ret.gen_opt.filename)).doc("Specify an output file. Default is new_post."),
 			 in_sequence(option("-r", "--reply-to"), value("reply_to", ret.gen_opt.post.reply_to_id)).doc("Reply to the specified post ID."),
 			 in_sequence(option("-i", "--reply-id"), value("id", ret.gen_opt.post.reply_id)).doc("Set an ID so that this post can be replied to with --reply-to."),
