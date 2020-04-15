@@ -10,8 +10,8 @@ std::string make_api_url(std::string_view instance_url, std::string_view api_rou
 
 struct parsed_account
 {
-    std::string username;
-    std::string instance;
+	std::string username;
+	std::string instance;
 };
 
 std::optional<parsed_account> parse_account_name(const std::string& name);

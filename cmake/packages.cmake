@@ -68,7 +68,7 @@ if (ipo_is_supported)
 endif()
 
 if(USE_SYSTEM_CURL)
-       find_package(CURL)
+	   find_package(CURL)
 endif()
 
 if (NOT USE_SYSTEM_CURL OR NOT CURL_FOUND)
@@ -105,7 +105,7 @@ if (NOT USE_SYSTEM_CURL OR NOT CURL_FOUND)
 
 		set(ZLIB_ROOT ${ZLIB_DOWNLOAD_DIR})
 		find_package(ZLIB)
-    endif()
+	endif()
 endif()
 
 #unset these because CPR's build will run its own find_package(CURL)
@@ -126,7 +126,7 @@ if (NOT USE_SYSTEM_CURL AND UNIX)
 	# more likely to know where the certs are
 	# this is for portability more than anything
 	set(CURL_CA_FALLBACK ON CACHE BOOL
-		    "Set ON to use built-in CA store of TLS backend. Defaults to OFF")
+			"Set ON to use built-in CA store of TLS backend. Defaults to OFF")
 endif()
 # add_definitions(-DCURL_STATICLIB)
 if (MSVC)

@@ -8,9 +8,9 @@
 
 enum class queues
 {
-    fav,
-    boost,
-    post
+	fav,
+	boost,
+	post
 };
 
 fs::path get_file_queue_directory(const std::string& account);

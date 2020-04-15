@@ -1,7 +1,12 @@
-[*.{c,cpp,hpp}]
+[*.{c,cpp,hpp,cmake},CMakeLists.txt]
 charset = utf-8
 indent_style = tab
 trim_trailing_whitespace = true
+
+[*.md]
+charset = utf-8
+indent_style = space
+indent_size = 4
 
 [.travis.yml]
 indent_style = space

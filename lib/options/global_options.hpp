@@ -13,7 +13,7 @@
 struct global_options
 {
 public:
-    const fs::path account_directory_location;
+	const fs::path account_directory_location;
 
 	global_options();
 

@@ -11,7 +11,7 @@ template <typename Container, bool(*Read)(Container&, std::string&&), void(*Writ
 class file_backed
 {
 public:
-    Container parsed;
+	Container parsed;
 
 	file_backed(fs::path filename) : backing(std::move(filename))
 	{
