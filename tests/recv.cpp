@@ -5,7 +5,7 @@
 
 #include "test_helpers.hpp"
 #include "mock_network.hpp"
-#include "../lib/net_interface/net_interface.hpp"
+#include "../lib/netinterface/net_interface.hpp"
 
 #include "../lib/constants/constants.hpp"
 

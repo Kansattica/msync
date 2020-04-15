@@ -1,7 +1,7 @@
 #include <catch2/catch.hpp>
 
 #include "../lib/sync/send.hpp"
-#include "../lib/net_interface/net_interface.hpp"
+#include "../lib/netinterface/net_interface.hpp"
 #include "../lib/queue/queues.hpp"
 #include "../lib/constants/constants.hpp"
 

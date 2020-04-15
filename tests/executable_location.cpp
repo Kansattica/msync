@@ -1,6 +1,6 @@
 #include <catch2/catch.hpp>
 
-#include "../lib/executable_location/executable_location.hpp"
+#include "../lib/executablelocation/executable_location.hpp"
 
 SCENARIO("executable_folder returns the same correct path every time.")
 {

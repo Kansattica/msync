@@ -3,7 +3,7 @@
 
 #include <print_logger.hpp>
 
-#include "../net_interface/net_interface.hpp"
+#include "../netinterface/net_interface.hpp"
 
 #include "../options/user_options.hpp"
 #include "../options/global_options.hpp"
