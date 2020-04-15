@@ -1,6 +1,7 @@
 #include "test_helpers.hpp"
 #include <catch2/catch.hpp>
 #include <constants.hpp>
+#include <print_logger.hpp>
 
 #include "../lib/options/global_options.hpp"
 
@@ -9,7 +10,8 @@ using namespace std::string_view_literals;
 
 SCENARIO("add_new_account correctly handles input.")
 {
-	const test_file acc = account_directory();
+	logs_off = true;
+	const test_file acc = clean_account_directory();
 	GIVEN("A global_options object")
 	{
 		global_options opts;
@@ -74,7 +76,7 @@ SCENARIO("add_new_account correctly handles input.")
 
 SCENARIO("read_accounts correctly fills global_options on construction.")
 {
-	const test_file acc = account_directory();
+	const test_file acc = clean_account_directory();
 	GIVEN("A global_options with some values added to it, destroyed, and then a new one created.")
 	{
 		{
@@ -156,7 +158,7 @@ SCENARIO("read_accounts correctly fills global_options on construction.")
 SCENARIO("select_account selects exactly one account.")
 {
 	// this should make sure the accounts are empty
-	const test_file acc = account_directory();
+	const test_file acc = clean_account_directory();
 	GIVEN("An empty accounts unordered_map")
 	{
 		global_options options;
@@ -408,7 +410,7 @@ SCENARIO("select_account selects exactly one account.")
 
 SCENARIO("clear_accounts deletes all the accounts known to the global_options.")
 {
-	const test_file acc = account_directory();
+	const test_file acc = clean_account_directory();
 
 	GIVEN("A global_options with two accounts.")
 	{

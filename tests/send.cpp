@@ -1,7 +1,7 @@
 #include <catch2/catch.hpp>
 
 #include "../lib/sync/send.hpp"
-#include "../lib/net_interface/net_interface.hpp"
+#include "../lib/netinterface/net_interface.hpp"
 #include "../lib/queue/queues.hpp"
 #include "../lib/constants/constants.hpp"
 
@@ -149,7 +149,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 {
 	logs_off = true;
 
-	const test_file fi = account_directory();
+	const test_file fi = clean_account_directory();
 	const static std::string account = "someguy@cool.account";
 	constexpr std::string_view instanceurl = "cool.account";
 	constexpr std::string_view accesstoken = "sometoken";
@@ -393,7 +393,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 SCENARIO("Send correctly sends new posts and deletes existing ones.")
 {
 	logs_off = true;
-	const test_file fi = account_directory();
+	const test_file fi = clean_account_directory();
 
 	static const std::string account = "someguy@cool.account";
 	constexpr std::string_view instanceurl = "cool.account";
@@ -846,7 +846,7 @@ SCENARIO("Send correctly sends from and modifies a queue of mixed API calls.")
 {
 	logs_off = true;
 
-	const test_file fi = account_directory();
+	const test_file fi = clean_account_directory();
 	static const std::string account = "prettynormal@website.egg";
 	constexpr std::string_view instanceurl = "website.egg";
 	constexpr std::string_view accesstoken = "someothertoken";

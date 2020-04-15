@@ -7,7 +7,7 @@
 
 #include <filesystem.hpp>
 
-#include "../net_interface/net_interface.hpp"
+#include "../netinterface/net_interface.hpp"
 
 #include "read_response.hpp"
 

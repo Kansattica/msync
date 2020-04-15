@@ -10,7 +10,7 @@
 
 #include "../lib/queue/queues.hpp"
 #include "../lib/constants/constants.hpp"
-#include "../lib/options/global_options.hpp"
+#include "../accountdirectory/account_directory.hpp"
 #include "../lib/printlog/print_logger.hpp"
 #include "../postfile/outgoing_post.hpp"
 
@@ -28,7 +28,7 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 	static const std::string account = "regularguy@internet.egg";
 	GIVEN("An empty queue")
 	{
-		const test_file allaccounts = account_directory(); //make sure this gets cleaned up, too
+		const test_file allaccounts = clean_account_directory(); //make sure this gets cleaned up, too
 		const fs::path queue_file = allaccounts.filename / account / Queue_Filename;
 
 		WHEN("some items are enqueued")
@@ -133,7 +133,7 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 void files_match(const std::string& account, const fs::path& original, const std::string& outfile)
 {
 	const outgoing_post orig{ original };
-	const outgoing_post newfile{ options().account_directory_location / account / File_Queue_Directory / outfile };
+	const outgoing_post newfile{ account_directory_path() / account / File_Queue_Directory / outfile };
 
 	REQUIRE(orig.parsed.text == newfile.parsed.text);
 }
@@ -144,7 +144,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 	logs_off = true; //shut up the printlogger
 
 	static const std::string account = "queueboy@website.egg";
-	test_file allaccounts = account_directory(); //make sure this gets cleaned up, too
+	test_file allaccounts = clean_account_directory(); //make sure this gets cleaned up, too
 	test_file accountdir = allaccounts.filename / account;
 
 	const fs::path file_queue_dir = accountdir.filename / File_Queue_Directory;
@@ -471,7 +471,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 SCENARIO("Queues can handle a mix of different queued calls.")
 {
 	static const std::string account = "funnybone@typical.egg";
-	test_file allaccounts = account_directory(); //make sure this gets cleaned up, too
+	test_file allaccounts = clean_account_directory(); //make sure this gets cleaned up, too
 	test_file accountdir = allaccounts.filename / account;
 
 	const fs::path file_queue_dir = accountdir.filename / File_Queue_Directory;

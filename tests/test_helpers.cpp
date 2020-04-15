@@ -1,8 +1,5 @@
 #include "test_helpers.hpp"
 
-#include <whereami.h>
-
-#include <memory>
 #include <random>
 #include <fstream>
 #include <iterator>
@@ -11,22 +8,11 @@
 
 #include "../lib/constants/constants.hpp"
 
-fs::path _get_exe_location()
+#include "../accountdirectory/account_directory.hpp"
+
+test_file clean_account_directory()
 {
-    // see https://github.com/gpakosz/whereami
-    const int length = wai_getModulePath(nullptr, 0, nullptr);
-
-    auto path = std::make_unique<char[]>(static_cast<size_t>(length) + 1);
-
-    int dirname_length;
-    wai_getExecutablePath(path.get(), length, &dirname_length);
-    return fs::path(path.get(), path.get() + dirname_length);
-}
-
-const static fs::path _accountdir = _get_exe_location() / Account_Directory;
-test_file account_directory()
-{
-	return test_file{ _accountdir };
+	return test_file{ account_directory_path() };
 }
 
 std::vector<std::string> read_lines(const fs::path& toread)

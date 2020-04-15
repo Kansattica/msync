@@ -3,10 +3,10 @@
 
 #include <print_logger.hpp>
 
-#include "../net_interface/net_interface.hpp"
+#include "../netinterface/net_interface.hpp"
+#include "../accountdirectory/account_directory.hpp"
 
 #include "../options/user_options.hpp"
-#include "../options/global_options.hpp"
 
 #include "../postlist/post_list.hpp"
 #include "../util/util.hpp"
@@ -40,7 +40,7 @@ public:
 		// which, as of this writing, means the maximum is 40 for statuses and 30 for notifications
 		// (the documentation lies and says that the limit is the same for both)
 
-		const fs::path user_folder = options().account_directory_location / account_name;
+		const fs::path user_folder = account_directory_path() / account_name;
 
 		exclude_notif_types = make_excludes(account);
 

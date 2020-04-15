@@ -1,11 +1,10 @@
 #include "global_options.hpp"
 #include "user_options.hpp"
 #include "../constants/constants.hpp"
+#include "../accountdirectory/account_directory.hpp"
 #include <msync_exception.hpp>
 #include <print_logger.hpp>
-#include <whereami.h>
 #include <algorithm>
-#include <memory>
 #include <iterator>
 
 #include <cctype>
@@ -16,26 +15,14 @@ global_options& options()
 	return options;
 }
 
-fs::path get_exe_location()
+global_options::global_options()
 {
-    // see https://github.com/gpakosz/whereami
-    const int length = wai_getModulePath(nullptr, 0, nullptr);
+	plverb() << "Reading accounts from " << account_directory_path() << "\n";
 
-    auto path = std::make_unique<char[]>(static_cast<size_t>(length) + 1);
-
-    int dirname_length;
-    wai_getExecutablePath(path.get(), length, &dirname_length);
-    return fs::path(path.get(), path.get() + dirname_length);
-}
-
-global_options::global_options() : account_directory_location(get_exe_location() / Account_Directory)
-{
-	plverb() << "Reading accounts from " << account_directory_location << "\n";
-
-	if (!fs::exists(account_directory_location))
+	if (!fs::exists(account_directory_path()))
 		return;
 
-	for (const auto& userfolder : fs::directory_iterator(account_directory_location))
+	for (const auto& userfolder : fs::directory_iterator(account_directory_path()))
 	{
 		if (!fs::is_directory(userfolder.path()))
 		{
@@ -64,7 +51,7 @@ std::pair<const std::string, user_options>& global_options::add_new_account(std:
 		return *contains;
 	}
 
-    fs::path user_path = account_directory_location / name;
+    fs::path user_path = account_directory_path() / name;
 
     fs::create_directories(user_path); //can throw if something goes wrong
 
@@ -109,7 +96,7 @@ std::pair<const std::string, user_options>* global_options::select_account(std::
 void global_options::clear_accounts()
 {
 	std::for_each(accounts.begin(), accounts.end(), 
-		[this](const auto& account) { fs::remove_all(account_directory_location / account.first); });
+		[this](const auto& account) { fs::remove_all(account_directory_path()  / account.first); });
 
 	accounts.clear();
 }

@@ -13,7 +13,7 @@
 #include <optional>
 #include <unordered_map>
 
-#include "../net_interface/net_interface.hpp"
+#include "../netinterface/net_interface.hpp"
 #include "../queue/queues.hpp"
 #include "../util/util.hpp"
 #include "../postfile/outgoing_post.hpp"

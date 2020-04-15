@@ -14,7 +14,7 @@
 
 #include "read_response.hpp"
 
-#include "../net_interface/net_interface.hpp"
+#include "../netinterface/net_interface.hpp"
 
 constexpr std::array<std::string_view, static_cast<uint8_t>(api_route::unknown)> ROUTE_LOOKUP = {
  "/favourite", 

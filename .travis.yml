@@ -1,4 +1,9 @@
 language: cpp
+
+git:
+  depth: 5
+  submodules: false
+
 matrix:
   include:
   - os: linux
@@ -42,12 +47,12 @@ matrix:
     env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=win32
 
 script:
-  - export VERBOSE=1 BUILDTYPE=Release
+  - export BUILDTYPE=Release 
   - mkdir -p build
   - cd build
   - cmake --version
   - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE .. 
-  - cmake --build . --config $BUILDTYPE --parallel
+  - cmake --build . --config $BUILDTYPE --parallel 2
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then EXELOCATION="./$BUILDTYPE/msync.exe"; else EXELOCATION="./msync"; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then TESTLOCATION="./tests/$BUILDTYPE/tests.exe"; else TESTLOCATION="./tests/tests"; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then NETTESTLOCATION="./tests/$BUILDTYPE/net_tests.exe"; else NETTESTLOCATION="./tests/net_tests"; fi

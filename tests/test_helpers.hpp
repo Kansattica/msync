@@ -72,5 +72,5 @@ public:
 	const fs::path filename;
 };
 
-test_file account_directory();
+test_file clean_account_directory();
 #endif

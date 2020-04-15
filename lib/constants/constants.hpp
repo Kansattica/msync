@@ -14,17 +14,17 @@
 #define CONSTEXPR_IF_NOT_BOOST constexpr
 #endif
 
+inline CONSTANT_PATH_DECLARATION Account_Directory{ "msync_accounts" };
 
-CONSTANT_PATH_DECLARATION Account_Directory{ "msync_accounts" };
+inline CONSTANT_PATH_DECLARATION User_Options_Filename{ "user.config" };
+inline CONSTANT_PATH_DECLARATION List_Options_Filename{ "lists.config" };
 
-CONSTANT_PATH_DECLARATION User_Options_Filename{ "user.config" };
-CONSTANT_PATH_DECLARATION List_Options_Filename{ "lists.config" };
+inline CONSTANT_PATH_DECLARATION Queue_Filename{ "queued.list" };
 
-CONSTANT_PATH_DECLARATION Queue_Filename{ "queued.list" };
+inline CONSTANT_PATH_DECLARATION File_Queue_Directory{ "queuedposts" };
 
-CONSTANT_PATH_DECLARATION File_Queue_Directory{ "queuedposts" };
+inline CONSTANT_PATH_DECLARATION Home_Timeline_Filename{ "home.list" };
+inline CONSTANT_PATH_DECLARATION Notifications_Filename{ "notifications.list" };
+inline CONSTANT_PATH_DECLARATION Direct_Messages_Filename{ "dm.list" };
 
-CONSTANT_PATH_DECLARATION Home_Timeline_Filename{ "home.list" };
-CONSTANT_PATH_DECLARATION Notifications_Filename{ "notifications.list" };
-CONSTANT_PATH_DECLARATION Direct_Messages_Filename{ "dm.list" };
 #endif

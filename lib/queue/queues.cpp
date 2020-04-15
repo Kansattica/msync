@@ -4,7 +4,7 @@
 #include <filesystem.hpp>
 #include <system_error>
 #include <print_logger.hpp>
-#include "../options/global_options.hpp"
+#include "../accountdirectory/account_directory.hpp"
 #include "../postfile/outgoing_post.hpp"
 #include <algorithm>
 #include <array>
@@ -13,7 +13,7 @@
 
 fs::path get_file_queue_directory(const std::string& account)
 {
-	return options().account_directory_location / account / File_Queue_Directory;
+	return account_directory_path() / account / File_Queue_Directory;
 }
 
 void unique_file_name(fs::path& path)
@@ -166,7 +166,7 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 template <typename queue_t = queue_list>
 queue_t open_queue(const std::string& account)
 {
-	fs::path qfile = options().account_directory_location / account;
+	fs::path qfile = account_directory_path() / account;
 	fs::create_directories(qfile);
 	return queue_t{ qfile / Queue_Filename };
 }
