@@ -1,4 +1,4 @@
-target_sources_local(executable_location
+target_sources_local(executablelocation
 	PRIVATE
     executable_location.cpp
     executable_location.hpp
