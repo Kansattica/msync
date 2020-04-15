@@ -1,7 +1,7 @@
 #include "global_options.hpp"
 #include "user_options.hpp"
 #include "../constants/constants.hpp"
-#include "../executablelocation/executable_location.hpp"
+#include "../accountdirectory/account_directory.hpp"
 #include <msync_exception.hpp>
 #include <print_logger.hpp>
 #include <algorithm>
@@ -15,14 +15,14 @@ global_options& options()
 	return options;
 }
 
-global_options::global_options() : account_directory_location(executable_folder() / Account_Directory)
+global_options::global_options()
 {
-	plverb() << "Reading accounts from " << account_directory_location << "\n";
+	plverb() << "Reading accounts from " << account_directory_path() << "\n";
 
-	if (!fs::exists(account_directory_location))
+	if (!fs::exists(account_directory_path()))
 		return;
 
-	for (const auto& userfolder : fs::directory_iterator(account_directory_location))
+	for (const auto& userfolder : fs::directory_iterator(account_directory_path()))
 	{
 		if (!fs::is_directory(userfolder.path()))
 		{
@@ -51,7 +51,7 @@ std::pair<const std::string, user_options>& global_options::add_new_account(std:
 		return *contains;
 	}
 
-    fs::path user_path = account_directory_location / name;
+    fs::path user_path = account_directory_path() / name;
 
     fs::create_directories(user_path); //can throw if something goes wrong
 
@@ -96,7 +96,7 @@ std::pair<const std::string, user_options>* global_options::select_account(std::
 void global_options::clear_accounts()
 {
 	std::for_each(accounts.begin(), accounts.end(), 
-		[this](const auto& account) { fs::remove_all(account_directory_location / account.first); });
+		[this](const auto& account) { fs::remove_all(account_directory_path()  / account.first); });
 
 	accounts.clear();
 }

@@ -7,12 +7,12 @@
 #include <algorithm>
 
 #include "../lib/constants/constants.hpp"
-#include "../lib/executablelocation/executable_location.hpp"
 
-const static fs::path _accountdir = executable_folder() / Account_Directory;
-test_file account_directory()
+#include "../accountdirectory/account_directory.hpp"
+
+test_file clean_account_directory()
 {
-	return test_file{ _accountdir };
+	return test_file{ account_directory_path() };
 }
 
 std::vector<std::string> read_lines(const fs::path& toread)

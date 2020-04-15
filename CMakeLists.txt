@@ -30,7 +30,7 @@ add_library(printlog STATIC "")
 add_library(postfile STATIC "")
 add_library(postlist STATIC "")
 add_library(net STATIC "")
-add_library(executablelocation STATIC "")
+add_library(accountdirectory STATIC "")
 add_library(netinterface INTERFACE)
 add_library(filebacked INTERFACE)
 add_library(entities INTERFACE)
@@ -49,7 +49,7 @@ add_subdirectory(lib/filesystem)
 add_subdirectory(lib/options)
 add_subdirectory(lib/constants)
 add_subdirectory(lib/net)
-add_subdirectory(lib/executablelocation)
+add_subdirectory(lib/accountdirectory)
 add_subdirectory(lib/postfile)
 add_subdirectory(lib/postlist)
 add_subdirectory(lib/exception)
@@ -66,18 +66,18 @@ target_link_libraries(filebacked INTERFACE filesystem)
 
 target_include_directories(entities INTERFACE lib/entities)
 
-target_link_libraries(sync PRIVATE entities printlog queue util netinterface postfile postlist constants filesystem options nlohmannjson)
+target_link_libraries(sync PRIVATE entities printlog queue util netinterface postfile postlist constants filesystem options nlohmannjson accountdirectory)
 
-target_link_libraries(executablelocation PRIVATE whereami filesystem)
+target_link_libraries(accountdirectory PRIVATE whereami filesystem constants)
 
-target_link_libraries(options PRIVATE printlog exception filebacked constants executablelocation)
+target_link_libraries(options PRIVATE printlog exception filebacked constants accountdirectory)
 target_link_libraries(options PUBLIC filesystem) 
 
 target_link_libraries(postfile PRIVATE filebacked printlog util)
 
 target_link_libraries(postlist PRIVATE filesystem entities)
 
-target_link_libraries(queue PRIVATE constants printlog options filebacked exception postfile) 
+target_link_libraries(queue PRIVATE constants printlog accountdirectory filebacked exception postfile) 
 
 target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options queue postfile)
 

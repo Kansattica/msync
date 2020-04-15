@@ -13,8 +13,6 @@
 struct global_options
 {
 public:
-    const fs::path account_directory_location;
-
 	global_options();
 
 	std::pair<const std::string, user_options>& add_new_account(std::string name);

@@ -1,5 +1,6 @@
-#include "executable_location.hpp"
+#include "account_directory.hpp"
 
+#include <constants.hpp>
 
 #ifdef __linux__
 #include <limits.h>
@@ -33,8 +34,8 @@ fs::path get_executable_folder()
 }
 
 
-const fs::path& executable_folder()
+const fs::path& account_directory_path()
 {
-	const static fs::path folder = get_executable_folder();
+	const static fs::path folder = get_executable_folder().append(Account_Directory);
 	return folder;
 }

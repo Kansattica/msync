@@ -205,7 +205,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 	static constexpr std::string_view expected_home_endpoint = "https://crime.egg/api/v1/timelines/home";
 	static constexpr std::string_view expected_access_token = "token!";
 
-	const test_file account_dir = account_directory();
+	const test_file account_dir = clean_account_directory();
 
 	auto& account = options().add_new_account(std::string{ account_name });
 
