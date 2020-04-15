@@ -1,6 +1,7 @@
 #include "test_helpers.hpp"
 #include <catch2/catch.hpp>
 #include <constants.hpp>
+#include <print_logger.hpp>
 
 #include "../lib/options/global_options.hpp"
 
@@ -9,6 +10,7 @@ using namespace std::string_view_literals;
 
 SCENARIO("add_new_account correctly handles input.")
 {
+	logs_off = true;
 	const test_file acc = clean_account_directory();
 	GIVEN("A global_options object")
 	{
