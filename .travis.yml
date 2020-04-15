@@ -39,15 +39,6 @@ matrix:
         - libcurl4-openssl-dev:i386
         - linux-libc-dev:i386
         - libstdc++-8-dev
-  - os: linux
-    dist: bionic
-    compiler: gcc
-    arch: arm64
-    env: BUILD_ARCH=x64 CC=gcc-8 CXX=g++-8 EXPECTED_CMAKE_DIR=cmake-3.17.1
-    addons:
-      apt: g++-8 libstdc++-8-dev
-    cache:
-      directories: $EXPECTED_CMAKE_DIR
   - os: windows
     compiler: cl64.exe
     env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64
@@ -55,23 +46,8 @@ matrix:
     compiler: cl32.exe
     env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=win32
 
-before_install:
-  - |
-    if [ ! -z ${EXPECTED_CMAKE_DIR+x} ]; then
-      sudo apt -yqq purge '--auto-remove' cmake; 
-      if [ "$(ls -A $EXPECTED_CMAKE_DIR)" ]; then
-        cd "$EXPECTED_CMAKE_DIR";
-      else
-        wget https://github.com/Kitware/CMake/releases/download/v3.17.1/cmake-3.17.1.tar.gz  -O - | tar -xzf -;
-        cd "$EXPECTED_CMAKE_DIR";
-        ./bootstrap '--' '-DCMAKE_BUILD_TYPE:STRING=Release' && make -j2;
-      fi
-      sudo make install; hash -r;
-      cd ..;
-    fi
-
 script:
-  - export BUILDTYPE=Debug VERBOSE=1
+  - export BUILDTYPE=Release 
   - mkdir -p build
   - cd build
   - cmake --version
