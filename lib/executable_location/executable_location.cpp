@@ -17,7 +17,7 @@ fs::path get_executable_folder()
     // so use the correct form of realpath on linux and whereami everywhere else
 #ifdef __linux__
     // this version of realpath malloc()s a buffer and returns it, so we use unique_ptr to free it automatically.
-	std::unique_ptr<char[]> full_executable_path { realpath("/proc/self/exe", NULL) };
+	std::unique_ptr<char[], decltype(std::free)*> full_executable_path { realpath("/proc/self/exe", NULL), std::free };
 	fs::path to_return { full_executable_path.get() };
 	to_return.remove_filename();
 	return to_return;
