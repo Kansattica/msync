@@ -22,7 +22,7 @@
 #include "read_response.hpp"
 #include "sync_helpers.hpp"
 #include "send_helpers.hpp"
-#include "lazy_url_builder.hpp"
+#include "deferred_url_builder.hpp"
 
 template <typename post_request, typename delete_request, typename post_new_status, typename upload_attachments>
 struct send_posts
@@ -46,7 +46,7 @@ private:
 	post_new_status& new_status;
 	upload_attachments& upload;
 
-	bool make_api_call(const api_call& to_make, lazy_url_builder& urls, const std::string& account, std::string_view access_token)
+	bool make_api_call(const api_call& to_make, deferred_url_builder& urls, const std::string& account, std::string_view access_token)
 	{
 		switch (to_make.queued_call)
 		{
@@ -71,7 +71,7 @@ private:
 
 		std::deque<api_call> failed;
 
-		lazy_url_builder urls(instance_url);
+		deferred_url_builder urls(instance_url);
 
 		while (!queuelist.parsed.empty())
 		{

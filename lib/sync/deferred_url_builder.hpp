@@ -1,13 +1,13 @@
-#ifndef LAZY_URL_BUILDER
-#define LAZY_URL_BUILDER
+#ifndef DEFERRED_URL_BUILDER
+#define DEFERRED_URL_BUILDER
 
 #include <string>
 #include <string_view>
 
-class lazy_url_builder
+class deferred_url_builder
 {
 public:
-	lazy_url_builder(std::string_view instance_url) : instance_url(instance_url)
+	deferred_url_builder(std::string_view instance_url) : instance_url(instance_url)
 	{ }
 
 	const std::string& status_url();

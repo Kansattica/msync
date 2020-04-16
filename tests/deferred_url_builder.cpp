@@ -1,13 +1,13 @@
 #include <catch2/catch.hpp>
 
-#include "../lib/sync/lazy_url_builder.hpp"
+#include "../lib/sync/deferred_url_builder.hpp"
 
-SCENARIO("lazy_url_builder correctly constructs and caches URLs.")
+SCENARIO("deferred_url_builder correctly constructs and caches URLs.")
 {
 	GIVEN("A builder with an instance URL.")
 	{
 		constexpr std::string_view url = "coolwebsite.egg";
-		lazy_url_builder builder(url);
+		deferred_url_builder builder(url);
 
 		WHEN("A status URL is requested.")
 		{
