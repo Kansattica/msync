@@ -22,6 +22,7 @@
 #include "read_response.hpp"
 #include "sync_helpers.hpp"
 #include "send_helpers.hpp"
+#include "lazy_url_builder.hpp"
 
 template <typename post_request, typename delete_request, typename post_new_status, typename upload_attachments>
 struct send_posts
@@ -45,7 +46,7 @@ private:
 	post_new_status& new_status;
 	upload_attachments& upload;
 
-	bool make_api_call(const api_call& to_make, const std::string& status_url, const std::string& media_url, const std::string& account, std::string_view access_token)
+	bool make_api_call(const api_call& to_make, lazy_url_builder urls, const std::string& account, std::string_view access_token)
 	{
 		switch (to_make.queued_call)
 		{
@@ -53,12 +54,12 @@ private:
 		case api_route::unfav:
 		case api_route::boost:
 		case api_route::unboost:
-			return simple_call(post, "POST", retries, paramaterize_url(status_url, to_make.argument, ROUTE_LOOKUP[static_cast<uint8_t>(to_make.queued_call)]), access_token);
+			return simple_call(post, "POST", retries, paramaterize_url(urls.status_url(), to_make.argument, ROUTE_LOOKUP[static_cast<uint8_t>(to_make.queued_call)]), access_token);
 		case api_route::post:
 			// posts are a little trickier
-			return send_post(account, access_token, status_url, media_url, to_make.argument);
+			return send_post(account, access_token, urls.status_url(), urls.media_url(), to_make.argument);
 		case api_route::unpost:
-			return simple_call(del, "DELETE", retries, paramaterize_url(status_url, to_make.argument, ROUTE_LOOKUP[static_cast<uint8_t>(to_make.queued_call)]), access_token);
+			return simple_call(del, "DELETE", retries, paramaterize_url(urls.status_url(), to_make.argument, ROUTE_LOOKUP[static_cast<uint8_t>(to_make.queued_call)]), access_token);
 		default:
 			return false;
 		}
@@ -70,12 +71,11 @@ private:
 
 		std::deque<api_call> failed;
 
-		const auto status_url = make_api_url(instance_url, STATUS_ROUTE);
-		const auto media_url = make_api_url(instance_url, MEDIA_ROUTE);
+		lazy_url_builder urls(instance_url);
 
 		while (!queuelist.parsed.empty())
 		{
-			if (!make_api_call(queuelist.parsed.front(), status_url, media_url, account, access_token))
+			if (!make_api_call(queuelist.parsed.front(), instance_url, account, access_token))
 				failed.push_back(std::move(queuelist.parsed.front()));
 			queuelist.parsed.pop_front();
 		}

@@ -8,4 +8,6 @@ target_sources_local(sync
 	recv_helpers.hpp
 	send_helpers.hpp
 	send_helpers.cpp
+	lazy_url_builder.cpp
+	lazy_url_builder.hpp
 	)
