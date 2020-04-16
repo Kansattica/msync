@@ -19,13 +19,16 @@ matrix:
     addons:
       apt: clang-7 llvm-7-dev libstdc++-8-dev
   - os: osx
+    osx_image: xcode11
     compiler: clang
     env: LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib" CPPFLAGS="-I/usr/local/opt/llvm/include" PATH="/usr/local/opt/llvm/bin:$PATH"
     addons: # llvm is needed because it provides an updated version of the standard library needed to run the tests and std::optional
       homebrew: # the update is because the osx image won't work without it.
         packages: 
           - llvm
-        update: true
+  - os: osx
+    osx_image: xcode11
+    compiler: clang
   - os: linux
     dist: bionic
     compiler: gcc
