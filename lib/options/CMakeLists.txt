@@ -1,11 +1,11 @@
 target_sources_local(options
-        PRIVATE
-        global_options.hpp
-        global_options.cpp
-        option_enums.hpp
-        option_enums.cpp
-        user_options.hpp
-        user_options.cpp
-        option_file.cpp
-        option_file.hpp
+		PRIVATE
+		global_options.hpp
+		global_options.cpp
+		option_enums.hpp
+		option_enums.cpp
+		user_options.hpp
+		user_options.cpp
+		option_file.cpp
+		option_file.hpp
 )

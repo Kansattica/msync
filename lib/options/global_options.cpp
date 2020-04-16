@@ -51,11 +51,11 @@ std::pair<const std::string, user_options>& global_options::add_new_account(std:
 		return *contains;
 	}
 
-    fs::path user_path = account_directory_path() / name;
+	fs::path user_path = account_directory_path() / name;
 
-    fs::create_directories(user_path); //can throw if something goes wrong
+	fs::create_directories(user_path); //can throw if something goes wrong
 
-    user_path /= User_Options_Filename;
+	user_path /= User_Options_Filename;
 
 	return accounts.emplace_back(std::move(name), user_options{ std::move(user_path) });
 }
@@ -66,28 +66,28 @@ std::pair<const std::string, user_options>* global_options::select_account(std::
 
 	std::pair<const std::string, user_options>* candidate = nullptr;
 
-    for (auto& entry : accounts)
-    {
-        // if name is longer than the entry, we'll step off the end of entry and segfault
-        // since name can't possibly match something it's longer than, just skip this
-        if (name.size() > entry.first.size())
-            continue;
+	for (auto& entry : accounts)
+	{
+		// if name is longer than the entry, we'll step off the end of entry and segfault
+		// since name can't possibly match something it's longer than, just skip this
+		if (name.size() > entry.first.size())
+			continue;
 
-        // won't have string.starts_with until c++20, so
-        // if the name given is a prefix of (or equal to) this entry, it's a candidate
+		// won't have string.starts_with until c++20, so
+		// if the name given is a prefix of (or equal to) this entry, it's a candidate
 		// unsigned char because https://en.cppreference.com/w/cpp/string/byte/tolower
-        if (std::equal(name.begin(), name.end(), entry.first.begin(), [](unsigned char a, unsigned char b) {
-                return std::tolower(a) == std::tolower(b); //case insensitive
-            }))
-        {
-            plverb() << "Matched account " << entry.first << '\n';
+		if (std::equal(name.begin(), name.end(), entry.first.begin(), [](unsigned char a, unsigned char b) {
+				return std::tolower(a) == std::tolower(b); //case insensitive
+			}))
+		{
+			plverb() << "Matched account " << entry.first << '\n';
 
 			// if this is the second candidate we've found, it's ambiguous and return nothing
 			if (candidate != nullptr) { return nullptr; }
 
-            candidate = &entry;
-        }
-    }
+			candidate = &entry;
+		}
+	}
 	
 	// nullptr if we found nothing, points to the account entry if we found exactly one candidate
 	return candidate;
