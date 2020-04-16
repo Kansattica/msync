@@ -25,9 +25,6 @@ constexpr std::array<std::string_view, static_cast<uint8_t>(api_route::unknown)>
  ""
 };
 
-constexpr std::string_view STATUS_ROUTE{ "/api/v1/statuses/" };
-constexpr std::string_view MEDIA_ROUTE{ "/api/v1/media" };
-
 template <typename make_request>
 bool simple_call(make_request& method, const char* method_name, unsigned int retries, const std::string& url, std::string_view access_token)
 {
