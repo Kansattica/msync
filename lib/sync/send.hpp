@@ -75,7 +75,7 @@ private:
 
 		while (!queuelist.parsed.empty())
 		{
-			if (!make_api_call(queuelist.parsed.front(), instance_url, account, access_token))
+			if (!make_api_call(queuelist.parsed.front(), urls, account, access_token))
 				failed.push_back(std::move(queuelist.parsed.front()));
 			queuelist.parsed.pop_front();
 		}
