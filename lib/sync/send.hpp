@@ -46,7 +46,7 @@ private:
 	post_new_status& new_status;
 	upload_attachments& upload;
 
-	bool make_api_call(const api_call& to_make, lazy_url_builder urls, const std::string& account, std::string_view access_token)
+	bool make_api_call(const api_call& to_make, lazy_url_builder& urls, const std::string& account, std::string_view access_token)
 	{
 		switch (to_make.queued_call)
 		{
