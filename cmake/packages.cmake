@@ -55,7 +55,7 @@ message(STATUS "Downloading CPR...")
 FetchContent_Declare(
 	libcpr
 	GIT_REPOSITORY 	https://github.com/kansattica/cpr.git
-	GIT_TAG			31db80d3c4dd45d736e61a2014f029e89444830c
+	GIT_TAG			544f1d53e0a5b0248c8f91128b97f6e9735a45c6
 )
 option(USE_SYSTEM_CURL "Try to use the system's libcurl instead of downloading and statically linking." ON)
 option(MSYNC_DOWNLOAD_ZLIB "If downloading and building curl on Windows, try to download zlib as well." ON)
