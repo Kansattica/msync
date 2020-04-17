@@ -13,3 +13,4 @@ _deps
 .vscode/
 msync.log
 /.vs
+/lib/constants/constants.hpp

@@ -6,6 +6,7 @@ project (msync VERSION 0.9.5
 	LANGUAGES CXX C)
 
 option(MSYNC_BUILD_TESTS "Download catch2 and build tests with it." ON)
+option(MSYNC_FILE_LOG "Log debug messages to msync.log" ON)
 
 set(CMAKE_POLICY_DEFAULT_CMP0069 NEW) #enable interprocedural optimization for all projects
 
@@ -76,6 +77,8 @@ target_link_libraries(options PUBLIC filesystem)
 target_link_libraries(postfile PRIVATE filebacked printlog util)
 
 target_link_libraries(postlist PRIVATE filesystem entities)
+
+target_link_libraries(printlog PRIVATE constants)
 
 target_link_libraries(queue PRIVATE constants printlog filebacked exception postfile) 
 
