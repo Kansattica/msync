@@ -19,7 +19,7 @@ inline CONSTANT_PATH_DECLARATION Account_Directory{ "msync_accounts" };
 inline CONSTANT_PATH_DECLARATION User_Options_Filename{ "user.config" };
 inline CONSTANT_PATH_DECLARATION List_Options_Filename{ "lists.config" };
 
-inline CONSTANT_PATH_DECLARATION Queue_Filename{ "queued.list" };
+inline CONSTANT_PATH_DECLARATION Queue_Filename{ "sync.queue" };
 
 inline CONSTANT_PATH_DECLARATION File_Queue_Directory{ "queuedposts" };
 
