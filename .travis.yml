@@ -74,8 +74,9 @@ after_success:
 deploy:
   provider: releases
   skip_cleanup: true
-  draft: true
   file: $FINISHED_BINARY_NAME
   api_key: $API_KEY
+  name: msync release $TRAVIS_TAG
+  body: "$(git tag -l --format='%(contents)' $TRAVIS_TAG)"
   on:
     tags: true
