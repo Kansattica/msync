@@ -4,6 +4,7 @@ project (msync VERSION 0.9.5
 	DESCRIPTION "Store and forward messages with a Mastodon API-compatible server."
 	HOMEPAGE_URL "https://github.com/Kansattica/msync"
 	LANGUAGES CXX C)
+set (CPACK_PACKAGE_CONTACT "grace@hypnovir.us")
 
 option(MSYNC_BUILD_TESTS "Download catch2 and build tests with it." ON)
 
@@ -93,3 +94,14 @@ if (MSYNC_BUILD_TESTS)
 	enable_testing()
 	add_subdirectory(tests)
 endif()
+
+install(TARGETS msync
+	RUNTIME DESTINATION bin
+)
+
+if (UNIX)
+	set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
+	set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libgcc1, libcurl4")
+	set(CPACK_GENERATOR "DEB")
+endif()
+include(CPack)
