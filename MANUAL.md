@@ -1,14 +1,14 @@
 
-# msync Manual
+# `msync` Manual
 ## A low bandwidth store and forward Mastodon api client
 
 Hello! Welcome to the manual for `msync`, a store and forward command line Mastodon API client. `msync` is a piece of software with some quirks, but also some (in my opinion) really cool and powerful functionality, so a manual can be a real help. You dont have to read this from top to bottom- feel free to skim the table of contents or ctrl-F for a word or phrase related to what you want to do. Or, feel free to get ahold of me on Mastodon at [@BestGirlGrace@my.hypnovir.us](https://my.hypnovir.us/@BestGirlGrace).
 
-### How to start using msync
+### How to start using `msync`
 
 #### Installing
 
-Once you've compiled or [downloaded](https://github.com/Kansattica/msync/releases) msync (see [README.md](./README.md)), you have a few options:
+Once you've compiled or [downloaded](https://github.com/Kansattica/msync/releases) `msync` (see [README.md](./README.md)), you have a few options:
 
 - leave it where it is and use it in place, or copy it to a folder in your home directory and use it from there.
 - copy the compiled `msync` executable to somewhere in your `$PATH`. 
@@ -21,9 +21,9 @@ Either option works. The only thing to be aware of is that `msync` will create a
 
 `msync new --account yourusername@instance.egg`
 
-This will register msync with your instance and give you a URL to visit in your browser. Go to that URL, log in if needed, click 'authorize', and copy the authorization code it gives you. `msync` will give you onscreen instructions as to what to do next. Notice that the `--account` (or `-a`, for short) switch always goes at the end. Putting it earlier won't work!
+This will register `msync` with your instance and give you a URL to visit in your browser. Go to that URL, log in if needed, click 'authorize', and copy the authorization code it gives you. `msync` will give you onscreen instructions as to what to do next. Notice that the `--account` (or `-a`, for short) switch always goes at the end. Putting it earlier won't work!
 
-Once you see `Done! You're ready to start using this account`, you're ready to go. Notice that `msync` has created an `msync_accounts` directory in the same directory as itself. Keep this somewhere safe, because it now contains a password-equivalent access token! This `msync_accounts` directory contains everything msync knows: your account name, your settings, anything you've queued but haven't sent, and, once you synchronize with the server, it will contain local copies of your notifications and home timeline. To move or copy your `msync` installation to another computer, simply copy that `msync_accounts` folder.
+Once you see `Done! You're ready to start using this account`, you're ready to go. Notice that `msync` has created an `msync_accounts` directory in the same directory as itself. Keep this somewhere safe, because it now contains a password-equivalent access token! This `msync_accounts` directory contains everything `msync` knows: your account name, your settings, anything you've queued but haven't sent, and, once you synchronize with the server, it will contain local copies of your notifications and home timeline. To move, copy, or back up your `msync` installation to another computer, simply copy that `msync_accounts` folder.
 
 #### A note on multiple accounts
 
@@ -59,26 +59,27 @@ Note also that `msync sync` doesn't have to take an `--account` flag. You can us
 
 To remove an account from msync, simply delete its folder from `msync_accounts`.
 
-### How to use msync
+### How to use `msync`
 
-When I say `msync` is a store and forward client. What this means is that msync lets you queue stuff up while you're not connected to the internet, and then sync up later. `msync` will only connect to the internet when you run `msync new` or `msync sync`. Everything else simply manipulates settings or queues that are kept locally on your machine. `msync` is for everyone, but it's designed for:
+When I say `msync` is a store and forward client. What this means is that `msync` lets you queue stuff up while you're not connected to the internet, and then sync up later. `msync` will only connect to the internet when you run `msync new` or `msync sync`. Everything else simply manipulates settings or queues that are kept locally on your machine. `msync` is for everyone, but it's designed for:
 
 - Unreliable, slow, or not always-on internet connections.
 - Computers or connections that can't handle the Mastodon web frontend.
-- Systems without a graphical without a graphical front end.
+- Systems that run "headless" or otherwise can't use a graphical Mastodon client.
+- Anyone who prefers to use a keyboard.
+- Use in automated scripts.
 
 #### Reading the home timeline and notifications
 
 After your account is set up, running `msync sync --verbose` will connect to your instance and, if all is well, start downloading notifications and statuses. The `--verbose` is optional (and can be shortened to `-v`), but it will make `msync` tell you where to find the downloaded timeline and notifications. These will be stored at `msync_accounts/[username@instance.url]/home.list` and `msync_accounts/[username@instance.url]/notifications.list`, respectively. There's a lot of ways you can look at these files (in a text editor, IDE or `less` are common for me, I'll write more about this later), but the important things to know the process are:
 
-- `msync` does not care about the contents of these files. It simply appends posts and notifications to them. You can delete these files, edit them, move them elsewhere, msync doesn't care.
+- `msync` does not care about the contents of these files. It simply appends posts and notifications to them. You can delete these files, edit them, move them elsewhere, `msync` doesn't care.
 - When you first sync up, `msync` will get five chunks of statuses or notifications. On subsequent updates, `msync` will default to downloading until it's "caught up", and has downloaded everything since the last post it saw. To change this behavior, use the ` --max-requests <integer>` option when calling `msync sync`. 
 - Especially when using `--max-requests`, tell `msync` whether you want it to get the newest posts first or the oldest by using `msync config sync (home|notifications) (newest|oldest|off)`
-- If you plan on always syncing every message every time, instead of using `--max-requests`, I suggest using `oldest` instead of `newest`. When syncing oldest-first, msync can write the messages to disk as they come in, letting you see the files update immediately AND not having to store every message in memory until the end.
+- If you plan on always syncing every message every time, instead of using `--max-requests`, I suggest using `oldest` instead of `newest`. When syncing oldest-first, `msync` can write the messages to disk as they come in, letting you see the files update immediately AND not having to store every message in memory until the end.
 - Note that you can also not sync a timeline at all with `msync config sync home off`
 - If you don't care about a specific type of notification, you can stop `msync` from retrieving them when you sync with `msync config exclude_boosts true`, and same for `favs`, `follows`, `mentions`, and `polls`. `msync` treats anything start with a `t`, `T`, `y`, or `Y` as truthy, and everything else as falsy. So `exclude_favs true`, `exclude_favs YES`, and `exclude_favs Yeehaw` are equivalent.
 - I'll write more about configuration later, but for now, you can see all your settings and registered accounts with `msync config showall`.
-
 
 #### Queueing
 
@@ -95,6 +96,7 @@ If you want to just clear that queue, possibly because there's a typo'd ID in th
 Posts are a little different. You still queue them up to be sent when you next `sync` up, but there's an extra step involved. `msync queue post <any number of file paths>` takes, well, a number of file paths. The contents of these will be interpreted as text files and sent as posts when you `msync sync` up next. A few notes on posts:
 
 - Most of the time, I use `msync gen` to create files that I then fill with my posts. Run `msync` without any options to see all the switches that `msync gen` takes- these allow you to set privacy, content warnings, replies, and file attachments and descriptions. When I want to make a post with msync, I do this most of the time:
+
 ```
     msync gen
     vim new_post
@@ -106,10 +108,10 @@ Posts are a little different. You still queue them up to be sent when you next `
 - `msync` does *not* copy attachments when you queue them. Attachment paths are converted to absolute file paths and uploaded in place when you `msync sync` up next.
 - The `--body` option to `msync gen` can be useful, especially for prefilling someone's handle in the body of a post, but be careful- your shell might do unwanted things with characters like `!` and `$`. 
 - If you're replying to someone else's post, make sure you:
-    - use the same (or whatever necessary) visibility setting- msync will default to whatever your account's default visibility setting is. 
+    - use the same (or whatever necessary) visibility setting- `msync` will default to whatever your account's default visibility setting is. 
     - include their @ handle in the body
     - include a CW, if needed
-    - all in all, my msync command line when generating a reply usually looks like this:
+    - all in all, my `msync` command line when generating a reply usually looks like this:
 
     ```
     msync gen --privacy unlisted --reply-to 12345678 --body "@whoever@crime.egg" --cw "contains content" 
