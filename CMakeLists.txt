@@ -6,7 +6,7 @@ project (msync VERSION 0.9.5
 	LANGUAGES CXX C)
 
 option(MSYNC_BUILD_TESTS "Download catch2 and build tests with it." ON)
-
+option(MSYNC_USE_XDG_DIRECTORIES "Use xdg standard directory layout for files used." OFF)
 set(CMAKE_POLICY_DEFAULT_CMP0069 NEW) #enable interprocedural optimization for all projects
 
 include(cmake/linktimeoptimization.cmake)
