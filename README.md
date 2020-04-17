@@ -38,7 +38,7 @@ Older Ubuntu releases might require you to `apt install g++-8 libstdc++-8-dev` a
 
 #### Building on macOS
 
-The instructions for building on Linux should mostly work, though note that Apple only officially supports std::filesystem on Xcode 11.1 and Catalina/10.15 and up. `msync` does support pre-10.15 versions with Boost::filesystem, which you can install through Homebrew. I don't have a Mac to test on, but I do ensure that it builds and all unit tests pass. I do my testing with the newest version of LLVM installed through Homebrew, because the versions released with OSX often miss stuff I need to run the tests.
+The instructions for building on Linux should mostly work, though note that Apple only officially supports std::filesystem on Xcode 11.1 and Catalina/10.15 and up. `msync` does support pre-10.15 versions with Boost::filesystem, which you can install through Homebrew. I don't have a Mac to test on, but I do ensure that it builds and all unit tests pass. I test on OSX 10.14.6 with Xcode 11 and Boost::filesystem 1.72.0.
 
 #### Building on Windows
 On Windows, you'll want Visual Studio with the C++ development workload and CMake installed. After that, `git clone https://github.com/Kansattica/msync.git`, then open Visual Studio and go to `File > Open > CMake...` (some versions just have `File > Open > Folder...` instead, this will also work) and choose the `msync` repo you just downloaded. Visual Studio will take a while to download and configure everything, and then you should be able to pick `x64-Release` from the dropdown at the top, make sure the `msync.exe` target is selected, and build from there. 
@@ -51,12 +51,12 @@ If you want something lighter weight, I suspect you can install the [build tools
 
 - gcc and clang on 64-bit Ubuntu and Debian
 - gcc on 32-bit Ubuntu
-- OSX 10.13 with the LLVM 10 clang compiler. The one that comes with xcode should work, but it causes the tests to fail or run slowly.
+- OSX 10.14 with Xcode 11
 - MSVC 2017 on 32 and 64-bit Windows 
 
 #### Testing your build
 
-To ensure that `msync` found and compiled its network dependencies correctly, run the CMake commands above without `-DMSYNC_BUILD_TESTS=FALSE` (or, equivalently, `-DMSYNC_BUILD_TESTS=TRUE`). Then, run `./tests/net_tests`. This will determine whether `msync` can correctly make authenticated HTTPS requests and will print warnings if it cannot request and recieve gzipped responses.
+To ensure that `msync` found and compiled its network dependencies correctly, run the CMake commands above without `-DMSYNC_BUILD_TESTS=FALSE` (or, equivalently, `-DMSYNC_BUILD_TESTS=TRUE`). Then, run `./tests/net_tests`. This will determine whether `msync` can correctly make authenticated HTTPS requests and will print warnings if it cannot request and recieve compressed responses.
 
 ### Next steps
 
