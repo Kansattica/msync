@@ -28,5 +28,6 @@ inline CONSTANT_PATH_DECLARATION Notifications_Filename{ "notifications.list" };
 inline CONSTANT_PATH_DECLARATION Direct_Messages_Filename{ "dm.list" };
 
 #cmakedefine MSYNC_FILE_LOG
+#cmakedefine MSYNC_USER_CONFIG
 
 #endif
