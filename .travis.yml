@@ -71,11 +71,15 @@ after_success:
   - echo $FINISHED_BINARY_NAME
   - mv $EXELOCATION $FINISHED_BINARY_NAME
 
+before_deploy:
+  - git tag -l --format='%(contents)' $TRAVIS_TAG > msync_release_notes
+
 deploy:
   provider: releases
-  skip_cleanup: true
-  draft: true
+  edge: true
   file: $FINISHED_BINARY_NAME
   api_key: $API_KEY
+  name: msync release $TRAVIS_TAG
+  release_notes_file: msync_release_notes
   on:
     tags: true
