@@ -1,7 +1,7 @@
 #ifndef _MSYNC_VERSION_HPP_
 #define _MSYNC_VERSION_HPP_
 
-constexpr const char* MSYNC_VERSION = "0.9.4";
+constexpr const char* MSYNC_VERSION = "0.9.5";
 
 constexpr const char* MSYNC_LICENSE = R"(
 	msync - a command line store and forward Mastodon client.
