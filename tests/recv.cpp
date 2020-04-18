@@ -18,7 +18,7 @@
 #include <tuple>
 
 // apple's stdlib is missing to_chars
-#if __APPLE__
+#if __APPLE__ && !defined(__cpp_lib_to_chars)
 #include <cstdio>
 #endif
 
@@ -33,7 +33,7 @@ std::string_view sv_to_chars(Number n, std::array<char, 10>& char_buf)
 	// note that this function takes a character buffer that it will clobber and returns a string view into it
 	// this is to avoid allocations and also not return pointers into memory that will be freed when the function returns.
 
-#if __APPLE__
+#if __APPLE__ && !defined(__cpp_lib_to_chars)
 	const int written = sprintf(char_buf.data(), "%u", n);
 	if (written > 10) { FAIL("You messed up with sprintf, ya dingus."); }
 	return std::string_view(char_buf.data(), written);
