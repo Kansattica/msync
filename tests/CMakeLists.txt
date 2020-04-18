@@ -16,3 +16,8 @@ endif()
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	set_target_properties(net_tests PROPERTIES LINK_FLAGS "-Wno-odr")
 endif()
+
+include(CTest)
+include(${catch2lib_SOURCE_DIR}/contrib/Catch.cmake)
+catch_discover_tests(tests)
+catch_discover_tests(net_tests)
