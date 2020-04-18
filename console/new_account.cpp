@@ -20,6 +20,12 @@ constexpr auto scopes = "write:favourites write:media write:statuses read:notifi
 constexpr auto urlscopes = "write:favourites%20write:media%20write:statuses%20read:notifications%20read:statuses";
 constexpr auto redirect_uri = "urn:ietf:wg:oauth:2.0:oob";
 
+std::string make_clean_accountname(std::string username, const std::string& instance)
+{
+	username.reserve(username.size() + instance.size() + 1);
+	return username.append('@', 1).append(instance);
+}
+
 void make_new_account(const std::string& accountname)
 {
 	auto useraccountpair = options().select_account(accountname);
@@ -37,7 +43,7 @@ void make_new_account(const std::string& accountname)
 			return;
 		}
 		// make a new account
-		useraccountpair = &options().add_new_account(accountname);
+		useraccountpair = &options().add_new_account(make_clean_accountname(parsed->username, parsed->instance));
 		useraccountpair->second.set_option(user_option::account_name, parsed->username);
 		useraccountpair->second.set_option(user_option::instance_url, parsed->instance);
 		useraccountpair->second.set_option(user_option::file_version, "1");
