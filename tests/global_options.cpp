@@ -30,6 +30,14 @@ SCENARIO("add_new_account correctly handles input.")
 				REQUIRE(fs::is_directory(acc.filename));
 			}
 
+			//Windows doesn't respect filesystem permissions in the same way.
+#ifdef __linux__
+			THEN("the accounts directory has the proper permissions.")
+			{
+				REQUIRE(fs::status(acc.filename).permissions() == fs::perms::owner_all);
+			}
+#endif
+
 			THEN("no file is created immediately.")
 			{
 				REQUIRE_FALSE(fs::exists(userfile));
@@ -437,6 +445,11 @@ SCENARIO("clear_accounts deletes all the accounts known to the global_options.")
 			THEN("The accounts directory is empty.")
 			{
 				REQUIRE(count_files_in_directory(acc.filename) == 0);
+			}
+
+			THEN("The accounts directory has the proper permissions.")
+			{
+				REQUIRE(fs::status(acc.filename).permissions() == fs::perms::owner_all);
 			}
 		}
 	}
