@@ -37,7 +37,7 @@ std::string_view sv_to_chars(Number n, std::array<char, 10>& char_buf)
 	if (err != std::errc()) { FAIL("You messed up with to_chars, ya dingus."); }
 	return std::string_view(char_buf.data(), end - char_buf.data());
 #else
-	const int written = sprintf(char_buf.data(), "%u", n);
+	const int written = sprintf_s(char_buf.data(), "%u", n);
 	if (written > 10) { FAIL("You messed up with sprintf, ya dingus."); }
 	return std::string_view(char_buf.data(), written);
 #endif
