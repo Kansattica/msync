@@ -5,8 +5,6 @@
 #include <algorithm>
 #include <utility>
 
-#include <iostream>
-
 #include "test_helpers.hpp"
 
 #include "../console/optionparsing/parse_options.hpp"
@@ -1380,8 +1378,6 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		for (unsigned int i = 0; i < options.size(); i++)
 			options[i].order = i;
 
-
-		std::cout << "Another fresh command line!\n";
 		WHEN("the command line is parsed")
 		{
 			// static and doing the pass-by-mutable-ref thing because there's really no sense in 
@@ -1393,26 +1389,21 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 			// so if there's more than that, randomly shuffle instead
 			if (options.size() <= 7)
 			{
-				std::cout << "I'm permuting " << options.size() << " things.\n";
 				do
 				{
 					check_parse(argv, options, expected);
 				} while (std::next_permutation(options.begin(), options.end()));
-				std::cout << "Done permuting!\n";
 			}
 			else
 			{
 				static std::minstd_rand g(std::random_device{}());
 				// shuffle once because shuffling is slow
-				std::cout << "Shuffling!\n";
 				std::shuffle(options.begin(), options.end(), g);
-				std::cout << "Done shuffling!\n";
 				for (int i = 0; i < 6000; i++)
 				{
 					check_parse(argv, options, expected);
 					std::next_permutation(options.begin(), options.end());
 				}
-				std::cout << "Done permuting after the shuffling!\n";
 			}
 
 		}
