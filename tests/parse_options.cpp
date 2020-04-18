@@ -1378,7 +1378,6 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		for (unsigned int i = 0; i < options.size(); i++)
 			options[i].order = i;
 
-
 		WHEN("the command line is parsed")
 		{
 			// static and doing the pass-by-mutable-ref thing because there's really no sense in 

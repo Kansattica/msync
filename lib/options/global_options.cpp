@@ -54,6 +54,7 @@ std::pair<const std::string, user_options>& global_options::add_new_account(std:
 	fs::path user_path = account_directory_path() / name;
 
 	fs::create_directories(user_path); //can throw if something goes wrong
+	fs::permissions(account_directory_path(), fs::perms::owner_all);
 
 	user_path /= User_Options_Filename;
 
