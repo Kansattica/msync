@@ -3,7 +3,7 @@ target_sources_local(accountdirectory
 	account_directory.cpp
 	account_directory.hpp
 	)
-if(MSYNC_USE_XDG_DIRECTORIES OR MSYNC_BASE_DIRECTORY EQUAL "")
+if(MSYNC_USE_XDG_DIRECTORIES OR MSYNC_BASE_DIRECTORY STREQUAL "")
   target_compile_definitions(accountdirectory
     PRIVATE USE_XDG_DIRECTORY_SPEC=1)
 else()
