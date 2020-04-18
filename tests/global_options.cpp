@@ -447,10 +447,13 @@ SCENARIO("clear_accounts deletes all the accounts known to the global_options.")
 				REQUIRE(count_files_in_directory(acc.filename) == 0);
 			}
 
-			THEN("The accounts directory has the proper permissions.")
+			//Windows doesn't respect filesystem permissions in the same way.
+#ifdef __linux__
+			THEN("the accounts directory has the proper permissions.")
 			{
 				REQUIRE(fs::status(acc.filename).permissions() == fs::perms::owner_all);
 			}
+#endif
 		}
 	}
 
