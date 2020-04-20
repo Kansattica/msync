@@ -74,10 +74,11 @@ script:
 after_success:
   - echo "Binary size:"
   - du -h $EXELOCATION
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then FINISHED_BINARY_NAME="msync-$TRAVIS_TAG-linux-$BUILD_ARCH-$TRAVIS_COMPILER"; fi
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then FINISHED_BINARY_NAME="msync-$TRAVIS_TAG-windows-$CMAKE_GENERATOR_PLATFORM.exe"; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then FINISHED_BINARY_NAME="msync-$TRAVIS_TAG-osx-x64"; fi
-  - if [[ $CONFIGURE_ARGUMENTS == *"MSYNC_USER_CONFIG=ON"* ]]; then FINISHED_BINARY_NAME+="-install"; fi
+  - export FINISHED_BINARY_NAME=msync-$TRAVIS_TAG-
+  - if [[ $CONFIGURE_ARGUMENTS == *"MSYNC_USER_CONFIG=ON"* ]]; then FINISHED_BINARY_NAME+="install-"; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then FINISHED_BINARY_NAME+="linux-$BUILD_ARCH-$TRAVIS_COMPILER"; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then FINISHED_BINARY_NAME=+"windows-$CMAKE_GENERATOR_PLATFORM.exe"; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then FINISHED_BINARY_NAME+="osx-x64"; fi
   - echo $FINISHED_BINARY_NAME
   - mv $EXELOCATION $FINISHED_BINARY_NAME
 
