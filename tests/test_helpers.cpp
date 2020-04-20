@@ -10,6 +10,8 @@
 
 #include "../accountdirectory/account_directory.hpp"
 
+#include "to_chars_patch.hpp"
+
 test_file clean_account_directory()
 {
 	return test_file{ account_directory_path() };
@@ -70,6 +72,17 @@ int zero_to_n(int n)
 {
 	std::uniform_int_distribution<> dis(0, n);
 	return dis(gen);
+}
+
+test_file temporary_file()
+{
+	const static fs::path tempdir = fs::temp_directory_path() / "msync_test_file.";
+	static unsigned int filecount = 0;
+	static std::array<char, 10> buffer;
+
+	std::string_view printed = sv_to_chars(filecount++, buffer);
+
+	return test_file{ fs::path {tempdir}.concat(printed.begin(), printed.end()) };
 }
 
 void make_status_json(std::string_view id, std::string& to_append)

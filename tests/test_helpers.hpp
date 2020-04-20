@@ -73,4 +73,5 @@ public:
 };
 
 test_file clean_account_directory();
+test_file temporary_file();
 #endif
