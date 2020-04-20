@@ -60,6 +60,11 @@ bool user_options::get_bool_option(user_option toget) const
 	return firstchar == 't' || firstchar == 'T' || firstchar == 'y' || firstchar == 'Y';
 }
 
+const fs::path& user_options::get_user_directory() const
+{
+	return user_directory;
+}
+
 void user_options::set_option(user_option opt, std::string value)
 {
 	backing.parsed.insert_or_assign(std::string{ USER_OPTION_NAMES[static_cast<size_t>(opt)] }, std::move(value));
@@ -84,3 +89,5 @@ void user_options::set_bool_option(user_option opt, bool value)
 	static constexpr std::string_view false_sv = "false";
 	backing.parsed.insert_or_assign(std::string{ USER_OPTION_NAMES[static_cast<size_t>(opt)] }, std::string{ value ? true_sv : false_sv });
 }
+
+

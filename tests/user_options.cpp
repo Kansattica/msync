@@ -364,3 +364,27 @@ SCENARIO("The boolean overload for get_option works.")
 		}
 	}
 }
+
+SCENARIO("user_options correctly reports the directory it's in.")
+{
+	GIVEN("A user_options for some file.")
+	{
+		test_file fi = temporary_file();
+		user_options opts{ fi.filename };
+
+		WHEN("get_user_directory is taken.")
+		{
+			const auto& userdir = opts.get_user_directory();
+
+			THEN("The directory exists.")
+			{
+				REQUIRE(fs::is_directory(userdir));
+			}
+
+			THEN("The directory contains the user_options.")
+			{
+				REQUIRE(fs::is_regular_file(userdir / fi.filename.filename()));
+			}
+		}
+	}
+}
