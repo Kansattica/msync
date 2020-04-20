@@ -40,13 +40,22 @@ matrix:
   - os: windows
     compiler: cl32.exe
     env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=win32
+  - os: windows
+    compiler: cl64.exe
+    env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64 CONFIGURE_ARGUMENTS="-DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF" 
+  - os: linux
+    dist: bionic
+    compiler: gcc
+    env: BUILD_ARCH=x64 CC=gcc-8 CXX=g++-8 CONFIGURE_ARGUMENTS="-DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF"
+    addons:
+      apt: g++-8 libstdc++-8-dev
 
 script:
   - export BUILDTYPE=Release 
   - mkdir -p build
   - cd build
   - cmake --version
-  - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE .. 
+  - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE $CONFIGURE_ARGUMENTS ..
   - cmake --build . --config $BUILDTYPE --parallel 2
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then EXELOCATION="./$BUILDTYPE/msync.exe"; else EXELOCATION="./msync"; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then TESTLOCATION="./tests/$BUILDTYPE/tests.exe"; else TESTLOCATION="./tests/tests"; fi
