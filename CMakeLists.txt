@@ -90,5 +90,6 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 if (MSYNC_BUILD_TESTS)
+	enable_testing()
 	add_subdirectory(tests)
 endif()
