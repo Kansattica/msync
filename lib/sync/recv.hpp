@@ -32,7 +32,7 @@ public:
 
 	recv_posts(get_posts& post_downloader) : download(post_downloader) {};
 
-	void get(const std::string& account_name, user_options& account)
+	void get(user_options& account)
 	{
 		retries = set_default(retries, 3, "Number of retries cannot be zero or less. Resetting to 3.\n", pl());
 
@@ -40,15 +40,14 @@ public:
 		// which, as of this writing, means the maximum is 40 for statuses and 30 for notifications
 		// (the documentation lies and says that the limit is the same for both)
 
-		const fs::path user_folder = account_directory_path() / account_name;
-
 		exclude_notif_types = make_excludes(account);
 
+		const std::string account_name = account.get_user_directory().stem().string();
 		pl() << "Downloading notifications for " << account_name << '\n';
-		update_timeline<to_get::notifications, mastodon_notification, true>(account, user_folder, clamp_or_default(per_call, 30));
+		update_timeline<to_get::notifications, mastodon_notification, true>(account, account.get_user_directory(), clamp_or_default(per_call, 30));
 
 		pl() << "Downloading the home timeline for " << account_name << '\n';
-		update_timeline<to_get::home, mastodon_status>(account, user_folder, clamp_or_default(per_call, 40));
+		update_timeline<to_get::home, mastodon_status>(account, account.get_user_directory(), clamp_or_default(per_call, 40));
 	}
 
 private:

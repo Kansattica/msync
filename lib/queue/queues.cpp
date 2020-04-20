@@ -1,19 +1,17 @@
 #include "queues.hpp"
 
 #include <constants.hpp>
-#include <filesystem.hpp>
 #include <system_error>
 #include <print_logger.hpp>
-#include "../accountdirectory/account_directory.hpp"
 #include "../postfile/outgoing_post.hpp"
 #include <algorithm>
 #include <array>
 #include <msync_exception.hpp>
 
 
-fs::path get_file_queue_directory(const std::string& account)
+fs::path get_file_queue_directory(const fs::path& user_account_dir)
 {
-	return account_directory_path() / account / File_Queue_Directory;
+	return user_account_dir / File_Queue_Directory;
 }
 
 void unique_file_name(fs::path& path)
@@ -164,11 +162,9 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 }
 
 template <typename queue_t = queue_list>
-queue_t open_queue(const std::string& account)
+queue_t open_queue(const fs::path& user_account_dir)
 {
-	fs::path qfile = account_directory_path() / account;
-	fs::create_directories(qfile);
-	return queue_t{ qfile / Queue_Filename };
+	return queue_t{ user_account_dir / Queue_Filename };
 }
 
 std::vector<api_call> to_api_calls(std::vector<std::string>&& add, api_route target_route)
@@ -184,14 +180,14 @@ std::vector<api_call> to_api_calls(std::vector<std::string>&& add, api_route tar
 	return to_return;
 }
 
-void enqueue(const queues toenqueue, const std::string& account, std::vector<std::string>&& add)
+void enqueue(const queues toenqueue, const fs::path& user_account_dir, std::vector<std::string>&& add)
 {
-	queue_list toaddto = open_queue(account);
+	queue_list toaddto = open_queue(user_account_dir);
 	const auto target_route = get_route(toenqueue, false);
 
 	if (toenqueue == queues::post)
 	{
-		const fs::path filequeuedir = get_file_queue_directory(account);
+		const fs::path filequeuedir = get_file_queue_directory(user_account_dir);
 		std::transform(add.begin(), add.end(), std::back_inserter(toaddto.parsed), [&filequeuedir, target_route](const auto& id)
 			{
 				return api_call{ target_route, queue_post(filequeuedir, id) };
@@ -236,9 +232,9 @@ void dequeue_post(const fs::path& queuedir, const fs::path& filename)
 	}
 }
 
-void dequeue(queues todequeue, const std::string& account, std::vector<std::string>&& remove)
+void dequeue(queues todequeue, const fs::path& user_account_dir, std::vector<std::string>&& remove)
 {
-	queue_list toremovefrom = open_queue(account);
+	queue_list toremovefrom = open_queue(user_account_dir);
 
 	if (todequeue == queues::post)
 	{
@@ -281,7 +277,7 @@ void dequeue(queues todequeue, const std::string& account, std::vector<std::stri
 
 	if (todequeue == queues::post)
 	{
-		const fs::path filequeuedir = get_file_queue_directory(account);
+		const fs::path filequeuedir = get_file_queue_directory(user_account_dir);
 		std::for_each(toremove.begin(), toremove_pivot,
 			[&filequeuedir](const auto& apicall) { dequeue_post(filequeuedir, apicall.argument); });
 	}
@@ -296,9 +292,9 @@ void dequeue(queues todequeue, const std::string& account, std::vector<std::stri
 		[&toremovefrom, remove_route](api_call& queuedel) { toremovefrom.parsed.push_back(api_call{ remove_route, std::move(queuedel.argument) }); });
 }
 
-void clear(queues toclear, const std::string& account)
+void clear(queues toclear, const fs::path& user_account_dir)
 {
-	queue_list clearthis = open_queue(account);
+	queue_list clearthis = open_queue(user_account_dir);
 	const auto toclearinsert = get_route(toclear, true);
 	const auto toclearremove = get_route(toclear, false);
 
@@ -310,19 +306,19 @@ void clear(queues toclear, const std::string& account)
 
 	if (toclear == queues::post)
 	{
-		fs::remove_all(get_file_queue_directory(account));
+		fs::remove_all(get_file_queue_directory(user_account_dir));
 	}
 }
 
-queue_list get(const std::string& account)
+queue_list get(const fs::path& user_account_dir)
 {
-	return open_queue(account);
+	return open_queue(user_account_dir);
 }
 
-std::vector<std::string> print(const std::string& account)
+std::vector<std::string> print(const fs::path& user_account_dir)
 {
 	//prettyprint posts
-	readonly_queue_list printthis = open_queue<readonly_queue_list>(account);
+	readonly_queue_list printthis = open_queue<readonly_queue_list>(user_account_dir);
 	std::vector<std::string> toreturn(printthis.parsed.size());
 	std::transform(std::make_move_iterator(printthis.parsed.begin()), std::make_move_iterator(printthis.parsed.end()),
 		toreturn.begin(), [](api_call&& call) 

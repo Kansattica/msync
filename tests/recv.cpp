@@ -216,7 +216,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 		{
 			recv_posts post_getter{ mock_get };
 
-			post_getter.get(account.first, account.second);
+			post_getter.get(account.second);
 
 			THEN("Five calls each were made to the home and notification API endpoints with the correct URLs, default limits, and access tokens.")
 			{
@@ -251,7 +251,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 				mock_get.total_post_count += 10;
 				mock_get.total_notif_count += 15;
 
-				post_getter.get(account.first, account.second);
+				post_getter.get(account.second);
 
 				THEN("Only one call was made to each endpoint.")
 				{
@@ -295,7 +295,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 		{
 			recv_posts post_getter{ mock_get };
 
-			post_getter.get(account.first, account.second);
+			post_getter.get(account.second);
 
 			THEN("Calls to the notification API correctly include the excluded notif types.")
 			{
@@ -339,7 +339,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 				mock_get.total_post_count += 10;
 				mock_get.total_notif_count += 15;
 
-				post_getter.get(account.first, account.second);
+				post_getter.get(account.second);
 
 				THEN("Only one call was made to each endpoint.")
 				{

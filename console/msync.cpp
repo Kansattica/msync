@@ -69,16 +69,16 @@ int main(int argc, const char* argv[])
 			switch (parsed.queue_opt.to_do)
 			{
 			case queue_action::add:
-				enqueue(parsed.queue_opt.selected, assume_account(parsed.account).first, std::move(parsed.queue_opt.queued));
+				enqueue(parsed.queue_opt.selected, assume_account(parsed.account).second.get_user_directory(), std::move(parsed.queue_opt.queued));
 				break;
 			case queue_action::remove:
-				dequeue(parsed.queue_opt.selected, assume_account(parsed.account).first, std::move(parsed.queue_opt.queued));
+				dequeue(parsed.queue_opt.selected, assume_account(parsed.account).second.get_user_directory(), std::move(parsed.queue_opt.queued));
 				break;
 			case queue_action::clear:
-				clear(parsed.queue_opt.selected, assume_account(parsed.account).first);
+				clear(parsed.queue_opt.selected, assume_account(parsed.account).second.get_user_directory());
 				break;
 			case queue_action::print:
-				print_iterable(print(assume_account(parsed.account).first));
+				print_iterable(print(assume_account(parsed.account).second.get_user_directory()));
 				break;
 			}
 			break;
@@ -163,10 +163,10 @@ void do_sync(const parse_result& parsed)
 		if (user == nullptr)
 		{
 			options().foreach_account([&send](const auto& user) {
-				send.send(user.first, user.second.get_option(user_option::instance_url), user.second.get_option(user_option::access_token)); });
+				send.send(user.second.get_user_directory(), user.second.get_option(user_option::instance_url), user.second.get_option(user_option::access_token)); });
 		}
 		else
-			send.send(user->first, user->second.get_option(user_option::instance_url), user->second.get_option(user_option::access_token));
+			send.send(user->second.get_user_directory(), user->second.get_option(user_option::instance_url), user->second.get_option(user_option::access_token));
 	}
 
 	if (parsed.sync_opts.get)
@@ -179,10 +179,10 @@ void do_sync(const parse_result& parsed)
 		if (user == nullptr)
 		{
 			options().foreach_account([&recv](auto& user) {
-				recv.get(user.first, user.second); });
+				recv.get(user.second); });
 		}
 		else
-			recv.get(user->first, user->second);
+			recv.get(user->second);
 	}
 }
 

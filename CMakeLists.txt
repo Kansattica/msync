@@ -66,7 +66,7 @@ target_link_libraries(filebacked INTERFACE filesystem)
 
 target_include_directories(entities INTERFACE lib/entities)
 
-target_link_libraries(sync PRIVATE entities printlog queue util netinterface postfile postlist constants filesystem options nlohmannjson accountdirectory)
+target_link_libraries(sync PRIVATE entities printlog queue util netinterface postfile postlist constants filesystem options nlohmannjson)
 
 target_link_libraries(accountdirectory PRIVATE whereami filesystem constants)
 
@@ -77,7 +77,7 @@ target_link_libraries(postfile PRIVATE filebacked printlog util)
 
 target_link_libraries(postlist PRIVATE filesystem entities)
 
-target_link_libraries(queue PRIVATE constants printlog accountdirectory filebacked exception postfile) 
+target_link_libraries(queue PRIVATE constants printlog filebacked exception postfile) 
 
 target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options queue postfile)
 

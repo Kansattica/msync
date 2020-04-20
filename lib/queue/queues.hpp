@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "queue_list.hpp"
+#include <filesystem.hpp>
 
 enum class queues
 {
@@ -13,16 +14,16 @@ enum class queues
 	post
 };
 
-fs::path get_file_queue_directory(const std::string& account);
+fs::path get_file_queue_directory(const fs::path& user_account_dir);
 
 // enqueue and dequeue mutate and move from the vector for efficiency
-void enqueue(queues toenqueue, const std::string& account, std::vector<std::string>&& add);
-void dequeue(queues todequeue, const std::string& account, std::vector<std::string>&& remove);
+void enqueue(queues toenqueue, const fs::path& user_account_dir, std::vector<std::string>&& add);
+void dequeue(queues todequeue, const fs::path& user_account_dir, std::vector<std::string>&& remove);
 
-void clear(queues toclear, const std::string& account);
+void clear(queues toclear, const fs::path& user_account_dir);
 
-queue_list get(const std::string& account);
+queue_list get(const fs::path& user_account_dir);
 
-std::vector<std::string> print(const std::string& account);
+std::vector<std::string> print(const fs::path& user_account_dir);
 
 #endif
