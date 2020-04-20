@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-void print(std::ofstream& out, const char* key, const std::string& val, bool newline = true)
+void print(std::ostream& out, const char* key, const std::string& val, bool newline = true)
 {
 	if (!val.empty())
 	{
@@ -12,7 +12,7 @@ void print(std::ofstream& out, const char* key, const std::string& val, bool new
 	}
 }
 
-void print_author(std::ofstream& out, const char* key, const std::string& display_name, const std::string& account, bool bot, bool newline = true)
+void print_author(std::ostream& out, const char* key, const std::string& display_name, const std::string& account, bool bot, bool newline = true)
 { 
 	// this is so that posts that aren't boosts don't print that boosted_by section
 	if (account.empty()) { return; }
@@ -24,7 +24,7 @@ void print_author(std::ofstream& out, const char* key, const std::string& displa
 	if (newline) out << '\n';
 }
 
-void print(std::ofstream& out, const char* key, bool val, bool newline = true)
+void print(std::ostream& out, const char* key, bool val, bool newline = true)
 {
 	if (val)
 	{
@@ -34,7 +34,7 @@ void print(std::ofstream& out, const char* key, bool val, bool newline = true)
 	}
 }
 
-std::ofstream& operator<<(std::ofstream& out, const mastodon_poll& poll)
+std::ostream& operator<<(std::ostream& out, const mastodon_poll& poll)
 {
 	print(out, "poll id: ", poll.id);
 	print(out, poll.expired ? "expired at: " : "expires at: ", poll.expires_at);
@@ -52,7 +52,7 @@ std::ofstream& operator<<(std::ofstream& out, const mastodon_poll& poll)
 	return out;
 }
 
-std::ofstream& operator<<(std::ofstream& out, const mastodon_status& status)
+std::ostream& operator<<(std::ostream& out, const mastodon_status& status)
 {
 	print(out, "status id: ", status.id);
 	print(out, "url: ", status.url);
@@ -103,7 +103,7 @@ const char* notification_verb(notif_type t)
 	}
 }
 
-std::ofstream& operator<<(std::ofstream& out, const mastodon_notification& notification)
+std::ostream& operator<<(std::ostream& out, const mastodon_notification& notification)
 {
 	out << "notification id: " << notification.id << '\n';
 	out << "at " << notification.created_at << ", ";
