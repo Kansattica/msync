@@ -11,7 +11,7 @@ SCENARIO("User_options reads from a file when created")
 {
 	GIVEN("A file on disk with some properly formatted data")
 	{
-		const test_file fi("someuser.test");
+		const test_file fi = temporary_file();
 
 		{
 			std::ofstream maketest(fi);
@@ -50,7 +50,7 @@ SCENARIO("User_options saves changes back to its file")
 {
 	GIVEN("A file on disk with some properly formatted data")
 	{
-		const test_file fi("someuser.test");
+		const test_file fi = temporary_file();
 
 		{
 			std::ofstream maketest(fi);
@@ -95,7 +95,7 @@ SCENARIO("An empty user_options writes to a file when destroyed")
 {
 	GIVEN("A path with no file on disk")
 	{
-		test_file fi("someuser.test");
+		const test_file fi = temporary_file();
 
 		WHEN("a user_options is created with that path and modified")
 		{
@@ -137,7 +137,7 @@ SCENARIO("Get and set options manage string references correctly.")
 {
 	GIVEN("A file on disk with some properly formatted data")
 	{
-		test_file fi("someuser.test");
+		const test_file fi = temporary_file();
 
 		{
 			std::ofstream maketest(fi);
@@ -181,7 +181,7 @@ CATCH_REGISTER_ENUM(sync_settings, sync_settings::dont_sync, sync_settings::newe
 
 SCENARIO("The enum overload for get_option works.")
 {
-	const test_file fi{ "testfilefriend" };
+	const test_file fi = temporary_file();
 	GIVEN("An empty user_options")
 	{
 		user_options opt{fi.filename};
@@ -254,7 +254,7 @@ SCENARIO("The enum overload for get_option works.")
 
 SCENARIO("The boolean overload for get_option works.")
 {
-	const test_file fi{ "testfilefriend" };
+	const test_file fi = temporary_file();
 	GIVEN("An empty user_options")
 	{
 		user_options opt{fi.filename};

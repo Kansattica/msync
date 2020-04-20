@@ -12,7 +12,7 @@ SCENARIO("option_files save their data when destroyed.")
 {
 	GIVEN("An option_file with some values.")
 	{
-		const test_file tf("testfileopt");
+		const test_file tf = temporary_file();
 
 		option_file opts(tf.filename);
 		opts.parsed["atestoption"] = "coolstuff";
@@ -91,7 +91,7 @@ SCENARIO("option_files save their data when destroyed.")
 
 	GIVEN("An empty option_file.")
 	{
-		const test_file tf("testfileopt");
+		const test_file tf = temporary_file();
 
 		option_file opts{ tf.filename };
 
@@ -118,7 +118,7 @@ SCENARIO("option_files read data when created.")
 {
 	GIVEN("An option file on disk with some data.")
 	{
-		const test_file tf("testfileoptread");
+		const test_file tf = temporary_file();
 
 		{
 			std::ofstream fout(tf);
@@ -179,7 +179,7 @@ SCENARIO("option_files read data when created.")
 
 	GIVEN("An option file on disk with some data, blank lines, and comments.")
 	{
-		const test_file tf("testfileoptread");
+		const test_file tf = temporary_file();
 
 		{
 			std::ofstream fout(tf);
