@@ -81,7 +81,7 @@ target_link_libraries(queue PRIVATE constants printlog filebacked exception post
 
 target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options queue postfile)
 
-target_link_libraries(msync PRIVATE options optionparsing printlog ${CPR_LIBRARIES} util nlohmannjson exception postfile queue sync net netinterface)
+target_link_libraries(msync PRIVATE options optionparsing printlog ${CPR_LIBRARIES} util nlohmannjson exception postfile queue sync net netinterface accountdirectory)
 
 # basically, if you compile CPR with LTO enabled, the gnu compiler emits a bunch of spurious ODR warnings for every library that includes CPR.
 # this quiets that down.

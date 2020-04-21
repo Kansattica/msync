@@ -1,6 +1,5 @@
 #include "new_account.hpp"
 
-#include "../lib/options/global_options.hpp"
 #include "../lib/util/util.hpp"
 #include "../lib/options/option_enums.hpp"    // for user_option, user_optio...
 #include "../lib/options/option_file.hpp"     // for string
@@ -26,9 +25,9 @@ std::string make_clean_accountname(std::string username, const std::string& inst
 	return username.append('@', 1).append(instance);
 }
 
-void make_new_account(const std::string& accountname)
+void make_new_account(const std::string& accountname, global_options& options)
 {
-	auto useraccountpair = options().select_account(accountname);
+	auto useraccountpair = options.select_account(accountname);
 
 	// see: https://docs.joinmastodon.org/api/authentication/
 
@@ -43,7 +42,7 @@ void make_new_account(const std::string& accountname)
 			return;
 		}
 		// make a new account
-		useraccountpair = &options().add_new_account(make_clean_accountname(parsed->username, parsed->instance));
+		useraccountpair = &(options.add_new_account(make_clean_accountname(parsed->username, parsed->instance)));
 		useraccountpair->second.set_option(user_option::account_name, parsed->username);
 		useraccountpair->second.set_option(user_option::instance_url, parsed->instance);
 		useraccountpair->second.set_option(user_option::file_version, "1");

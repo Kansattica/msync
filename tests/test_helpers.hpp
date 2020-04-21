@@ -72,6 +72,6 @@ public:
 	const fs::path filename;
 };
 
-test_file clean_account_directory();
 test_file temporary_file();
+test_file temporary_directory();
 #endif

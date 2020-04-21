@@ -8,14 +8,7 @@
 
 #include "../lib/constants/constants.hpp"
 
-#include "../accountdirectory/account_directory.hpp"
-
 #include "to_chars_patch.hpp"
-
-test_file clean_account_directory()
-{
-	return test_file{ account_directory_path() };
-}
 
 std::vector<std::string> read_lines(const fs::path& toread)
 {
@@ -83,6 +76,20 @@ test_file temporary_file()
 	std::string_view printed = sv_to_chars(filecount++, buffer);
 
 	return test_file{ fs::path {tempdir}.concat(printed.begin(), printed.end()) };
+}
+
+test_file temporary_directory()
+{
+	const static fs::path tempdir = fs::temp_directory_path() / "msync_test_dir_";
+	static unsigned int dircount = 0;
+	static std::array<char, 10> buffer;
+
+	std::string_view printed = sv_to_chars(dircount++, buffer);
+
+	auto fi = test_file{ fs::path {tempdir}.concat(printed.begin(), printed.end()) };
+	fs::create_directory(fi.filename);
+	return fi;
+
 }
 
 void make_status_json(std::string_view id, std::string& to_append)

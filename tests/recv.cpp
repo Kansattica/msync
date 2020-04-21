@@ -193,9 +193,11 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 	static constexpr std::string_view expected_home_endpoint = "https://crime.egg/api/v1/timelines/home";
 	static constexpr std::string_view expected_access_token = "token!";
 
-	const test_file account_dir = clean_account_directory();
+	const test_file account_dir = temporary_directory();
 
-	auto& account = options().add_new_account(std::string{ account_name });
+	global_options options{ account_dir.filename };
+
+	auto& account = options.add_new_account(std::string{ account_name });
 
 	const static auto user_dir = account_dir.filename / account.first;
 	const static auto home_timeline_file = user_dir / Home_Timeline_Filename;
@@ -372,6 +374,4 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 			}
 		}
 	}
-
-	options().clear_accounts();
 }

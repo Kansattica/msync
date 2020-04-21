@@ -1,7 +1,6 @@
 #include "global_options.hpp"
 #include "user_options.hpp"
 #include "../constants/constants.hpp"
-#include "../accountdirectory/account_directory.hpp"
 #include <msync_exception.hpp>
 #include <print_logger.hpp>
 #include <algorithm>
@@ -9,20 +8,14 @@
 
 #include <cctype>
 
-global_options& options()
+global_options::global_options(fs::path accounts_dir) : accounts_directory(std::move(accounts_dir))
 {
-	static global_options options;
-	return options;
-}
+	plverb() << "Reading accounts from " << accounts_directory << "\n";
 
-global_options::global_options()
-{
-	plverb() << "Reading accounts from " << account_directory_path() << "\n";
-
-	if (!fs::exists(account_directory_path()))
+	if (!fs::exists(accounts_directory))
 		return;
 
-	for (const auto& userfolder : fs::directory_iterator(account_directory_path()))
+	for (const auto& userfolder : fs::directory_iterator(accounts_directory))
 	{
 		if (!fs::is_directory(userfolder.path()))
 		{
@@ -51,10 +44,10 @@ std::pair<const std::string, user_options>& global_options::add_new_account(std:
 		return *contains;
 	}
 
-	fs::path user_path = account_directory_path() / name;
+	fs::path user_path = accounts_directory / name;
 
 	fs::create_directories(user_path); //can throw if something goes wrong
-	fs::permissions(account_directory_path(), fs::perms::owner_all);
+	fs::permissions(accounts_directory, fs::perms::owner_all);
 
 	user_path /= User_Options_Filename;
 
@@ -92,14 +85,6 @@ std::pair<const std::string, user_options>* global_options::select_account(std::
 	
 	// nullptr if we found nothing, points to the account entry if we found exactly one candidate
 	return candidate;
-}
-
-void global_options::clear_accounts()
-{
-	std::for_each(accounts.begin(), accounts.end(), 
-		[this](const auto& account) { fs::remove_all(account_directory_path()  / account.first); });
-
-	accounts.clear();
 }
 
 std::vector<std::string_view> global_options::all_accounts() const

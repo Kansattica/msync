@@ -149,8 +149,10 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 {
 	logs_off = true;
 
-	const test_file fi = clean_account_directory();
-	const static std::string account = "someguy@cool.account";
+	const test_file fi = temporary_directory();
+	const fs::path account = fi.filename / "someguy@cool.account";
+	fs::create_directory(account); //enqueue expects this directory to exist already
+
 	constexpr std::string_view instanceurl = "cool.account";
 	constexpr std::string_view accesstoken = "sometoken";
 
@@ -393,14 +395,16 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 SCENARIO("Send correctly sends new posts and deletes existing ones.")
 {
 	logs_off = true;
-	const test_file fi = clean_account_directory();
+	const test_file fi = temporary_directory();
 
-	static const std::string account = "someguy@cool.account";
+	const fs::path account = fi.filename / "someguy@cool.account";
+	fs::create_directory(account);
+
 	constexpr std::string_view instanceurl = "cool.account";
 	constexpr std::string_view accesstoken = "sometoken";
 	constexpr std::string_view new_post_url = "https://cool.account/api/v1/statuses";
 
-	const static fs::path queue_directory = fi.filename / account / File_Queue_Directory;
+	const static fs::path queue_directory = account / File_Queue_Directory;
 
 	GIVEN("A queue with some post filenames to send.")
 	{
@@ -846,8 +850,8 @@ SCENARIO("Send correctly sends from and modifies a queue of mixed API calls.")
 {
 	logs_off = true;
 
-	const test_file fi = clean_account_directory();
-	static const std::string account = "prettynormal@website.egg";
+	const test_file fi = temporary_directory();
+	const fs::path account = fi.filename / "prettynormal@website.egg";
 	constexpr std::string_view instanceurl = "website.egg";
 	constexpr std::string_view accesstoken = "someothertoken";
 
@@ -873,7 +877,7 @@ SCENARIO("Send correctly sends from and modifies a queue of mixed API calls.")
 
 			THEN("the queue is empty.")
 			{
-				REQUIRE(read_file(fi.filename / account / Queue_Filename).empty());
+				REQUIRE(read_file(account / Queue_Filename).empty());
 			}
 
 			THEN("the correct number of calls were made.")

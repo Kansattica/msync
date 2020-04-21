@@ -15,6 +15,7 @@
 #include "../lib/sync/recv.hpp"
 #include "../lib/net/net.hpp"
 #include "../lib/util/util.hpp"
+#include "../lib/accountdirectory/account_directory.hpp"
 #include "new_account.hpp"
 #include "optionparsing/parse_options.hpp"
 
@@ -27,6 +28,8 @@ void show_all_options(std::pair<const std::string, user_options>* user_ptr, cons
 
 void print_stringptr(const std::string* toprint);
 void print_sensitive(std::string_view name, const std::string* value);
+
+global_options& options();
 
 template <typename T>
 void print_iterable(const T& vec);
@@ -43,7 +46,7 @@ int main(int argc, const char* argv[])
 		switch (parsed.selected)
 		{
 		case mode::newuser:
-			make_new_account(parsed.account);
+			make_new_account(parsed.account, options());
 			break;
 		case mode::showopt:
 			print_stringptr(assume_account(parsed.account).second.try_get_option(parsed.toset));
@@ -249,6 +252,12 @@ std::pair<const std::string, user_options>& assume_account(std::pair<const std::
 std::pair<const std::string, user_options>& assume_account(const std::string& account)
 {
 	return assume_account(options().select_account(account));
+}
+
+global_options& options()
+{
+	static global_options options{ account_directory_path() };
+	return options;
 }
 
 void print_stringptr(const std::string* toprint)
