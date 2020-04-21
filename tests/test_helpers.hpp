@@ -25,11 +25,8 @@ struct test_file
 public:
 	test_file(const char* name) : test_file(fs::path(name)) {};
 	test_file(std::string_view name) : test_file(fs::path(name.begin(), name.end())) {}; //use iterator interface for boost's benefit
-	test_file(fs::path name) : filename(std::move(name))
+	test_file(fs::path name) : filename(std::move(name)), filenamebak(make_backup_if_not_directory())
 	{
-		if (!fs::is_directory(filename))
-			filenamebak = fs::path{ filename }.concat(".bak");
-
 		fs::remove_all(filename);
 
 		if (!filenamebak.empty())
@@ -46,8 +43,15 @@ public:
 
 	operator const fs::path::value_type* () const { return filename.c_str(); }
 	const fs::path filename;
-	fs::path filenamebak;
+	const fs::path filenamebak;
 private:
+
+	fs::path make_backup_if_not_directory()
+	{
+		if (fs::is_directory(filename))
+			return {};
+		return fs::path{ filename }.concat(".bak");
+	}
 };
 
 test_file temporary_file();
@@ -69,7 +73,6 @@ public:
 	test_dir(const test_dir&) = delete;
 
 	const fs::path dirname;
-private:
 };
 
 test_dir temporary_directory();
