@@ -118,6 +118,7 @@ int main(int argc, const char* argv[])
 	}
 	catch (const std::exception& e)
 	{
+		should_print_newline = true;
 		pl() << "An error occurred: " << e.what();
 		pl() << "\nFor account: ";
 		if (parsed.account.empty())
@@ -245,7 +246,11 @@ void show_all_options(std::pair<const std::string, user_options>* user_ptr, cons
 std::pair<const std::string, user_options>& assume_account(std::pair<const std::string, user_options>* user)
 {
 	if (user == nullptr)
-		throw msync_exception("Could not find a match [or an unambiguous match].");
+		throw msync_exception("msync couldn't determine which account you wanted to use. This can happen because:"
+		"\n    - You have no accounts registered with msync. Run msync new --account username@instance.url to register one."
+		"\n    - You have more than one account registered with msync and didn't specify one with the --account flag."
+		"\n    - The prefix you gave to the --account flag could match more than one account."
+		"\nYou can see a list of accounts registered with msync by running msync config showall.");
 	return *user;
 }
 
