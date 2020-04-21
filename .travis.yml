@@ -57,7 +57,7 @@ script:
   # Basically, Travis will time out if it doesn't get any output for over ten minutes.
   # Usually, this is fine, but it causes problems because OSX produces binaries that
   # run much slower for some reason.
-  - travis_wait ctest --output-on-failure -j 2
+  - travis_wait ctest --output-on-failure --schedule-random -j 2
 
 after_success:
   - echo "Binary size:"
