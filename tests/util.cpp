@@ -36,6 +36,7 @@ SCENARIO("parse_account_name correctly parses account names into a username and 
 	{
 		const auto input = GENERATE(
 			std::make_tuple("GoddessGrace@goodchristian.website", "GoddessGrace", "goodchristian.website"),
+			std::make_tuple("@GoddessGrace@goodchristian.website", "GoddessGrace", "goodchristian.website"),
 			std::make_tuple("BestGirl102@good.time.website", "BestGirl102", "good.time.website"),
 			std::make_tuple("hey_its_m3@internet12.for.egg", "hey_its_m3", "internet12.for.egg"),
 			std::make_tuple("_@some-website.comb", "_", "some-website.comb"),
