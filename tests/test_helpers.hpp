@@ -72,5 +72,28 @@ public:
 	const fs::path filename;
 };
 
-test_file clean_account_directory();
+test_file temporary_file();
+
+struct test_dir
+{
+public:
+	test_dir(fs::path name) : dirname(std::move(name))
+	{
+		fs::remove_all(dirname);
+		fs::create_directories(dirname);
+	}
+
+	~test_dir()
+	{
+		fs::remove_all(dirname);
+	}
+
+	test_dir(const test_dir&) = delete;
+
+	const fs::path dirname;
+private:
+};
+
+
+test_dir temporary_directory();
 #endif

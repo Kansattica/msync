@@ -15,6 +15,7 @@
 #include "../lib/sync/recv.hpp"
 #include "../lib/net/net.hpp"
 #include "../lib/util/util.hpp"
+#include "../lib/accountdirectory/account_directory.hpp"
 #include "new_account.hpp"
 #include "optionparsing/parse_options.hpp"
 
@@ -27,6 +28,8 @@ void show_all_options(std::pair<const std::string, user_options>* user_ptr, cons
 
 void print_stringptr(const std::string* toprint);
 void print_sensitive(std::string_view name, const std::string* value);
+
+global_options& options();
 
 template <typename T>
 void print_iterable(const T& vec);
@@ -43,7 +46,7 @@ int main(int argc, const char* argv[])
 		switch (parsed.selected)
 		{
 		case mode::newuser:
-			make_new_account(parsed.account);
+			make_new_account(parsed.account, options());
 			break;
 		case mode::showopt:
 			print_stringptr(assume_account(parsed.account).second.try_get_option(parsed.toset));
@@ -69,16 +72,16 @@ int main(int argc, const char* argv[])
 			switch (parsed.queue_opt.to_do)
 			{
 			case queue_action::add:
-				enqueue(parsed.queue_opt.selected, assume_account(parsed.account).first, std::move(parsed.queue_opt.queued));
+				enqueue(parsed.queue_opt.selected, assume_account(parsed.account).second.get_user_directory(), std::move(parsed.queue_opt.queued));
 				break;
 			case queue_action::remove:
-				dequeue(parsed.queue_opt.selected, assume_account(parsed.account).first, std::move(parsed.queue_opt.queued));
+				dequeue(parsed.queue_opt.selected, assume_account(parsed.account).second.get_user_directory(), std::move(parsed.queue_opt.queued));
 				break;
 			case queue_action::clear:
-				clear(parsed.queue_opt.selected, assume_account(parsed.account).first);
+				clear(parsed.queue_opt.selected, assume_account(parsed.account).second.get_user_directory());
 				break;
 			case queue_action::print:
-				print_iterable(print(assume_account(parsed.account).first));
+				print_iterable(print(assume_account(parsed.account).second.get_user_directory()));
 				break;
 			}
 			break;
@@ -163,10 +166,10 @@ void do_sync(const parse_result& parsed)
 		if (user == nullptr)
 		{
 			options().foreach_account([&send](const auto& user) {
-				send.send(user.first, user.second.get_option(user_option::instance_url), user.second.get_option(user_option::access_token)); });
+				send.send(user.second.get_user_directory(), user.second.get_option(user_option::instance_url), user.second.get_option(user_option::access_token)); });
 		}
 		else
-			send.send(user->first, user->second.get_option(user_option::instance_url), user->second.get_option(user_option::access_token));
+			send.send(user->second.get_user_directory(), user->second.get_option(user_option::instance_url), user->second.get_option(user_option::access_token));
 	}
 
 	if (parsed.sync_opts.get)
@@ -179,10 +182,10 @@ void do_sync(const parse_result& parsed)
 		if (user == nullptr)
 		{
 			options().foreach_account([&recv](auto& user) {
-				recv.get(user.first, user.second); });
+				recv.get(user.second); });
 		}
 		else
-			recv.get(user->first, user->second);
+			recv.get(user->second);
 	}
 }
 
@@ -249,6 +252,12 @@ std::pair<const std::string, user_options>& assume_account(std::pair<const std::
 std::pair<const std::string, user_options>& assume_account(const std::string& account)
 {
 	return assume_account(options().select_account(account));
+}
+
+global_options& options()
+{
+	static global_options options{ account_directory_path() };
+	return options;
 }
 
 void print_stringptr(const std::string* toprint)

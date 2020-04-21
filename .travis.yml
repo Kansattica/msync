@@ -63,13 +63,10 @@ script:
   - $EXELOCATION version
   - $EXELOCATION yeehaw
   - $NETTESTLOCATION
-  - $TESTLOCATION ~[long_run]
-  # This one is usually fine, but the osx build will randomly time out on this one.
-  - travis_wait $TESTLOCATION [long_run_outgoingpost]
   # Basically, Travis will time out if it doesn't get any output for over ten minutes.
   # Usually, this is fine, but it causes problems because OSX produces binaries that
   # run much slower for some reason.
-  - travis_wait $TESTLOCATION [long_run_parseopts]
+  - travis_wait ctest --output-on-failure --schedule-random -j 2
 
 after_success:
   - echo "Binary size:"

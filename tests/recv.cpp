@@ -17,32 +17,9 @@
 #include <system_error>
 #include <tuple>
 
-// apple's stdlib is missing to_chars
-#if __APPLE__ && !defined(__cpp_lib_to_chars)
-#include <cstdio>
-#endif
+#include "to_chars_patch.hpp"
 
 using namespace std::string_view_literals;
-
-template <typename Number>
-std::string_view sv_to_chars(Number n, std::array<char, 10>& char_buf)
-{
-	// see https://en.cppreference.com/w/cpp/utility/to_chars
-	// this avoids an allocation compared to std::to_string
-
-	// note that this function takes a character buffer that it will clobber and returns a string view into it
-	// this is to avoid allocations and also not return pointers into memory that will be freed when the function returns.
-
-#if __APPLE__ && !defined(__cpp_lib_to_chars)
-	const int written = sprintf(char_buf.data(), "%u", n);
-	if (written > 10) { FAIL("You messed up with sprintf, ya dingus."); }
-	return std::string_view(char_buf.data(), written);
-#else
-	const auto [end, err] = std::to_chars(char_buf.data(), char_buf.data() + char_buf.size(), n);
-	if (err != std::errc()) { FAIL("You messed up with to_chars, ya dingus."); }
-	return std::string_view(char_buf.data(), end - char_buf.data());
-#endif
-}
 
 template <typename make_object>
 std::string make_json_array(make_object func, unsigned int min_id, unsigned int max_id)
@@ -216,14 +193,15 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 	static constexpr std::string_view expected_home_endpoint = "https://crime.egg/api/v1/timelines/home";
 	static constexpr std::string_view expected_access_token = "token!";
 
-	const test_file account_dir = clean_account_directory();
+	const test_dir account_dir = temporary_directory();
 
-	auto& account = options().add_new_account(std::string{ account_name });
+	global_options options{ account_dir.dirname };
 
-	const static auto user_dir = account_dir.filename / account.first;
-	const static auto home_timeline_file = user_dir / Home_Timeline_Filename;
-	const static auto notifications_file = user_dir / Notifications_Filename;
+	auto& account = options.add_new_account(std::string{ account_name });
 
+	const auto user_dir = account_dir.dirname / account.first;
+	const auto home_timeline_file = user_dir / Home_Timeline_Filename;
+	const auto notifications_file = user_dir / Notifications_Filename;
 
 	REQUIRE(account.first == account_name);
 
@@ -239,7 +217,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 		{
 			recv_posts post_getter{ mock_get };
 
-			post_getter.get(account.first, account.second);
+			post_getter.get(account.second);
 
 			THEN("Five calls each were made to the home and notification API endpoints with the correct URLs, default limits, and access tokens.")
 			{
@@ -274,7 +252,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 				mock_get.total_post_count += 10;
 				mock_get.total_notif_count += 15;
 
-				post_getter.get(account.first, account.second);
+				post_getter.get(account.second);
 
 				THEN("Only one call was made to each endpoint.")
 				{
@@ -318,7 +296,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 		{
 			recv_posts post_getter{ mock_get };
 
-			post_getter.get(account.first, account.second);
+			post_getter.get(account.second);
 
 			THEN("Calls to the notification API correctly include the excluded notif types.")
 			{
@@ -362,7 +340,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 				mock_get.total_post_count += 10;
 				mock_get.total_notif_count += 15;
 
-				post_getter.get(account.first, account.second);
+				post_getter.get(account.second);
 
 				THEN("Only one call was made to each endpoint.")
 				{
@@ -395,6 +373,4 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 			}
 		}
 	}
-
-	options().clear_accounts();
 }

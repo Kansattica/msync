@@ -8,12 +8,7 @@
 
 #include "../lib/constants/constants.hpp"
 
-#include "../accountdirectory/account_directory.hpp"
-
-test_file clean_account_directory()
-{
-	return test_file{ account_directory_path() };
-}
+#include "to_chars_patch.hpp"
 
 std::vector<std::string> read_lines(const fs::path& toread)
 {
@@ -70,6 +65,31 @@ int zero_to_n(int n)
 {
 	std::uniform_int_distribution<> dis(0, n);
 	return dis(gen);
+}
+
+// the .concat(to_string(random number)) guys exist so that we can use ctest to run tests in parallel.
+// All you have to do is ensure that no two processes are trying to use the same filenames.
+// the correct way to do this would probably be to get the process ID, but I'd have to do a bunch of platform-specific code for that.
+test_file temporary_file()
+{
+	static std::array<char, 10> buffer;
+	const static fs::path tempdir = (fs::temp_directory_path() / "msync_test_file_").concat(std::to_string(gen()));
+	static unsigned int filecount = 0;
+
+	std::string_view printed = sv_to_chars(filecount++, buffer);
+
+	return test_file{ fs::path {tempdir}.concat(printed.begin(), printed.end()) };
+}
+
+test_dir temporary_directory()
+{
+	const static fs::path tempdir = (fs::temp_directory_path() / "msync_test_dir_").concat(std::to_string(gen()));;
+	static unsigned int dircount = 0;
+	static std::array<char, 10> buffer;
+
+	std::string_view printed = sv_to_chars(dircount++, buffer);
+
+	return test_dir{ fs::path {tempdir}.concat(printed.begin(), printed.end()) };
 }
 
 void make_status_json(std::string_view id, std::string& to_append)

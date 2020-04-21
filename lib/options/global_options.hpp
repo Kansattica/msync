@@ -10,14 +10,15 @@
 #include <algorithm>
 #include <vector>
 
+#include <filesystem.hpp>
+
 struct global_options
 {
 public:
-	global_options();
+	global_options(fs::path accounts_dir);
 
 	std::pair<const std::string, user_options>& add_new_account(std::string name);
 	std::pair<const std::string, user_options>* select_account(std::string_view name);
-	void clear_accounts();
 	std::vector<std::string_view> all_accounts() const;
 
 	template <typename Callable>
@@ -27,7 +28,6 @@ public:
 	}
 private:
 	std::vector<std::pair<const std::string, user_options>> accounts;
+	const fs::path accounts_directory;
 };
-
-global_options& options();
 #endif

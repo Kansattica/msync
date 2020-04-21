@@ -15,7 +15,7 @@ SCENARIO("queue_lists save their data when destroyed.")
 {
 	GIVEN("An queue_list with some values.")
 	{
-		const test_file tf("testfileopt");
+		const test_file tf = temporary_file();
 
 		queue_list opts(tf.filename);
 		opts.parsed.push_back(api_call{ api_route::fav, "thingone" });
@@ -94,7 +94,7 @@ SCENARIO("queue_lists read data when created.")
 {
 	GIVEN("An queue_list on disk with some data.")
 	{
-		const test_file tf("testfileoptread");
+		const test_file tf = temporary_file();
 
 		{
 			std::ofstream fout(tf);
@@ -156,7 +156,7 @@ SCENARIO("queue_lists read data when created.")
 
 	GIVEN("An queue_list on disk with some data and some stuff to skip.")
 	{
-		const test_file tf("testfileoptread");
+		const test_file tf = temporary_file();
 
 		{
 			std::ofstream fout(tf);
@@ -229,7 +229,7 @@ SCENARIO("queue_list can handle a long queue with a lot of items.")
 
 	GIVEN("A bunch of API calls to enqueue and an empty queue_list.")
 	{
-		test_file queuefile{ "somequeuefile" };
+		test_file queuefile = temporary_file();
 
 		std::vector<api_call> expected;
 		expected.reserve(size);

@@ -32,11 +32,11 @@ public:
 
 	send_posts(post_request& post, delete_request& del, post_new_status& new_status, upload_attachments& upload) : post(post), del(del), new_status(new_status), upload(upload) { }
 
-	void send(const std::string& account, const std::string_view instance_url, const std::string_view access_token)
+	void send(const fs::path& user_account_dir, const std::string_view instance_url, const std::string_view access_token)
 	{
 		retries = set_default(retries, 3, "Number of retries cannot be zero or less. Resetting to 3.\n", pl());
 
-		process_queue(account, instance_url, access_token);
+		process_queue(user_account_dir, instance_url, access_token);
 	}
 
 
@@ -46,7 +46,7 @@ private:
 	post_new_status& new_status;
 	upload_attachments& upload;
 
-	bool make_api_call(const api_call& to_make, deferred_url_builder& urls, const std::string& account, std::string_view access_token)
+	bool make_api_call(const api_call& to_make, deferred_url_builder& urls, const fs::path& user_account_dir, std::string_view access_token)
 	{
 		switch (to_make.queued_call)
 		{
@@ -57,7 +57,7 @@ private:
 			return simple_call(post, "POST", retries, paramaterize_url(urls.status_url(), to_make.argument, ROUTE_LOOKUP[static_cast<uint8_t>(to_make.queued_call)]), access_token);
 		case api_route::post:
 			// posts are a little trickier
-			return send_post(account, access_token, urls.status_url(), urls.media_url(), to_make.argument);
+			return send_post(user_account_dir, access_token, urls.status_url(), urls.media_url(), to_make.argument);
 		case api_route::unpost:
 			return simple_call(del, "DELETE", retries, paramaterize_url(urls.status_url(), to_make.argument, ROUTE_LOOKUP[static_cast<uint8_t>(to_make.queued_call)]), access_token);
 		default:
@@ -65,9 +65,9 @@ private:
 		}
 	}
 
-	void process_queue(const std::string& account, const std::string_view instance_url, const std::string_view access_token)
+	void process_queue(const fs::path& user_account_dir, const std::string_view instance_url, const std::string_view access_token)
 	{
-		auto queuelist = get(account);
+		auto queuelist = get(user_account_dir);
 
 		std::deque<api_call> failed;
 
@@ -75,7 +75,7 @@ private:
 
 		while (!queuelist.parsed.empty())
 		{
-			if (!make_api_call(queuelist.parsed.front(), urls, account, access_token))
+			if (!make_api_call(queuelist.parsed.front(), urls, user_account_dir, access_token))
 				failed.push_back(std::move(queuelist.parsed.front()));
 			queuelist.parsed.pop_front();
 		}
@@ -116,21 +116,9 @@ private:
 		return true;
 	}
 
-	const fs::path& get_cached_file_queue_dir(const std::string& account)
+	bool send_post(const fs::path& user_account_dir, const std::string_view access_token, const std::string& statusurl, const std::string& mediaurl, const std::string& post_filename)
 	{
-		static std::unordered_map<std::string_view, fs::path> file_queue_dir_cache;
-
-		auto found = file_queue_dir_cache.find(account);
-
-		if (found != file_queue_dir_cache.end())
-			return found->second;
-
-		return (file_queue_dir_cache.insert({ account, get_file_queue_directory(account) })).first->second;
-	}
-
-	bool send_post(const std::string& account, const std::string_view access_token, const std::string& statusurl, const std::string& mediaurl, const std::string& post_filename)
-	{
-		const fs::path file_to_send = get_cached_file_queue_dir(account) / post_filename;
+		const fs::path file_to_send = user_account_dir / File_Queue_Directory / post_filename;
 
 		file_status_params params = read_params(file_to_send);
 
