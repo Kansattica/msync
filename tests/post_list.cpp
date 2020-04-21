@@ -304,7 +304,7 @@ SCENARIO("post_list correctly serializes lists of statuses.")
 			status_test_case{ unexpired_poll, expected_unexpired_poll }
 		};
 
-		test_file fi = temporary_file();
+		const test_file fi = temporary_file();
 		WHEN("one status is written to a post_list and destroyed")
 		{
 			const auto& test_post = GENERATE_REF(from_range(statuses));
@@ -467,7 +467,7 @@ SCENARIO("post_list correctly serializes lists of notifications.")
 			notif_test_case{ poll, expected_poll, expected_expired_poll },
 		};
 
-		test_file fi = temporary_file();
+		const test_file fi = temporary_file();
 
 		WHEN("One of the notifications is serialized with post_list")
 		{

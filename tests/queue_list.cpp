@@ -229,7 +229,7 @@ SCENARIO("queue_list can handle a long queue with a lot of items.")
 
 	GIVEN("A bunch of API calls to enqueue and an empty queue_list.")
 	{
-		test_file queuefile = temporary_file();
+		const test_file queuefile = temporary_file();
 
 		std::vector<api_call> expected;
 		expected.reserve(size);

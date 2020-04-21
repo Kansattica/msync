@@ -72,6 +72,5 @@ public:
 private:
 };
 
-
 test_dir temporary_directory();
 #endif
