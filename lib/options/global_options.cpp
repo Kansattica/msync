@@ -54,8 +54,10 @@ std::pair<const std::string, user_options>& global_options::add_new_account(std:
 	return accounts.emplace_back(std::move(name), user_options{ std::move(user_path) });
 }
 
-std::pair<const std::string, user_options>* global_options::select_account(std::string_view name)
+select_account_result global_options::select_account(std::string_view name)
 {
+	if (accounts.empty()) { return select_account_error::no_accounts; }
+
 	if (!name.empty() && name.front() == '@') { name.remove_prefix(1); } //remove leading @s
 
 	std::pair<const std::string, user_options>* candidate = nullptr;
@@ -77,13 +79,19 @@ std::pair<const std::string, user_options>* global_options::select_account(std::
 			plverb() << "Matched account " << entry.first << '\n';
 
 			// if this is the second candidate we've found, it's ambiguous and return nothing
-			if (candidate != nullptr) { return nullptr; }
+			if (candidate != nullptr)
+			{
+				if (name.empty()) { return select_account_error::empty_name_many_accounts; }
+				pl() << name << " could match either " << candidate->first << " or " << entry.first << ". Please specify an unambiguous prefix.\n";
+				return select_account_error::ambiguous_prefix;
+			}
 
 			candidate = &entry;
 		}
 	}
 	
 	// nullptr if we found nothing, points to the account entry if we found exactly one candidate
+	if (candidate == nullptr) { return select_account_error::bad_prefix; }
 	return candidate;
 }
 
