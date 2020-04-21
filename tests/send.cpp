@@ -399,7 +399,7 @@ public:
 	touch_file(const char* name) : touch_file(fs::path(name)) {};
 	touch_file(fs::path name) : filename(std::move(name))
 	{
-		touch(filename);
+		std::ofstream of(filename.c_str(), std::ios::out | std::ios::app);
 	};
 
 	~touch_file()

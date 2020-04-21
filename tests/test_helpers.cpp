@@ -38,11 +38,6 @@ size_t count_files_in_directory(const fs::path& tocheck)
 	return count;
 }
 
-void touch(const fs::path& totouch)
-{
-	std::ofstream of(totouch.c_str(), std::ios::out | std::ios::app);
-}
-
 std::string read_file(const fs::path& file)
 {
 	std::ifstream fi(file.c_str(), std::ios::ate | std::ios::in);

@@ -9,7 +9,6 @@
 
 std::vector<std::string> read_lines(const fs::path& toread);
 size_t count_files_in_directory(const fs::path& tocheck);
-void touch(const fs::path& totouch);
 std::string read_file(const fs::path& file);
 
 void make_status_json(std::string_view id, std::string& to_append);
