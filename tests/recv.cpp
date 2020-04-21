@@ -205,6 +205,8 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 
 	REQUIRE(account.first == account_name);
 
+	REQUIRE(account.second.get_user_directory().filename().string() == account_name);
+
 	account.second.set_option(user_option::account_name, "user");
 	account.second.set_option(user_option::instance_url, "crime.egg");
 	account.second.set_option(user_option::access_token, "token!");

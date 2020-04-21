@@ -42,9 +42,10 @@ public:
 
 		exclude_notif_types = make_excludes(account);
 
-		// We want the last segment of the path. std::filesystem doesn't provide a function for this (filename doesn't work because this is a directory, stem lops off everything after the last .
-		// so, get an iterator to past-the-end, back it up one, then get the string version of it.
-		const std::string account_name = (--account.get_user_directory().end())->string();
+		// note that this only works because the .parent_path() call that populates get_user_directory() omits the trailing slash
+		// otherwise, .filename() would get nothing.
+		const std::string account_name = account.get_user_directory().filename().string();
+
 		pl() << "Downloading notifications for " << account_name << '\n';
 		update_timeline<to_get::notifications, mastodon_notification, true>(account, account.get_user_directory(), clamp_or_default(per_call, 30));
 
