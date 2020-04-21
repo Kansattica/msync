@@ -276,14 +276,10 @@ void print_stringptr(const std::string* toprint)
 template <typename T>
 void print_iterable(const T& vec)
 {
-	bool minushelp = false;
 	for (const auto& item : vec)
 	{
 		pl() << item << '\n';
-		minushelp = minushelp || (item.back() == '-');
 	}
-	if (minushelp)
-		pl() << "IDs followed by a - will be deleted next time you sync.\n";
 }
 
 void print_sensitive(std::string_view name, const std::string* value)
