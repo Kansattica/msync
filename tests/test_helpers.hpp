@@ -51,27 +51,6 @@ public:
 private:
 };
 
-//ensures a file only exists during each test run
-struct touch_file
-{
-public:
-	touch_file(const char* name) : touch_file(fs::path(name)) {};
-	touch_file(std::string_view name) : touch_file(fs::path(name.begin(), name.end())) {};
-	touch_file(fs::path name) : filename(std::move(name))
-	{
-		if (!fs::exists(filename))
-			touch(filename);
-	};
-
-	~touch_file()
-	{
-		fs::remove(filename);
-	};
-
-	operator const fs::path::value_type* () const { return filename.c_str(); }
-	const fs::path filename;
-};
-
 test_file temporary_file();
 
 struct test_dir

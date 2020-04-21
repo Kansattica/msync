@@ -392,6 +392,24 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 	}
 }
 
+//ensures a file only exists during each test run
+struct touch_file
+{
+public:
+	touch_file(const char* name) : touch_file(fs::path(name)) {};
+	touch_file(fs::path name) : filename(std::move(name))
+	{
+		touch(filename);
+	};
+
+	~touch_file()
+	{
+		fs::remove(filename);
+	};
+
+	const fs::path filename;
+};
+
 SCENARIO("Send correctly sends new posts and deletes existing ones.")
 {
 	logs_off = true;
