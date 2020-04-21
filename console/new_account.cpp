@@ -22,7 +22,7 @@ constexpr auto redirect_uri = "urn:ietf:wg:oauth:2.0:oob";
 std::string make_clean_accountname(std::string username, const std::string& instance)
 {
 	username.reserve(username.size() + instance.size() + 1);
-	return username.append('@', 1).append(instance);
+	return username.append(1, '@').append(instance);
 }
 
 void make_new_account(const std::string& accountname, global_options& options)
