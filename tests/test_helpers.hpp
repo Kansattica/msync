@@ -73,5 +73,27 @@ public:
 };
 
 test_file temporary_file();
-test_file temporary_directory();
+
+struct test_dir
+{
+public:
+	test_dir(fs::path name) : dirname(std::move(name))
+	{
+		fs::remove_all(dirname);
+		fs::create_directories(dirname);
+	}
+
+	~test_dir()
+	{
+		fs::remove_all(dirname);
+	}
+
+	test_dir(const test_dir&) = delete;
+
+	const fs::path dirname;
+private:
+};
+
+
+test_dir temporary_directory();
 #endif

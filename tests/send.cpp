@@ -149,8 +149,8 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 {
 	logs_off = true;
 
-	const test_file fi = temporary_directory();
-	const fs::path account = fi.filename / "someguy@cool.account";
+	const test_dir testdir = temporary_directory();
+	const fs::path account = testdir.dirname / "someguy@cool.account";
 	fs::create_directory(account); //enqueue expects this directory to exist already
 
 	constexpr std::string_view instanceurl = "cool.account";
@@ -395,16 +395,16 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 SCENARIO("Send correctly sends new posts and deletes existing ones.")
 {
 	logs_off = true;
-	const test_file fi = temporary_directory();
+	const test_dir dir = temporary_directory();
 
-	const fs::path account = fi.filename / "someguy@cool.account";
-	fs::create_directory(account);
+	const fs::path account = dir.dirname / "someguy@cool.account";
 
 	constexpr std::string_view instanceurl = "cool.account";
 	constexpr std::string_view accesstoken = "sometoken";
 	constexpr std::string_view new_post_url = "https://cool.account/api/v1/statuses";
 
-	const static fs::path queue_directory = account / File_Queue_Directory;
+	const fs::path queue_directory = account / File_Queue_Directory;
+	fs::create_directories(queue_directory);
 
 	GIVEN("A queue with some post filenames to send.")
 	{
@@ -850,8 +850,9 @@ SCENARIO("Send correctly sends from and modifies a queue of mixed API calls.")
 {
 	logs_off = true;
 
-	const test_file fi = temporary_directory();
-	const fs::path account = fi.filename / "prettynormal@website.egg";
+	const test_dir dir = temporary_directory();
+	const fs::path account = dir.dirname / "prettynormal@website.egg";
+	fs::create_directory(account);
 	constexpr std::string_view instanceurl = "website.egg";
 	constexpr std::string_view accesstoken = "someothertoken";
 

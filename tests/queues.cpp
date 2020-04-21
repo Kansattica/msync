@@ -24,12 +24,12 @@ bool prefix_match(std::string_view actual, std::string_view prefix, std::string_
 SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 {
 	logs_off = true;
-	static const std::string account = "regularguy@internet.egg";
+	const test_dir allaccounts = temporary_directory();
+	const fs::path account = allaccounts.dirname / "regularguy@internet.egg";
+	fs::create_directory(account);
 	GIVEN("An empty queue")
 	{
-		const test_file allaccounts = temporary_directory();
-		fs::create_directory(allaccounts.filename / account);
-		const fs::path queue_file = allaccounts.filename / account / Queue_Filename;
+		const fs::path queue_file = account / Queue_Filename;
 
 		WHEN("some items are enqueued")
 		{
@@ -143,8 +143,8 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 {
 	logs_off = true; //shut up the printlogger
 
-	test_file allaccounts = temporary_directory(); //make sure this gets cleaned up, too
-	const fs::path accountdir = allaccounts.filename / "queueboy@website.egg";
+	const test_dir allaccounts = temporary_directory();
+	const fs::path accountdir = allaccounts.dirname / "queueboy@website.egg";
 
 	const fs::path file_queue_dir = accountdir / File_Queue_Directory;
 	const fs::path post_queue_file = accountdir/ Queue_Filename;
@@ -469,8 +469,9 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 SCENARIO("Queues can handle a mix of different queued calls.")
 {
-	test_file allaccounts = temporary_directory();
-	const fs::path accountdir = allaccounts.filename / "funnybone@typical.egg";
+	const test_dir allaccounts = temporary_directory();
+	const fs::path accountdir = allaccounts.dirname / "funnybone@typical.egg";
+	fs::create_directory(accountdir);
 
 	const fs::path file_queue_dir = accountdir / File_Queue_Directory;
 	const fs::path queue_file = accountdir / Queue_Filename;

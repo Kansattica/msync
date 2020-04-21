@@ -367,13 +367,17 @@ SCENARIO("The boolean overload for get_option works.")
 
 SCENARIO("user_options correctly reports the directory it's in.")
 {
-	GIVEN("A user_options for some file.")
+	GIVEN("A user_options for some file is created and destroyed.")
 	{
 		test_file fi = temporary_file();
-		user_options opts{ fi.filename };
 
-		WHEN("get_user_directory is taken.")
+		{ // gotta make sure that file gets made
+			user_options opts{ fi.filename };
+		}
+
+		WHEN("get_user_directory is taken from a new user_options.")
 		{
+			user_options opts{ fi.filename };
 			const auto& userdir = opts.get_user_directory();
 
 			THEN("The directory exists.")

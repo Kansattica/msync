@@ -11,14 +11,14 @@ using namespace std::string_view_literals;
 SCENARIO("add_new_account correctly handles input.")
 {
 	logs_off = true;
-	const test_file acc = temporary_directory();
+	const test_dir acc = temporary_directory();
 	GIVEN("A global_options object")
 	{
-		global_options opts{ acc.filename };
+		global_options opts{ acc.dirname };
 
 		WHEN("add_new_account is called on it with a valid username")
 		{
-			fs::path userfile{ acc.filename };
+			fs::path userfile{ acc.dirname };
 			userfile /= "coolguy@website.com";
 			userfile /= User_Options_Filename;
 
@@ -26,15 +26,15 @@ SCENARIO("add_new_account correctly handles input.")
 
 			THEN("the accounts directory is created.")
 			{
-				REQUIRE(fs::exists(acc.filename));
-				REQUIRE(fs::is_directory(acc.filename));
+				REQUIRE(fs::exists(acc.dirname));
+				REQUIRE(fs::is_directory(acc.dirname));
 			}
 
 			//Windows doesn't respect filesystem permissions in the same way.
 #ifdef __linux__
 			THEN("the accounts directory has the proper permissions.")
 			{
-				REQUIRE(fs::status(acc.filename).permissions() == fs::perms::owner_all);
+				REQUIRE(fs::status(acc.dirname).permissions() == fs::perms::owner_all);
 			}
 #endif
 
@@ -84,11 +84,11 @@ SCENARIO("add_new_account correctly handles input.")
 
 SCENARIO("read_accounts correctly fills global_options on construction.")
 {
-	const test_file acc = temporary_directory();
+	const test_dir acc = temporary_directory();
 	GIVEN("A global_options with some values added to it, destroyed, and then a new one created.")
 	{
 		{
-			global_options opt{ acc.filename };
+			global_options opt{ acc.dirname };
 
 			auto& added = opt.add_new_account("coolaccount@website.com");
 			REQUIRE(added.first == "coolaccount@website.com");
@@ -100,7 +100,7 @@ SCENARIO("read_accounts correctly fills global_options on construction.")
 			alsoadded.second.set_option(user_option::instance_url, "wedsize.egg");
 		}
 
-		global_options opt{ acc.filename };
+		global_options opt{ acc.dirname };
 
 		WHEN("a given account is looked up")
 		{
@@ -161,10 +161,10 @@ SCENARIO("read_accounts correctly fills global_options on construction.")
 
 SCENARIO("select_account selects exactly one account.")
 {
-	const test_file acc = temporary_directory();
+	const test_dir acc = temporary_directory();
 	GIVEN("An empty accounts unordered_map")
 	{
-		global_options options{ acc.filename };
+		global_options options{ acc.dirname };
 
 		WHEN("select_account is given an empty string to search on")
 		{
@@ -200,9 +200,9 @@ SCENARIO("select_account selects exactly one account.")
 
 	GIVEN("A global_options with one account")
 	{
-		const test_file fi = acc.filename / "someaccount@website.com";
+		const test_file fi = acc.dirname / "someaccount@website.com";
 
-		global_options options{ acc.filename };
+		global_options options{ acc.dirname };
 		options.add_new_account("someaccount@website.com");
 
 		WHEN("select_account is given an empty string to search on")
@@ -272,10 +272,10 @@ SCENARIO("select_account selects exactly one account.")
 
 	GIVEN("An global_options with two accounts")
 	{
-		const test_file fi = acc.filename / "someaccount@website.com";
-		const test_file anotherfi = acc.filename / "someotheraccount@place2.egg";
+		const test_file fi = acc.dirname / "someaccount@website.com";
+		const test_file anotherfi = acc.dirname / "someotheraccount@place2.egg";
 
-		global_options options{ acc.filename };
+		global_options options{ acc.dirname };
 
 		for (const auto& accountname : { "someaccount@website.com", "someotheraccount@place2.egg" })
 		{

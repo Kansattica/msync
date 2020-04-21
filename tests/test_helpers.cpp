@@ -78,7 +78,7 @@ test_file temporary_file()
 	return test_file{ fs::path {tempdir}.concat(printed.begin(), printed.end()) };
 }
 
-test_file temporary_directory()
+test_dir temporary_directory()
 {
 	const static fs::path tempdir = fs::temp_directory_path() / "msync_test_dir_";
 	static unsigned int dircount = 0;
@@ -86,10 +86,7 @@ test_file temporary_directory()
 
 	std::string_view printed = sv_to_chars(dircount++, buffer);
 
-	auto fi = test_file{ fs::path {tempdir}.concat(printed.begin(), printed.end()) };
-	fs::create_directory(fi.filename);
-	return fi;
-
+	return test_dir{ fs::path {tempdir}.concat(printed.begin(), printed.end()) };
 }
 
 void make_status_json(std::string_view id, std::string& to_append)
