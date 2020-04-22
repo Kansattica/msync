@@ -16,10 +16,11 @@ constexpr auto scopes = "write:favourites write:media write:statuses read:notifi
 constexpr auto urlscopes = "write:favourites%20write:media%20write:statuses%20read:notifications%20read:statuses";
 constexpr auto redirect_uri = "urn:ietf:wg:oauth:2.0:oob";
 
-std::string make_clean_accountname(std::string username, const std::string& instance)
+std::string make_clean_accountname(const std::string& username, const std::string& instance)
 {
-	username.reserve(username.size() + instance.size() + 1);
-	return username.append(1, '@').append(instance);
+	std::string to_return;
+	to_return.reserve(username.size() + instance.size() + 1);
+	return to_return.append(username).append(1, '@').append(instance);
 }
 
 void make_new_account(const std::string& accountname, global_options& options)
