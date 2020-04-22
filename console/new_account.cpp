@@ -27,9 +27,9 @@ std::string make_clean_accountname(std::string username, const std::string& inst
 
 void make_new_account(const std::string& accountname, global_options& options)
 {
-	auto useraccountresult = std::get_if<0>(&options.select_account(accountname));
+	auto useraccountresult = options.select_account(accountname);
 
-	auto useraccountpair = useraccountresult == nullptr ? nullptr : *useraccountresult;
+	auto useraccountpair = useraccountresult.index() == 0 ? std::get<0>(useraccountresult) : nullptr;
 
 	// see: https://docs.joinmastodon.org/api/authentication/
 
