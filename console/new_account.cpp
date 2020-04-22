@@ -34,7 +34,7 @@ void make_new_account(const std::string& accountname, global_options& options)
 	// if no user was found, make a new one
 	if (useraccountpair == nullptr)
 	{
-		pl() << "Creating new account for " << accountname << "\n";
+		pl() << "Creating new account for " << accountname << '\n';
 		const auto parsed = parse_account_name(accountname);
 		if (!parsed.has_value())
 		{
@@ -90,14 +90,14 @@ void make_new_account(const std::string& accountname, global_options& options)
 	{
 		const auto& foundaccountname = useraccount.get_option(user_option::account_name);
 		pl() << "Please open this URL in your browser:\n"
-		   << "https://" << instanceurl << "/oauth/authorize?response_type=code&client_id=" << *client_id
-		   << "&redirect_uri=" << redirect_uri << "&scope=" << urlscopes << '\n'
-		   << "Enter your authorization code like so:\n"
-		   << "msync config auth_code <the authorization code from the site> -a " << foundaccountname << '@' << instanceurl << '\n'
-		   << "then run this again:\n"
-		   << "msync new -a " << foundaccountname << '@' << instanceurl << '\n'
-		   << "You can shorten the username part, as long as msync can figure out which registered account you're talking about.\n"
-		   << "If this is your only account, you can leave the -a part off altogether.\n";
+		   "https://" << instanceurl << "/oauth/authorize?response_type=code&client_id=" << *client_id
+		   << "&redirect_uri=" << redirect_uri << "&scope=" << urlscopes << "\n"
+		   "Enter your authorization code like so:\n"
+		   "msync config auth_code <the authorization code from the site> --account " << foundaccountname << '@' << instanceurl << "\n"
+		   "then run this again:\n"
+		   "msync new -a " << foundaccountname << '@' << instanceurl << "\n"
+		   "You can shorten the username part, as long as msync can figure out which registered account you're talking about.\n"
+		   "If this is your only account, you can leave the -a part off altogether.\n";
 		return;
 	}
 
@@ -118,13 +118,13 @@ void make_new_account(const std::string& accountname, global_options& options)
 	{
 		const auto foundaccountname = *useraccount.try_get_option(user_option::account_name);
 		pl() << "Could not get access token from server. Authorization codes can only be used once, so it's been deleted and you should get another one.\n"
-		   << "Please open this URL in your browser:\n"
-		   << "https://" << instanceurl << "/oauth/authorize?response_type=code&client_id=" << *client_id
-		   << "&redirect_uri=" << redirect_uri << "&scope=" << urlscopes << '\n'
-		   << "Enter your authorization code like so:\n"
-		   << "msync config authcode <the authorization code from the site> -a " << foundaccountname << '@' << instanceurl << '\n'
-		   << "then run this again:\n"
-		   << "msync new -a " << foundaccountname << '@' << instanceurl << '\n';
+		   "Please open this URL in your browser:\n"
+		   "https://" << instanceurl << "/oauth/authorize?response_type=code&client_id=" << *client_id
+		   << "&redirect_uri=" << redirect_uri << "&scope=" << urlscopes << "\n"
+		   "Enter your authorization code like so:\n"
+		   "msync config authcode <the authorization code from the site> -a " << foundaccountname << '@' << instanceurl << "\n"
+		   "then run this again:\n"
+		   "msync new -a " << foundaccountname << '@' << instanceurl << '\n';
 		return;
 	}
 
