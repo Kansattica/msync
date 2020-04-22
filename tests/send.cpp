@@ -14,6 +14,7 @@
 #include <string>
 #include <utility>
 #include <algorithm>
+#include <initializer_list>
 #include <print_logger.hpp>
 
 struct id_mock_args : public basic_mock_args
@@ -410,6 +411,20 @@ public:
 	const fs::path filename;
 };
 
+int unique_idempotency_keys(std::initializer_list<uint64_t> keys)
+{
+	int number_of_tests = 0;
+	for (auto first = keys.begin(); first != keys.end(); ++first)
+	{
+		for (auto next = first + 1; next != keys.end(); ++next)
+		{
+			REQUIRE(*first != *next);
+			++number_of_tests;
+		}
+	}
+	return number_of_tests;
+}
+
 SCENARIO("Send correctly sends new posts and deletes existing ones.")
 {
 	logs_off = true;
@@ -536,6 +551,8 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 				REQUIRE(fourth.params.content_warning.empty());
 				REQUIRE(fourth.params.reply_to == "777777");
 				REQUIRE(fourth.params.visibility == "unlisted");
+
+				REQUIRE(6 == unique_idempotency_keys({ first.params.idempotency_key, second.params.idempotency_key, third.params.idempotency_key, fourth.params.idempotency_key }));
 			}
 
 
@@ -627,8 +644,9 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 				REQUIRE(fourth.params.content_warning.empty());
 				REQUIRE(fourth.params.reply_to == "777777");
 				REQUIRE(fourth.params.visibility == "unlisted");
-			}
 
+				REQUIRE(3 == unique_idempotency_keys({ first.params.idempotency_key, second.params.idempotency_key, fourth.params.idempotency_key }));
+			}
 
 			THEN("the uploads are as expected.")
 			{
@@ -778,6 +796,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 			{
 				size_t idx = 0;
 
+				auto expected_idempotency_key = mocknew.arguments[idx].params.idempotency_key;
 				for (size_t i = 0; i < retries.second; i++)
 				{
 					const auto& first = mocknew.arguments[idx++];
@@ -786,11 +805,18 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 					REQUIRE(first.params.content_warning.empty());
 					REQUIRE(first.params.reply_to.empty());
 					REQUIRE(first.params.visibility.empty());
+
+					// their idempotency keys should all be the same for each unique post
+					REQUIRE(first.params.idempotency_key == expected_idempotency_key);
 				}
 
 				// the other replies will be to the last ID for this post
 				// since that's the one that actually went through
 				std::string reply_to_id = mocknew.arguments[idx - 1].id;
+
+				// keys should be different between posts
+				REQUIRE(expected_idempotency_key != mocknew.arguments[idx].params.idempotency_key);
+				expected_idempotency_key = mocknew.arguments[idx].params.idempotency_key;
 
 				for (size_t i = 0; i < retries.second; i++)
 				{
@@ -799,6 +825,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 					REQUIRE(second.params.body == "This one has a body, too.");
 					REQUIRE(second.params.content_warning == "And a content warning.");
 					REQUIRE(second.params.visibility == "private");
+					REQUIRE(second.params.idempotency_key == expected_idempotency_key);
 
 					// test that posts are threaded correctly
 					REQUIRE(second.params.reply_to == reply_to_id);
@@ -806,6 +833,9 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 
 				// do it again because third is a reply to second
 				reply_to_id = mocknew.arguments[idx - 1].id;
+
+				REQUIRE(expected_idempotency_key != mocknew.arguments[idx].params.idempotency_key);
+				expected_idempotency_key = mocknew.arguments[idx].params.idempotency_key;
 
 				for (size_t i = 0; i < retries.second; i++)
 				{
@@ -815,7 +845,11 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 					REQUIRE(third.params.content_warning.empty());
 					REQUIRE(third.params.visibility == "direct");
 					REQUIRE(third.params.reply_to == reply_to_id);
+					REQUIRE(third.params.idempotency_key == expected_idempotency_key);
 				}
+
+				REQUIRE(expected_idempotency_key != mocknew.arguments[idx].params.idempotency_key);
+				expected_idempotency_key = mocknew.arguments[idx].params.idempotency_key;
 
 				for (size_t i = 0; i < retries.second; i++)
 				{
@@ -825,6 +859,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 					REQUIRE(fourth.params.content_warning.empty());
 					REQUIRE(fourth.params.reply_to == "777777");
 					REQUIRE(fourth.params.visibility == "unlisted");
+					REQUIRE(fourth.params.idempotency_key == expected_idempotency_key);
 				}
 			}
 
