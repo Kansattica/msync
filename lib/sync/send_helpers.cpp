@@ -19,7 +19,7 @@ std::mt19937_64 make_random_engine()
 	return std::mt19937_64(rd());
 }
 
-uint64_t random_number()
+uint_fast64_t random_number()
 {
 	static auto twister = make_random_engine();
 	return twister();

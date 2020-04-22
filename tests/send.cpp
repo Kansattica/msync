@@ -411,7 +411,7 @@ public:
 	const fs::path filename;
 };
 
-int unique_idempotency_keys(std::initializer_list<uint64_t> keys)
+int unique_idempotency_keys(std::initializer_list<uint_fast64_t> keys)
 {
 	int number_of_tests = 0;
 	for (auto first = keys.begin(); first != keys.end(); ++first)
