@@ -151,7 +151,7 @@ void do_sync(const parse_result& parsed)
 				});
 			return;
 		}
-		else if (error != select_account_error::no_accounts)
+		else if (error != select_account_error::empty_name_many_accounts) //this one just means "sync all"
 		{
 			// let assume_account print the error message
 			// (it throws if the error is set)
@@ -217,6 +217,7 @@ void show_all_options(select_account_result user_result, const parse_result& par
 	}
 
 	const auto& user = assume_account(user_result);
+	pl() << "\nSettings for " << user.first << ":\n";
 	for (auto opt = user_option(0); opt <= user_option::pull_notifications; opt = user_option(static_cast<int>(opt) + 1))
 	{
 		const auto option_name = USER_OPTION_NAMES[static_cast<int>(opt)];
