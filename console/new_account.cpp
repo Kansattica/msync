@@ -34,7 +34,7 @@ void make_new_account(const std::string& accountname, global_options& options)
 	// if no user was found, make a new one
 	if (useraccountpair == nullptr)
 	{
-		pl() << "Creating new account for " << accountname << '\n';
+		pl() << "Creating new account for " << accountname << ".\n";
 		const auto parsed = parse_account_name(accountname);
 		if (!parsed.has_value())
 		{
@@ -61,14 +61,14 @@ void make_new_account(const std::string& accountname, global_options& options)
 	const auto& instanceurl = useraccount.get_option(user_option::instance_url);
 	if (client_id == nullptr || client_secret == nullptr)
 	{
-		pl() << "Registering app with " << instanceurl << '\n';
+		pl() << "Registering app with " << instanceurl << ".\n";
 		const auto r = cpr::Post(cpr::Url{make_api_url(instanceurl, "/api/v1/apps")},
 						   cpr::Parameters{{"client_name", "msync"}, {"redirect_uris", redirect_uri}, {"scopes", scopes}, {"website", "https://github.com/kansattica/msync"}});
 
 		if (r.error)
 		{
-			pl() << "Could not register app with server. Responded with error code " << r.status_code << ": " << r.error.message << '\n';
-			pl() << "Please try again.\n";
+			pl() << "Could not register app with server. Responded with error code " << r.status_code << ": " << r.error.message << ".\n"
+			"Please double check your instance URL, ensure you're connected to the internet, and try again.";
 			return;
 		}
 
@@ -97,14 +97,14 @@ void make_new_account(const std::string& accountname, global_options& options)
 		   "then run this again:\n"
 		   "msync new -a " << foundaccountname << '@' << instanceurl << "\n"
 		   "You can shorten the username part, as long as msync can figure out which registered account you're talking about.\n"
-		   "If this is your only account, you can leave the -a part off altogether.\n";
+		   "If this is your only account, you can leave the -a part off altogether.";
 		return;
 	}
 
 	const auto access_token = useraccount.try_get_option(user_option::access_token);
 	if (access_token != nullptr)
 	{
-		pl() << "Your account is already registered! You're done!\n";
+		pl() << "Your account is already registered! You're done!";
 		return;
 	}
 
@@ -124,7 +124,7 @@ void make_new_account(const std::string& accountname, global_options& options)
 		   "Enter your authorization code like so:\n"
 		   "msync config authcode <the authorization code from the site> -a " << foundaccountname << '@' << instanceurl << "\n"
 		   "then run this again:\n"
-		   "msync new -a " << foundaccountname << '@' << instanceurl << '\n';
+		   "msync new -a " << foundaccountname << '@' << instanceurl;
 		return;
 	}
 
