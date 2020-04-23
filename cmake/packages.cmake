@@ -3,17 +3,16 @@ include(FetchContent)
 message(STATUS "Downloading nlohmann json...")
 FetchContent_Declare(
 	njson
-	GIT_REPOSITORY https://github.com/nlohmann/json.git
-	GIT_TAG		   v3.7.3
-	GIT_SHALLOW	   TRUE
+	URL https://github.com/nlohmann/json/releases/download/v3.7.3/include.zip
+	URL_HASH SHA256=87b5884741427220d3a33df1363ae0e8b898099fbc59f1c451113f6732891014
 	)
 
-option(JSON_BuildTests "" OFF)
 #FetchContent_MakeAvailable(json) Not available in cmake 13
 FetchContent_GetProperties(njson)
 if(NOT njson_POPULATED)
 	FetchContent_Populate(njson)
-	add_subdirectory(${njson_SOURCE_DIR} ${njson_BINARY_DIR})
+	add_library(nlohmannjson INTERFACE)
+	target_include_directories(nlohmannjson INTERFACE ${njson_SOURCE_DIR}/single_include)
 endif()
 
 message(STATUS "Downloading clipp...")
@@ -56,16 +55,20 @@ message(STATUS "Downloading CPR...")
 FetchContent_Declare(
 	libcpr
 	GIT_REPOSITORY 	https://github.com/kansattica/cpr.git
-	GIT_TAG			origin/master
-	GIT_SHALLOW		TRUE 	
+	GIT_TAG			544f1d53e0a5b0248c8f91128b97f6e9735a45c6
 )
 option(USE_SYSTEM_CURL "Try to use the system's libcurl instead of downloading and statically linking." ON)
+option(MSYNC_DOWNLOAD_ZLIB "If downloading and building curl on Windows, try to download zlib as well." ON)
 option(BUILD_CPR_TESTS "" OFF)
 set (BUILD_TESTING OFF CACHE BOOL "If you must build curl from source, don't build the tests." FORCE)
 set (BUILD_SHARED_LIBS OFF CACHE BOOL "Build static libcurl and cpr." FORCE)
 
+if (ipo_is_supported)
+	set (CURL_LTO ON CACHE BOOL "Turn on link time optimization for curl" FORCE)
+endif()
+
 if(USE_SYSTEM_CURL)
-       find_package(CURL)
+	   find_package(CURL)
 endif()
 
 if (NOT USE_SYSTEM_CURL OR NOT CURL_FOUND)
@@ -75,6 +78,34 @@ if (NOT USE_SYSTEM_CURL OR NOT CURL_FOUND)
 	include(CheckCXXSourceCompiles)
 
 	set (USE_SYSTEM_CURL OFF CACHE BOOL "Don't use system curl if we don't have it." FORCE)
+	set (ENABLE_MANUAL OFF CACHE BOOL "Tell curl not to bother trying to make the manual." FORCE)
+
+	if (MSVC AND MSYNC_DOWNLOAD_ZLIB)
+		set(CMAKE_POLICY_DEFAULT_CMP0074 NEW) #force curl to honor ZLIB_ROOT
+		set(ZLIB_DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/depends/zlib)
+		set(ZLIB_HEADER_DIR ${CMAKE_SOURCE_DIR}/external/zlib/include)
+		file(MAKE_DIRECTORY ${ZLIB_DOWNLOAD_DIR})
+
+		file(COPY ${ZLIB_HEADER_DIR}
+			DESTINATION
+			${ZLIB_DOWNLOAD_DIR})
+
+		# did you know that the only way I could get up-to-date static zlib was compiling it myself?
+		if (CMAKE_SIZEOF_VOID_P MATCHES "8")
+			message(STATUS "Downloading 64-bit zlib...")
+			file(DOWNLOAD "https://kansattica.github.io/msync_deps/zlib1.2.11-winx64.lib"
+				${ZLIB_DOWNLOAD_DIR}/lib/zlibstatic.lib
+				EXPECTED_HASH SHA256=d65fe524750d8f6001c5b3f0a3cbac56c17f27bf5ff1f86d1bc9e20ae1d5abc7)
+		else()
+			message(STATUS "Downloading 32-bit zlib...")
+			file(DOWNLOAD "https://kansattica.github.io/msync_deps/zlib1.2.11-winx86.lib"
+				${ZLIB_DOWNLOAD_DIR}/lib/zlibstatic.lib
+				EXPECTED_HASH SHA256=f28f0bed6ec9868e14a3f0a62e53fd9d15473a35d832194c0f12cd6d5c284f34)
+		endif()
+
+		set(ZLIB_ROOT ${ZLIB_DOWNLOAD_DIR})
+		find_package(ZLIB)
+	endif()
 endif()
 
 #unset these because CPR's build will run its own find_package(CURL)
@@ -95,13 +126,14 @@ if (NOT USE_SYSTEM_CURL AND UNIX)
 	# more likely to know where the certs are
 	# this is for portability more than anything
 	set(CURL_CA_FALLBACK ON CACHE BOOL
-		    "Set ON to use built-in CA store of TLS backend. Defaults to OFF")
+			"Set ON to use built-in CA store of TLS backend. Defaults to OFF")
 endif()
 # add_definitions(-DCURL_STATICLIB)
 if (MSVC)
 	set (CMAKE_USE_WINSSL ON CACHE BOOL "Use winssl" FORCE)
 	set (CMAKE_USE_OPENSSL OFF CACHE BOOL "Don't use openssl" FORCE)
 endif()
+
 FetchContent_GetProperties(libcpr)
 if(NOT libcpr_POPULATED)
 	message(STATUS "Configuring CPR...")

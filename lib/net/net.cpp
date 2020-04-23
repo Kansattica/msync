@@ -39,9 +39,7 @@ net_response handle_response(cpr::Response&& response)
 	// for example, if the user sends a bad post, you'll get a 422 and the error is in response.text
 
 	if (!to_return.okay)
-	{
 		to_return.message = std::move(response.error.message);
-	}
 
 	if (to_return.message.empty())
 		to_return.message = std::move(response.text);

@@ -1,36 +1,19 @@
 #include "test_helpers.hpp"
 
-#include <whereami.h>
-
-#include <memory>
 #include <random>
 #include <fstream>
 #include <iterator>
 #include <array>
+#include <algorithm>
 
 #include "../lib/constants/constants.hpp"
 
-fs::path _get_exe_location()
-{
-    // see https://github.com/gpakosz/whereami
-    const int length = wai_getModulePath(nullptr, 0, nullptr);
-
-    auto path = std::make_unique<char[]>(static_cast<size_t>(length) + 1);
-
-    int dirname_length;
-    wai_getExecutablePath(path.get(), length, &dirname_length);
-    return fs::path(path.get(), path.get() + dirname_length);
-}
-
-const static fs::path _accountdir = _get_exe_location() / Account_Directory;
-test_file account_directory()
-{
-	return test_file{ _accountdir };
-}
+#include "to_chars_patch.hpp"
 
 std::vector<std::string> read_lines(const fs::path& toread)
 {
-	std::ifstream fin(toread);
+	// all these .c_str()s are to make Boost happy.
+	std::ifstream fin(toread.c_str());
 	std::vector<std::string> toreturn;
 
 	for (std::string line; std::getline(fin, line);)
@@ -57,12 +40,12 @@ size_t count_files_in_directory(const fs::path& tocheck)
 
 void touch(const fs::path& totouch)
 {
-	std::ofstream of(totouch, std::ios::out | std::ios::app);
+	std::ofstream of(totouch.c_str(), std::ios::out | std::ios::app);
 }
 
 std::string read_file(const fs::path& file)
 {
-	std::ifstream fi(file, std::ios::ate | std::ios::in);
+	std::ifstream fi(file.c_str(), std::ios::ate | std::ios::in);
 
 	std::string content;
 	content.reserve(fi.tellg());
@@ -70,7 +53,7 @@ std::string read_file(const fs::path& file)
 	return content.append(std::istreambuf_iterator(fi), std::istreambuf_iterator<char>());
 }
 
-std::mt19937 gen(std::random_device{}());
+std::minstd_rand gen(std::random_device{}());
 
 bool flip_coin()
 {
@@ -82,6 +65,31 @@ int zero_to_n(int n)
 {
 	std::uniform_int_distribution<> dis(0, n);
 	return dis(gen);
+}
+
+// the .concat(to_string(random number)) guys exist so that we can use ctest to run tests in parallel.
+// All you have to do is ensure that no two processes are trying to use the same filenames.
+// the correct way to do this would probably be to get the process ID, but I'd have to do a bunch of platform-specific code for that.
+test_file temporary_file()
+{
+	static std::array<char, 10> buffer;
+	const static fs::path tempdir = (fs::temp_directory_path() / "msync_test_file_").concat(std::to_string(gen()));
+	static unsigned int filecount = 0;
+
+	std::string_view printed = sv_to_chars(filecount++, buffer);
+
+	return test_file{ fs::path {tempdir}.concat(printed.begin(), printed.end()) };
+}
+
+test_dir temporary_directory()
+{
+	const static fs::path tempdir = (fs::temp_directory_path() / "msync_test_dir_").concat(std::to_string(gen()));;
+	static unsigned int dircount = 0;
+	static std::array<char, 10> buffer;
+
+	std::string_view printed = sv_to_chars(dircount++, buffer);
+
+	return test_dir{ fs::path {tempdir}.concat(printed.begin(), printed.end()) };
 }
 
 void make_status_json(std::string_view id, std::string& to_append)
@@ -114,3 +122,12 @@ void make_notification_json(std::string_view id, std::string& to_append)
 	to_append += '}';
 }
 
+std::vector<std::string> make_expected_ids(const std::vector<std::string>& ids, std::string_view prefix)
+{
+	std::vector<std::string> toreturn(ids.size());
+	std::transform(ids.begin(), ids.end(), toreturn.begin(), [&prefix](const std::string& id) 
+		{
+			return std::string{ id }.insert(0, prefix);
+		});
+	return toreturn;
+}

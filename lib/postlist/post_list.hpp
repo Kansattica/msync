@@ -7,17 +7,19 @@
 
 #include "../entities/entities.hpp"
 
-// these should be ostreams, but I didn't want to pull in the whole iostream library just for this
-std::ofstream& operator<<(std::ofstream& out, const mastodon_status& status);
-std::ofstream& operator<<(std::ofstream& out, const mastodon_notification& notification);
-std::ofstream& operator<<(std::ofstream& out, const mastodon_poll& poll);
+std::ostream& operator<<(std::ostream& out, const mastodon_status& status);
+std::ostream& operator<<(std::ostream& out, const mastodon_notification& notification);
+std::ostream& operator<<(std::ostream& out, const mastodon_poll& poll);
 
 // currently supposed to work with statuses and notifications
 template <typename post_type>
 class post_list
 {
 public:
-	post_list(const fs::path& filename) : outfile(filename, std::ios::app | std::ios::ate | std::ios::out)
+
+	// ofstream doesn't know what to do with Boost's filesystem paths, so call c_str()
+	// this is harmless with non-Boost filesystems because those just turn around and call .c_str() on the path anyway
+	post_list(const fs::path& filename) : outfile(filename.c_str(), std::ios::app | std::ios::ate | std::ios::out)
 	{
 	}
 

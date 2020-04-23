@@ -10,10 +10,10 @@
 #include "test_helpers.hpp"
 #include "../postfile/outgoing_post.hpp"
 
-SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
+SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run][long_run_outgoingpost]")
 {
 	logs_off = true;
-	test_file fi{ "outfile" };
+	test_file fi = temporary_file();
 	GIVEN("An outgoing_post with only text is filled and destroyed")
 	{
 		{
@@ -83,7 +83,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 			" ---" );
 
 		{
-			std::ofstream of{ fi.filename };
+			std::ofstream of{ fi };
 			of << testtext;
 		}
 
@@ -156,7 +156,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 			);
 
 		{
-			std::ofstream of{ fi.filename };
+			std::ofstream of{ fi };
 			if (!content_warning.empty())
 				of << "cw=" << content_warning << '\n';
 
@@ -186,6 +186,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run]")
 			of << testtext;
 		}
 
+		CAPTURE(read_file(fi.filename));
 
 		WHEN("A new outgoing_post is made from the same file")
 		{

@@ -2,28 +2,28 @@
 #define _QUEUES_HPP_
 
 #include <string>
-#include <string_view>
 #include <vector>
 
 #include "queue_list.hpp"
+#include <filesystem.hpp>
 
 enum class queues
 {
-    fav,
-    boost,
-    post
+	fav,
+	boost,
+	post
 };
 
-fs::path get_file_queue_directory(std::string_view account);
+fs::path get_file_queue_directory(const fs::path& user_account_dir);
 
-void enqueue(queues toenqueue, const std::string_view account, const std::vector<std::string>& add);
+// enqueue and dequeue mutate and move from the vector for efficiency
+void enqueue(queues toenqueue, const fs::path& user_account_dir, std::vector<std::string>&& add);
+void dequeue(queues todequeue, const fs::path& user_account_dir, std::vector<std::string>&& remove);
 
-// dequeue mutates and moves from the vector for efficiency
-void dequeue(queues todequeue, const std::string_view account, std::vector<std::string>&& remove);
-void clear(queues toclear, const std::string_view account);
+void clear(queues toclear, const fs::path& user_account_dir);
 
-queue_list get(queues toget, const std::string_view account);
+queue_list get(const fs::path& user_account_dir);
 
-std::vector<std::string> print(queues toprint, const std::string_view account);
+std::vector<std::string> print(const fs::path& user_account_dir);
 
 #endif

@@ -1,38 +1,92 @@
 language: cpp
-env:
-  - BUILDTYPE=Release
-  #- BUILDTYPE=MinSizeRel
-os: linux
-dist: bionic
-compiler:
-  - gcc
-  - clang
+
+git:
+  depth: 5
+  submodules: false
+
 matrix:
   include:
+  - os: linux
+    dist: bionic
+    compiler: gcc
+    env: BUILD_ARCH=x64 CC=gcc-8 CXX=g++-8 
+    addons:
+      apt: g++-8 libstdc++-8-dev
+  - os: linux
+    dist: bionic
+    compiler: clang
+    env: BUILD_ARCH=x64 CC="/usr/bin/clang-7" CXX="/usr/bin/clang++-7"
+    addons:
+      apt: clang-7 llvm-7-dev libstdc++-8-dev
+  - os: osx
+    osx_image: xcode11
+    compiler: clang
+  - os: linux
+    dist: bionic
+    compiler: gcc
+    env: CXXFLAGS="-m32" CFLAGS="-m32" BUILD_ARCH=i386 CC=gcc-8 CXX=g++-8
+    addons:
+      apt: 
+        - g++-8
+        - gcc-8-multilib
+        - g++-8-multilib 
+        - libstdc++-8-dev-i386-cross
+        - libcurl4-openssl-dev:i386
+        - linux-libc-dev:i386
+        - libstdc++-8-dev
   - os: windows
-    compiler: msvc
-    env: BUILDTYPE=Release
-  #- os: windows
-    #compiler: msvc
-    #env: BUILDTYPE=MinSizeRel 
-  
-before_install:
-  - if [ "$TRAVIS_COMPILER" = "gcc" ]; then sudo -E apt-get -yqq --no-install-suggests --no-install-recommends install g++-8 && CC=gcc-8 && CXX=g++-8; fi
-  - if [ "$TRAVIS_COMPILER" = "clang" ]; then sudo -E apt-get -yqq --no-install-suggests --no-install-recommends install clang-7 llvm-7-dev && CC="/usr/bin/clang-7" && CXX="/usr/bin/clang++-7"; fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo -E apt -yqq install --fix-missing libstdc++-8-dev; fi
+    compiler: cl64.exe
+    env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64
+  - os: windows
+    compiler: cl32.exe
+    env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=win32
+  - os: windows
+    compiler: cl64.exe
+    env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64 CONFIGURE_ARGUMENTS="-DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF" 
+  - os: linux
+    dist: bionic
+    compiler: gcc
+    env: BUILD_ARCH=x64 CC=gcc-8 CXX=g++-8 CONFIGURE_ARGUMENTS="-DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF"
+    addons:
+      apt: g++-8 libstdc++-8-dev
 
 script:
-  - mkdir build
+  - export BUILDTYPE=Release 
+  - mkdir -p build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE ..
+  - cmake --version
+  - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE $CONFIGURE_ARGUMENTS ..
   - cmake --build . --config $BUILDTYPE --parallel 2
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then EXELOCATION="./$BUILDTYPE/msync.exe"; else EXELOCATION="./msync"; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then TESTLOCATION="./tests/$BUILDTYPE/tests.exe"; else TESTLOCATION="./tests/tests"; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then NETTESTLOCATION="./tests/$BUILDTYPE/net_tests.exe"; else NETTESTLOCATION="./tests/net_tests"; fi
-  - $NETTESTLOCATION
-  - $TESTLOCATION ~[long_run]
-  - $TESTLOCATION [long_run]
+  - $EXELOCATION version
+  - $EXELOCATION yeehaw
+  # Basically, Travis will time out if it doesn't get any output for over ten minutes.
+  # Usually, this is fine, but it causes problems because OSX produces binaries that
+  # run much slower for some reason.
+  - travis_wait ctest --output-on-failure --schedule-random -j 2
 
 after_success:
   - echo "Binary size:"
   - du -h $EXELOCATION
+  - export FINISHED_BINARY_NAME=msync-$TRAVIS_TAG-
+  - if [[ $CONFIGURE_ARGUMENTS == *"MSYNC_USER_CONFIG=ON"* ]]; then FINISHED_BINARY_NAME+="install-"; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then FINISHED_BINARY_NAME+="linux-$BUILD_ARCH-$TRAVIS_COMPILER"; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then FINISHED_BINARY_NAME+="windows-$CMAKE_GENERATOR_PLATFORM.exe"; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then FINISHED_BINARY_NAME+="osx-x64"; fi
+  - echo $FINISHED_BINARY_NAME
+  - mv $EXELOCATION $FINISHED_BINARY_NAME
+
+before_deploy:
+  - git tag -l --format='%(contents)' $TRAVIS_TAG > msync_release_notes
+
+deploy:
+  provider: releases
+  edge: true
+  file: $FINISHED_BINARY_NAME
+  api_key: $API_KEY
+  name: msync release $TRAVIS_TAG
+  release_notes_file: msync_release_notes
+  on:
+    tags: true

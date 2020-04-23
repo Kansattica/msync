@@ -3,10 +3,10 @@
 
 #include <print_logger.hpp>
 
-#include "../net_interface/net_interface.hpp"
+#include "../netinterface/net_interface.hpp"
+#include "../accountdirectory/account_directory.hpp"
 
 #include "../options/user_options.hpp"
-#include "../options/global_options.hpp"
 
 #include "../postlist/post_list.hpp"
 #include "../util/util.hpp"
@@ -30,10 +30,9 @@ public:
 	unsigned int max_requests = 0;
 	unsigned int per_call = 0;
 
-
 	recv_posts(get_posts& post_downloader) : download(post_downloader) {};
 
-	void get(std::string_view account_name, user_options& account)
+	void get(user_options& account)
 	{
 		retries = set_default(retries, 3, "Number of retries cannot be zero or less. Resetting to 3.\n", pl());
 
@@ -41,15 +40,17 @@ public:
 		// which, as of this writing, means the maximum is 40 for statuses and 30 for notifications
 		// (the documentation lies and says that the limit is the same for both)
 
-		const fs::path user_folder = options().account_directory_location / account_name;
-
 		exclude_notif_types = make_excludes(account);
 
+		// note that this only works because the .parent_path() call that populates get_user_directory() omits the trailing slash
+		// otherwise, .filename() would get nothing.
+		const std::string account_name = account.get_user_directory().filename().string();
+
 		pl() << "Downloading notifications for " << account_name << '\n';
-		update_timeline<to_get::notifications, mastodon_notification, true>(account, user_folder, clamp_or_default(per_call, 30));
+		update_timeline<to_get::notifications, mastodon_notification, true>(account, account.get_user_directory(), clamp_or_default(per_call, 30));
 
 		pl() << "Downloading the home timeline for " << account_name << '\n';
-		update_timeline<to_get::home, mastodon_status>(account, user_folder, clamp_or_default(per_call, 40));
+		update_timeline<to_get::home, mastodon_status>(account, account.get_user_directory(), clamp_or_default(per_call, 40));
 	}
 
 private:
@@ -59,7 +60,7 @@ private:
 	template <to_get timeline, typename mastodon_entity, bool use_excludes = false>
 	void update_timeline(user_options& account, const fs::path& user_folder, unsigned int limit)
 	{
-		constexpr recv_parameters params = get_parameters<timeline>();
+		const CONSTEXPR_IF_NOT_BOOST recv_parameters params = get_parameters<timeline>();
 
 		const sync_settings sync_method = account.get_sync_option(params.sync_setting);
 

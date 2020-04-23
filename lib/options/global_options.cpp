@@ -3,41 +3,21 @@
 #include "../constants/constants.hpp"
 #include <msync_exception.hpp>
 #include <print_logger.hpp>
-#include <whereami.h>
 #include <algorithm>
-#include <memory>
 #include <iterator>
 
 #include <cctype>
 
-global_options& options()
+global_options::global_options(fs::path accounts_dir) : accounts_directory(std::move(accounts_dir))
 {
-	static global_options options;
-	return options;
-}
+	plverb() << "Reading accounts from " << accounts_directory << "\n";
 
-fs::path get_exe_location()
-{
-    // see https://github.com/gpakosz/whereami
-    const int length = wai_getModulePath(nullptr, 0, nullptr);
-
-    auto path = std::make_unique<char[]>(static_cast<size_t>(length) + 1);
-
-    int dirname_length;
-    wai_getExecutablePath(path.get(), length, &dirname_length);
-    return fs::path(path.get(), path.get() + dirname_length);
-}
-
-global_options::global_options() : account_directory_location(get_exe_location() / Account_Directory)
-{
-	plverb() << "Reading accounts from " << account_directory_location << "\n";
-
-	if (!fs::exists(account_directory_location))
+	if (!fs::exists(accounts_directory))
 		return;
 
-	for (const auto& userfolder : fs::directory_iterator(account_directory_location))
+	for (const auto& userfolder : fs::directory_iterator(accounts_directory))
 	{
-		if (!userfolder.is_directory())
+		if (!fs::is_directory(userfolder.path()))
 		{
 			plverb() << userfolder.path() << " is not a directory. Skipping.\n";
 			continue;
@@ -64,11 +44,12 @@ std::pair<const std::string, user_options>& global_options::add_new_account(std:
 		return *contains;
 	}
 
-    fs::path user_path = account_directory_location / name;
+	fs::path user_path = accounts_directory / name;
 
-    fs::create_directories(user_path); //can throw if something goes wrong
+	fs::create_directories(user_path); //can throw if something goes wrong
+	fs::permissions(accounts_directory, fs::perms::owner_all);
 
-    user_path /= User_Options_Filename;
+	user_path /= User_Options_Filename;
 
 	return accounts.emplace_back(std::move(name), user_options{ std::move(user_path) });
 }
@@ -79,39 +60,31 @@ std::pair<const std::string, user_options>* global_options::select_account(std::
 
 	std::pair<const std::string, user_options>* candidate = nullptr;
 
-    for (auto& entry : accounts)
-    {
-        // if name is longer than the entry, we'll step off the end of entry and segfault
-        // since name can't possibly match something it's longer than, just skip this
-        if (name.size() > entry.first.size())
-            continue;
+	for (auto& entry : accounts)
+	{
+		// if name is longer than the entry, we'll step off the end of entry and segfault
+		// since name can't possibly match something it's longer than, just skip this
+		if (name.size() > entry.first.size())
+			continue;
 
-        // won't have string.starts_with until c++20, so
-        // if the name given is a prefix of (or equal to) this entry, it's a candidate
+		// won't have string.starts_with until c++20, so
+		// if the name given is a prefix of (or equal to) this entry, it's a candidate
 		// unsigned char because https://en.cppreference.com/w/cpp/string/byte/tolower
-        if (std::equal(name.begin(), name.end(), entry.first.begin(), [](unsigned char a, unsigned char b) {
-                return std::tolower(a) == std::tolower(b); //case insensitive
-            }))
-        {
-            plverb() << "Matched account " << entry.first << '\n';
+		if (std::equal(name.begin(), name.end(), entry.first.begin(), [](unsigned char a, unsigned char b) {
+				return std::tolower(a) == std::tolower(b); //case insensitive
+			}))
+		{
+			plverb() << "Matched account " << entry.first << '\n';
 
 			// if this is the second candidate we've found, it's ambiguous and return nothing
 			if (candidate != nullptr) { return nullptr; }
 
-            candidate = &entry;
-        }
-    }
+			candidate = &entry;
+		}
+	}
 	
 	// nullptr if we found nothing, points to the account entry if we found exactly one candidate
 	return candidate;
-}
-
-void global_options::clear_accounts()
-{
-	std::for_each(accounts.begin(), accounts.end(), 
-		[this](const auto& account) { fs::remove_all(account_directory_location / account.first); });
-
-	accounts.clear();
 }
 
 std::vector<std::string_view> global_options::all_accounts() const

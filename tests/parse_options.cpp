@@ -962,11 +962,11 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 		}
 	}
 
-	GIVEN("A command line that prints the post queue.")
+	GIVEN("A command line that prints the current queue.")
 	{
 		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
-		int argc = 4;
-		char const* argv[]{ "msync", qcommand, "-p", "post" };
+		int argc = 3;
+		char const* argv[]{ "msync", qcommand, "print" };
 
 		WHEN("the command line is parsed")
 		{
@@ -975,11 +975,6 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 			THEN("the parse is good.")
 			{
 				REQUIRE(result.okay);
-			}
-
-			THEN("the correct queue is selected")
-			{
-				REQUIRE(result.queue_opt.selected == queues::post);
 			}
 
 			THEN("the correct action is selected.")
@@ -989,29 +984,98 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 		}
 	}
 
-	GIVEN("A command line that prints the post queue with long options.")
+}
+
+SCENARIO("The command line parser recognizes when the user requests yeehaw.")
+{
+	GIVEN("A command line requesting yeehaw.")
 	{
-		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
-		int argc = 4;
-		char const* argv[]{ "msync", qcommand, "--print", "post" };
+		char const* argv[] { "msync", "yeehaw" };
 
 		WHEN("the command line is parsed")
 		{
-			auto result = parse(argc, argv);
+			const auto result = parse(2, argv);
 
 			THEN("the parse is good.")
 			{
 				REQUIRE(result.okay);
 			}
 
-			THEN("the correct queue is selected")
+			THEN("the correct action is selected.")
 			{
-				REQUIRE(result.queue_opt.selected == queues::post);
+				REQUIRE(result.selected == mode::yeehaw);
+			}
+		}
+	}
+
+	GIVEN("A command line requesting a verbose yeehaw.")
+	{
+		const auto verb = GENERATE("-v", "--verbose");
+
+		char const* argv[] { "msync", "yeehaw", verb };
+
+		WHEN("the command line is parsed")
+		{
+			const auto result = parse(3, argv);
+
+			THEN("the parse is good.")
+			{
+				REQUIRE(result.okay);
 			}
 
 			THEN("the correct action is selected.")
 			{
-				REQUIRE(result.queue_opt.to_do == queue_action::print);
+				REQUIRE(result.selected == mode::yeehaw);
+			}
+		}
+	}
+}
+
+SCENARIO("The command line parser recognizes when the user requests msync's version.")
+{
+	GIVEN("A command line requesting the version.")
+	{
+		const auto version = GENERATE(as<const char*>{}, "version", "--version");
+
+		char const* argv[] { "msync", version };
+
+		WHEN("the command line is parsed")
+		{
+			const auto result = parse(2, argv);
+
+			THEN("the parse is good.")
+			{
+				REQUIRE(result.okay);
+			}
+
+			THEN("the correct action is selected.")
+			{
+				REQUIRE(result.selected == mode::version);
+			}
+		}
+	}
+}
+
+SCENARIO("The command line parser recognizes when the user requests msync's license.")
+{
+	GIVEN("A command line requesting the license.")
+	{
+		const auto license = GENERATE(as<const char*>{}, "license", "--license");
+
+		char const* argv[] { "msync", license };
+
+		WHEN("the command line is parsed")
+		{
+			const auto result = parse(2, argv);
+
+			THEN("the parse is good.")
+			{
+				REQUIRE(result.okay);
+			}
+
+			THEN("the correct action is selected.")
+			{
+				REQUIRE(result.selected == mode::license);
 			}
 		}
 	}
@@ -1025,6 +1089,8 @@ bool flag_set(int combo, int position)
 struct command_line_option
 {
 	std::vector<const char*> options;
+	unsigned int attachment_order = 0;
+	unsigned int description_order = 0;
 	unsigned int order = 1000;
 
 	friend bool operator< (const command_line_option& lhs, const command_line_option& rhs)
@@ -1032,6 +1098,7 @@ struct command_line_option
 		return lhs.order < rhs.order;
 	}
 };
+
 
 void pick_attachment(int number, gen_options& expected, std::vector<command_line_option>& options)
 {
@@ -1042,8 +1109,8 @@ void pick_attachment(int number, gen_options& expected, std::vector<command_line
 		expected.post.attachments.push_back("someattach");
 		break;
 	case 1:
-		options.push_back(command_line_option{ {"--attach", "attacher"} });
-		options.push_back(command_line_option{ {"-f", "somefile"} });
+		options.push_back(command_line_option{ {"--attach", "attacher"}, 1 });
+		options.push_back(command_line_option{ { "--attachment", "somefile"}, 2 });
 		expected.post.attachments.push_back("attacher");
 		expected.post.attachments.push_back("somefile");
 		break;
@@ -1072,8 +1139,8 @@ void pick_description(int number, gen_options& expected, std::vector<command_lin
 		expected.post.descriptions.push_back("somedescrip");
 		break;
 	case 1:
-		options.push_back(command_line_option{ {"--description", "describer"} });
-		options.push_back(command_line_option{ {"-d", "some file!"} });
+		options.push_back(command_line_option{ {"--description", "describer"}, 0, 1 });
+		options.push_back(command_line_option{ {"-d", "some file!"}, 0, 2 });
 		expected.post.descriptions.push_back("describer");
 		expected.post.descriptions.push_back("some file!");
 		break;
@@ -1120,6 +1187,21 @@ auto pick_visibility()
 	return std::make_pair("Well, this shouldn't happen.", visibility::default_vis);
 }
 
+template <typename get_field>
+bool should_reverse(const std::vector<command_line_option>& options, get_field func)
+{
+	const auto found = std::find_if(options.begin(), options.end(), [func](const auto& opt) { return func(opt) != 0; });
+	if (found == options.end() || func(*found) == 1)
+		return false;
+	return true;
+}
+
+template <typename T>
+std::vector<T> reversed(const std::vector<T>& vec)
+{
+	return std::vector<T> { vec.rbegin(), vec.rend() };
+}
+
 void check_parse(std::vector<const char*>& argv, const std::vector<command_line_option>& options, const gen_options& expected)
 {
 	if (flip_coin())
@@ -1143,16 +1225,25 @@ void check_parse(std::vector<const char*>& argv, const std::vector<command_line_
 
 		REQUIRE(expected.filename == parsed.gen_opt.filename);
 		REQUIRE(expected.post.text == parsed.gen_opt.post.text);
-		REQUIRE(expected.post.attachments == parsed.gen_opt.post.attachments);
 		REQUIRE(expected.post.vis == parsed.gen_opt.post.vis);
-		REQUIRE(expected.post.descriptions == parsed.gen_opt.post.descriptions);
 		REQUIRE(expected.post.content_warning == parsed.gen_opt.post.content_warning);
 		REQUIRE(expected.post.reply_to_id == parsed.gen_opt.post.reply_to_id);
 		REQUIRE(expected.post.reply_id == parsed.gen_opt.post.reply_id);
+
+		// basically, it's possible for these to get permuted so that they're not in the original order.
+		if (should_reverse(options, [](const command_line_option& opt) { return opt.attachment_order; }))
+			REQUIRE(reversed(expected.post.attachments) == parsed.gen_opt.post.attachments);
+		else
+			REQUIRE(expected.post.attachments == parsed.gen_opt.post.attachments);
+
+		if (should_reverse(options, [](const command_line_option& opt) { return opt.description_order; }))
+			REQUIRE(reversed(expected.post.descriptions) == parsed.gen_opt.post.descriptions);
+		else
+			REQUIRE(expected.post.descriptions == parsed.gen_opt.post.descriptions);
 	}
 }
 
-SCENARIO("The command line parser recognizes when the user wants to generate a file.", "[long_run]")
+SCENARIO("The command line parser recognizes when the user wants to generate a file.", "[long_run][long_run_parseopts]")
 {
 	GIVEN("A combination of options for the file generator")
 	{
@@ -1164,8 +1255,11 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		const auto vis = pick_visibility();
 
 		gen_options expected;
-		std::vector<command_line_option> options;
-		options.reserve(8);
+
+		// this guy is going to be refilled and emptied a bunch
+		// make 'em static and clear it every time to keep the capacity
+		static std::vector<command_line_option> options;
+		options.clear();
 
 		if (vis.first[0] != '\0')
 		{
@@ -1284,7 +1378,6 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		for (unsigned int i = 0; i < options.size(); i++)
 			options[i].order = i;
 
-
 		WHEN("the command line is parsed")
 		{
 			// static and doing the pass-by-mutable-ref thing because there's really no sense in 
@@ -1303,11 +1396,13 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 			}
 			else
 			{
-				static std::mt19937 g(std::random_device{}());
+				static std::minstd_rand g(std::random_device{}());
+				// shuffle once because shuffling is slow
+				std::shuffle(options.begin(), options.end(), g);
 				for (int i = 0; i < 6000; i++)
 				{
 					check_parse(argv, options, expected);
-					std::shuffle(options.begin(), options.end(), g);
+					std::next_permutation(options.begin(), options.end());
 				}
 			}
 

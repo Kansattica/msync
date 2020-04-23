@@ -4,13 +4,11 @@
 #include <iostream>
 #include <fstream>
 
-using std::cout;
-
 enum class logtype
 {
-    normal,
-    verbose,
-    fileonly
+	normal,
+	verbose,
+	fileonly
 };
 extern bool verbose_logs;
 extern bool logs_off;
@@ -18,36 +16,30 @@ extern bool logs_off;
 template <logtype isverbose = logtype::normal>
 struct print_logger
 {
-    print_logger(std::ofstream& file) : logfile(file) {}
+	print_logger(std::ofstream& file) : logfile(file) {}
 
-    void flush()
-    {
-        cout.flush();
-        logfile.flush();
-    }
-
-    template <typename T>
-    print_logger& operator<<(const T& towrite)
-    {
+	template <typename T>
+	print_logger& operator<<(const T& towrite)
+	{
 		if (logs_off)
 			return *this;
 
-        if constexpr (isverbose == logtype::verbose)
-        {
-            if (verbose_logs)
-                cout << towrite;
-        }
-        else if constexpr (isverbose != logtype::fileonly)
-        {
-            cout << towrite;
-        }
+		if constexpr (isverbose == logtype::verbose)
+		{
+			if (verbose_logs)
+				std::cout << towrite;
+		}
+		else if constexpr (isverbose != logtype::fileonly)
+		{
+			std::cout << towrite;
+		}
 
-        logfile << towrite;
-        return *this;
-    }
+		logfile << towrite;
+		return *this;
+	}
 
 private:
-    std::ofstream& logfile;
+	std::ofstream& logfile;
 };
 
 print_logger<logtype::normal>& pl();

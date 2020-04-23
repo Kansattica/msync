@@ -16,6 +16,8 @@ If this is your first time, try running:
 msync new -a [account name]
 
 New account names must be fully specified, like: GoddessGrace@goodchristian.website
+
+For more information, consult the manual: https://raw.githubusercontent.com/Kansattica/msync/master/MANUAL.md
 )";
 
 parse_result parse(const int argc, const char* argv[], const bool silent)
@@ -80,7 +82,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 	const auto genMode = (command("gen", "generate").set(ret.selected, mode::gen).doc("Generate a post template in the current folder. Edit this file afterwards to add a body.") &
 			(
 			 repeatable(in_sequence(option("-d", "--description") & value("file description", ret.gen_opt.post.descriptions))).doc("Associate this description with the corresponding file."),
-			 repeatable(in_sequence(option("-f", "--file", "--attach") & value("file path", ret.gen_opt.post.attachments))).doc("Attach these files to the post."),
+			 repeatable(in_sequence(option("-f", "--file", "--attach", "--attachment") & value("file path", ret.gen_opt.post.attachments))).doc("Attach these files to the post."),
 			 in_sequence(option("-o", "--output"), value("filename", ret.gen_opt.filename)).doc("Specify an output file. Default is new_post."),
 			 in_sequence(option("-r", "--reply-to"), value("reply_to", ret.gen_opt.post.reply_to_id)).doc("Reply to the specified post ID."),
 			 in_sequence(option("-i", "--reply-id"), value("id", ret.gen_opt.post.reply_id)).doc("Set an ID so that this post can be replied to with --reply-to."),
@@ -91,19 +93,23 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 
 	const auto queueMode = (command("queue", "q").set(ret.selected, mode::queue).doc("Manage queued favs, boosts, and posts") &
 			one_of(option("-r", "--remove").set(ret.queue_opt.to_do, queue_action::remove).doc("Remove the post ids or filenames from the queue instead of adding them. If not in the queue, queue unfaving, unboosting, or deleting the post so it happens on next sync."),
-				option("-c", "--clear").set(ret.queue_opt.to_do, queue_action::clear).doc("Remove everything in the specified queue."),
-				option("-p", "--print").set(ret.queue_opt.to_do, queue_action::print).doc("Print everything in the specified queue. The first item is on top.")) %
+				option("-c", "--clear").set(ret.queue_opt.to_do, queue_action::clear).doc("Remove everything in the specified queue.")) %
 			"queue options",
 			one_of(
 				command("fav").set(ret.queue_opt.selected, queues::fav) & opt_values("post ids", ret.queue_opt.queued),
 				command("boost").set(ret.queue_opt.selected, queues::boost) & opt_values("post ids", ret.queue_opt.queued),
-				command("post").set(ret.queue_opt.selected, queues::post) & opt_values("filenames", ret.queue_opt.queued))
+				command("post").set(ret.queue_opt.selected, queues::post) & opt_values("filenames", ret.queue_opt.queued),
+				command("print").set(ret.queue_opt.to_do, queue_action::print))
 			.doc("queue commands"));
 
 	const auto universalOptions = ((option("-a", "--account") & value("account", ret.account)).doc("The account name to operate on."),
 			option("-v", "--verbose").set(verbose_logs).doc("Verbose mode. Program will be more chatty."));
 
-	const auto cli = (newaccount | configMode | syncMode | genMode | queueMode | (command("help").set(ret.selected, mode::help)), universalOptions);
+	const auto cli = (newaccount | configMode | syncMode | genMode | queueMode | 
+		command("yeehaw").set(ret.selected, mode::yeehaw) | 
+		command("version", "--version").set(ret.selected, mode::version) |
+		command("license", "--license").set(ret.selected, mode::license) |
+		(command("help").set(ret.selected, mode::help)), universalOptions);
 
 	//skip the first result.
 	//we do it this way because C++11 and later don't like it when you turn a string literal into a char*, so we have to use the iterator interface

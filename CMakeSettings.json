@@ -15,6 +15,11 @@
           "name": "CMAKE_CXX_FLAGS",
           "value": "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /Zc:__cplusplus",
           "type": "STRING"
+        },
+        {
+          "name": "MSYNC_DOWNLOAD_ZLIB",
+          "value": "True",
+          "type": "BOOL"
         }
       ]
     },
@@ -40,6 +45,18 @@
       "name": "x64-ReleaseWithDebugInfo",
       "generator": "Ninja",
       "configurationType": "RelWithDebInfo",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "variables": []
+    },
+    {
+      "name": "x64-MinSizeRelease",
+      "generator": "Ninja",
+      "configurationType": "MinSizeRel",
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
       "cmakeCommandArgs": "",

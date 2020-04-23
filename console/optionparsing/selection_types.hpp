@@ -4,27 +4,27 @@
 
 struct sync_options
 {
-    unsigned int retries = 3;
-    unsigned int max_requests = 0;
-    unsigned int per_call = 0;
+	unsigned int retries = 3;
+	unsigned int max_requests = 0;
+	unsigned int per_call = 0;
 	bool send = true;
 	bool get = true;
-    sync_settings mode;
+	sync_settings mode;
 };
 
 enum class queue_action
 {
-    add,
-    remove,
-    clear,
+	add,
+	remove,
+	clear,
 	print
 };
 
 struct queue_options
 {
-    std::vector<std::string> queued;
-    queue_action to_do = queue_action::add;
-    queues selected;
+	std::vector<std::string> queued;
+	queue_action to_do = queue_action::add;
+	queues selected;
 };
 
 struct gen_options

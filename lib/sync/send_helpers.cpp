@@ -1,21 +1,10 @@
-#include "sync_helpers.hpp"
+#include "send_helpers.hpp"
 
 #include <random>
 #include <algorithm>
 #include <unordered_map>
 
 #include "../postfile/outgoing_post.hpp"
-
-bool should_undo(std::string_view& id)
-{
-	if (id.back() == '-')
-	{
-		id.remove_suffix(1);
-		return true;
-	}
-
-	return false;
-}
 
 std::string paramaterize_url(const std::string_view before, const std::string_view middle, const std::string_view after)
 {

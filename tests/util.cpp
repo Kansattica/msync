@@ -11,86 +11,87 @@ using namespace std::string_view_literals;
 
 SCENARIO("make_api_url correctly concatenates URLs and paths.")
 {
-    GIVEN("An instance URL and API route")
-    {
-        const auto input = GENERATE(
-            std::make_tuple("coolinstance.social", "/api/v1/register", "https://coolinstance.social/api/v1/register"),
-            std::make_tuple("aplace.egg", "/api/v1/howdy", "https://aplace.egg/api/v1/howdy"),
-            std::make_tuple("instance.place", "/api/v1/yes", "https://instance.place/api/v1/yes"));
+	GIVEN("An instance URL and API route")
+	{
+		const auto input = GENERATE(
+			std::make_tuple("coolinstance.social", "/api/v1/register", "https://coolinstance.social/api/v1/register"),
+			std::make_tuple("aplace.egg", "/api/v1/howdy", "https://aplace.egg/api/v1/howdy"),
+			std::make_tuple("instance.place", "/api/v1/yes", "https://instance.place/api/v1/yes"));
 
-        WHEN("they're passed to make_api_url")
-        {
-            const std::string result = make_api_url(std::get<0>(input), std::get<1>(input));
+		WHEN("they're passed to make_api_url")
+		{
+			const std::string result = make_api_url(std::get<0>(input), std::get<1>(input));
 
-            THEN("they're correctly concatenated with the prefix.")
-            {
-                REQUIRE(result == std::get<2>(input));
-            }
-        }
-    }
+			THEN("they're correctly concatenated with the prefix.")
+			{
+				REQUIRE(result == std::get<2>(input));
+			}
+		}
+	}
 }
 
 SCENARIO("parse_account_name correctly parses account names into a username and instance URL.")
 {
-    GIVEN("A correct account name")
-    {
-        const auto input = GENERATE(
-            std::make_tuple("GoddessGrace@goodchristian.website", "GoddessGrace", "goodchristian.website"),
-            std::make_tuple("BestGirl102@good.time.website", "BestGirl102", "good.time.website"),
-            std::make_tuple("hey_its_m3@internet12.for.egg", "hey_its_m3", "internet12.for.egg"),
-            std::make_tuple("_@some-website.comb", "_", "some-website.comb"),
-            std::make_tuple("@_@some-website.comb", "_", "some-website.comb"),
-            std::make_tuple("@_@some-website.comb/", "_", "some-website.comb"),
-            std::make_tuple("@_@some-website.comb\\", "_", "some-website.comb"),
-            std::make_tuple("@_@some-website.comb?", "_", "some-website.comb"),
-            std::make_tuple("@leadingat@boringplace.comb", "leadingat", "boringplace.comb"),
-            std::make_tuple("@leadingat@http://boringplace.comb", "leadingat", "boringplace.comb"),
-            std::make_tuple("@leadingat@https://boringplace.comb", "leadingat", "boringplace.comb"));
+	GIVEN("A correct account name")
+	{
+		const auto input = GENERATE(
+			std::make_tuple("GoddessGrace@goodchristian.website", "GoddessGrace", "goodchristian.website"),
+			std::make_tuple("@GoddessGrace@goodchristian.website", "GoddessGrace", "goodchristian.website"),
+			std::make_tuple("BestGirl102@good.time.website", "BestGirl102", "good.time.website"),
+			std::make_tuple("hey_its_m3@internet12.for.egg", "hey_its_m3", "internet12.for.egg"),
+			std::make_tuple("_@some-website.comb", "_", "some-website.comb"),
+			std::make_tuple("@_@some-website.comb", "_", "some-website.comb"),
+			std::make_tuple("@_@some-website.comb/", "_", "some-website.comb"),
+			std::make_tuple("@_@some-website.comb\\", "_", "some-website.comb"),
+			std::make_tuple("@_@some-website.comb?", "_", "some-website.comb"),
+			std::make_tuple("@leadingat@boringplace.comb", "leadingat", "boringplace.comb"),
+			std::make_tuple("@leadingat@http://boringplace.comb", "leadingat", "boringplace.comb"),
+			std::make_tuple("@leadingat@https://boringplace.comb", "leadingat", "boringplace.comb"));
 
-        WHEN("an account name is parsed by parse_account_name")
-        {
-            const auto result = parse_account_name(std::get<0>(input));
+		WHEN("an account name is parsed by parse_account_name")
+		{
+			const auto result = parse_account_name(std::get<0>(input));
 
-            THEN("the parse is good")
-            {
-                REQUIRE(result.has_value());
-            }
+			THEN("the parse is good")
+			{
+				REQUIRE(result.has_value());
+			}
 
-            THEN("the username was parsed correctly")
-            {
-                REQUIRE(result->username == std::get<1>(input));
-            }
+			THEN("the username was parsed correctly")
+			{
+				REQUIRE(result->username == std::get<1>(input));
+			}
 
-            THEN("the instance name was parsed correctly")
-            {
-                REQUIRE(result->instance == std::get<2>(input));
-            }
-        }
-    }
+			THEN("the instance name was parsed correctly")
+			{
+				REQUIRE(result->instance == std::get<2>(input));
+			}
+		}
+	}
 
-    GIVEN("A bad account name")
-    {
+	GIVEN("A bad account name")
+	{
 		const auto input = GENERATE(as<const char*>{}, //msvc won't build without this
-            "as;dfhasldfasd",
-            "badcharacter**@website.com",
-            "knockitoff@too.dang.many.subdomains",
-            "noinstance@",
-            "@nousername",
-            "what",
-            "|pipekateer",
-            "",
-            ":3@:33.:4");
+			"as;dfhasldfasd",
+			"badcharacter**@website.com",
+			"knockitoff@too.dang.many.subdomains",
+			"noinstance@",
+			"@nousername",
+			"what",
+			"|pipekateer",
+			"",
+			":3@:33.:4");
 
-        WHEN("it's parsed by parse_account_name")
-        {
-            const auto result = parse_account_name(input);
+		WHEN("it's parsed by parse_account_name")
+		{
+			const auto result = parse_account_name(input);
 
-            THEN("the parse is bad")
-            {
-                REQUIRE_FALSE(result.has_value());
-            }
-        }
-    }
+			THEN("the parse is bad")
+			{
+				REQUIRE_FALSE(result.has_value());
+			}
+		}
+	}
 }
 
 SCENARIO("split_string correctly splits strings")

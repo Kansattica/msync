@@ -6,9 +6,30 @@
 
 #include "../filebacked/file_backed.hpp"
 
-bool Read(std::deque<std::string>&, std::string&&);
-void Write(std::deque<std::string>&&, std::ofstream&);
+enum class api_route : uint8_t
+{
+	fav,
+	unfav,
+	boost,
+	unboost,
+	post,
+	unpost, // you might call it "delete post"
+	unknown,
+};
 
-using queue_list = file_backed<std::deque<std::string>, Read, Write>;
-using readonly_queue_list = file_backed<std::deque<std::string>, Read, Write, true, true, true>;
+struct api_call
+{
+	api_route queued_call;
+	std::string argument;
+};
+
+bool operator== (const api_call& rhs, const api_call& lhs);
+
+std::string_view print_route(api_route route);
+
+bool Read(std::deque<api_call>&, std::string&&);
+void Write(std::deque<api_call>&&, std::ofstream&);
+
+using queue_list = file_backed<std::deque<api_call>, Read, Write>;
+using readonly_queue_list = file_backed<std::deque<api_call>, Read, Write, true, true, true>;
 #endif

@@ -5,7 +5,7 @@
 
 #include "test_helpers.hpp"
 #include "mock_network.hpp"
-#include "../lib/net_interface/net_interface.hpp"
+#include "../lib/netinterface/net_interface.hpp"
 
 #include "../lib/constants/constants.hpp"
 
@@ -17,21 +17,9 @@
 #include <system_error>
 #include <tuple>
 
+#include "to_chars_patch.hpp"
+
 using namespace std::string_view_literals;
-
-template <typename Number>
-std::string_view sv_to_chars(Number n, std::array<char, 10>& char_buf)
-{
-	// see https://en.cppreference.com/w/cpp/utility/to_chars
-	// this avoids an allocation compared to std::to_string
-
-	// note that this function takes a character buffer that it will clobber and returns a string view into it
-	// this is to avoid allocations and also not return pointers into memory that will be freed when the function returns.
-
-	const auto [end, err] = std::to_chars(char_buf.data(), char_buf.data() + char_buf.size(), n);
-	if (err != std::errc()) { FAIL("You messed up with to_chars, ya dingus."); }
-	return std::string_view(char_buf.data(), end - char_buf.data());
-}
 
 template <typename make_object>
 std::string make_json_array(make_object func, unsigned int min_id, unsigned int max_id)
@@ -81,7 +69,7 @@ struct mock_network_get : public mock_network
 
 	net_response operator()(std::string_view url, std::string_view access_token, const timeline_params& params, unsigned int limit)
 	{
-		arguments.push_back(get_mock_args{ std::string{url}, std::string{access_token}, 
+		arguments.push_back(get_mock_args{ 0, std::string{url}, std::string{access_token}, 
 			std::string{params.min_id}, std::string{params.max_id}, std::string{params.since_id}, copy_excludes(params.exclude_notifs), limit });
 
 		net_response toreturn;
@@ -205,15 +193,19 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 	static constexpr std::string_view expected_home_endpoint = "https://crime.egg/api/v1/timelines/home";
 	static constexpr std::string_view expected_access_token = "token!";
 
-	const test_file account_dir = account_directory();
+	const test_dir account_dir = temporary_directory();
 
-	const static auto user_dir = account_dir.filename / account_name;
-	const static auto home_timeline_file = user_dir / Home_Timeline_Filename;
-	const static auto notifications_file = user_dir / Notifications_Filename;
+	global_options options{ account_dir.dirname };
 
-	auto& account = options().add_new_account(std::string{ account_name });
+	auto& account = options.add_new_account(std::string{ account_name });
+
+	const auto user_dir = account_dir.dirname / account.first;
+	const auto home_timeline_file = user_dir / Home_Timeline_Filename;
+	const auto notifications_file = user_dir / Notifications_Filename;
 
 	REQUIRE(account.first == account_name);
+
+	REQUIRE(account.second.get_user_directory().filename().string() == account_name);
 
 	account.second.set_option(user_option::account_name, "user");
 	account.second.set_option(user_option::instance_url, "crime.egg");
@@ -227,7 +219,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 		{
 			recv_posts post_getter{ mock_get };
 
-			post_getter.get(account.first, account.second);
+			post_getter.get(account.second);
 
 			THEN("Five calls each were made to the home and notification API endpoints with the correct URLs, default limits, and access tokens.")
 			{
@@ -262,7 +254,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 				mock_get.total_post_count += 10;
 				mock_get.total_notif_count += 15;
 
-				post_getter.get(account.first, account.second);
+				post_getter.get(account.second);
 
 				THEN("Only one call was made to each endpoint.")
 				{
@@ -306,7 +298,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 		{
 			recv_posts post_getter{ mock_get };
 
-			post_getter.get(account.first, account.second);
+			post_getter.get(account.second);
 
 			THEN("Calls to the notification API correctly include the excluded notif types.")
 			{
@@ -350,7 +342,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 				mock_get.total_post_count += 10;
 				mock_get.total_notif_count += 15;
 
-				post_getter.get(account.first, account.second);
+				post_getter.get(account.second);
 
 				THEN("Only one call was made to each endpoint.")
 				{
@@ -383,6 +375,4 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 			}
 		}
 	}
-
-	options().clear_accounts();
 }

@@ -15,6 +15,8 @@ std::string read_file(const fs::path& file);
 void make_status_json(std::string_view id, std::string& to_append);
 void make_notification_json(std::string_view id, std::string& to_append);
 
+std::vector<std::string> make_expected_ids(const std::vector<std::string>& ids, std::string_view prefix);
+
 bool flip_coin();
 int zero_to_n(int n);
 
@@ -23,11 +25,11 @@ struct test_file
 {
 public:
 	test_file(const char* name) : test_file(fs::path(name)) {};
-	test_file(std::string_view name) : test_file(fs::path(name)) {};
-	test_file(fs::path name) : filename(name)
+	test_file(std::string_view name) : test_file(fs::path(name.begin(), name.end())) {}; //use iterator interface for boost's benefit
+	test_file(fs::path name) : filename(std::move(name))
 	{
-		if (!fs::is_directory(name))
-			filenamebak = fs::path{ name }.concat(".bak");
+		if (!fs::is_directory(filename))
+			filenamebak = fs::path{ filename }.concat(".bak");
 
 		fs::remove_all(filename);
 
@@ -43,7 +45,7 @@ public:
 			fs::remove(filenamebak);
 	};
 
-	operator std::string() const { return filename.string(); }
+	operator const fs::path::value_type* () const { return filename.c_str(); }
 	const fs::path filename;
 	fs::path filenamebak;
 private:
@@ -54,8 +56,8 @@ struct touch_file
 {
 public:
 	touch_file(const char* name) : touch_file(fs::path(name)) {};
-	touch_file(std::string_view name) : touch_file(fs::path(name)) {};
-	touch_file(fs::path name) : filename(name)
+	touch_file(std::string_view name) : touch_file(fs::path(name.begin(), name.end())) {};
+	touch_file(fs::path name) : filename(std::move(name))
 	{
 		if (!fs::exists(filename))
 			touch(filename);
@@ -66,10 +68,32 @@ public:
 		fs::remove(filename);
 	};
 
-	operator std::string() const { return filename.string(); }
+	operator const fs::path::value_type* () const { return filename.c_str(); }
 	const fs::path filename;
+};
+
+test_file temporary_file();
+
+struct test_dir
+{
+public:
+	test_dir(fs::path name) : dirname(std::move(name))
+	{
+		fs::remove_all(dirname);
+		fs::create_directories(dirname);
+	}
+
+	~test_dir()
+	{
+		fs::remove_all(dirname);
+	}
+
+	test_dir(const test_dir&) = delete;
+
+	const fs::path dirname;
 private:
 };
 
-test_file account_directory();
+
+test_dir temporary_directory();
 #endif
