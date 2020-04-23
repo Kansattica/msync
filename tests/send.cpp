@@ -16,7 +16,6 @@
 #include <algorithm>
 #include <initializer_list>
 #include <print_logger.hpp>
-#include <unordered_set>
 
 struct id_mock_args : public basic_mock_args
 {
@@ -996,10 +995,10 @@ SCENARIO("read_params doesn't repeat idempotency keys or mutate the post file.")
 
 		WHEN("The outgoing_post is read by read_params repeatedly.")
 		{
-			std::unordered_set<uint_fast64_t> seen_ids;
+			constexpr int trials = 50000;
+			std::array<uint_fast64_t, trials> seen_ids;
 			THEN("The paramaters are always as expected, and the idempotency_ids never repeat.")
 			{
-				constexpr int trials = 50000;
 				for (int i = 0; i < trials; i++)
 				{
 					const auto params = read_params(fi.filename);
@@ -1012,11 +1011,12 @@ SCENARIO("read_params doesn't repeat idempotency keys or mutate the post file.")
 					REQUIRE(params.reply_to.empty());
 					REQUIRE(params.visibility == visibility);
 
-					const auto [it, inserted] = seen_ids.insert(params.idempotency_key);
-					REQUIRE(inserted);
+					seen_ids[i] = params.idempotency_key;
 				}
 
-				REQUIRE(seen_ids.size() == trials);
+				std::sort(seen_ids.begin(), seen_ids.end());
+				REQUIRE(seen_ids[0] != 0);
+				REQUIRE(std::adjacent_find(seen_ids.begin(), seen_ids.end()) == seen_ids.end());
 			}
 		}
 	}
