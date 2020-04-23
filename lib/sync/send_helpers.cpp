@@ -21,6 +21,9 @@ std::mt19937_64 make_random_engine()
 	// idempotency keys that won't repeat within or between runs, but if you're gonna do something, might as well do it right.
 	// I think the real proper thing to do would be to use seedseq, but I haven't found any real documentation on
 	// how to use it correctly.
+	// if you're on a system where this isn't true (say, your unsigned int is 16 bits), you should only have to make
+	// two more calls to rd().
+	static_assert(sizeof(std::random_device::result_type) * 2 == sizeof(uint_fast64_t));
 	std::random_device rd;
 	uint_fast64_t seed = rd();
 	seed = (seed << 32) | rd();
