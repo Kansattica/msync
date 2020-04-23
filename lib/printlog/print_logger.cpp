@@ -1,9 +1,15 @@
 #include "print_logger.hpp"
+#include <constants.hpp>
 
 bool verbose_logs = false;
 bool logs_off = false;
 
+#ifdef MSYNC_FILE_LOG
 std::ofstream logfile("msync.log", std::ios::out | std::ios::app);
+#else
+// never opened
+std::ofstream logfile;
+#endif
 
 print_logger<logtype::normal>& pl()
 {

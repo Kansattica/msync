@@ -4,8 +4,10 @@ project (msync VERSION 0.9.5
 	DESCRIPTION "Store and forward messages with a Mastodon API-compatible server."
 	HOMEPAGE_URL "https://github.com/Kansattica/msync"
 	LANGUAGES CXX C)
+set (CPACK_PACKAGE_CONTACT "grace@hypnovir.us")
 
 option(MSYNC_BUILD_TESTS "Download catch2 and build tests with it." ON)
+option(MSYNC_FILE_LOG "Log debug messages to msync.log" ON)
 
 set(CMAKE_POLICY_DEFAULT_CMP0069 NEW) #enable interprocedural optimization for all projects
 
@@ -77,6 +79,8 @@ target_link_libraries(postfile PRIVATE filebacked printlog util)
 
 target_link_libraries(postlist PRIVATE filesystem entities)
 
+target_link_libraries(printlog PRIVATE constants)
+
 target_link_libraries(queue PRIVATE constants printlog filebacked exception postfile) 
 
 target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options queue postfile)
@@ -93,3 +97,14 @@ if (MSYNC_BUILD_TESTS)
 	enable_testing()
 	add_subdirectory(tests)
 endif()
+
+install(TARGETS msync
+	RUNTIME DESTINATION bin
+)
+
+if (UNIX)
+	set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
+	set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libgcc1, libcurl4")
+	set(CPACK_GENERATOR "DEB")
+endif()
+include(CPack)

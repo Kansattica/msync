@@ -60,30 +60,31 @@ To ensure that `msync` found and compiled its network dependencies correctly, ru
 
 ### Next steps
 
-Once you have `msync` compiled, check out [MANUAL.md](manual.md) for installation and usage information.
+Once you have `msync` compiled, check out [MANUAL.md](manual.md#msync-manual) for installation and usage information.
 
 ### Features (that are implemented or coming soon)
-- [X] Multiple account support
-- [X] Queue posts, boosts, and favs
+- [X] Multiple account support.
+- [X] Queue posts, boosts, and favs.
 - [X] Queue up threads before sending.
-- [X] Send posts, boosts, and favs
-- [X] Download posts from home timeline
-- [ ] Download direct messages
-- [X] Download notifications
-- [ ] Download posts from lists
-- [ ] Download posts from your profile
-- [X] Post template file generation
-- [X] Attachment support
-- [ ] Following support
+- [X] Send posts, boosts, and favs.
+- [X] Download posts from home timeline.
+- [ ] Download direct messages.
+- [X] Download notifications.
+- [ ] Download posts from lists.
+- [ ] Download posts from your profile.
+- [X] Post template file generation.
+- [X] Attachment support.
+- [ ] Following support.
 - [X] Ability to exclude notifications by type.
-- [ ] Nicknames for accounts
+- [ ] Allow choosing a default account.
 
 ### Roadmap (things for later)
-- [ ] Queue and send profile updates
-- [ ] Download individual posts and threads by URL or ID
-- [X] Poll support (polls download and render properly, voting not implemented yet)
+- [ ] Nicknames for accounts.
+- [ ] Queue and send profile updates.
+- [ ] Download individual posts and threads by URL or ID.
+- [X] Poll support (polls download and render properly, voting not implemented yet).
 - [ ] Nicer UI, like a minimal webpage to show downloaded posts in.
-- [ ] [A proper manual for the weirder ins and outs of msync](MANUAL.md)
+- [ ] [A proper manual for the weirder ins and outs of msync.](MANUAL.md)
 
 ### Build Dependencies
 CMake will download all of these for you, except it'll use your system's libcurl if you have it and can't update your compiler or standard library. I recommend at least having an SSL/TLS library for CMake to find and dynamically link.

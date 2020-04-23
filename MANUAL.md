@@ -81,6 +81,39 @@ After your account is set up, running `msync sync --verbose` will connect to you
 - If you don't care about a specific type of notification, you can stop `msync` from retrieving them when you sync with `msync config exclude_boosts true`, and same for `favs`, `follows`, `mentions`, and `polls`. `msync` treats anything start with a `t`, `T`, `y`, or `Y` as truthy, and everything else as falsy. So `exclude_favs true`, `exclude_favs YES`, and `exclude_favs Yeehaw` are equivalent.
 - I'll write more about configuration later, but for now, you can see all your settings and registered accounts with `msync config showall`.
 
+#### Downloading attachments
+
+`msync` cannot display attachments on its own, but it will provide you with the URLs your mastodon instance stores attachments at. You can use a tool such as `wget`, `aria2`, or, on Windows, `Invoke-WebRequest`.
+
+If you'd also like to download images, you can run a little shell script like the following after syncing. I recommend `aria2`, available from your Linux distribution's package manager or as a Windows binary, because it supports parallel downloads and doesn't leave the query string (that annoying `?1582789450` thing) in the filenames like `wget` does.
+
+```
+grep "^attached: " msync_accounts/username@instance.egg/home.list | sed 's/attached: //' | sort | uniq | aria2c -c -d downloaded_images -i -
+```
+Or, if you prefer `wget`:
+
+```
+grep "^attached: " msync_accounts/username@instance.egg/home.list | sed 's/attached: //' | sort | uniq | wget -c --content-disposition -P downloaded_images -i -
+```
+
+The `--content-disposition` flag here ensures `wget` fixes up the filename in some cases, but still leaves the query strings in the file name.
+
+On Windows, you can use a pure Powershell solution like this:
+
+```
+New-Item -Type Directory downloaded_images;  Get-Content .\home.list | Select-String -Pattern "^attached: " | ForEach-Object { $_ -replace "^attached: ", "" } | Where-Object { !(Test-Path -Path "downloaded_images/$((Split-Path -Leaf $_).Split('?')[0])" -PathType Leaf) } | Sort-Object -Unique | ForEach-Object { Invoke-WebRequest -UseBasicParsing -Uri $_ -OutFile "downloaded_images/$((Split-Path -Leaf $_).Split('?')[0])" }
+```
+
+`Invoke-WebRequest` is pretty slow, though, so you should try using BITS if you have it:
+
+```
+New-Item -Type Directory downloaded_images;  Get-Content .\home.list | Select-String -Pattern "^attached: " | ForEach-Object { $_ -replace "^attached: ", "" } | Where-Object { !(Test-Path -Path "downloaded_images/$((Split-Path -Leaf $_).Split('?')[0])" -PathType Leaf) } | Sort-Object -Unique | ForEach-Object { New-Object psobject -Property @{Source = $_;Destination = "downloaded_images/$((Split-Path -Leaf $_).Split('?')[0])" } } | Start-BitsTransfer -TransferType Download
+```
+
+Or you can replace the last step in either of these chains with `wget` or `aria2c`, if you're willing to install those on Windows.
+
+All of these skip downloading files you've already downloaded, so feel free to always run them after syncing- perhaps by saving them into a shell script and running `msync sync; ./get_images.sh` or whatever.
+
 #### Queueing
 
 To do other useful stuff with msync, you'll have to use queues. The `msync queue` command allows you to queue up favorites, boosts, and posts to be sent when you're back online. 
