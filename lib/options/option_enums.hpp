@@ -1,5 +1,5 @@
-#ifndef _ENUM_NAMES_HPP_
-#define _ENUM_NAMES_HPP_
+#ifndef ENUM_NAMES_HPP
+#define ENUM_NAMES_HPP
 #include <array>
 #include <string_view>
 

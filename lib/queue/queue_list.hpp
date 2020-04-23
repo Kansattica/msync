@@ -1,5 +1,5 @@
-#ifndef _QUEUE_LIST_HPP_
-#define _QUEUE_LIST_HPP_
+#ifndef QUEUE_LIST_HPP
+#define QUEUE_LIST_HPP
 
 #include <deque>
 #include <string>

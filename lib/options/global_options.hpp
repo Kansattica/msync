@@ -1,5 +1,5 @@
-#ifndef _GLOBAL_OPTIONS_HPP_
-#define _GLOBAL_OPTIONS_HPP_
+#ifndef GLOBAL_OPTIONS_HPP
+#define GLOBAL_OPTIONS_HPP
 
 #include "user_options.hpp"
 #include <filesystem.hpp>

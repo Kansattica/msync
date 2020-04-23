@@ -1,5 +1,5 @@
-#ifndef _USER_OPTIONS_HPP_
-#define _USER_OPTIONS_HPP_
+#ifndef USER_OPTIONS_HPP
+#define USER_OPTIONS_HPP
 
 #include <string>
 

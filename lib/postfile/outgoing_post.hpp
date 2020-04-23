@@ -1,5 +1,5 @@
-#ifndef _OUTGOING_POST_HPP_
-#define _OUTGOING_POST_HPP_
+#ifndef OUTGOING_POST_HPP
+#define OUTGOING_POST_HPP
 
 #include <vector>
 #include <string>

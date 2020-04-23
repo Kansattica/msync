@@ -1,5 +1,5 @@
-#ifndef _TEST_HELPERS_HPP_
-#define _TEST_HELPERS_HPP_
+#ifndef TEST_HELPERS_HPP
+#define TEST_HELPERS_HPP
 
 #include <filesystem.hpp>
 

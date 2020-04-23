@@ -1,5 +1,5 @@
-#ifndef _MOCK_NETWORK_HPP_
-#define _MOCK_NETWORK_HPP_
+#ifndef MOCK_NETWORK_HPP
+#define MOCK_NETWORK_HPP
 
 struct mock_network
 {

@@ -1,5 +1,5 @@
-#ifndef _PRINTLOG_HPP_
-#define _PRINTLOG_HPP_
+#ifndef PRINTLOG_HPP
+#define PRINTLOG_HPP
 
 #include <iostream>
 #include <fstream>

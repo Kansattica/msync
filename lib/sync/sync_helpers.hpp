@@ -1,5 +1,5 @@
-#ifndef _SYNC_HELPERS_HPP_
-#define _SYNC_HELPERS_HPP_
+#ifndef SYNC_HELPERS_HPP
+#define SYNC_HELPERS_HPP
 
 #include <string_view>
 #include <optional>

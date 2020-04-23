@@ -1,5 +1,5 @@
-#ifndef _RECV_HELPERS_HPP_
-#define _RECV_HELPERS_HPP_
+#ifndef RECV_HELPERS_HPP
+#define RECV_HELPERS_HPP
 
 #include <string_view>
 #include <string>

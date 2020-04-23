@@ -1,5 +1,5 @@
-#ifndef _QUEUES_HPP_
-#define _QUEUES_HPP_
+#ifndef QUEUES_HPP
+#define QUEUES_HPP
 
 #include <string>
 #include <vector>

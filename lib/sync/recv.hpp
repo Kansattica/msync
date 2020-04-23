@@ -1,5 +1,5 @@
-#ifndef _MSYNC_RECV_HPP_
-#define _MSYNC_RECV_HPP_
+#ifndef MSYNC_RECV_HPP
+#define MSYNC_RECV_HPP
 
 #include <print_logger.hpp>
 

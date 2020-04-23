@@ -1,5 +1,5 @@
-#ifndef _MSYNC_NET_INTERFACE_HPP_
-#define _MSYNC_NET_INTERFACE_HPP_
+#ifndef MSYNC_NET_INTERFACE_HPP
+#define MSYNC_NET_INTERFACE_HPP
 
 #include <string_view>
 #include <string>

@@ -1,5 +1,5 @@
-#ifndef _POST_LIST_HPP_
-#define _POST_LIST_HPP_
+#ifndef POST_LIST_HPP
+#define POST_LIST_HPP
 
 #include <filesystem.hpp>
 
