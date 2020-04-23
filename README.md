@@ -60,7 +60,7 @@ To ensure that `msync` found and compiled its network dependencies correctly, ru
 
 ### Next steps
 
-Once you have `msync` compiled, check out [MANUAL.md](manual.md) for installation and usage information.
+Once you have `msync` compiled, check out [MANUAL.md](manual.md#msync-manual) for installation and usage information.
 
 ### Features (that are implemented or coming soon)
 - [X] Multiple account support
