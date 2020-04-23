@@ -15,8 +15,16 @@ std::string paramaterize_url(const std::string_view before, const std::string_vi
 
 std::mt19937_64 make_random_engine()
 {
+	// random_device produces an unsigned int (32 bits), but the mersenne twister wants to be seeded with a 64-bit value,
+	// so take two seeds and combine them like this
+	// this is overkill for what msync uses the mersenne twister for, which is to simply generate a sequence of
+	// idempotency keys that won't repeat within or between runs, but if you're gonna do something, might as well do it right.
+	// I think the real proper thing to do would be to use seedseq, but I haven't found any real documentation on
+	// how to use it correctly.
 	std::random_device rd;
-	return std::mt19937_64(rd());
+	uint_fast64_t seed = rd();
+	seed = (seed << 32) | rd();
+	return std::mt19937_64(seed);
 }
 
 uint_fast64_t random_number()
