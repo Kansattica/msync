@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <initializer_list>
 #include <print_logger.hpp>
+#include <unordered_set>
 
 struct id_mock_args : public basic_mock_args
 {
@@ -972,6 +973,50 @@ SCENARIO("Send correctly sends from and modifies a queue of mixed API calls.")
 				REQUIRE(mockpost.arguments[5].sequence == 7);
 				REQUIRE(mockpost.arguments[5].url == make_expected_url("badpost", "/unfavourite", instanceurl));
 
+			}
+		}
+	}
+}
+
+SCENARIO("read_params doesn't repeat idempotency keys or mutate the post file.")
+{
+	const test_file fi = temporary_file();
+	GIVEN("An outgoing post to read from.")
+	{
+		constexpr std::string_view expected_text = "hi there, bud";
+		constexpr std::string_view expected_cw = "careful, watch out for that content";
+		constexpr std::string_view visibility = "direct";
+		
+		{
+			outgoing_post towrite{ fi.filename };
+			towrite.parsed.text = expected_text;
+			towrite.parsed.content_warning = expected_cw;
+			towrite.parsed.vis = visibility::direct;
+		}
+
+		WHEN("The outgoing_post is read by read_params repeatedly.")
+		{
+			std::unordered_set<uint_fast64_t> seen_ids;
+			THEN("The paramaters are always as expected, and the idempotency_ids never repeat.")
+			{
+				constexpr int trials = 50000;
+				for (int i = 0; i < trials; i++)
+				{
+					const auto params = read_params(fi.filename);
+					REQUIRE(params.attachments.empty());
+					REQUIRE(params.attachment_ids.empty());
+					REQUIRE(params.body == expected_text);
+					REQUIRE(params.content_warning == expected_cw);
+					REQUIRE(params.okay);
+					REQUIRE(params.reply_id.empty());
+					REQUIRE(params.reply_to.empty());
+					REQUIRE(params.visibility == visibility);
+
+					const auto [it, inserted] = seen_ids.insert(params.idempotency_key);
+					REQUIRE(inserted);
+				}
+
+				REQUIRE(seen_ids.size() == trials);
 			}
 		}
 	}
