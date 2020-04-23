@@ -23,9 +23,9 @@ std::mt19937_64 make_random_engine()
 	// how to use it correctly.
 	// if you're on a system where this isn't true (say, your unsigned int is 16 bits), you should only have to make
 	// two more calls to rd().
-	static_assert(sizeof(std::random_device::result_type) * 2 == sizeof(uint_fast64_t));
+	static_assert(sizeof(std::random_device::result_type) * 2 == sizeof(std::mt19937_64::result_type));
 	std::random_device rd;
-	uint_fast64_t seed = rd();
+	std::mt19937_64::result_type seed = rd();
 	seed = (seed << 32) | rd();
 	return std::mt19937_64(seed);
 }
