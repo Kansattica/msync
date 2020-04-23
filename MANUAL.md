@@ -85,7 +85,7 @@ After your account is set up, running `msync sync --verbose` will connect to you
 
 `msync` cannot display attachments on its own, but it will provide you with the URLs your mastodon instance stores attachments at. You can use a tool such as `wget`, `aria2`, or, on Windows, `Invoke-WebRequest`.
 
-If you'd also like to download images, you can run a little shell script like the following after syncing. I recommend `aria2`, available from your Linux distribution's package manager or as a Windows binary, because it supports parallel downloads and doesn't leave the query string (that annoying `?1582789450` thing) in the filenames like wget does.
+If you'd also like to download images, you can run a little shell script like the following after syncing. I recommend `aria2`, available from your Linux distribution's package manager or as a Windows binary, because it supports parallel downloads and doesn't leave the query string (that annoying `?1582789450` thing) in the filenames like `wget` does.
 
 ```
 grep "^attached: " msync_accounts/username@instance.egg/home.list | sed 's/attached: //' | sort | uniq | aria2c -c -d downloaded_images -i -
