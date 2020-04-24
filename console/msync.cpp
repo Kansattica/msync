@@ -100,8 +100,9 @@ int main(int argc, const char* argv[])
 			should_print_newline = false;
 			break;
 		case mode::version:
+			should_print_newline = false;
 			pl() << "msync version " << MSYNC_VERSION;
-			pl() << "\nBuilt with: " << MSYNC_BUILD_OPTIONS;
+			pl() << "\n" << MSYNC_BUILD_OPTIONS;
 			break;
 		case mode::license:
 			pl() << MSYNC_LICENSE;
