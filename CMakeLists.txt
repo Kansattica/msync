@@ -44,8 +44,6 @@ add_executable(msync "")
 # see https://crascit.com/2016/01/31/enhanced-source-file-handling-with-target_sources/
 include(cmake/compatibility.cmake)
 
-add_subdirectory(console)
-add_subdirectory(console/optionparsing)
 add_subdirectory(lib/queue)
 add_subdirectory(lib/sync)
 add_subdirectory(lib/filesystem)
@@ -58,6 +56,8 @@ add_subdirectory(lib/postlist)
 add_subdirectory(lib/exception)
 add_subdirectory(lib/printlog)
 add_subdirectory(lib/util)
+add_subdirectory(console/optionparsing)
+add_subdirectory(console)
 
 target_include_directories(netinterface INTERFACE lib/netinterface)
 target_link_libraries(netinterface INTERFACE filesystem)

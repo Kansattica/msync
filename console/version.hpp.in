@@ -1,7 +1,7 @@
 #ifndef MSYNC_VERSION_HPP
 #define MSYNC_VERSION_HPP
 
-constexpr const char* MSYNC_VERSION = "0.9.5";
+constexpr const char* MSYNC_VERSION = "@PROJECT_VERSION@";
 
 constexpr const char* MSYNC_LICENSE = R"(
 	msync - a command line store and forward Mastodon client.
@@ -22,5 +22,21 @@ constexpr const char* MSYNC_LICENSE = R"(
 
 	Please contact grace@hypnovir.us with licensing questions.
 )";
+
+#cmakedefine MSYNC_FILE_LOG
+#cmakedefine MSYNC_USER_CONFIG
+#cmakedefine MSYNC_USE_BOOST
+
+constexpr const char* MSYNC_BUILD_OPTIONS = ""
+#ifdef MSYNC_FILE_LOG
+"MSYNC_FILE_LOG "
+#endif
+#ifdef MSYNC_USER_CONFIG
+"MSYNC_USER_CONFIG "
+#endif
+#ifdef MSYNC_USE_BOOST
+"MSYNC_USE_BOOST"
+#endif
+;
 
 #endif

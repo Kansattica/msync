@@ -101,6 +101,7 @@ int main(int argc, const char* argv[])
 			break;
 		case mode::version:
 			pl() << "msync version " << MSYNC_VERSION;
+			pl() << "\nBuilt with: " << MSYNC_BUILD_OPTIONS;
 			break;
 		case mode::license:
 			pl() << MSYNC_LICENSE;
