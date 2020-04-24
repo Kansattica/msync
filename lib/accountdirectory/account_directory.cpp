@@ -3,17 +3,17 @@
 #include <constants.hpp>
 
 #ifdef __linux__
-#include <limits.h>
-#include <cstdlib>
-#include <memory>
+	#include <limits.h>
+	#include <cstdlib>
+	#include <memory>
 #else
-#include <string>
-#ifdef MSYNC_USER_CONFIG
-#include <windows.h>
-#include <shlobj.h>
-#else
-#include <whereami.h>
-#endif
+	#include <string>
+	#if defined(MSYNC_USER_CONFIG)
+		#include <windows.h>
+		#include <shlobj.h>
+	#else
+		#include <whereami.h>
+	#endif
 #endif
 
 #ifdef MSYNC_USER_CONFIG
