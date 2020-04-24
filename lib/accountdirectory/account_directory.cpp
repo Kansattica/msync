@@ -8,8 +8,44 @@
 #include <memory>
 #else
 #include <string>
+#ifdef MSYNC_USER_CONFIG
+#include <windows.h>
+#include <shlobj.h>
+#else
 #include <whereami.h>
 #endif
+#endif
+
+#ifdef MSYNC_USER_CONFIG
+
+fs::path get_user_config_folder_base()
+{
+#ifdef __linux__
+	// compliant with the XDG Base Directory Specification
+	if (const char *config_dir = getenv("XDG_CONFIG_HOME")) {
+		return config_dir;
+	}
+	return fs::path{ getenv("HOME") }.append(".config");
+#else
+	PWSTR appdata_path = nullptr;
+	auto hresult = ::SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_DEFAULT, nullptr, &appdata_path);
+	if (SUCCEEDED(hresult)) {
+		fs::path path{ appdata_path };
+		::CoTaskMemFree(appdata_path);
+		return fs::canonical(path);
+	}
+	return fs::path{};
+#endif
+}
+
+fs::path get_user_config_folder()
+{
+	return get_user_config_folder_base().append("msync");
+}
+
+#define get_config_folder get_user_config_folder
+
+#else
 
 fs::path get_executable_folder()
 {
@@ -33,9 +69,12 @@ fs::path get_executable_folder()
 #endif
 }
 
+#define get_config_folder get_executable_folder
+
+#endif
 
 const fs::path& account_directory_path()
 {
-	const static fs::path folder = get_executable_folder().append(Account_Directory);
+	const static fs::path folder = get_config_folder().append(Account_Directory);
 	return folder;
 }

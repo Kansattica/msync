@@ -8,6 +8,7 @@ set (CPACK_PACKAGE_CONTACT "grace@hypnovir.us")
 
 option(MSYNC_BUILD_TESTS "Download catch2 and build tests with it." ON)
 option(MSYNC_FILE_LOG "Log debug messages to msync.log" ON)
+option(MSYNC_USER_CONFIG "Store configuration in the OS user configuration folder. Otherwise, store configuration in msync_accounts in the executable's directory." OFF)
 
 set(CMAKE_POLICY_DEFAULT_CMP0069 NEW) #enable interprocedural optimization for all projects
 

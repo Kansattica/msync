@@ -30,10 +30,12 @@ SCENARIO("account_directory_path returns the same correct path every time.")
 			REQUIRE(*it == Account_Directory);
 		}
 
+#ifndef MSYNC_USER_CONFIG
 		THEN("The test executable exists in the parent directory.")
 		{
 			REQUIRE(fs::exists(account_dir.parent_path() / filename));
 		}
+#endif
 
 		THEN("Each subsequent call returns the same path.")
 		{
