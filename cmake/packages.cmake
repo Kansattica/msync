@@ -51,6 +51,8 @@ if (NOT MSYNC_USER_CONFIG)
 		add_library (whereami STATIC ${whereamilib_SOURCE_DIR}/src/whereami.c  ${whereamilib_SOURCE_DIR}/src/whereami.h)
 		target_include_directories(whereami PUBLIC ${whereamilib_SOURCE_DIR}/src)
 	endif()
+else()
+		add_library(whereami INTERFACE)
 endif()
 
 message(STATUS "Downloading CPR...")
