@@ -12,11 +12,11 @@ You can download the latest stable release of `msync` [here](https://github.com/
 
 If you would like to build `msync` yourself, read on. If you have a fairly recent version of CMake (3.12 or later), you can simply clone the repo, make a `build` directory, run CMake inside, and CMake will download and build `msync` and its dependencies automatically. 
 
-On Linux systems, it works a lot better if it can link in your system's openssl (or whatever other TLS implementation cURL knows how to use) and, if you have it, libcurl. Consider installing these through your package manager. For example, I install `libcurl4-openssl-dev` on Debian.
+On Linux systems, it works a lot better if it can link in your system's openssl (or whatever other TLS implementation cURL knows how to use) and, if you have it, libcurl. Most systems have `libcurl4` or an equivalent installed already.
 
 ##### Notes on libcurl 
 
-- Some systems come with `libcurl4-gnutls-dev` preinstalled. This works as well- no need to uninstall it for the openssl version.
+- If you're compiling `msync` from source, you'll need something like `libcurl4-gnutls-dev` or `libcurl4-openssl-dev` installed.
 - If you'd rather have msync compile curl into itself, add `-DUSE_SYSTEM_CURL=OFF` after `-DCMAKE_BUILD_TYPE=Release`. This will automatically download and configure curl as part of the build process. If you go this route, I suggest having zlib (e.g. `zlib1g-dev`, optional but highly recommended) and an ssl library (e.g. `libssl-dev`, required) installed where curl can find them.
 
 #### Building on Linux
@@ -28,13 +28,13 @@ git clone https://github.com/Kansattica/msync.git
 cd msync
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DMSYNC_BUILD_TESTS=FALSE
+cmake .. -DCMAKE_BUILD_TYPE=Release -DMSYNC_BUILD_TESTS=OFF
 cmake --build . --parallel
 ```
 
 The last two steps will take a while, but when you're done, you should see a `msync` executable in your folder, and that's all you need! 
 
-Older Ubuntu releases might require you to `apt install g++-8 libstdc++-8-dev` and run `CC=gcc-8 CXX=g++-8 cmake .. -DCMAKE_BUILD_TYPE=Release -DMSYNC_BUILD_TESTS=FALSE` instead, in order to get and use a version of the standard library that supports std::filesystem.
+Older Ubuntu releases might require you to `apt install g++-8 libstdc++-8-dev` and run `CC=gcc-8 CXX=g++-8 cmake .. -DCMAKE_BUILD_TYPE=Release -DMSYNC_BUILD_TESTS=OFF` instead, in order to get and use a version of the standard library that supports std::filesystem.
 
 #### Building on macOS
 
@@ -54,9 +54,20 @@ If you want something lighter weight, I suspect you can install the [build tools
 - OSX 10.14 with Xcode 11
 - MSVC 2017 on 32 and 64-bit Windows 
 
+#### Relevant CMake flags
+
+Pass these during the first call to CMake (next to `-DCMAKE_BUILD_TYPE=Release`) to configure `msync`'s behavior. Boolean options can either be set to `ON` or `OFF` like this: `-DMSYNC_FILE_LOG=OFF`
+
+| Command             |   Type    | Default | Description |
+|:-------------------:|:---------:|:-------:|--------------
+| `MSYNC_BUILD_TESTS` | boolean   |  `ON`   | If `ON`, download Catch2 and build two test executables, `tests` and `net_tests`, will also be built. |
+| `MSYNC_FILE_LOG`    | boolean   |  `ON`   | If `ON`, `msync` will create an `msync.log` file in the current directory whenever it runs with a record of what it did. | 
+|`MSYNC_DOWNLOAD_ZLIB`| boolean   |  `ON`   | If `ON` AND you're on Windows, CMake will download a built copy of zlib and statically link it to curl for compression. No effect on other platforms. |
+| `USE_SYSTEM_CURL`   | boolean   |  `ON`   | If `ON` AND CMake can find `libcurl` on your system, `msync` will use that to perform network requests. If this is `OFF` OR CMake couldn't find `libcurl`, it will download, build, and statically link `libcurl` for you. |
+
 #### Testing your build
 
-To ensure that `msync` found and compiled its network dependencies correctly, run the CMake commands above without `-DMSYNC_BUILD_TESTS=FALSE` (or, equivalently, `-DMSYNC_BUILD_TESTS=TRUE`). Then, run `./tests/net_tests`. This will determine whether `msync` can correctly make authenticated HTTPS requests and will print warnings if it cannot request and recieve compressed responses.
+To ensure that `msync` found and compiled its network dependencies correctly, run the CMake commands above without `-DMSYNC_BUILD_TESTS=OFF` (or, equivalently, `-DMSYNC_BUILD_TESTS=ON`). Then, run `./tests/net_tests`. This will determine whether `msync` can correctly make authenticated HTTPS requests and will print warnings if it cannot request and recieve compressed responses.
 
 ### Next steps
 
