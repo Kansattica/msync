@@ -1,5 +1,6 @@
-#ifndef _MSYNC_EXCEPTION_HPP_
-#define _MSYNC_EXCEPTION_HPP_
+#ifndef MSYNC_EXCEPTION_HPP
+#define MSYNC_EXCEPTION_HPP
+
 #include <exception>
 #include <string>
 

@@ -1,5 +1,5 @@
-#ifndef _MASTODON_ENTITIES_HPP_
-#define _MASTODON_ENTITIES_HPP_
+#ifndef MASTODON_ENTITIES_HPP
+#define MASTODON_ENTITIES_HPP
 
 #include <optional>
 #include <vector>

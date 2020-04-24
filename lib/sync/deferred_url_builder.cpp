@@ -5,7 +5,7 @@
 constexpr std::string_view STATUS_ROUTE{ "/api/v1/statuses/" };
 constexpr std::string_view MEDIA_ROUTE{ "/api/v1/media" };
 
-std::string& deferred_url_builder::make_if_empty(std::string& field, std::string_view route)
+const std::string& deferred_url_builder::make_if_empty(std::string& field, std::string_view route)
 {
 	if (field.empty())
 		field = make_api_url(instance_url, route);

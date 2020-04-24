@@ -1,8 +1,6 @@
 #include "new_account.hpp"
 
 #include "../lib/util/util.hpp"
-#include "../lib/options/option_enums.hpp"    // for user_option, user_optio...
-#include "../lib/options/option_file.hpp"     // for string
 #include "../lib/options/user_options.hpp"    // for user_options
 
 #include <cpr/cpr.h>
@@ -10,7 +8,6 @@
 #include <print_logger.hpp>
 
 #include <string>
-#include <optional>                           // for optional
 #include <utility>                            // for pair
 
 using json = nlohmann::json;
@@ -19,22 +16,25 @@ constexpr auto scopes = "write:favourites write:media write:statuses read:notifi
 constexpr auto urlscopes = "write:favourites%20write:media%20write:statuses%20read:notifications%20read:statuses";
 constexpr auto redirect_uri = "urn:ietf:wg:oauth:2.0:oob";
 
-std::string make_clean_accountname(std::string username, const std::string& instance)
+std::string make_clean_accountname(const std::string& username, const std::string& instance)
 {
-	username.reserve(username.size() + instance.size() + 1);
-	return username.append(1, '@').append(instance);
+	std::string to_return;
+	to_return.reserve(username.size() + instance.size() + 1);
+	return to_return.append(username).append(1, '@').append(instance);
 }
 
 void make_new_account(const std::string& accountname, global_options& options)
 {
-	auto useraccountpair = options.select_account(accountname);
+	auto useraccountresult = options.select_account(accountname);
+
+	auto useraccountpair = useraccountresult.index() == 0 ? std::get<0>(useraccountresult) : nullptr;
 
 	// see: https://docs.joinmastodon.org/api/authentication/
 
 	// if no user was found, make a new one
 	if (useraccountpair == nullptr)
 	{
-		pl() << "Creating new account for " << accountname << "\n";
+		pl() << "Creating new account for " << accountname << ".\n";
 		const auto parsed = parse_account_name(accountname);
 		if (!parsed.has_value())
 		{
@@ -61,14 +61,14 @@ void make_new_account(const std::string& accountname, global_options& options)
 	const auto& instanceurl = useraccount.get_option(user_option::instance_url);
 	if (client_id == nullptr || client_secret == nullptr)
 	{
-		pl() << "Registering app with " << instanceurl << '\n';
+		pl() << "Registering app with " << instanceurl << ".\n";
 		const auto r = cpr::Post(cpr::Url{make_api_url(instanceurl, "/api/v1/apps")},
 						   cpr::Parameters{{"client_name", "msync"}, {"redirect_uris", redirect_uri}, {"scopes", scopes}, {"website", "https://github.com/kansattica/msync"}});
 
 		if (r.error)
 		{
-			pl() << "Could not register app with server. Responded with error code " << r.status_code << ": " << r.error.message << '\n';
-			pl() << "Please try again.\n";
+			pl() << "Could not register app with server. Responded with error code " << r.status_code << ": " << r.error.message << ".\n"
+			"Please double check your instance URL, ensure you're connected to the internet, and try again.";
 			return;
 		}
 
@@ -90,21 +90,21 @@ void make_new_account(const std::string& accountname, global_options& options)
 	{
 		const auto& foundaccountname = useraccount.get_option(user_option::account_name);
 		pl() << "Please open this URL in your browser:\n"
-		   << "https://" << instanceurl << "/oauth/authorize?response_type=code&client_id=" << *client_id
-		   << "&redirect_uri=" << redirect_uri << "&scope=" << urlscopes << '\n'
-		   << "Enter your authorization code like so:\n"
-		   << "msync config auth_code <the authorization code from the site> -a " << foundaccountname << "@" << instanceurl << '\n'
-		   << "then run this again:\n"
-		   << "msync new -a " << foundaccountname << "@" << instanceurl << '\n'
-		   << "You can shorten the username part, as long as msync can figure out which registered account you're talking about.\n"
-		   << "If this is your only account, you can leave the -a part off altogether.\n";
+		   "https://" << instanceurl << "/oauth/authorize?response_type=code&client_id=" << *client_id
+		   << "&redirect_uri=" << redirect_uri << "&scope=" << urlscopes << "\n"
+		   "Enter your authorization code like so:\n"
+		   "msync config auth_code <the authorization code from the site> --account " << foundaccountname << '@' << instanceurl << "\n"
+		   "then run this again:\n"
+		   "msync new -a " << foundaccountname << '@' << instanceurl << "\n"
+		   "You can shorten the username part, as long as msync can figure out which registered account you're talking about.\n"
+		   "If this is your only account, you can leave the -a part off altogether.";
 		return;
 	}
 
 	const auto access_token = useraccount.try_get_option(user_option::access_token);
 	if (access_token != nullptr)
 	{
-		pl() << "Your account is already registered! You're done!\n";
+		pl() << "Your account is already registered! You're done!";
 		return;
 	}
 
@@ -118,13 +118,13 @@ void make_new_account(const std::string& accountname, global_options& options)
 	{
 		const auto foundaccountname = *useraccount.try_get_option(user_option::account_name);
 		pl() << "Could not get access token from server. Authorization codes can only be used once, so it's been deleted and you should get another one.\n"
-		   << "Please open this URL in your browser:\n"
-		   << "https://" << instanceurl << "/oauth/authorize?response_type=code&client_id=" << *client_id
-		   << "&redirect_uri=" << redirect_uri << "&scope=" << urlscopes << '\n'
-		   << "Enter your authorization code like so:\n"
-		   << "msync config authcode <the authorization code from the site> -a " << foundaccountname << "@" << instanceurl << '\n'
-		   << "then run this again:\n"
-		   << "msync new -a " << foundaccountname << "@" << instanceurl << '\n';
+		   "Please open this URL in your browser:\n"
+		   "https://" << instanceurl << "/oauth/authorize?response_type=code&client_id=" << *client_id
+		   << "&redirect_uri=" << redirect_uri << "&scope=" << urlscopes << "\n"
+		   "Enter your authorization code like so:\n"
+		   "msync config authcode <the authorization code from the site> -a " << foundaccountname << '@' << instanceurl << "\n"
+		   "then run this again:\n"
+		   "msync new -a " << foundaccountname << '@' << instanceurl;
 		return;
 	}
 

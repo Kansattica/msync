@@ -1,5 +1,5 @@
-#ifndef _MSYNC_NET_HPP_
-#define _MSYNC_NET_HPP_
+#ifndef MSYNC_NET_HPP
+#define MSYNC_NET_HPP
 
 #include "../netinterface/net_interface.hpp"
 

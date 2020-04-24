@@ -1,5 +1,5 @@
-#ifndef _CONSTANTS_HPP_
-#define _CONSTANTS_HPP_
+#ifndef CONSTANTS_HPP
+#define CONSTANTS_HPP
 
 // boost doesn't know what to do with std::string_views and paths.
 #if MSYNC_USE_BOOST

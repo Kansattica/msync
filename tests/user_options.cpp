@@ -369,7 +369,7 @@ SCENARIO("user_options correctly reports the directory it's in.")
 {
 	GIVEN("A user_options for some file is created and destroyed.")
 	{
-		test_file fi = temporary_file();
+		const test_file fi = temporary_file();
 
 		{ // gotta make sure that file gets made
 			user_options opts{ fi.filename };

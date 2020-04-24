@@ -1,5 +1,5 @@
-#ifndef _SEND_HELPERS_HPP_
-#define _SEND_HELPERS_HPP_
+#ifndef SEND_HELPERS_HPP
+#define SEND_HELPERS_HPP
 
 #include "../queue/queue_list.hpp"
 #include <print_logger.hpp>

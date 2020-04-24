@@ -1,5 +1,5 @@
-#ifndef _FS_HPP_
-#define _FS_HPP_
+#ifndef FS_HPP
+#define FS_HPP
 
 #if MSYNC_USE_BOOST && __has_include(<boost/filesystem.hpp>)
 #include <boost/filesystem.hpp>

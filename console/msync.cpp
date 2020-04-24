@@ -20,11 +20,11 @@
 #include "optionparsing/parse_options.hpp"
 
 std::pair<const std::string, user_options>& assume_account(const std::string& account);
-std::pair<const std::string, user_options>& assume_account(std::pair<const std::string, user_options>* user);
+std::pair<const std::string, user_options>& assume_account(select_account_result user);
 
 void do_sync(const parse_result& parsed);
 
-void show_all_options(std::pair<const std::string, user_options>* user_ptr, const parse_result& parsed);
+void show_all_options(select_account_result user_result, const parse_result& parsed);
 
 void print_stringptr(const std::string* toprint);
 void print_sensitive(std::string_view name, const std::string* value);
@@ -118,6 +118,7 @@ int main(int argc, const char* argv[])
 	}
 	catch (const std::exception& e)
 	{
+		should_print_newline = true;
 		pl() << "An error occurred: " << e.what();
 		pl() << "\nFor account: ";
 		if (parsed.account.empty())
@@ -134,20 +135,13 @@ int main(int argc, const char* argv[])
 
 void do_sync(const parse_result& parsed)
 {
-	auto user = options().select_account(parsed.account);
+	auto select_result = options().select_account(parsed.account);
 
-	if (user == nullptr)
+	if (std::holds_alternative<select_account_error>(select_result))
 	{
-		int number_of_accounts = 0;
-		options().foreach_account([&number_of_accounts](const auto& _) { number_of_accounts++; });
+		const auto error = std::get<select_account_error>(select_result);
 
-		if (number_of_accounts == 0)
-		{
-			pl() << "No accounts registered. Run msync new --account [username@instance.url] to register an account with msync.\n";
-			return;
-		}
-
-		if (number_of_accounts > 1 && !parsed.account.empty())
+		if (error == select_account_error::ambiguous_prefix)
 		{
 			pl() << "Ambiguous account. Either run msync sync with no account flag to synchronize all accounts, or specify an unambiguous prefix.\n"
 					"Basically, msync doesn't know which of the following accounts you meant:\n";
@@ -157,13 +151,22 @@ void do_sync(const parse_result& parsed)
 				});
 			return;
 		}
+		else if (error != select_account_error::empty_name_many_accounts) //this one just means "sync all"
+		{
+			// let assume_account print the error message
+			// (it throws if the error is set)
+			assume_account(select_result);
+			return;
+		}
 	}
+
+	auto user = select_result.index() == 0 ? std::get<0>(select_result) : nullptr;
 
 	if (parsed.sync_opts.send)
 	{
 		send_posts send{ simple_post, simple_delete, new_status, upload_media };
 		send.retries = parsed.sync_opts.retries;
-		if (user == nullptr)
+		if (user == nullptr) 
 		{
 			options().foreach_account([&send](const auto& user) {
 				send.send(user.second.get_user_directory(), user.second.get_option(user_option::instance_url), user.second.get_option(user_option::access_token)); });
@@ -200,20 +203,21 @@ bool is_sensitive(user_option opt)
 	return false;
 }
 
-void show_all_options(std::pair<const std::string, user_options>* user_ptr, const parse_result& parsed)
+void show_all_options(select_account_result user_result, const parse_result& parsed)
 {
 	pl() << "Accounts registered:\n";
 	{
 		const auto accountnames = options().all_accounts();
 		if (accountnames.empty())
 		{
-			pl() << "None. Run msync new --account [username@instance.url] to register an account with msync.\n";
+			pl() << "None.\n";
 			return;
 		}
 		std::for_each(accountnames.begin(), accountnames.end(), [](const auto& accountname) { pl() << accountname << '\n'; });
 	}
 
-	const auto& user = assume_account(user_ptr);
+	const auto& user = assume_account(user_result);
+	pl() << "\nSettings for " << user.first << ":\n";
 	for (auto opt = user_option(0); opt <= user_option::pull_notifications; opt = user_option(static_cast<int>(opt) + 1))
 	{
 		const auto option_name = USER_OPTION_NAMES[static_cast<int>(opt)];
@@ -242,11 +246,34 @@ void show_all_options(std::pair<const std::string, user_options>* user_ptr, cons
 	}
 }
 
-std::pair<const std::string, user_options>& assume_account(std::pair<const std::string, user_options>* user)
+std::string get_account_error(select_account_error err)
 {
-	if (user == nullptr)
-		throw msync_exception("Could not find a match [or an unambiguous match].");
-	return *user;
+	std::string toreturn = "msync couldn't determine which account you wanted to use.\n";
+	switch (err)
+	{
+	case select_account_error::ambiguous_prefix:
+		toreturn += "The prefix you gave to the --account flag could match more than one account.";
+		break;
+	case select_account_error::bad_prefix:
+		toreturn += "The prefix you gave to the --account flag didn't match any accounts.";
+		break;
+	case select_account_error::empty_name_many_accounts:
+		toreturn += "You have more than one account registered with msync and didn't specify one with the --account flag.";
+		break;
+	case select_account_error::no_accounts:
+		toreturn += "You have no accounts registered with msync. Run msync new --account username@instance.url to register one.";
+		break;
+	}
+
+	return toreturn.append("\nYou can see a list of accounts registered with msync by running msync config showall.");
+}
+
+std::pair<const std::string, user_options>& assume_account(select_account_result result)
+{
+
+	if (std::holds_alternative<select_account_error>(result))
+		throw msync_exception(get_account_error(std::get<select_account_error>(result)));
+	return *std::get<0>(result);
 }
 
 std::pair<const std::string, user_options>& assume_account(const std::string& account)
@@ -271,14 +298,10 @@ void print_stringptr(const std::string* toprint)
 template <typename T>
 void print_iterable(const T& vec)
 {
-	bool minushelp = false;
 	for (const auto& item : vec)
 	{
 		pl() << item << '\n';
-		minushelp = minushelp || (item.back() == '-');
 	}
-	if (minushelp)
-		pl() << "IDs followed by a - will be deleted next time you sync.\n";
 }
 
 void print_sensitive(std::string_view name, const std::string* value)

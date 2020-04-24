@@ -1,5 +1,5 @@
-#ifndef _MSYNC_SEND_HPP_
-#define _MSYNC_SEND_HPP_
+#ifndef MSYNC_SEND_HPP
+#define MSYNC_SEND_HPP
 
 #include <print_logger.hpp>
 #include <filesystem.hpp>

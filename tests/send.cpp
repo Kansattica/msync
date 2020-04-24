@@ -14,6 +14,7 @@
 #include <string>
 #include <utility>
 #include <algorithm>
+#include <initializer_list>
 #include <print_logger.hpp>
 
 struct id_mock_args : public basic_mock_args
@@ -392,6 +393,38 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 	}
 }
 
+//ensures a file only exists during each test run
+struct touch_file
+{
+public:
+	touch_file(const char* name) : touch_file(fs::path(name)) {};
+	touch_file(fs::path name) : filename(std::move(name))
+	{
+		std::ofstream of(filename.c_str(), std::ios::out | std::ios::app);
+	};
+
+	~touch_file()
+	{
+		fs::remove(filename);
+	};
+
+	const fs::path filename;
+};
+
+int unique_idempotency_keys(std::initializer_list<uint_fast64_t> keys)
+{
+	int number_of_tests = 0;
+	for (auto first = keys.begin(); first != keys.end(); ++first)
+	{
+		for (auto next = first + 1; next != keys.end(); ++next)
+		{
+			REQUIRE(*first != *next);
+			++number_of_tests;
+		}
+	}
+	return number_of_tests;
+}
+
 SCENARIO("Send correctly sends new posts and deletes existing ones.")
 {
 	logs_off = true;
@@ -518,6 +551,8 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 				REQUIRE(fourth.params.content_warning.empty());
 				REQUIRE(fourth.params.reply_to == "777777");
 				REQUIRE(fourth.params.visibility == "unlisted");
+
+				REQUIRE(6 == unique_idempotency_keys({ first.params.idempotency_key, second.params.idempotency_key, third.params.idempotency_key, fourth.params.idempotency_key }));
 			}
 
 
@@ -609,8 +644,9 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 				REQUIRE(fourth.params.content_warning.empty());
 				REQUIRE(fourth.params.reply_to == "777777");
 				REQUIRE(fourth.params.visibility == "unlisted");
-			}
 
+				REQUIRE(3 == unique_idempotency_keys({ first.params.idempotency_key, second.params.idempotency_key, fourth.params.idempotency_key }));
+			}
 
 			THEN("the uploads are as expected.")
 			{
@@ -760,6 +796,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 			{
 				size_t idx = 0;
 
+				auto expected_idempotency_key = mocknew.arguments[idx].params.idempotency_key;
 				for (size_t i = 0; i < retries.second; i++)
 				{
 					const auto& first = mocknew.arguments[idx++];
@@ -768,11 +805,18 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 					REQUIRE(first.params.content_warning.empty());
 					REQUIRE(first.params.reply_to.empty());
 					REQUIRE(first.params.visibility.empty());
+
+					// their idempotency keys should all be the same for each unique post
+					REQUIRE(first.params.idempotency_key == expected_idempotency_key);
 				}
 
 				// the other replies will be to the last ID for this post
 				// since that's the one that actually went through
 				std::string reply_to_id = mocknew.arguments[idx - 1].id;
+
+				// keys should be different between posts
+				REQUIRE(expected_idempotency_key != mocknew.arguments[idx].params.idempotency_key);
+				expected_idempotency_key = mocknew.arguments[idx].params.idempotency_key;
 
 				for (size_t i = 0; i < retries.second; i++)
 				{
@@ -781,6 +825,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 					REQUIRE(second.params.body == "This one has a body, too.");
 					REQUIRE(second.params.content_warning == "And a content warning.");
 					REQUIRE(second.params.visibility == "private");
+					REQUIRE(second.params.idempotency_key == expected_idempotency_key);
 
 					// test that posts are threaded correctly
 					REQUIRE(second.params.reply_to == reply_to_id);
@@ -788,6 +833,9 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 
 				// do it again because third is a reply to second
 				reply_to_id = mocknew.arguments[idx - 1].id;
+
+				REQUIRE(expected_idempotency_key != mocknew.arguments[idx].params.idempotency_key);
+				expected_idempotency_key = mocknew.arguments[idx].params.idempotency_key;
 
 				for (size_t i = 0; i < retries.second; i++)
 				{
@@ -797,7 +845,11 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 					REQUIRE(third.params.content_warning.empty());
 					REQUIRE(third.params.visibility == "direct");
 					REQUIRE(third.params.reply_to == reply_to_id);
+					REQUIRE(third.params.idempotency_key == expected_idempotency_key);
 				}
+
+				REQUIRE(expected_idempotency_key != mocknew.arguments[idx].params.idempotency_key);
+				expected_idempotency_key = mocknew.arguments[idx].params.idempotency_key;
 
 				for (size_t i = 0; i < retries.second; i++)
 				{
@@ -807,6 +859,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 					REQUIRE(fourth.params.content_warning.empty());
 					REQUIRE(fourth.params.reply_to == "777777");
 					REQUIRE(fourth.params.visibility == "unlisted");
+					REQUIRE(fourth.params.idempotency_key == expected_idempotency_key);
 				}
 			}
 
@@ -919,6 +972,51 @@ SCENARIO("Send correctly sends from and modifies a queue of mixed API calls.")
 				REQUIRE(mockpost.arguments[5].sequence == 7);
 				REQUIRE(mockpost.arguments[5].url == make_expected_url("badpost", "/unfavourite", instanceurl));
 
+			}
+		}
+	}
+}
+
+SCENARIO("read_params doesn't repeat idempotency keys or mutate the post file.")
+{
+	const test_file fi = temporary_file();
+	GIVEN("An outgoing post to read from.")
+	{
+		constexpr std::string_view expected_text = "hi there, bud";
+		constexpr std::string_view expected_cw = "careful, watch out for that content";
+		constexpr std::string_view visibility = "direct";
+		
+		{
+			outgoing_post towrite{ fi.filename };
+			towrite.parsed.text = expected_text;
+			towrite.parsed.content_warning = expected_cw;
+			towrite.parsed.vis = visibility::direct;
+		}
+
+		WHEN("The outgoing_post is read by read_params repeatedly.")
+		{
+			constexpr int trials = 50000;
+			std::array<uint_fast64_t, trials> seen_ids;
+			THEN("The paramaters are always as expected, and the idempotency_ids never repeat.")
+			{
+				for (int i = 0; i < trials; i++)
+				{
+					const auto params = read_params(fi.filename);
+					REQUIRE(params.attachments.empty());
+					REQUIRE(params.attachment_ids.empty());
+					REQUIRE(params.body == expected_text);
+					REQUIRE(params.content_warning == expected_cw);
+					REQUIRE(params.okay);
+					REQUIRE(params.reply_id.empty());
+					REQUIRE(params.reply_to.empty());
+					REQUIRE(params.visibility == visibility);
+
+					seen_ids[i] = params.idempotency_key;
+				}
+
+				std::sort(seen_ids.begin(), seen_ids.end());
+				REQUIRE(seen_ids[0] != 0);
+				REQUIRE(std::adjacent_find(seen_ids.begin(), seen_ids.end()) == seen_ids.end());
 			}
 		}
 	}

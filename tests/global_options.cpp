@@ -104,15 +104,16 @@ SCENARIO("read_accounts correctly fills global_options on construction.")
 
 		WHEN("a given account is looked up")
 		{
-			const auto found = opt.select_account("coolaccount@website.com");
+			const auto result = opt.select_account("coolaccount@website.com");
 
 			THEN("something was found")
 			{
-				REQUIRE(found != nullptr);
+				REQUIRE(result.index() == 0);
 			}
 
 			THEN("it was what we expected")
 			{
+				const auto found = std::get<0>(result);
 				REQUIRE(found->first == "coolaccount@website.com");
 				REQUIRE(found->second.get_option(user_option::account_name) == "coolaccount");
 				REQUIRE(found->second.get_option(user_option::instance_url) == "website.com");
@@ -121,15 +122,16 @@ SCENARIO("read_accounts correctly fills global_options on construction.")
 
 		WHEN("a given account is looked up with a leading @")
 		{
-			const auto found = opt.select_account("@coolaccount@website.com");
+			const auto result = opt.select_account("@coolaccount@website.com");
 
 			THEN("something was found")
 			{
-				REQUIRE(found != nullptr);
+				REQUIRE(result.index() == 0);
 			}
 
 			THEN("it was what we expected")
 			{
+				const auto found = std::get<0>(result);
 				REQUIRE(found->first == "coolaccount@website.com");
 				REQUIRE(found->second.get_option(user_option::account_name) == "coolaccount");
 				REQUIRE(found->second.get_option(user_option::instance_url) == "website.com");
@@ -140,9 +142,14 @@ SCENARIO("read_accounts correctly fills global_options on construction.")
 		{
 			const auto found = opt.select_account("boringaccount@badsize.pling");
 
-			THEN("nothing was found")
+			THEN("an error is returned.")
 			{
-				REQUIRE(found == nullptr);
+				REQUIRE(found.index() == 1);
+			}
+
+			THEN("the error correctly reports that there were no matches because the prefix didn't match.")
+			{
+				REQUIRE(std::get<select_account_error>(found) == select_account_error::bad_prefix);
 			}
 		}
 
@@ -171,9 +178,14 @@ SCENARIO("select_account selects exactly one account.")
 			REQUIRE_NOTHROW(options.select_account(""));
 			auto account = options.select_account("");
 
-			THEN("a nullptr is returned")
+			THEN("a error is returned")
 			{
-				REQUIRE(account == nullptr);
+				REQUIRE(account.index() == 1);
+			}
+
+			THEN("the error correctly reports that there are no accounts.")
+			{
+				REQUIRE(std::get<select_account_error>(account) == select_account_error::no_accounts);
 			}
 		}
 
@@ -181,9 +193,14 @@ SCENARIO("select_account selects exactly one account.")
 		{
 			auto account = options.select_account("coolperson");
 
-			THEN("a nullptr is returned")
+			THEN("a error is returned")
 			{
-				REQUIRE(account == nullptr);
+				REQUIRE(account.index() == 1);
+			}
+
+			THEN("the error correctly reports that there are no accounts.")
+			{
+				REQUIRE(std::get<select_account_error>(account) == select_account_error::no_accounts);
 			}
 		}
 
@@ -200,19 +217,25 @@ SCENARIO("select_account selects exactly one account.")
 
 	GIVEN("A global_options with one account")
 	{
-		const test_file fi = acc.dirname / "someaccount@website.com";
+		const static std::string expected_account = "someaccount@website.com";
+		const test_file fi = acc.dirname / expected_account;
 
 		global_options options{ acc.dirname };
-		options.add_new_account("someaccount@website.com");
+		options.add_new_account(expected_account);
 
 		WHEN("select_account is given an empty string to search on")
 		{
 			REQUIRE_NOTHROW(options.select_account(""));
-		 	auto account = options.select_account("");
+			auto account = options.select_account("");
 
 			THEN("a user_options is returned.")
 			{
-				REQUIRE_FALSE(account == nullptr);
+				REQUIRE(account.index() == 0);
+			}
+
+			THEN("the user_options has the correct name.")
+			{
+				REQUIRE(std::get<0>(account)->first == expected_account);
 			}
 		}
 
@@ -222,7 +245,12 @@ SCENARIO("select_account selects exactly one account.")
 
 			THEN("a user_options is returned.")
 			{
-				REQUIRE_FALSE(account == nullptr);
+				REQUIRE(account.index() == 0);
+			}
+
+			THEN("the user_options has the correct name.")
+			{
+				REQUIRE(std::get<0>(account)->first == expected_account);
 			}
 		}
 
@@ -233,7 +261,12 @@ SCENARIO("select_account selects exactly one account.")
 
 			THEN("a user_options is returned.")
 			{
-				REQUIRE_FALSE(account == nullptr);
+				REQUIRE(account.index() == 0);
+			}
+
+			THEN("the user_options has the correct name.")
+			{
+				REQUIRE(std::get<0>(account)->first == expected_account);
 			}
 		}
 
@@ -244,7 +277,12 @@ SCENARIO("select_account selects exactly one account.")
 
 			THEN("a user_options is returned.")
 			{
-				REQUIRE_FALSE(account == nullptr);
+				REQUIRE(account.index() == 0);
+			}
+
+			THEN("the user_options has the correct name.")
+			{
+				REQUIRE(std::get<0>(account)->first == expected_account);
 			}
 		}
 
@@ -252,9 +290,14 @@ SCENARIO("select_account selects exactly one account.")
 		{
 			auto account = options.select_account("bad");
 
-			THEN("a nullptr is returned")
+			THEN("an error is returned.")
 			{
-				REQUIRE(account == nullptr);
+				REQUIRE(account.index() == 1);
+			}
+
+			THEN("the error correctly reports that an invalid prefix was given.")
+			{
+				REQUIRE(std::get<select_account_error>(account) == select_account_error::bad_prefix);
 			}
 		}
 
@@ -265,19 +308,20 @@ SCENARIO("select_account selects exactly one account.")
 			THEN("the account shows up.")
 			{
 				REQUIRE(accounts.size() == 1);
-				REQUIRE(accounts[0] == "someaccount@website.com");
+				REQUIRE(accounts[0] == expected_account);
 			}
 		}
 	}
 
 	GIVEN("An global_options with two accounts")
 	{
-		const test_file fi = acc.dirname / "someaccount@website.com";
-		const test_file anotherfi = acc.dirname / "someotheraccount@place2.egg";
+		const static std::array<std::string, 2> expected_accounts { "someaccount@website.com",  "someotheraccount@place2.egg" };
+		const test_file fi = acc.dirname / expected_accounts[0];
+		const test_file anotherfi = acc.dirname / expected_accounts[1];
 
 		global_options options{ acc.dirname };
 
-		for (const auto& accountname : { "someaccount@website.com", "someotheraccount@place2.egg" })
+		for (const auto& accountname : expected_accounts)
 		{
 			auto& newaccount = options.add_new_account(accountname);
 			newaccount.second.set_option(user_option::account_name, accountname);
@@ -287,9 +331,9 @@ SCENARIO("select_account selects exactly one account.")
 		{
 			const auto account = options.select_account("");
 
-			THEN("a nullptr is returned")
+			THEN("an error is returned to indicate that an empty string was given when there's more than one account.")
 			{
-				REQUIRE(account == nullptr);
+				REQUIRE(std::get<select_account_error>(account) == select_account_error::empty_name_many_accounts);
 			}
 		}
 
@@ -297,9 +341,9 @@ SCENARIO("select_account selects exactly one account.")
 		{
 			const auto account = options.select_account("some");
 
-			THEN("a nullptr is returned")
+			THEN("an error is returned to indicate that an ambiguous prefix was given.")
 			{
-				REQUIRE(account == nullptr);
+				REQUIRE(std::get<select_account_error>(account) == select_account_error::ambiguous_prefix);
 			}
 		}
 
@@ -309,13 +353,13 @@ SCENARIO("select_account selects exactly one account.")
 
 			THEN("a user_options is returned.")
 			{
-				REQUIRE_FALSE(account == nullptr);
+				REQUIRE(account.index() == 0);
 			}
 
 			THEN("the user_options is the correct one.")
 			{
-				const std::string& account_name = account->second.get_option(user_option::account_name);
-				REQUIRE(account_name == "someotheraccount@place2.egg");
+				const std::string& account_name = std::get<0>(account)->second.get_option(user_option::account_name);
+				REQUIRE(account_name == expected_accounts[1]);
 			}
 		}
 
@@ -325,13 +369,13 @@ SCENARIO("select_account selects exactly one account.")
 
 			THEN("a user_options is returned.")
 			{
-				REQUIRE_FALSE(account == nullptr);
+				REQUIRE(account.index() == 0);
 			}
 
 			THEN("the user_options is the correct one.")
 			{
-				const std::string& account_name = account->second.get_option(user_option::account_name);
-				REQUIRE(account_name == "someotheraccount@place2.egg");
+				const std::string& account_name = std::get<0>(account)->second.get_option(user_option::account_name);
+				REQUIRE(account_name == expected_accounts[1]);
 			}
 		}
 
@@ -342,12 +386,13 @@ SCENARIO("select_account selects exactly one account.")
 
 			THEN("a user_options is returned.")
 			{
-				REQUIRE_FALSE(account == nullptr);
+				REQUIRE(account.index() == 0);
 			}
 
 			THEN("the user_options is the correct one.")
 			{
-				REQUIRE(account->second.get_option(user_option::account_name) == "someotheraccount@place2.egg");
+				const std::string& account_name = std::get<0>(account)->second.get_option(user_option::account_name);
+				REQUIRE(account_name == expected_accounts[1]);
 			}
 		}
 
@@ -358,12 +403,13 @@ SCENARIO("select_account selects exactly one account.")
 
 			THEN("a user_options is returned.")
 			{
-				REQUIRE_FALSE(account == nullptr);
+				REQUIRE(account.index() == 0);
 			}
 
 			THEN("the user_options is the correct one.")
 			{
-				REQUIRE(account->second.get_option(user_option::account_name) == "someotheraccount@place2.egg");
+				const std::string& account_name = std::get<0>(account)->second.get_option(user_option::account_name);
+				REQUIRE(account_name == expected_accounts[1]);
 			}
 		}
 
@@ -371,9 +417,9 @@ SCENARIO("select_account selects exactly one account.")
 		{
 			const auto account = options.select_account("bad");
 
-			THEN("a nullptr is returned")
+			THEN("an error is returned that indicates that an invalid prefix was requested.")
 			{
-				REQUIRE(account == nullptr);
+				REQUIRE(std::get<1>(account) == select_account_error::bad_prefix);
 			}
 		}
 
@@ -381,9 +427,9 @@ SCENARIO("select_account selects exactly one account.")
 		{
 			const auto account = options.select_account(std::string(100, 'b'));
 
-			THEN("a nullptr is returned.")
+			THEN("an error is returned that indicates that an invalid prefix was requested.")
 			{
-				REQUIRE(account == nullptr);
+				REQUIRE(std::get<1>(account) == select_account_error::bad_prefix);
 			}
 		}
 
@@ -405,7 +451,7 @@ SCENARIO("select_account selects exactly one account.")
 			THEN("both accounts show up.")
 			{
 				using Catch::Matchers::UnorderedEquals;
-				REQUIRE_THAT(accounts, Catch::UnorderedEquals(std::vector<std::string_view> {"someaccount@website.com", "someotheraccount@place2.egg" }));
+				REQUIRE_THAT(accounts, Catch::UnorderedEquals(std::vector<std::string_view>{expected_accounts.begin(), expected_accounts.end()}));
 			}
 		}
 	}

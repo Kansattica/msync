@@ -1,5 +1,6 @@
-#ifndef _MSYNC_UTIL_HPP_
-#define _MSYNC_UTIL_HPP_
+#ifndef MSYNC_UTIL_HPP
+#define MSYNC_UTIL_HPP
+
 #include <string>
 #include <string_view>
 #include <utility>

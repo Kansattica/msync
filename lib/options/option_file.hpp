@@ -1,5 +1,5 @@
-#ifndef _OPTION_FILE_HPP_
-#define _OPTION_FILE_HPP_
+#ifndef OPTION_FILE_HPP
+#define OPTION_FILE_HPP
 
 #include <map> //use an ordered map so keys don't get shuffled around between runs
 #include <string>

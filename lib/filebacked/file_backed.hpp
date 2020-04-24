@@ -1,5 +1,5 @@
-#ifndef _FILE_BACKED_HPP_
-#define _FILE_BACKED_HPP_
+#ifndef FILE_BACKED_HPP
+#define FILE_BACKED_HPP
 
 #include <fstream>
 

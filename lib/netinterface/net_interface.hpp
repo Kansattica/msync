@@ -1,5 +1,5 @@
-#ifndef _MSYNC_NET_INTERFACE_HPP_
-#define _MSYNC_NET_INTERFACE_HPP_
+#ifndef MSYNC_NET_INTERFACE_HPP
+#define MSYNC_NET_INTERFACE_HPP
 
 #include <string_view>
 #include <string>
@@ -17,7 +17,7 @@ struct net_response
 
 struct status_params
 {
-	uint64_t idempotency_key;
+	uint_fast64_t idempotency_key = 0;
 	std::string body;
 	std::string reply_to;
 	std::string content_warning;

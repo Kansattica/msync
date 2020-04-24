@@ -13,7 +13,7 @@
 SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run][long_run_outgoingpost]")
 {
 	logs_off = true;
-	test_file fi = temporary_file();
+	const test_file fi = temporary_file();
 	GIVEN("An outgoing_post with only text is filled and destroyed")
 	{
 		{
@@ -185,8 +185,6 @@ SCENARIO("outgoing_post correctly reads and writes posts.", "[long_run][long_run
 
 			of << testtext;
 		}
-
-		CAPTURE(read_file(fi.filename));
 
 		WHEN("A new outgoing_post is made from the same file")
 		{

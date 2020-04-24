@@ -14,7 +14,7 @@ public:
 	const std::string& media_url();
 
 private:
-	std::string& make_if_empty(std::string& field, std::string_view route);
+	const std::string& make_if_empty(std::string& field, std::string_view route);
 	std::string_view instance_url;
 	std::string cached_status_url;
 	std::string cached_media_url;

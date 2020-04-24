@@ -1,5 +1,5 @@
-#ifndef _MSYNC_VERSION_HPP_
-#define _MSYNC_VERSION_HPP_
+#ifndef MSYNC_VERSION_HPP
+#define MSYNC_VERSION_HPP
 
 constexpr const char* MSYNC_VERSION = "0.9.5";
 

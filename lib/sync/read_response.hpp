@@ -1,5 +1,6 @@
-#ifndef _READ_RESPONSE_HPP_
-#define _READ_RESPONSE_HPP_
+#ifndef READ_RESPONSE_HPP
+#define READ_RESPONSE_HPP
+
 #include <string>
 #include <string_view>
 #include <vector>
