@@ -62,13 +62,20 @@ int zero_to_n(int n)
 	return dis(gen);
 }
 
+const fs::path& test_base_dir()
+{
+	const static fs::path base_dir = fs::temp_directory_path() / "msync_test_files";
+	fs::create_directories(base_dir);
+	return base_dir;
+}
+
 // the .concat(to_string(random number)) guys exist so that we can use ctest to run tests in parallel.
 // All you have to do is ensure that no two processes are trying to use the same filenames.
 // the correct way to do this would probably be to get the process ID, but I'd have to do a bunch of platform-specific code for that.
 test_file temporary_file()
 {
 	static std::array<char, 10> buffer;
-	const static fs::path tempdir = (fs::temp_directory_path() / "msync_test_file_").concat(std::to_string(gen()));
+	const static fs::path tempdir = (test_base_dir() / "msync_test_file_").concat(std::to_string(gen()));
 	static unsigned int filecount = 0;
 
 	std::string_view printed = sv_to_chars(filecount++, buffer);
@@ -78,7 +85,7 @@ test_file temporary_file()
 
 test_dir temporary_directory()
 {
-	const static fs::path tempdir = (fs::temp_directory_path() / "msync_test_dir_").concat(std::to_string(gen()));;
+	const static fs::path tempdir = (test_base_dir() / "msync_test_dir_").concat(std::to_string(gen()));;
 	static unsigned int dircount = 0;
 	static std::array<char, 10> buffer;
 
