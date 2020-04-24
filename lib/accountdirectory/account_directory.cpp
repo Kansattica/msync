@@ -9,6 +9,7 @@
 #else
 	#include <string>
 	#ifdef MSYNC_USER_CONFIG
+		#define WIN32_LEAN_AND_MEAN
 		#include <windows.h>
 		#include <shlobj.h>
 	#else
