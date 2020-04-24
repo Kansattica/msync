@@ -8,7 +8,7 @@
 	#include <memory>
 #else
 	#include <string>
-	#if defined(MSYNC_USER_CONFIG)
+	#ifdef MSYNC_USER_CONFIG
 		#include <windows.h>
 		#include <shlobj.h>
 	#else
