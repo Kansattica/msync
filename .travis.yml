@@ -62,6 +62,7 @@ script:
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then NETTESTLOCATION="./tests/$BUILDTYPE/net_tests.exe"; else NETTESTLOCATION="./tests/net_tests"; fi
   - $EXELOCATION version
   - $EXELOCATION yeehaw
+  - $EXELOCATION location
   # Basically, Travis will time out if it doesn't get any output for over ten minutes.
   # Usually, this is fine, but it causes problems because OSX produces binaries that
   # run much slower for some reason.

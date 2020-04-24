@@ -1081,6 +1081,29 @@ SCENARIO("The command line parser recognizes when the user requests msync's lice
 	}
 }
 
+SCENARIO("The command line parser recognizes when the user requests msync's config location.")
+{
+	GIVEN("A command line requesting the location.")
+	{
+		char const* argv[] { "msync", "location" };
+
+		WHEN("the command line is parsed")
+		{
+			const auto result = parse(2, argv);
+
+			THEN("the parse is good.")
+			{
+				REQUIRE(result.okay);
+			}
+
+			THEN("the correct action is selected.")
+			{
+				REQUIRE(result.selected == mode::location);
+			}
+		}
+	}
+}
+
 bool flag_set(int combo, int position)
 {
 	return combo & (1 << position);

@@ -107,6 +107,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 
 	const auto cli = (newaccount | configMode | syncMode | genMode | queueMode | 
 		command("yeehaw").set(ret.selected, mode::yeehaw) | 
+		command("location").set(ret.selected, mode::location) | 
 		command("version", "--version").set(ret.selected, mode::version) |
 		command("license", "--license").set(ret.selected, mode::license) |
 		(command("help").set(ret.selected, mode::help)), universalOptions);

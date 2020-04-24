@@ -12,8 +12,20 @@ Once you've compiled or [downloaded](https://github.com/Kansattica/msync/release
 
 - leave it where it is and use it in place, or copy it to a folder in your home directory and use it from there.
 - copy the compiled `msync` executable to somewhere in your `$PATH`. 
+- if you're on a Debian-like system, run `sudo dpkg -i msync-<version>-Linux.deb`, which will install msync into `/usr/bin`.
 
-Either option works. The only thing to be aware of is that `msync` will create a `msync_accounts` folder in the same directory as its executable. For the purposes of this guide, commands will be written `msync sync`, but anyone using the first option should type `./msync sync` from the correct folder instead. If you downloaded a prebuilt release, your executable will be called something like `msync-v0.9.1-linux-x64`. Feel free to rename it to simply `msync` or whatever else you like. 
+Any of these options work, but please read the note about `msync_accounts` below. If you downloaded a prebuilt release, your executable will be called something like `msync-v0.9.5-linux-x64`. Feel free to rename it to simply `msync` or whatever else you like. 
+
+#### A note about `msync_accounts`
+
+`msync` stores its information (account settings, downloaded posts, queued posts, etc.) in a directory named `msync_accounts`. By default, `msync` creates and looks for this directory in the same directory as the executable. If you downloaded a release with `install` in the name, installed `msync` from the .deb package, or configured `msync` with `-DMSYNC_USER_CONFIG=ON`, then msync will create `msync_accounts` in the conventional place for your platform:
+
+- On Windows, this is something like `C:\Users\username\AppData\Local`.
+- On Linux, this is the `XDG_CONFIG_HOME` environment variable, if set, and `~/.config` otherwise.
+
+I recommend this "install" approach over the same-directory-as-executable approach.
+
+You can see where your `msync_accounts` directory is by running `msync location`.
 
 #### Setting up your account
 
