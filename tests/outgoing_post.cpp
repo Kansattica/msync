@@ -111,7 +111,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.")
 void make_file(const fs::path& target_path, std::string_view content_warning, std::string_view reply_to, std::string_view reply_id, const char* visibility,
 	const std::vector<std::string>& attachments, const std::vector<std::string>& descriptions, std::string_view testtext, bool snip)
 {
-	std::ofstream of{ target_path };
+	std::ofstream of{ target_path.c_str() }; // make boost happy
 	if (!content_warning.empty())
 		of << "cw=" << content_warning << '\n';
 
