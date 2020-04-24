@@ -65,6 +65,7 @@ int zero_to_n(int n)
 const fs::path& test_base_dir()
 {
 	const static fs::path base_dir = fs::temp_directory_path() / "msync_test_files";
+	fs::create_directories(base_dir);
 	return base_dir;
 }
 
