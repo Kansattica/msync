@@ -43,7 +43,11 @@ std::string read_file(const fs::path& file)
 	std::ifstream fi(file.c_str(), std::ios::ate | std::ios::in);
 
 	std::string content;
-	content.reserve(fi.tellg());
+	const std::streampos filesize = fi.tellg();
+	//this should never be negative, but streampos is signed, so it's possible
+	//and it makes me feel better about using a cast to shut up a compiler warning on 32-bit windows.
+	if (filesize > 0)
+		content.reserve(static_cast<size_t>(filesize));
 	fi.seekg(0, std::ios::beg);
 	return content.append(std::istreambuf_iterator(fi), std::istreambuf_iterator<char>());
 }
