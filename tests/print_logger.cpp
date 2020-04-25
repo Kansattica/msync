@@ -11,6 +11,10 @@ SCENARIO("The print logger respects the MSYNC_FILE_LOG define.")
 		logs_off = false;
 		verbose_logs = false;
 
+#ifndef MSYNC_FILE_LOG
+		fs::remove("msync.log");
+#endif
+
 		WHEN("Some messages are logged.")
 		{
 			plverb() << "One message.";
