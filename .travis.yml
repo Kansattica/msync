@@ -82,11 +82,21 @@ before_deploy:
   - git tag -l --format='%(contents)' $TRAVIS_TAG > msync_release_notes
 
 deploy:
-  provider: releases
-  edge: true
-  file: $FINISHED_BINARY_NAME
-  api_key: $API_KEY
-  name: msync release $TRAVIS_TAG
-  release_notes_file: msync_release_notes
-  on:
-    tags: true
+  - provider: releases
+    edge: true
+    file: $FINISHED_BINARY_NAME
+    api_key: $API_KEY
+    name: msync release $TRAVIS_TAG
+    release_notes_file: msync_release_notes
+    on:
+      tags: true
+
+  - provider: releases
+    edge: true
+    file: '*.deb'
+    api_key: $API_KEY
+    name: msync release $TRAVIS_TAG
+    release_notes_file: msync_release_notes
+    on:
+      tags: true
+      condition: $MAKE_DEB = "TRUE"
