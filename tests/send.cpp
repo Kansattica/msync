@@ -996,7 +996,7 @@ SCENARIO("read_params doesn't repeat idempotency keys or mutate the post file.")
 		WHEN("The outgoing_post is read by read_params repeatedly.")
 		{
 			constexpr int trials = 50000;
-			std::array<uint_fast64_t, trials> seen_ids;
+			std::vector<uint_fast64_t> seen_ids(trials);
 			THEN("The paramaters are always as expected, and the idempotency_ids never repeat.")
 			{
 				for (int i = 0; i < trials; i++)
