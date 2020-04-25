@@ -91,7 +91,7 @@ struct mock_network_new_status : public mock_network
 		else
 			make_status_json(str_id, toreturn.message);
 
-		arguments.push_back(status_mock_args{ ++sequence, std::string {url}, std::string { access_token }, std::move(str_id), params});
+		arguments.push_back(status_mock_args{{{++sequence, std::string {url}, std::string { access_token }}, std::move(str_id)}, params });
 
 		return toreturn;
 	}
@@ -119,7 +119,7 @@ struct mock_network_upload : public mock_network
 		toreturn.message += str_id;
 		toreturn.message += "\"}";
 
-		arguments.push_back(upload_mock_args{ ++sequence, std::string {url}, std::string { access_token }, std::move(str_id),
+		arguments.push_back(upload_mock_args{ {{++sequence, std::string {url}, std::string { access_token }}, std::move(str_id) },
 			attachment{file, description} });
 
 		return toreturn;
