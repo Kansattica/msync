@@ -13,12 +13,12 @@ SCENARIO("The command line parser recognizes when the user wants to start a new 
 {
 	GIVEN("A command line that doesn't specify an account.")
 	{
-		int argc = 2;
+		constexpr int argc = 2;
 		char const* argv[]{ "msync", "new" };
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse(argc, argv);
+			const auto parsed = parse(argc, argv);
 
 			THEN("the selected mode is new user")
 			{
@@ -39,12 +39,12 @@ SCENARIO("The command line parser recognizes when the user wants to start a new 
 
 	GIVEN("A command line that does specify an account.")
 	{
-		int argc = 4;
+		constexpr int argc = 4;
 		char const* argv[]{ "msync", "new", "-a", "regular@folks.egg" };
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse(argc, argv);
+			const auto parsed = parse(argc, argv);
 
 			THEN("the selected mode is new user")
 			{
@@ -68,12 +68,12 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 {
 	GIVEN("A command line setting an option without an account.")
 	{
-		int argc = 4;
+		constexpr int argc = 4;
 		char const* argv[]{ "msync", "config", "access_token", "sometoken" };
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse(argc, argv);
+			const auto parsed = parse(argc, argv);
 
 			THEN("the selected mode is config")
 			{
@@ -104,12 +104,12 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 	GIVEN("A command line setting an option with an account.")
 	{
-		int argc = 6;
+		constexpr int argc = 6;
 		char const* argv[]{ "msync", "config", "client_secret", "asecret!", "-a", "jerk@fun.website" };
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse(argc, argv);
+			const auto parsed = parse(argc, argv);
 
 			THEN("the selected mode is config")
 			{
@@ -140,12 +140,12 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 	GIVEN("A command line reading an option without an account.")
 	{
-		int argc = 3;
+		constexpr int argc = 3;
 		char const* argv[]{ "msync", "config", "account_name" };
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse(argc, argv);
+			const auto parsed = parse(argc, argv);
 
 			THEN("the selected mode is showopt")
 			{
@@ -176,12 +176,12 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 	GIVEN("A command line reading an option with an account.")
 	{
-		int argc = 5;
+		constexpr int argc = 5;
 		char const* argv[]{ "msync", "config", "instance_url", "-a", "niceperson@impolite.egg" };
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse(argc, argv);
+			const auto parsed = parse(argc, argv);
 
 			THEN("the selected mode is showopt")
 			{
@@ -212,12 +212,12 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 	GIVEN("A showall command that doesn't specify an account.")
 	{
-		int argc = 3;
+		constexpr int argc = 3;
 		char const* argv[]{ "msync", "config", "showall" };
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse(argc, argv);
+			const auto parsed = parse(argc, argv);
 
 			THEN("the selected mode is showallopt")
 			{
@@ -243,12 +243,12 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 	GIVEN("A showall command that specifies an account.")
 	{
-		int argc = 5;
+		constexpr int argc = 5;
 		char const* argv[]{ "msync", "config", "showall", "-a", "regular@folks.egg" };
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse(argc, argv);
+			const auto parsed = parse(argc, argv);
 
 			THEN("the selected mode is showallopt")
 			{
@@ -274,12 +274,12 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 	GIVEN("A command line adding a list to be pulled.")
 	{
-		int argc = 5;
+		constexpr int argc = 5;
 		char const* argv[]{ "msync", "config", "list", "add", "somelist" };
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse(argc, argv);
+			const auto parsed = parse(argc, argv);
 
 			THEN("the selected mode is configlist")
 			{
@@ -310,12 +310,12 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 	GIVEN("A command line specifying a list to be removed.")
 	{
-		int argc = 7;
+		constexpr int argc = 7;
 		char const* argv[]{ "msync", "config", "list", "remove", "anotherlist", "-a", "coolfriend" };
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse(argc, argv);
+			const auto parsed = parse(argc, argv);
 
 			THEN("the selected mode is configlist")
 			{
@@ -346,12 +346,12 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 	GIVEN("A command line specifying that the home timeline should be synced oldest first.")
 	{
-		int argc = 7;
+		constexpr int argc = 7;
 		char const* argv[]{ "msync", "config", "sync", "home", "oldest", "-a", "coolerfriend" };
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse(argc, argv);
+			const auto parsed = parse(argc, argv);
 
 			THEN("the selected mode is configsync")
 			{
@@ -382,12 +382,12 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 	GIVEN("A command line specifying that DMs should be synced newest first.")
 	{
-		int argc = 5;
+		constexpr int argc = 5;
 		char const* argv[]{ "msync", "config", "sync", "dms", "newest" };
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse(argc, argv);
+			const auto parsed = parse(argc, argv);
 
 			THEN("the selected mode is configsync")
 			{
@@ -418,12 +418,12 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 	GIVEN("A command line specifying that the notifications timeline should not be synced.")
 	{
-		int argc = 7;
+		constexpr int argc = 7;
 		char const* argv[]{ "msync", "config", "sync", "notifications", "off", "-a", "coolestfriend" };
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse(argc, argv);
+			const auto parsed = parse(argc, argv);
 
 			THEN("the selected mode is configsync")
 			{
@@ -457,12 +457,12 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 {
 	GIVEN("A command line that says 'sync'.")
 	{
-		int argc = 2;
+		constexpr int argc = 2;
 		char const* argv[]{ "msync", "sync" };
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse(argc, argv);
+			const auto parsed = parse(argc, argv);
 
 			THEN("the selected mode is sync")
 			{
@@ -488,12 +488,12 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 	GIVEN("A command line that says 'sync' and specifies a number of retries.")
 	{
-		int argc = 4;
+		constexpr int argc = 4;
 		char const* argv[]{ "msync", "sync", "-r", "10" };
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse(argc, argv);
+			const auto parsed = parse(argc, argv);
 
 			THEN("the selected mode is sync")
 			{
@@ -519,12 +519,12 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 	GIVEN("A command line that says 'sync' and specifies getting only.")
 	{
-		int argc = 3;
+		constexpr int argc = 3;
 		char const* argv[]{ "msync", "sync", "-g" };
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse(argc, argv);
+			const auto parsed = parse(argc, argv);
 
 			THEN("the selected mode is sync")
 			{
@@ -551,12 +551,12 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 	GIVEN("A command line that says 'sync' and specifies sending only.")
 	{
-		int argc = 3;
+		constexpr int argc = 3;
 		char const* argv[]{ "msync", "sync", "-s" };
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse(argc, argv);
+			const auto parsed = parse(argc, argv);
 
 			THEN("the selected mode is sync")
 			{
@@ -583,12 +583,12 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 	GIVEN("A command line that says 'sync' and specifies an account and number of retries with the long options.")
 	{
-		int argc = 6;
+		constexpr int argc = 6;
 		char const* argv[]{ "msync", "sync", "--retries", "15", "--account", "coolfella" };
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse(argc, argv);
+			const auto parsed = parse(argc, argv);
 
 			THEN("the selected mode is sync")
 			{
@@ -614,12 +614,12 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 	GIVEN("A command line that says 'sync' and specifies an account, get only, and number of retries with the long options.")
 	{
-		int argc = 7;
+		constexpr int argc = 7;
 		char const* argv[]{ "msync", "sync", "--get-only", "--retries", "15", "--account", "coolfella" };
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse(argc, argv);
+			const auto parsed = parse(argc, argv);
 
 			THEN("the selected mode is sync")
 			{
@@ -656,7 +656,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse((int)argv.size(), argv.data());
+			const auto parsed = parse((int)argv.size(), argv.data());
 
 			THEN("the selected mode is sync")
 			{
@@ -696,7 +696,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse((int)argv.size(), argv.data());
+			const auto parsed = parse((int)argv.size(), argv.data());
 
 			THEN("the selected mode is sync")
 			{
@@ -740,7 +740,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse((int)argv.size(), argv.data());
+			const auto parsed = parse((int)argv.size(), argv.data());
 
 			THEN("the selected mode is sync")
 			{
@@ -786,7 +786,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 			WHEN("the command line is parsed")
 			{
-				auto parsed = parse((int)argv.size(), argv.data());
+				const auto parsed = parse((int)argv.size(), argv.data());
 
 				THEN("the selected mode is sync")
 				{
@@ -825,7 +825,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 	GIVEN("A command line that just says 'queue'")
 	{
 		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
-		int argc = 2;
+		constexpr int argc = 2;
 		char const* argv[]{ "msync", qcommand };
 
 		WHEN("the command line is parsed")
@@ -842,7 +842,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 	GIVEN("A command line that adds a bunch of things to the fav queue.")
 	{
 		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
-		int argc = 6;
+		constexpr int argc = 6;
 		char const* argv[]{ "msync", qcommand, "fav", "12345", "6789", "123FQ43" };
 
 		WHEN("the command line is parsed")
@@ -874,7 +874,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 	GIVEN("A command line that removes a bunch of things from the boost queue.")
 	{
 		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
-		int argc = 7;
+		constexpr int argc = 7;
 		char const* argv[]{ "msync", qcommand, "-r", "boost", "12345", "6789", "bwingus" };
 
 		WHEN("the command line is parsed")
@@ -906,7 +906,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 	GIVEN("A command line that enqueues a post")
 	{
 		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
-		int argc = 4;
+		constexpr int argc = 4;
 		char const* argv[]{ "msync", qcommand, "post", "msync.post" };
 
 		WHEN("the command line is parsed")
@@ -938,7 +938,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 	GIVEN("A command line that clears the post queue.")
 	{
 		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
-		int argc = 4;
+		constexpr int argc = 4;
 		char const* argv[]{ "msync", qcommand, "-c", "post" };
 
 		WHEN("the command line is parsed")
@@ -965,7 +965,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 	GIVEN("A command line that prints the current queue.")
 	{
 		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
-		int argc = 3;
+		constexpr int argc = 3;
 		char const* argv[]{ "msync", qcommand, "print" };
 
 		WHEN("the command line is parsed")
@@ -1437,12 +1437,12 @@ SCENARIO("The command line parser recognizes when the user wants help.")
 {
 	GIVEN("A command line that says 'help'.")
 	{
-		int argc = 2;
+		constexpr int argc = 2;
 		char const* argv[]{ "msync", "help" };
 
 		WHEN("the command line is parsed")
 		{
-			auto parsed = parse(argc, argv);
+			const auto parsed = parse(argc, argv);
 
 			THEN("the selected mode is help")
 			{

@@ -23,7 +23,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.")
 
 		WHEN("A new outgoing_post is made from the same file")
 		{
-			outgoing_post result{ fi.filename };
+			const outgoing_post result{ fi.filename };
 
 			THEN("the text is the same.")
 			{
@@ -50,7 +50,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.")
 
 		WHEN("A new outgoing_post is made from the same file")
 		{
-			outgoing_post result{ fi.filename };
+			const outgoing_post result{ fi.filename };
 
 			THEN("the text is the same.")
 			{
@@ -90,7 +90,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.")
 
 		WHEN("A new outgoing_post is made from the same file")
 		{
-			outgoing_post result{ fi.filename };
+			const outgoing_post result{ fi.filename };
 
 			THEN("the text is the same.")
 			{
@@ -195,7 +195,7 @@ SCENARIO("outgoing_post can handle a bunch of combinations of cooked post with t
 		WHEN("A new outgoing_post is made from the same file")
 		{
 			{
-				outgoing_post result{ fi.filename };
+				const outgoing_post result{ fi.filename };
 
 				THEN("everything is as expected.")
 				{
@@ -218,7 +218,7 @@ SCENARIO("outgoing_post can handle a bunch of combinations of cooked post with t
 
 			AND_WHEN("That post is destroyed and a new one is created")
 			{
-				outgoing_post result{ fi.filename };
+				const outgoing_post result{ fi.filename };
 
 				THEN("everything is as expected.")
 				{
@@ -272,7 +272,7 @@ SCENARIO("outgoing_post can handle a bunch of combinations of cooked post with t
 
 			AND_WHEN("That post is modified, destroyed and a new one is created")
 			{
-				readonly_outgoing_post result{ fi.filename };
+				const readonly_outgoing_post result{ fi.filename };
 
 				THEN("everything is as expected.")
 				{
@@ -353,7 +353,7 @@ SCENARIO("outgoing_post can handle a bunch of combinations of cooked post withou
 		WHEN("A new outgoing_post is made from the same file")
 		{
 			{
-				outgoing_post result{ fi.filename };
+				const outgoing_post result{ fi.filename };
 
 				THEN("everything is as expected.")
 				{
@@ -376,7 +376,7 @@ SCENARIO("outgoing_post can handle a bunch of combinations of cooked post withou
 
 			AND_WHEN("That post is destroyed and a new one is created")
 			{
-				outgoing_post result{ fi.filename };
+				const outgoing_post result{ fi.filename };
 
 				THEN("everything is as expected.")
 				{
@@ -430,7 +430,7 @@ SCENARIO("outgoing_post can handle a bunch of combinations of cooked post withou
 
 			AND_WHEN("That post is modified, destroyed and a new one is created")
 			{
-				readonly_outgoing_post result{ fi.filename };
+				const readonly_outgoing_post result{ fi.filename };
 
 				THEN("everything is as expected.")
 				{
