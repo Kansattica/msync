@@ -1,7 +1,7 @@
 if (MSVC)
 	add_compile_options("/utf-8")
 else()
-	add_compile_options(-Wall -Wextra -pedantic -Werror)
+	add_compile_options(-Wall -Wextra -pedantic)
 endif()
 
 # basically, if you compile CPR with LTO enabled, the gnu compiler emits a bunch of spurious ODR warnings for every library that includes CPR.
