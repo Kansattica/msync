@@ -16,7 +16,6 @@ include(cmake/linktimeoptimization.cmake)
 
 include(cmake/packages.cmake)
 
-include(cmake/compilerflags.cmake)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -38,6 +37,8 @@ add_library(entities INTERFACE)
 add_library(constants INTERFACE)
 add_library(exception INTERFACE)
 add_executable(msync "")
+
+include(cmake/compilerflags.cmake)
 
 # see https://crascit.com/2016/01/31/enhanced-source-file-handling-with-target_sources/
 include(cmake/compatibility.cmake)
