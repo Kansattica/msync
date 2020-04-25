@@ -37,18 +37,22 @@ FetchContent_GetProperties(clipplib)
 	unset(MESSAGE_QUIET)
 endif()
 
-message(STATUS "Downloading whereami...")
-FetchContent_Declare(
-	whereamilib
-	GIT_REPOSITORY https://github.com/gpakosz/whereami.git
-	GIT_TAG	       6a8536a8b2d8c1903f22333c1a130a142f6d31de
-	)
+if (NOT MSYNC_USER_CONFIG)
+	message(STATUS "Downloading whereami...")
+	FetchContent_Declare(
+		whereamilib
+		GIT_REPOSITORY https://github.com/gpakosz/whereami.git
+		GIT_TAG	       6a8536a8b2d8c1903f22333c1a130a142f6d31de
+		)
 
-FetchContent_GetProperties(whereamilib)
-if(NOT whereamilib_POPULATED)
-	FetchContent_Populate(whereamilib)
-	add_library (whereami STATIC ${whereamilib_SOURCE_DIR}/src/whereami.c  ${whereamilib_SOURCE_DIR}/src/whereami.h)
-	target_include_directories(whereami PUBLIC ${whereamilib_SOURCE_DIR}/src)
+	FetchContent_GetProperties(whereamilib)
+	if(NOT whereamilib_POPULATED)
+		FetchContent_Populate(whereamilib)
+		add_library (whereami STATIC ${whereamilib_SOURCE_DIR}/src/whereami.c  ${whereamilib_SOURCE_DIR}/src/whereami.h)
+		target_include_directories(whereami PUBLIC ${whereamilib_SOURCE_DIR}/src)
+	endif()
+else()
+		add_library(whereami INTERFACE)
 endif()
 
 message(STATUS "Downloading CPR...")

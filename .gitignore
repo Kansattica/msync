@@ -14,3 +14,5 @@ _deps
 msync.log
 /.vs
 /lib/constants/constants.hpp
+/console/version.hpp
+/CMakeSettings.json

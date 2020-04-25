@@ -42,11 +42,11 @@ matrix:
     env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=win32
   - os: windows
     compiler: cl64.exe
-    env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64 CONFIGURE_ARGUMENTS="-DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF" 
+    env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64 CONFIGURE_ARGUMENTS="-DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF"
   - os: linux
     dist: bionic
     compiler: gcc
-    env: BUILD_ARCH=x64 CC=gcc-8 CXX=g++-8 CONFIGURE_ARGUMENTS="-DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF"
+    env: BUILD_ARCH=x64 CC=gcc-8 CXX=g++-8 CONFIGURE_ARGUMENTS="-DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF" MAKE_DEB=TRUE
     addons:
       apt: g++-8 libstdc++-8-dev
 
@@ -57,11 +57,11 @@ script:
   - cmake --version
   - cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE $CONFIGURE_ARGUMENTS ..
   - cmake --build . --config $BUILDTYPE --parallel 2
+  - if [ "$MAKE_DEB" = "TRUE" ]; then cpack; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then EXELOCATION="./$BUILDTYPE/msync.exe"; else EXELOCATION="./msync"; fi
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then TESTLOCATION="./tests/$BUILDTYPE/tests.exe"; else TESTLOCATION="./tests/tests"; fi
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then NETTESTLOCATION="./tests/$BUILDTYPE/net_tests.exe"; else NETTESTLOCATION="./tests/net_tests"; fi
   - $EXELOCATION version
   - $EXELOCATION yeehaw
+  - $EXELOCATION location
   # Basically, Travis will time out if it doesn't get any output for over ten minutes.
   # Usually, this is fine, but it causes problems because OSX produces binaries that
   # run much slower for some reason.
@@ -82,11 +82,21 @@ before_deploy:
   - git tag -l --format='%(contents)' $TRAVIS_TAG > msync_release_notes
 
 deploy:
-  provider: releases
-  edge: true
-  file: $FINISHED_BINARY_NAME
-  api_key: $API_KEY
-  name: msync release $TRAVIS_TAG
-  release_notes_file: msync_release_notes
-  on:
-    tags: true
+  - provider: releases
+    edge: true
+    file: $FINISHED_BINARY_NAME
+    api_key: $API_KEY
+    name: msync release $TRAVIS_TAG
+    release_notes_file: msync_release_notes
+    on:
+      tags: true
+
+  - provider: releases
+    edge: true
+    file: '*.deb'
+    api_key: $API_KEY
+    name: msync release $TRAVIS_TAG
+    release_notes_file: msync_release_notes
+    on:
+      tags: true
+      condition: $MAKE_DEB = "TRUE"

@@ -25,7 +25,7 @@ SCENARIO("queue_lists save their data when destroyed.")
 
 		WHEN("an queue_list is moved from")
 		{
-			queue_list newopts(std::move(opts));
+			const queue_list newopts(std::move(opts));
 
 			THEN("no file is written")
 			{
@@ -36,14 +36,14 @@ SCENARIO("queue_lists save their data when destroyed.")
 		WHEN("an queue_list is moved from with the move constructor and destroyed")
 		{
 			{
-				queue_list newopts(std::move(opts));
+				const queue_list newopts(std::move(opts));
 			}
 
 			THEN("the file is written")
 			{
 				REQUIRE(fs::exists(tf.filename));
 
-				auto lines = read_lines(tf.filename);
+				const auto lines = read_lines(tf.filename);
 
 				REQUIRE(lines.size() == 2);
 				REQUIRE(lines[0] == "FAV thingone");
@@ -54,14 +54,14 @@ SCENARIO("queue_lists save their data when destroyed.")
 		WHEN("an queue_list is moved from with move assignment and destroyed")
 		{
 			{
-				queue_list newopts = std::move(opts);
+				const queue_list newopts = std::move(opts);
 			}
 
 			THEN("the file gets written")
 			{
 				REQUIRE(fs::exists(tf.filename));
 
-				auto lines = read_lines(tf.filename);
+				const auto lines = read_lines(tf.filename);
 
 				REQUIRE(lines.size() == 2);
 				REQUIRE(lines[0] == "FAV thingone");
@@ -74,14 +74,14 @@ SCENARIO("queue_lists save their data when destroyed.")
 			opts.parsed.pop_front();
 
 			{
-				queue_list newopts = std::move(opts);
+				const queue_list newopts = std::move(opts);
 			}
 
 			THEN("the file gets written without the deleted options.")
 			{
 				REQUIRE(fs::exists(tf.filename));
 
-				auto lines = read_lines(tf.filename);
+				const auto lines = read_lines(tf.filename);
 
 				REQUIRE(lines.size() == 1);
 				REQUIRE(lines[0] == "UNBOOST thingtwo");
@@ -131,7 +131,7 @@ SCENARIO("queue_lists read data when created.")
 
 			THEN("it saves the new information back to the file.")
 			{
-				auto lines = read_lines(tf.filename);
+				const auto lines = read_lines(tf.filename);
 
 				REQUIRE(lines.size() == 4);
 				REQUIRE(lines[0] == "UNPOST secondthing");
@@ -143,7 +143,7 @@ SCENARIO("queue_lists read data when created.")
 				{
 					REQUIRE(fs::exists(tf.filenamebak));
 
-					auto linesbak = read_lines(tf.filenamebak);
+					const auto linesbak = read_lines(tf.filenamebak);
 
 					REQUIRE(linesbak.size() == 3);
 					REQUIRE(linesbak[0] == "POST firsthing");
@@ -245,12 +245,12 @@ SCENARIO("queue_list can handle a long queue with a lot of items.")
 		WHEN("The queue is moved from and destroyed.")
 		{
 			{
-				queue_list newqueue = std::move(actual);
+				const queue_list newqueue = std::move(actual);
 			}
 
 			THEN("Reading the queue again is as expected.")
 			{
-				queue_list readqueue(queuefile.filename);
+				const queue_list readqueue(queuefile.filename);
 
 				REQUIRE(std::equal(readqueue.parsed.begin(), readqueue.parsed.end(), expected.begin(), expected.end()));
 			}

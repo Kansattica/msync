@@ -15,6 +15,7 @@ enum class mode
 	help,
 	version,
 	yeehaw,
+	location,
 	license
 };
 

@@ -31,7 +31,7 @@ SCENARIO("add_new_account correctly handles input.")
 			}
 
 			//Windows doesn't respect filesystem permissions in the same way.
-#ifdef __linux__
+#ifndef _WIN32
 			THEN("the accounts directory has the proper permissions.")
 			{
 				REQUIRE(fs::status(acc.dirname).permissions() == fs::perms::owner_all);

@@ -156,8 +156,6 @@ void verify_file(const fs::path& file, int expected_count, const std::string& id
 	unsigned int last_id = 0;
 	unsigned int total = 0;
 
-	CAPTURE(file);
-
 	for (const auto& line : lines)
 	{
 		if (line == dashes)

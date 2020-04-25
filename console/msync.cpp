@@ -100,10 +100,15 @@ int main(int argc, const char* argv[])
 			should_print_newline = false;
 			break;
 		case mode::version:
+			should_print_newline = false;
 			pl() << "msync version " << MSYNC_VERSION;
+			pl() << "\n" << MSYNC_BUILD_OPTIONS;
 			break;
 		case mode::license:
 			pl() << MSYNC_LICENSE;
+			break;
+		case mode::location:
+			std::cout << "msync is storing user data at: " << account_directory_path().string();
 			break;
 		case mode::yeehaw:
 			plverb() << " __________\n"

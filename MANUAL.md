@@ -12,8 +12,20 @@ Once you've compiled or [downloaded](https://github.com/Kansattica/msync/release
 
 - leave it where it is and use it in place, or copy it to a folder in your home directory and use it from there.
 - copy the compiled `msync` executable to somewhere in your `$PATH`. 
+- if you're on a Debian-like system, run `sudo dpkg -i msync-<version>-Linux.deb`, which will install msync into `/usr/bin`.
 
-Either option works. The only thing to be aware of is that `msync` will create a `msync_accounts` folder in the same directory as its executable. For the purposes of this guide, commands will be written `msync sync`, but anyone using the first option should type `./msync sync` from the correct folder instead. If you downloaded a prebuilt release, your executable will be called something like `msync-v0.9.1-linux-x64`. Feel free to rename it to simply `msync` or whatever else you like. 
+Any of these options work, but please read the note about `msync_accounts` below. If you downloaded a prebuilt release, your executable will be called something like `msync-v0.9.5-linux-x64`. Feel free to rename it to simply `msync` or whatever else you like. 
+
+#### A note about `msync_accounts`
+
+`msync` stores its information (account settings, downloaded posts, queued posts, etc.) in a directory named `msync_accounts`. By default, `msync` creates and looks for this directory in the same directory as the executable. If you downloaded a release with `install` in the name, installed `msync` from the .deb package, or configured `msync` with `-DMSYNC_USER_CONFIG=ON`, then msync will create `msync_accounts` in the conventional place for your platform:
+
+- On Windows, this is something like `C:\Users\username\AppData\Local`.
+- On Linux, this is the `XDG_CONFIG_HOME` environment variable, if set, and `~/.config` otherwise.
+
+I recommend this "install" approach over the same-directory-as-executable approach.
+
+You can see where your `msync_accounts` directory is by running `msync location`.
 
 #### Setting up your account
 
@@ -71,7 +83,7 @@ When I say `msync` is a store and forward client. What this means is that `msync
 
 #### Reading the home timeline and notifications
 
-After your account is set up, running `msync sync --verbose` will connect to your instance and, if all is well, start downloading notifications and statuses. The `--verbose` is optional (and can be shortened to `-v`), but it will make `msync` tell you where to find the downloaded timeline and notifications. These will be stored at `msync_accounts/[username@instance.url]/home.list` and `msync_accounts/[username@instance.url]/notifications.list`, respectively. There's a lot of ways you can look at these files (in a text editor, IDE or `less` are common for me, I'll write more about this later), but the important things to know the process are:
+After your account is set up, running `msync sync --verbose` will connect to your instance and, if all is well, start downloading notifications and statuses. The `--verbose` is optional (and can be shortened to `-v`), but it will make `msync` tell you where to find the downloaded timeline and notifications. These will be stored at `msync_accounts/[username@instance.url]/home.list` and `msync_accounts/[username@instance.url]/notifications.list`, respectively. You can locate your `msync_accounts` folder at any time by running `msync location`. There's a lot of ways you can look at these files (in a text editor, IDE or `less` are common for me, I'll write more about this later), but the important things to know the process are:
 
 - `msync` does not care about the contents of these files. It simply appends posts and notifications to them. You can delete these files, edit them, move them elsewhere, `msync` doesn't care.
 - When you first sync up, `msync` will get five chunks of statuses or notifications. On subsequent updates, `msync` will default to downloading until it's "caught up", and has downloaded everything since the last post it saw. To change this behavior, use the ` --max-requests <integer>` option when calling `msync sync`. 
@@ -162,4 +174,4 @@ Posts are a little different. You still queue them up to be sent when you next `
 
 `msync` tries its best not to touch the bytes that it sends to or from the server. This means that posts are sent to the server and written to the local timelines as close to as is as possible. Emojis and other non-ASCII characters should work fine, as long as you send and read UTF-8. Some terminal emulators have a hard time displaying UTF-8, and you may wind up having to change some setting or use a different font. I know that running `[Console]::OutputEncoding = [Text.UTF8Encoding]::UTF8` can help on Powershell. In addition, characters may show weird on the terminal, but go over the wire fine. 
 
-If you want to test whether your terminal renders UTF-8, running `msync yeehaw` will attempt to print a cowboy emoji (🤠). If it shows up as garbled characters, you'll have to adjust your terminal's encoding settings. It will print the same emoji to `msync.log` in the current directory so you can test your file viewer of choice as well. I know that Powershell makes you pass the `-Encoding utf8` option to commands such as `Get-Content`.
+If you want to test whether your terminal renders UTF-8, running `msync yeehaw` will attempt to print a cowboy emoji (🤠). If it shows up as garbled characters, you'll have to adjust your terminal's encoding settings. If your version of `msync` creates a `msync.log` in the current directory, you can test your file viewer of choice as well. I know that Powershell makes you pass the `-Encoding utf8` option to commands such as `Get-Content`.

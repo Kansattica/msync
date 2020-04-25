@@ -9,12 +9,6 @@ SCENARIO("account_directory_path returns the same correct path every time.")
 	{
 		const auto& account_dir = account_directory_path();
 
-#ifdef _WIN32
-		constexpr auto filename = "tests.exe";
-#else
-		constexpr auto filename = "tests";
-#endif
-
 		THEN("The path ends in in the name of the accounts directory.")
 		{
 			auto it = --account_dir.end();
@@ -33,6 +27,11 @@ SCENARIO("account_directory_path returns the same correct path every time.")
 #ifndef MSYNC_USER_CONFIG
 		THEN("The test executable exists in the parent directory.")
 		{
+#ifdef _WIN32
+			constexpr auto filename = "tests.exe";
+#else
+			constexpr auto filename = "tests";
+#endif
 			REQUIRE(fs::exists(account_dir.parent_path() / filename));
 		}
 #endif

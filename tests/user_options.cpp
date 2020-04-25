@@ -22,7 +22,7 @@ SCENARIO("User_options reads from a file when created")
 
 		WHEN("a user_options is created from a filename")
 		{
-			user_options opt(fi.filename);
+			const user_options opt(fi.filename);
 
 			THEN("the fields are set correctly.")
 			{
@@ -68,7 +68,7 @@ SCENARIO("User_options saves changes back to its file")
 
 			THEN("a newly created user_options for the same path should see the change.")
 			{
-				user_options newopt(fi.filename);
+				const user_options newopt(fi.filename);
 				REQUIRE(*newopt.try_get_option(user_option::account_name) == "someoneelse");
 				REQUIRE(*newopt.try_get_option(user_option::instance_url) == "website.egg");
 				REQUIRE(newopt.get_option(user_option::account_name) == "someoneelse");
@@ -81,7 +81,7 @@ SCENARIO("User_options saves changes back to its file")
 			{
 				REQUIRE(fs::exists(fi.filenamebak));
 
-				auto lines = read_lines(fi.filenamebak);
+				const auto lines = read_lines(fi.filenamebak);
 
 				REQUIRE(lines.size() == 2);
 				REQUIRE(lines[0] == "account_name=sometester");
@@ -184,7 +184,7 @@ SCENARIO("The enum overload for get_option works.")
 	const test_file fi = temporary_file();
 	GIVEN("An empty user_options")
 	{
-		user_options opt{fi.filename};
+		const user_options opt{fi.filename};
 
 		WHEN("one of the three options that have sync settings is asked for.")
 		{
@@ -213,8 +213,8 @@ SCENARIO("The enum overload for get_option works.")
 
 		WHEN("one of the three options that have sync settings is asked for.")
 		{
-			auto option = GENERATE(user_option::pull_home, user_option::pull_dms, user_option::pull_notifications);
-			auto result = opt.get_sync_option(option);
+			const auto option = GENERATE(user_option::pull_home, user_option::pull_dms, user_option::pull_notifications);
+			const auto result = opt.get_sync_option(option);
 
 			THEN("the result has the correct set or default value.")
 			{
@@ -225,12 +225,12 @@ SCENARIO("The enum overload for get_option works.")
 		WHEN("the user_options is destroyed")
 		{
 			{
-				user_options newopt = std::move(opt);
+				const user_options newopt = std::move(opt);
 			}
 
 			THEN("The generated file has the correct option set.")
 			{
-				auto lines = read_lines(fi.filename);
+				const auto lines = read_lines(fi.filename);
 
 				REQUIRE(lines.size() == 2);
 				REQUIRE(lines[0] == "file_version=1");
@@ -239,7 +239,7 @@ SCENARIO("The enum overload for get_option works.")
 
 			AND_WHEN("a new user_options is created from that file")
 			{
-				user_options neweropt(fi.filename);
+				const user_options neweropt(fi.filename);
 
 				THEN("it has the correct value.")
 				{

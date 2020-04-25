@@ -9,10 +9,10 @@ SCENARIO("list_operations stringify and parse properly.")
 	Catch::StringMaker<list_operations> sm;
 	GIVEN("A list_operation")
 	{
-		auto val = GENERATE(list_operations::add, list_operations::remove, list_operations::clear);
+		const auto val = GENERATE(list_operations::add, list_operations::remove, list_operations::clear);
 		WHEN("that list_operation is looked up in its array")
 		{
-			auto result = LIST_OPERATION_NAMES[static_cast<int>(val)];
+			const auto result = LIST_OPERATION_NAMES[static_cast<int>(val)];
 			THEN("the corresponding string is the correct one.")
 			{
 				REQUIRE(result == sm.convert(val));
@@ -20,7 +20,7 @@ SCENARIO("list_operations stringify and parse properly.")
 
 			AND_WHEN("the looked-up string is parsed")
 			{
-				auto parsedval = parse_enum<list_operations>(result[0]);
+				const auto parsedval = parse_enum<list_operations>(result[0]);
 
 				THEN("it matches the original.")
 				{
@@ -46,10 +46,10 @@ SCENARIO("sync_settings stringify properly.")
 	Catch::StringMaker<sync_settings> sm;
 	GIVEN("A sync_setting")
 	{
-		auto val = GENERATE(sync_settings::dont_sync, sync_settings::newest_first, sync_settings::oldest_first);
+		const auto val = GENERATE(sync_settings::dont_sync, sync_settings::newest_first, sync_settings::oldest_first);
 		WHEN("that sync_setting is looked up in its array")
 		{
-			auto result = SYNC_SETTING_NAMES[static_cast<int>(val)];
+			const auto result = SYNC_SETTING_NAMES[static_cast<int>(val)];
 			THEN("the corresponding string is the correct one.")
 			{
 				REQUIRE(result == sm.convert(val));
@@ -87,7 +87,7 @@ SCENARIO("user_option values stringify properly.")
 	Catch::StringMaker<user_option> sm;
 	GIVEN("A user_option")
 	{
-		auto val = GENERATE(user_option::file_version, user_option::account_name, user_option::instance_url, user_option::auth_code,
+		const auto val = GENERATE(user_option::file_version, user_option::account_name, user_option::instance_url, user_option::auth_code,
 					user_option::access_token, user_option::client_secret, user_option::client_id, 
 					user_option::last_home_id, user_option::last_dm_id, user_option::last_notification_id,
 					user_option::exclude_follows, user_option::exclude_favs, user_option::exclude_boosts, user_option::exclude_mentions, user_option::exclude_polls,
@@ -95,7 +95,7 @@ SCENARIO("user_option values stringify properly.")
 
 		WHEN("that user_option is looked up in its array")
 		{
-			auto result = USER_OPTION_NAMES[static_cast<int>(val)];
+			const auto result = USER_OPTION_NAMES[static_cast<int>(val)];
 			THEN("the corresponding string is the correct one.")
 			{
 				REQUIRE(result == sm.convert(val));
