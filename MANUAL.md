@@ -25,7 +25,7 @@ Any of these options work, but please read the note about `msync_accounts` below
 
 I recommend this "install" approach over the same-directory-as-executable approach.
 
-You can see where your `msync_accounts` directory is by running `msync location`.
+You can see where your `msync_accounts` directory is by running `msync location`. You can see what flags your `msync` was compiled with, including `MSYNC_USER_CONFIG`, by running `msync version`.
 
 #### Setting up your account
 
