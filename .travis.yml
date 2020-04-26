@@ -86,7 +86,7 @@ deploy:
     edge: true
     file: $FINISHED_BINARY_NAME
     api_key: $API_KEY
-    name: msync release $TRAVIS_TAG
+    name: $TRAVIS_TAG
     release_notes_file: msync_release_notes
     on:
       tags: true
@@ -95,7 +95,7 @@ deploy:
     edge: true
     file: '*.deb'
     api_key: $API_KEY
-    name: msync release $TRAVIS_TAG
+    name: $TRAVIS_TAG
     release_notes_file: msync_release_notes
     on:
       tags: true
