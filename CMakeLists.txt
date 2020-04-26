@@ -16,9 +16,6 @@ include(cmake/linktimeoptimization.cmake)
 
 include(cmake/packages.cmake)
 
-if (MSVC)
-	add_compile_options("/utf-8")
-endif()
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -40,6 +37,8 @@ add_library(entities INTERFACE)
 add_library(constants INTERFACE)
 add_library(exception INTERFACE)
 add_executable(msync "")
+
+include(cmake/compilerflags.cmake)
 
 # see https://crascit.com/2016/01/31/enhanced-source-file-handling-with-target_sources/
 include(cmake/compatibility.cmake)
@@ -88,11 +87,6 @@ target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options queue 
 
 target_link_libraries(msync PRIVATE options optionparsing printlog ${CPR_LIBRARIES} util nlohmannjson exception postfile queue sync net netinterface accountdirectory)
 
-# basically, if you compile CPR with LTO enabled, the gnu compiler emits a bunch of spurious ODR warnings for every library that includes CPR.
-# this quiets that down.
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	set_target_properties(msync PROPERTIES LINK_FLAGS "-Wno-odr")
-endif()
 
 if (MSYNC_BUILD_TESTS)
 	enable_testing()

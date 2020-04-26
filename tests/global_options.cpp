@@ -435,13 +435,16 @@ SCENARIO("select_account selects exactly one account.")
 
 		WHEN("each user account is visited by foreach_account")
 		{
-			int visited = 0;
-			options.foreach_account([&](const auto& pair) { visited++; });
+			std::vector<std::string_view> visited_accounts;
+			options.foreach_account([&](const auto& user) { visited_accounts.push_back(user.first); });
 
 			THEN("each account is visited once.")
 			{
-				REQUIRE(visited == 2);
+				REQUIRE(visited_accounts.size() == 2);
+				REQUIRE_THAT(std::vector<std::string_view>(expected_accounts.begin(), expected_accounts.end()),
+					Catch::UnorderedEquals(visited_accounts));
 			}
+
 		}
 
 		WHEN("all_accounts is called")

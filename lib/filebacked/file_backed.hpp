@@ -68,7 +68,7 @@ public:
 
 	// can be moved
 	file_backed(file_backed&& other) noexcept // move constructor
-		: backing(std::move(other.backing)), parsed(std::move(other.parsed))
+		:  parsed(std::move(other.parsed)), backing(std::move(other.backing))
 	{
 	}
 
