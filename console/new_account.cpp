@@ -89,13 +89,13 @@ void make_new_account(const std::string& accountname, global_options& options)
 	if (authcode == nullptr)
 	{
 		const auto& foundaccountname = useraccount.get_option(user_option::account_name);
-		pl() << "Please open this URL in your browser:\n"
+		pl() << "Please open this URL in your browser:\n\n"
 		   "https://" << instanceurl << "/oauth/authorize?response_type=code&client_id=" << *client_id
-		   << "&redirect_uri=" << redirect_uri << "&scope=" << urlscopes << "\n"
-		   "Enter your authorization code like so:\n"
-		   "msync config auth_code <the authorization code from the site> --account " << foundaccountname << '@' << instanceurl << "\n"
-		   "then run this again:\n"
-		   "msync new -a " << foundaccountname << '@' << instanceurl << "\n"
+		   << "&redirect_uri=" << redirect_uri << "&scope=" << urlscopes << "\n\n"
+		   "Log in, then copy and enter your authorization code like so:\n\n"
+		   "msync config auth_code <the authorization code from the site> --account " << foundaccountname << '@' << instanceurl << "\n\n"
+		   "then run this again:\n\n"
+		   "msync new -a " << foundaccountname << '@' << instanceurl << "\n\n"
 		   "You can shorten the username part, as long as msync can figure out which registered account you're talking about.\n"
 		   "If this is your only account, you can leave the -a part off altogether.";
 		return;
