@@ -108,7 +108,8 @@ int main(int argc, const char* argv[])
 			pl() << MSYNC_LICENSE;
 			break;
 		case mode::location:
-			std::cout << "msync is storing user data at: " << account_directory_path().string();
+			plverb() << "msync is storing user data at: ";
+			pl() << account_directory_path().string();
 			break;
 		case mode::yeehaw:
 			plverb() << " __________\n"
