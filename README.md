@@ -34,7 +34,7 @@ cmake --build . --parallel
 
 The last two steps will take a while, but when you're done, you should see a `msync` executable in your folder, and that's all you need! 
 
-Older Ubuntu releases might require you to `apt install g++-8 libstdc++-8-dev` and run `CC=gcc-8 CXX=g++-8 cmake .. -DCMAKE_BUILD_TYPE=Release -DMSYNC_BUILD_TESTS=OFF` instead, in order to get and use a version of the standard library that supports std::filesystem.
+Older Linux releases might require you to `apt install libstdc++-8-dev` or their equivalent to get the standard library features `msync` requires, such as std::filesystem. If that doesn't work, you may also need `g++-8` and to run `CC=gcc-8 CXX=g++-8 cmake .. -DCMAKE_BUILD_TYPE=Release -DMSYNC_BUILD_TESTS=OFF` instead.
 
 #### Building on macOS
 
