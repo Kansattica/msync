@@ -25,8 +25,6 @@ std::string post_content::visibility_string() const
 	return std::string{ VISIBILITIES[static_cast<int>(vis)][0] };
 }
 
-const char vector_delimiter = '`';
-
 int is_option(std::string_view line, size_t equals_sign);
 bool is_snip(std::string_view line);
 void parse_option(post_content& post, size_t option_index, std::string_view value);
