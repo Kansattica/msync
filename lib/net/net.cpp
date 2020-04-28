@@ -76,6 +76,8 @@ net_response upload_media(std::string_view url, std::string_view access_token, c
 			cpr::Header{ {authorization_key_header, make_bearer(access_token) } },
 			cpr::Multipart{ { "description", description },
 							{ "file", cpr::File{file.string()} } }
+			// cpr::File won't take a wchar string on Windows or a fs::path, so I think my best bet is to hope that .string()
+			// does whatever it does, and then CPR passes that on to the underlying filesystem unchanged and things will work out.
 	));
 }
 
