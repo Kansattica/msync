@@ -1102,6 +1102,27 @@ SCENARIO("The command line parser recognizes when the user requests msync's conf
 			}
 		}
 	}
+
+	GIVEN("A command line requesting the location verbosely.")
+	{
+		const auto verb = GENERATE("-v", "--verbose");
+		char const* argv[] { "msync", "location", verb };
+
+		WHEN("the command line is parsed")
+		{
+			const auto result = parse(3, argv);
+
+			THEN("the parse is good.")
+			{
+				REQUIRE(result.okay);
+			}
+
+			THEN("the correct action is selected.")
+			{
+				REQUIRE(result.selected == mode::location);
+			}
+		}
+	}
 }
 
 bool flag_set(int combo, int position)

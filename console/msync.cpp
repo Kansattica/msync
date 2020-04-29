@@ -24,7 +24,7 @@ std::pair<const std::string, user_options>& assume_account(select_account_result
 
 void do_sync(const parse_result& parsed);
 
-void show_all_options(select_account_result user_result, const parse_result& parsed);
+void show_all_options(select_account_result user_result);
 
 void print_stringptr(const std::string* toprint);
 void print_sensitive(std::string_view name, const std::string* value);
@@ -53,7 +53,7 @@ int main(int argc, const char* argv[])
 			break;
 		case mode::showallopt:
 			should_print_newline = false;
-			show_all_options(options().select_account(parsed.account), parsed);
+			show_all_options(options().select_account(parsed.account));
 			break;
 		case mode::config:
 			should_print_newline = false;
@@ -108,7 +108,8 @@ int main(int argc, const char* argv[])
 			pl() << MSYNC_LICENSE;
 			break;
 		case mode::location:
-			std::cout << "msync is storing user data at: " << as_utf8(account_directory_path());
+			plverb() << "msync is storing user data at: ";
+			pl() << as_utf8(account_directory_path());
 			break;
 		case mode::yeehaw:
 			plverb() << " __________\n"
@@ -208,7 +209,7 @@ bool is_sensitive(user_option opt)
 	return false;
 }
 
-void show_all_options(select_account_result user_result, const parse_result& parsed)
+void show_all_options(select_account_result user_result)
 {
 	pl() << "Accounts registered:\n";
 	{

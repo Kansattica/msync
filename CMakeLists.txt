@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12..3.15)
 
-project (msync VERSION 0.9.6
+project (msync VERSION 0.9.7
 	DESCRIPTION "Store and forward messages with a Mastodon API-compatible server."
 	HOMEPAGE_URL "https://github.com/Kansattica/msync"
 	LANGUAGES CXX C)
@@ -16,10 +16,11 @@ include(cmake/linktimeoptimization.cmake)
 
 include(cmake/packages.cmake)
 
-
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 set (CMAKE_CXX_EXTENSIONS OFF)
+
+include(cmake/compilerflags.cmake)
 
 add_library(queue STATIC "")
 add_library(sync STATIC "")
@@ -38,7 +39,6 @@ add_library(constants INTERFACE)
 add_library(exception INTERFACE)
 add_executable(msync "")
 
-include(cmake/compilerflags.cmake)
 
 # see https://crascit.com/2016/01/31/enhanced-source-file-handling-with-target_sources/
 include(cmake/compatibility.cmake)
