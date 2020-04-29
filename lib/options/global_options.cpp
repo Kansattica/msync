@@ -72,6 +72,8 @@ select_account_result global_options::select_account(std::string_view name)
 		// won't have string.starts_with until c++20, so
 		// if the name given is a prefix of (or equal to) this entry, it's a candidate
 		// unsigned char because https://en.cppreference.com/w/cpp/string/byte/tolower
+		// also, account names SHOULD only be ASCII, otherwise tolower is weird and
+		// it might not only work. 
 		if (std::equal(name.begin(), name.end(), entry.first.begin(), [](unsigned char a, unsigned char b) {
 				return std::tolower(a) == std::tolower(b); //case insensitive
 			}))
