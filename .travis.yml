@@ -61,7 +61,7 @@ script:
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then EXELOCATION="./$BUILDTYPE/msync.exe"; else EXELOCATION="./msync"; fi
   - $EXELOCATION version
   - $EXELOCATION yeehaw
-  - $EXELOCATION location
+  - $EXELOCATION location -v
   # Basically, Travis will time out if it doesn't get any output for over ten minutes.
   # Usually, this is fine, but it causes problems because OSX produces binaries that
   # run much slower for some reason.
