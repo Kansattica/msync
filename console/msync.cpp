@@ -110,7 +110,6 @@ int main(int argc, const char* argv[])
 		case mode::location:
 			plverb() << "msync is storing user data at: ";
 			pl() << as_utf8(account_directory_path());
-			pl() << "\nMy native string type is " << sizeof(fs::path::value_type) << " bytes wide!\n";
 			break;
 		case mode::yeehaw:
 			plverb() << " __________\n"
