@@ -46,6 +46,9 @@ matrix:
   - os: windows
     compiler: cl64.exe
     env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64 CONFIGURE_ARGUMENTS="-DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF"
+  - os: windows
+    compiler: cl64.exe
+    env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=win32 CONFIGURE_ARGUMENTS="-DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF"
   - os: linux
     dist: bionic
     compiler: gcc
