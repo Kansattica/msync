@@ -4,6 +4,9 @@ git:
   depth: 5
   submodules: false
 
+notifications:
+  email: false
+
 matrix:
   include:
   - os: linux
