@@ -65,6 +65,7 @@ script:
   - cmake --build . --config $BUILDTYPE --parallel 2
   - if [ "$MAKE_DEB" = "TRUE" ]; then cpack; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then EXELOCATION="./$BUILDTYPE/msync.exe"; else EXELOCATION="./msync"; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then strip --strip-unneeded $EXELOCATION; fi
   - $EXELOCATION version
   - $EXELOCATION yeehaw
   - $EXELOCATION location
@@ -74,7 +75,6 @@ script:
   - travis_wait ctest --output-on-failure --schedule-random -j 2
 
 after_success:
-  - echo "Binary size:"
   - du -h $EXELOCATION
   - export FINISHED_BINARY_NAME=msync-$TRAVIS_TAG-
   - if [[ $CONFIGURE_ARGUMENTS == *"MSYNC_USER_CONFIG=ON"* ]]; then FINISHED_BINARY_NAME+="install-"; fi
