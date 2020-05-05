@@ -35,10 +35,11 @@ SCENARIO("account_directory_path returns the same correct path every time.")
 #ifndef MSYNC_USER_CONFIG
 		THEN("The test executable exists in the parent directory.")
 		{
+			constexpr auto filename = 
 #ifdef _WIN32
-			constexpr auto filename = "tests.exe";
+			"tests.exe";
 #else
-			constexpr auto filename = "tests";
+			"tests";
 #endif
 			REQUIRE(fs::exists(account_dir.parent_path() / filename));
 		}
@@ -77,7 +78,7 @@ SCENARIO("The account directory locator respects MSYNC_USER_CONFIG.")
 		constexpr auto xdg_home = "XDG_CONFIG_HOME";
 		// the string that getenv returns changes when you call setenv, so save it off
 		const auto oldhome = getenv(xdg_home);
-		std::string old_home_val = oldhome == nullptr ? "" : oldhome;
+		const std::string old_home_val = oldhome == nullptr ? "" : oldhome;
 
 		WHEN("XDG_CONFIG_HOME is unset.")
 		{
@@ -102,9 +103,11 @@ SCENARIO("The account directory locator respects MSYNC_USER_CONFIG.")
 			}
 		}
 
-		setenv(xdg_home, old_home_val.c_str(), true);
+		if (oldhome == nullptr)
+			unsetenv(xdg_home);
+		else
+			setenv(xdg_home, old_home_val.c_str(), true);
 	}
-
 	#endif
 }
 #endif
