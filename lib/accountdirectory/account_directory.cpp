@@ -2,11 +2,7 @@
 
 #include <constants.hpp>
 
-#ifdef __linux__
-	#include <limits.h>
-	#include <cstdlib>
-	#include <memory>
-#else
+#ifdef __WIN32
 	#include <string>
 	#ifdef MSYNC_USER_CONFIG
 		#define WIN32_LEAN_AND_MEAN
@@ -15,19 +11,19 @@
 	#else
 		#include <whereami.h>
 	#endif
+#elif defined(__linux__)
+	#include <limits.h>
+	#include <cstdlib>
+	#include <memory>
+#elif defined(__APPLE__) && !defined(MSYNC_USER_CONFIG)
+	#include <whereami.h>
 #endif
 
 #ifdef MSYNC_USER_CONFIG
 
 fs::path get_user_config_folder_base()
 {
-#ifdef __linux__
-	// compliant with the XDG Base Directory Specification
-	if (const char *config_dir = getenv("XDG_CONFIG_HOME")) {
-		return config_dir;
-	}
-	return fs::path{ getenv("HOME") }.append(".config");
-#else
+#ifdef __WIN32
 	PWSTR appdata_path = nullptr;
 	auto hresult = ::SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_DEFAULT, nullptr, &appdata_path);
 	if (SUCCEEDED(hresult)) {
@@ -36,6 +32,12 @@ fs::path get_user_config_folder_base()
 		return fs::canonical(path);
 	}
 	return fs::path{};
+#else // Linux and OSX
+	// compliant with the XDG Base Directory Specification
+	if (const char *config_dir = getenv("XDG_CONFIG_HOME")) {
+		return config_dir;
+	}
+	return fs::path{ getenv("HOME") }.append(".config");
 #endif
 }
 
@@ -59,7 +61,7 @@ fs::path get_executable_folder()
 	fs::path to_return { full_executable_path.get() };
 	to_return.remove_filename();
 	return to_return;
-#else
+#else //osx doesn't have realpath
 	const int length = wai_getModulePath(nullptr, 0, nullptr);
 
 	auto path = std::string((size_t)length + 1, '\0');

@@ -3,6 +3,13 @@
 #include "../lib/accountdirectory/account_directory.hpp"
 #include <constants.hpp>
 
+#ifndef __WIN32
+	#include <cstdlib>
+	#include "test_helpers.hpp"
+	#include <cstring>
+	#include <memory>
+#endif
+
 SCENARIO("account_directory_path returns the same correct path every time.")
 {
 	GIVEN("The path that account_directory_path returns.")
@@ -45,3 +52,57 @@ SCENARIO("account_directory_path returns the same correct path every time.")
 		}
 	}
 }
+
+#ifdef MSYNC_USER_CONFIG
+SCENARIO("The account directory locator respects MSYNC_USER_CONFIG.")
+{
+	#ifdef __WIN32
+	GIVEN("The account directory path.")
+	{
+		const auto account_dir = account_directory_path();
+
+		THEN("On Windows, the path ends with AppData/Local/msync/msync_accounts.")
+		{
+			const auto path_iterator = account_dir.end();
+			REQUIRE(*(--path_iterator) == Account_Directory);
+			REQUIRE(*(--path_iterator) == "msync");
+			REQUIRE(*(--path_iterator) == "Local");
+			REQUIRE(*(--path_iterator) == "AppData");
+		}
+	}
+	#else // linux and OSX
+	GIVEN("An environment where XDG_CONFIG_HOME can be checked.")
+	{
+		constexpr auto xdg_home = "XDG_CONFIG_HOME";
+		// the string that getenv returns changes when you call setenv, so save it off
+		std::unique_ptr<char[], decltype(std::free)*> old_home_val { strdup(getenv(xdg_home)), std::free };
+
+		WHEN("XDG_CONFIG_HOME is unset.")
+		{
+			REQUIRE(unsetenv(xdg_home) == 0);
+			const auto account_dir = account_directory_path();
+			THEN("The path is as expected, ending in .config/msync/msync_accounts.")
+			{
+				const auto expectedpath = fs::path { getenv("HOME") } / ".config" / "msync" / Account_Directory;
+				REQUIRE(account_dir == expectedpath);
+			}
+		}
+
+		WHEN("XDG_CONFIG_HOME is set.")
+		{
+			const auto tempdir = temporary_directory();
+			REQUIRE(setenv(xdg_home, tempdir.dirname.c_str(), true) == 0);
+			const auto account_dir = account_directory_path();
+			THEN("The path is as expected.")
+			{
+				const auto expectedpath = tempdir.dirname / "msync" / Account_Directory;
+				REQUIRE(account_dir == expectedpath);
+			}
+		}
+
+		setenv(xdg_home, old_home_val.get(), true);
+	}
+
+	#endif
+}
+#endif
