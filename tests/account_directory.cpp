@@ -2,7 +2,7 @@
 
 #include <constants.hpp>
 
-#if !defined(__WIN32) && defined(MSYNC_USER_CONFIG)
+#if !defined(_WIN32) && defined(MSYNC_USER_CONFIG)
 	#include <cstdlib>
 	#include "test_helpers.hpp"
 	#include <string>
@@ -57,7 +57,7 @@ SCENARIO("account_directory_path returns the same correct path every time.")
 #ifdef MSYNC_USER_CONFIG
 SCENARIO("The account directory locator respects MSYNC_USER_CONFIG.")
 {
-	#ifdef __WIN32
+	#ifdef _WIN32
 	GIVEN("The account directory path.")
 	{
 		const auto account_dir = account_directory_path();

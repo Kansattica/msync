@@ -12,7 +12,7 @@
 // - Windows and OSX use whereami
 
 #ifdef MSYNC_USER_CONFIG
-	#ifdef __WIN32
+	#ifdef _WIN32
 		#define WIN32_LEAN_AND_MEAN
 		#include <windows.h>
 		#include <shlobj.h>
@@ -34,7 +34,7 @@
 
 fs::path get_user_config_folder_base()
 {
-#ifdef __WIN32
+#ifdef _WIN32
 	PWSTR appdata_path = nullptr;
 	auto hresult = ::SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_DEFAULT, nullptr, &appdata_path);
 	if (SUCCEEDED(hresult)) {
