@@ -2,21 +2,32 @@
 
 #include <constants.hpp>
 
-#ifdef __WIN32
-	#include <string>
-	#ifdef MSYNC_USER_CONFIG
+// basically, there's a number of paths we can take through here:
+
+// if MSYNC_USER_CONFIG is set:
+// - Windows has Windows-specific stuff
+// - OSX and Linux share an implementation
+// if MSYNC_USER_CONFIG is not set:
+// - Linux has linux-specific stuff
+// - Windows and OSX use whereami
+
+#ifdef MSYNC_USER_CONFIG
+	#ifdef __WIN32
 		#define WIN32_LEAN_AND_MEAN
 		#include <windows.h>
 		#include <shlobj.h>
 	#else
+		#include <cstdlib>
+	#endif
+#else
+	// realpath is available
+	#if _BSD_SOURCE || _XOPEN_SOURCE >= 500 || _XOPEN_SOURCE && _XOPEN_SOURCE_EXTENDED
+		#include <memory>
+		#include <limits.h>
+		#include <cstdlib>
+	#else
 		#include <whereami.h>
 	#endif
-#elif defined(__linux__)
-	#include <limits.h>
-	#include <cstdlib>
-	#include <memory>
-#elif defined(__APPLE__) && !defined(MSYNC_USER_CONFIG)
-	#include <whereami.h>
 #endif
 
 #ifdef MSYNC_USER_CONFIG
@@ -55,13 +66,13 @@ fs::path get_executable_folder()
 	// whereami doesn't work on arm processors for some reason, and also whereami uses PATH_MAX on Linux which you shouldn't do
 	// (see https://linux.die.net/man/3/realpath, stackoverflow answers, and blogs that say you shouldn't use PATH_MAX)
 	// so use the correct form of realpath on linux and whereami everywhere else
-#ifdef __linux__
+#if _BSD_SOURCE || _XOPEN_SOURCE >= 500 || _XOPEN_SOURCE && _XOPEN_SOURCE_EXTENDED
 	// this version of realpath malloc()s a buffer and returns it, so we use unique_ptr to free it automatically.
 	std::unique_ptr<char[], decltype(std::free)*> full_executable_path { realpath("/proc/self/exe", NULL), std::free };
 	fs::path to_return { full_executable_path.get() };
 	to_return.remove_filename();
 	return to_return;
-#else //osx doesn't have realpath
+#else //windows and maybe osx don't have realpath
 	const int length = wai_getModulePath(nullptr, 0, nullptr);
 
 	auto path = std::string((size_t)length + 1, '\0');
