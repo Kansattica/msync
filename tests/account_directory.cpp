@@ -65,7 +65,7 @@ SCENARIO("The account directory locator respects MSYNC_USER_CONFIG.")
 
 		THEN("On Windows, the path ends with AppData/Local/msync/msync_accounts.")
 		{
-			const auto path_iterator = account_dir.end();
+			auto path_iterator = account_dir.end();
 			REQUIRE(*(--path_iterator) == Account_Directory);
 			REQUIRE(*(--path_iterator) == "msync");
 			REQUIRE(*(--path_iterator) == "Local");
