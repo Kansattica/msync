@@ -109,7 +109,7 @@ int main(int argc, const char* argv[])
 			break;
 		case mode::location:
 			plverb() << "msync is storing user data at: ";
-			pl() << account_directory_path().string();
+			pl() << as_utf8(account_directory_path());
 			break;
 		case mode::yeehaw:
 			plverb() << " __________\n"

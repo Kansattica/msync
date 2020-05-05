@@ -14,4 +14,16 @@ namespace fs = std::experimental::filesystem;
 #error Could not find filesystem library in <filesystem> or <experimental/filesystem>
 #endif
 
+#include <string>
+
+inline std::string as_utf8(const fs::path& p)
+{
+#if MSYNC_USE_BOOST && __APPLE__
+	// this should be fine, OSX's paths should be UTF-8, and OSX is the only platform that should have to use Boost
+	return p.string();
+#else
+	return p.u8string();
+#endif
+}
+
 #endif 

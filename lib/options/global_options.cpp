@@ -28,10 +28,10 @@ global_options::global_options(fs::path accounts_dir) : accounts_directory(std::
 		if (!fs::exists(configfile))
 		{
 			using namespace std::string_literals;
-			throw msync_exception("Expected to find a config file and didn't find it. Try deleting the folder and running new again: "s + userfolder.path().string());
+			throw msync_exception("Expected to find a config file and didn't find it. Try deleting the folder and running new again: "s + as_utf8(userfolder.path()));
 		}
 
-		accounts.emplace_back(userfolder.path().filename().string(), user_options{ std::move(configfile) });
+		accounts.emplace_back(as_utf8(userfolder.path().filename()), user_options{ std::move(configfile) });
 	}
 }
 
@@ -72,6 +72,8 @@ select_account_result global_options::select_account(std::string_view name)
 		// won't have string.starts_with until c++20, so
 		// if the name given is a prefix of (or equal to) this entry, it's a candidate
 		// unsigned char because https://en.cppreference.com/w/cpp/string/byte/tolower
+		// also, account names SHOULD only be ASCII, otherwise tolower is weird and
+		// it might not only work. 
 		if (std::equal(name.begin(), name.end(), entry.first.begin(), [](unsigned char a, unsigned char b) {
 				return std::tolower(a) == std::tolower(b); //case insensitive
 			}))
