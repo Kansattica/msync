@@ -1,14 +1,15 @@
 #include <catch2/catch.hpp>
 
-#include "../lib/accountdirectory/account_directory.hpp"
 #include <constants.hpp>
 
-#ifndef __WIN32
+#if !defined(__WIN32) && defined(MSYNC_USER_CONFIG)
 	#include <cstdlib>
 	#include "test_helpers.hpp"
-	#include <cstring>
-	#include <memory>
+	#include <string>
+	#define MSYNC_TESTING
 #endif
+
+#include "../lib/accountdirectory/account_directory.hpp"
 
 SCENARIO("account_directory_path returns the same correct path every time.")
 {
@@ -75,12 +76,13 @@ SCENARIO("The account directory locator respects MSYNC_USER_CONFIG.")
 	{
 		constexpr auto xdg_home = "XDG_CONFIG_HOME";
 		// the string that getenv returns changes when you call setenv, so save it off
-		std::unique_ptr<char[], decltype(std::free)*> old_home_val { strdup(getenv(xdg_home)), std::free };
+		const auto oldhome = getenv(xdg_home);
+		std::string old_home_val = oldhome == nullptr ? "" : oldhome;
 
 		WHEN("XDG_CONFIG_HOME is unset.")
 		{
 			REQUIRE(unsetenv(xdg_home) == 0);
-			const auto account_dir = account_directory_path();
+			const auto account_dir = account_directory_path_uncached();
 			THEN("The path is as expected, ending in .config/msync/msync_accounts.")
 			{
 				const auto expectedpath = fs::path { getenv("HOME") } / ".config" / "msync" / Account_Directory;
@@ -92,7 +94,7 @@ SCENARIO("The account directory locator respects MSYNC_USER_CONFIG.")
 		{
 			const auto tempdir = temporary_directory();
 			REQUIRE(setenv(xdg_home, tempdir.dirname.c_str(), true) == 0);
-			const auto account_dir = account_directory_path();
+			const auto account_dir = account_directory_path_uncached();
 			THEN("The path is as expected.")
 			{
 				const auto expectedpath = tempdir.dirname / "msync" / Account_Directory;
@@ -100,7 +102,7 @@ SCENARIO("The account directory locator respects MSYNC_USER_CONFIG.")
 			}
 		}
 
-		setenv(xdg_home, old_home_val.get(), true);
+		setenv(xdg_home, old_home_val.c_str(), true);
 	}
 
 	#endif

@@ -76,8 +76,14 @@ fs::path get_executable_folder()
 
 #endif
 
+fs::path account_directory_path_uncached()
+{
+	return get_config_folder().append(Account_Directory);
+}
+
 const fs::path& account_directory_path()
 {
-	const static fs::path folder = get_config_folder().append(Account_Directory);
+	const static fs::path folder = account_directory_path_uncached();
 	return folder;
 }
+
