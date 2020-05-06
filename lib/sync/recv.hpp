@@ -139,7 +139,7 @@ private:
 
 			incoming = deserialize<mastodon_entity>(response.message);
 
-			plverb() << "Downloaded " << incoming.size() << " posts.\n";
+			plverb() << "Downloaded " << incoming.size() << " posts, ";
 
 			if (!incoming.empty())
 			{
@@ -147,6 +147,8 @@ private:
 				max_id = lowest_id(incoming);
 				total.insert(total.end(), std::make_move_iterator(incoming.begin()), std::make_move_iterator(incoming.end()));
 			}
+
+			plverb() << total.size() << " posts buffered.\n";
 
 			loop_iterations--;
 
