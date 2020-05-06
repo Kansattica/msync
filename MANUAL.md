@@ -80,9 +80,9 @@ When I say `msync` is a store and forward client. What this means is that `msync
 - Anyone who prefers to use a keyboard.
 - Use in automated scripts.
 
-#### Reading the home timeline and notifications
+#### The home timeline and notifications
 
-After your account is set up, running `msync sync --verbose` will connect to your instance and, if all is well, start downloading notifications and statuses. The `--verbose` is optional (and can be shortened to `-v`), but it will make `msync` tell you where to find the downloaded timeline and notifications. These will be stored at `msync_accounts/[username@instance.url]/home.list` and `msync_accounts/[username@instance.url]/notifications.list`, respectively. You can locate your `msync_accounts` folder at any time by running `msync location`. There's a lot of ways you can look at these files (in a text editor, IDE or `less` are common for me, I'll write more about this later), but the important things to know the process are:
+After your account is set up, running `msync sync --verbose` will connect to your instance and, if all is well, start downloading notifications and statuses. The `--verbose` is optional (and can be shortened to `-v`), but it will make `msync` tell you where to find the downloaded timeline and notifications. These will be stored at `msync_accounts/[username@instance.url]/home.list` and `msync_accounts/[username@instance.url]/notifications.list`, respectively. You can locate your `msync_accounts` folder at any time by running `msync location`. There's a lot of ways you can look at these files, but the important things to know the process are:
 
 - `msync` does not care about the contents of these files. It simply appends posts and notifications to them. You can delete these files, edit them, move them elsewhere, `msync` doesn't care.
 - When you first sync up, `msync` will get five chunks of statuses or notifications. On subsequent updates, `msync` will default to downloading until it's "caught up", and has downloaded everything since the last post it saw. To change this behavior, use the ` --max-requests <integer>` option when calling `msync sync`. 
@@ -91,6 +91,14 @@ After your account is set up, running `msync sync --verbose` will connect to you
 - Note that you can also not sync a timeline at all with `msync config sync home off`
 - If you don't care about a specific type of notification, you can stop `msync` from retrieving them when you sync with `msync config exclude_boosts true`, and same for `favs`, `follows`, `mentions`, and `polls`. `msync` treats anything start with a `t`, `T`, `y`, or `Y` as truthy, and everything else as falsy. So `exclude_favs true`, `exclude_favs YES`, and `exclude_favs Yeehaw` are equivalent.
 - I'll write more about configuration later, but for now, you can see all your settings and registered accounts with `msync config showall`.
+
+#### Reading the home timeline and notifications
+
+Your home timeline and notifications are saved into files named `home.list` and `notifications.list` in your `msync_accounts` folder under the appropriate user account. You can find where these files are located by running `msync location` or `msync sync --verbose`. `msync` doesn't provide a built-in way to look at these files so that you can use your own tool. Here's a few ways that work for me to get you started.
+
+##### vim
+
+asdf
 
 #### Downloading attachments
 
