@@ -128,7 +128,7 @@ All of these skip downloading files you've already downloaded, so feel free to a
 
 #### Queueing
 
-To do other useful stuff with msync, you'll have to use queues. The `msync queue` command allows you to queue up favorites, boosts, and posts to be sent when you're back online. 
+To do other useful stuff with `msync`, you'll have to use queues. The `msync queue` command allows you to queue up favorites, boosts, and posts to be sent when you're back online. 
 
 To queue up favorites, run `msync queue fav <any number of status IDs>`. You can get these status IDs from downloaded posts and notifications. They're always on a line that starts with `status id:` in `home.list` and `notifications.list`- don't put any other ID numbers into this! Boosts are the same: `msync queue boost <any number of status ids>`
 
