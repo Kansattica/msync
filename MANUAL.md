@@ -1,4 +1,3 @@
-
 # `msync` Manual
 ## A low bandwidth store and forward Mastodon api client
 
