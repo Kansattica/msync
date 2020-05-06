@@ -44,7 +44,7 @@ public:
 
 		// note that this only works because the .parent_path() call that populates get_user_directory() omits the trailing slash
 		// otherwise, .filename() would get nothing.
-		const std::string account_name = as_utf8(account.get_user_directory().filename());
+		const std::string account_name = to_utf8(account.get_user_directory().filename());
 
 		pl() << "Downloading notifications for " << account_name << '\n';
 		update_timeline<to_get::notifications, mastodon_notification, true>(account, account.get_user_directory(), clamp_or_default(per_call, 30));
