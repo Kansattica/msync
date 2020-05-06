@@ -133,7 +133,7 @@ To queue up favorites, run `msync queue fav <any number of status IDs>`. You can
 
 If you accidentally favorited or boosted a toot you'd rather not have, run `msync queue --remove fav <any number of status IDs>`. This works for favorites and boosts that you haven't sent yet (which will be removed immediately) and for ones that have already been sent (which will be removed the next time you `msync sync`).
 
-You can check the status of your queues and see what will be sent next time you sync up with `msync queue print`
+You can check the status of your queues and see what will be sent next time you sync up with `msync queue print`.
 
 If you want to just clear that queue, possibly because there's a typo'd ID in there- you can run `msync queue --clear fav` (or `boost` or `post`).
 
