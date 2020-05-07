@@ -603,13 +603,11 @@ SCENARIO("Queues can handle a mix of different queued calls.")
 
 SCENARIO("Can enqueue and dequeue files with non-ASCII paths.")
 {
-#ifndef __APPLE__
 	std::locale::global(std::locale("en_US.UTF-8"));
-#endif
 
 	GIVEN("Some files with non-ASCII paths.")
 	{
-		const fs::path skunkzone = u8"cool🦨zone";
+		const fs::path skunkzone = u8"./cool🦨zone";
 		fs::create_directory(skunkzone);
 		for (const auto filename : { u8"a friend.txt", u8"your 🤠 friend.txt" })
 		{
