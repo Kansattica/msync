@@ -39,20 +39,21 @@ std::string clean_up_html(const std::string_view to_strip)
 	// I think the +1 here is necessary because .size() doesn't account for the null terminator that decode_html_entities will want.
 	// either way, one extra byte won't hurt
 
-	// this is kind of a rat's nest both to avoid allocations (each regex replace requires one, but decode_html_entities is in-place)
+	// this is kind of a rat's nest both to avoid allocations (each regex replace requires a buffer, which can be reused, but decode_html_entities is in-place)
 	// and because we have to jump through some hoops in order to read from a string_view, because std::regex doesn't know about string views
 	// (we take a string_view to avoid an allocation on the way in, at least)
 
-	std::string line_break_temp_buffer(to_strip.size() + 1, '\0');
+	std::string output_buffer(to_strip.size() + 1, '\0');
 
-	auto end_of_output = std::regex_replace(&line_break_temp_buffer[0], to_strip.begin(), to_strip.end(), replace_line_breaks, "\n");
+	auto end_of_output = std::regex_replace(&output_buffer[0], to_strip.begin(), to_strip.end(), replace_line_breaks, "\n");
 
-	std::string par_break_temp_buffer(line_break_temp_buffer.size() + 1, '\0');
+	std::string par_break_temp_buffer(end_of_output - &output_buffer[0] + 1, '\0');
 
-	end_of_output = std::regex_replace(&par_break_temp_buffer[0], &line_break_temp_buffer[0], end_of_output, replace_paragraph_breaks, "\n\n");
+	end_of_output = std::regex_replace(&par_break_temp_buffer[0], &output_buffer[0], end_of_output, replace_paragraph_breaks, "\n\n");
 	par_break_temp_buffer.resize(end_of_output - &par_break_temp_buffer[0]);
 
-	std::string output_buffer = std::regex_replace(par_break_temp_buffer, remove_tags, "");
+	const auto end_of_tag_output = std::regex_replace(&output_buffer[0], par_break_temp_buffer.begin(), par_break_temp_buffer.end(), remove_tags, "");
+	*end_of_tag_output = '\0';
 
 	const size_t decoded_length = decode_html_entities_utf8(&output_buffer[0], nullptr);
 
