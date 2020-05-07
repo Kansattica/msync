@@ -610,7 +610,7 @@ SCENARIO("Can enqueue and dequeue files with non-ASCII paths.")
 
 	GIVEN("Some files with non-ASCII paths.")
 	{
-		const test_dir skunkzone = u8"cool🦨zone";
+		const test_dir skunkzone{ fs::path { u8"cool🦨zone" } };
 		for (const auto c : skunkzone.dirname.native())
 		{
 			std::cout << std::hex << (int)c << ' ';
