@@ -15,6 +15,7 @@
 #include <utility>
 #include <algorithm>
 #include <initializer_list>
+#include <locale>
 #include <print_logger.hpp>
 
 struct id_mock_args : public basic_mock_args
@@ -427,6 +428,7 @@ int unique_idempotency_keys(std::initializer_list<uint_fast64_t> keys)
 
 SCENARIO("Send correctly sends new posts and deletes existing ones.")
 {
+	std::locale::global(std::locale("en_US.UTF-8"));
 	logs_off = true;
 	const test_dir dir = temporary_directory();
 
@@ -441,17 +443,17 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 
 	GIVEN("A queue with some post filenames to send.")
 	{
-		const std::array<test_file, 4> to_enqueue { "first.post", "second.post", "another kind of post", "last one" };
-		const std::array<touch_file, 4> attachment_files{ "attachments", "on", "this", "one" };
+		const std::array<test_file, 4> to_enqueue { u8"first🍕.post", "second.post", "another kind of post", "last one" };
+		const std::array<touch_file, 4> attachment_files{ u8"attachments🖇", "on", "this", "one" };
 
-		const static std::vector<fs::path> expected_attach{ fs::canonical("attachments"), fs::canonical("on")
+		const static std::vector<fs::path> expected_attach{ fs::canonical(u8"attachments🖇"), fs::canonical("on")
 			, fs::canonical("this"), fs::canonical("one") };
-		const static std::vector<std::string> expected_descriptions{ "with", "some", "descriptions", "" };
-		const static std::vector<std::string> expected_files{ "first.post", "second.post", "another kind of post", "last one" };
+		const static std::vector<std::string> expected_descriptions{ "with", "some", u8"descri🅱tions", "" };
+		const static std::vector<std::string> expected_files{ u8"first🍕.post", "second.post", "another kind of post", "last one" };
 
 		{
 			outgoing_post first{ to_enqueue[0].filename };
-			first.parsed.text = "This one just has a body.";
+			first.parsed.text = u8"This one just has a 🧊 body.";
 			first.parsed.reply_id = "Hi";
 
 			outgoing_post second{ to_enqueue[1].filename };
@@ -462,14 +464,14 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 			second.parsed.reply_to_id = "Hi";
 
 			outgoing_post third{ to_enqueue[2].filename };
-			third.parsed.attachments = { "attachments", "on" };
-			third.parsed.descriptions = { "with", "some", "descriptions" };
+			third.parsed.attachments = { u8"attachments🖇", "on" };
+			third.parsed.descriptions = { "with", "some", u8"descri🅱tions" };
 			third.parsed.reply_to_id = "hi2hi";
 			third.parsed.vis = visibility::direct;
 
 			outgoing_post fourth{ to_enqueue[3].filename };
-			fourth.parsed.attachments = { "attachments", "on", "this", "one" };
-			fourth.parsed.descriptions = { "with", "some", "descriptions" };
+			fourth.parsed.attachments = { u8"attachments🖇", "on", "this", "one" };
+			fourth.parsed.descriptions = { "with", "some", u8"descri🅱tions" };
 			fourth.parsed.reply_to_id = "777777";
 			fourth.parsed.vis = visibility::unlisted;
 		}
@@ -526,7 +528,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 			{
 				const auto& first = mocknew.arguments[0];
 				REQUIRE(first.params.attachment_ids.empty());
-				REQUIRE(first.params.body == "This one just has a body.");
+				REQUIRE(first.params.body == u8"This one just has a 🧊 body.");
 				REQUIRE(first.params.content_warning.empty());
 				REQUIRE(first.params.reply_to.empty());
 				REQUIRE(first.params.visibility.empty());
@@ -624,7 +626,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 			{
 				const auto& first = mocknew.arguments[0];
 				REQUIRE(first.params.attachment_ids.empty());
-				REQUIRE(first.params.body == "This one just has a body.");
+				REQUIRE(first.params.body == u8"This one just has a 🧊 body.");
 				REQUIRE(first.params.content_warning.empty());
 				REQUIRE(first.params.reply_to.empty());
 				REQUIRE(first.params.visibility.empty());
@@ -718,7 +720,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 			{
 				const auto& first = mocknew.arguments[0];
 				REQUIRE(first.params.attachment_ids.empty());
-				REQUIRE(first.params.body == "This one just has a body.");
+				REQUIRE(first.params.body == u8"This one just has a 🧊 body.");
 				REQUIRE(first.params.content_warning.empty());
 				REQUIRE(first.params.visibility.empty());
 
@@ -801,7 +803,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 				{
 					const auto& first = mocknew.arguments[idx++];
 					REQUIRE(first.params.attachment_ids.empty());
-					REQUIRE(first.params.body == "This one just has a body.");
+					REQUIRE(first.params.body == u8"This one just has a 🧊 body.");
 					REQUIRE(first.params.content_warning.empty());
 					REQUIRE(first.params.reply_to.empty());
 					REQUIRE(first.params.visibility.empty());
