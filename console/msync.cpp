@@ -6,9 +6,6 @@
 #include <algorithm>
 #include <locale>
 
-#include <iostream>
-#include <bitset>
-
 #include "version.hpp"
 #include "../lib/options/global_options.hpp"
 #include "../lib/options/option_enums.hpp"
@@ -42,13 +39,6 @@ int main(int argc, const char* argv[])
 {
 	//mostly for Windows so it interprets strings of type char as UTF-8 when constructing paths.
 	std::locale::global(std::locale("en_US.UTF-8"));
-
-	const fs::path skunkzone{ u8"cool🦨zone" };
-	for (const auto c : skunkzone.native())
-	{
-		std::cout << std::bitset<sizeof(fs::path::value_type) * 8>(c) << ' ';
-	}
-	std::cout << '\n';
 
 	plfile() << "--- msync started ---\n";
 

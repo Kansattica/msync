@@ -607,11 +607,17 @@ SCENARIO("Can enqueue and dequeue files with non-ASCII paths.")
 
 	GIVEN("Some files with non-ASCII paths.")
 	{
+		std::vector<test_file> test_files;
+
 		const test_dir skunkzone{ fs::path { u8"cool🦨zone" } };
+
 		for (const auto filename : { u8"a friend.txt", u8"your 🤠 friend.txt" })
 		{
+			test_files.push_back(test_file { filename });
 			std::ofstream fi{ filename };
+
 			const fs::path infolder = skunkzone.dirname / filename;
+			test_files.push_back(test_file { infolder });
 			std::ofstream folderfi{ infolder.c_str() }; // Boost insists.
 
 			fi << "Hi, I'm " << filename;
