@@ -47,6 +47,9 @@ std::string clean_up_html(const std::string_view to_strip)
 
 	auto end_of_output = std::regex_replace(&output_buffer[0], to_strip.begin(), to_strip.end(), replace_line_breaks, "\n");
 
+	// one more than the number of characters written to output_buffer.
+	// The + 1 shouldn't be necessary, since the output of this replace should always be the same length or shorter
+	// but it's better than overflowing a buffer on accident with some oddball case I didn't expect.
 	std::string par_break_temp_buffer(end_of_output - &output_buffer[0] + 1, '\0');
 
 	end_of_output = std::regex_replace(&par_break_temp_buffer[0], &output_buffer[0], end_of_output, replace_paragraph_breaks, "\n\n");
