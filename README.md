@@ -8,11 +8,14 @@
 `msync` currently supports queueing and sending posts, boosts, and favorites for any number of accounts, as well as downloading the home timeline and notifications.
 
 ### Get msync
+
 You can download the latest stable release of `msync` [here](https://github.com/Kansattica/msync/releases) or the Releases tab above. 
 
-If you would like to build `msync` yourself, read on. If you have a fairly recent version of CMake (3.12 or later), you can simply clone the repo, make a `build` directory, run CMake inside, and CMake will download and build `msync` and its dependencies automatically. 
+#### Which release should I download?
 
-On Linux systems, it works a lot better if it can link in your system's openssl (or whatever other TLS implementation cURL knows how to use) and, if you have it, libcurl. Most systems have `libcurl4` or an equivalent installed already.
+I recommend downloading the `.deb` file if you're on a Debian-like system that can install it. Otherwise, I recommend downloading the release for your system with `install` in the filename. This version will store user data in the appropriate place for your system. The versions without `install` store user data in the same directory as the executable. See [the manual](MANUAL.md#a-note-about-msync_accounts) for more information.
+
+If you would like to build `msync` yourself, read on. If you have a fairly recent version of CMake (3.12 or later), you can simply clone the repo, make a `build` directory, run CMake inside, and CMake will download and build `msync` and its dependencies automatically. 
 
 ##### Notes on libcurl 
 
@@ -20,10 +23,11 @@ On Linux systems, it works a lot better if it can link in your system's openssl 
 - If you'd rather have msync compile curl into itself, add `-DUSE_SYSTEM_CURL=OFF` after `-DCMAKE_BUILD_TYPE=Release`. This will automatically download and configure curl as part of the build process. If you go this route, I suggest having zlib (e.g. `zlib1g-dev`, optional but highly recommended) and an ssl library (e.g. `libssl-dev`, required) installed where curl can find them.
 
 #### Building on Linux
+
 On a new Debian-like system, the setup process looks something like this:
 
 ```
-apt install libcurl4-openssl-dev cmake git gcc g++
+apt install cmake git gcc g++
 git clone https://github.com/Kansattica/msync.git
 cd msync
 mkdir build
@@ -32,15 +36,18 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DMSYNC_BUILD_TESTS=OFF
 cmake --build . --parallel
 ```
 
+The full list of options that can be passed to CMake is [here](#relevant-cmake-flags).
+
 The last two steps will take a while, but when you're done, you should see a `msync` executable in your folder, and that's all you need! 
 
-Older Linux releases might require you to `apt install libstdc++-8-dev` or their equivalent to get the standard library features `msync` requires, such as std::filesystem. If that doesn't work, you may also need `g++-8` and to run `CC=gcc-8 CXX=g++-8 cmake .. -DCMAKE_BUILD_TYPE=Release -DMSYNC_BUILD_TESTS=OFF` instead.
+Older Linux releases might require you to `apt install libstdc++-8-dev` or their equivalent to get the standard library features `msync` requires, such as std::filesystem. If that doesn't work, you may also need `g++-8` and to run `CC=gcc-8 CXX=g++-8 cmake [...]` instead.
 
 #### Building on macOS
 
 The instructions for building on Linux should mostly work, though note that Apple only officially supports std::filesystem on Xcode 11.1 and Catalina/10.15 and up. `msync` does support pre-10.15 versions with Boost::filesystem, which you can install through Homebrew. I don't have a Mac to test on, but I do ensure that it builds and all unit tests pass. I test on OSX 10.14.6 with Xcode 11 and Boost::filesystem 1.72.0.
 
 #### Building on Windows
+
 On Windows, you'll want Visual Studio with the C++ development workload and CMake installed. After that, `git clone https://github.com/Kansattica/msync.git`, then open Visual Studio and go to `File > Open > CMake...` (some versions just have `File > Open > Folder...` instead, this will also work) and choose the `msync` repo you just downloaded. Visual Studio will take a while to download and configure everything, and then you should be able to pick `x64-Release` from the dropdown at the top, make sure the `msync.exe` target is selected, and build from there. 
 
 If you want something lighter weight, I suspect you can install the [build tools for Visual Studio](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019) and build from the command line. I don't have as much experience with this, but you typically have to open the start menu, search for something called "developer command prompt", and then the CMake commands should be the same as the Linux commands up above.
@@ -51,7 +58,7 @@ If you want something lighter weight, I suspect you can install the [build tools
 
 - gcc and clang on 64-bit Ubuntu and Debian
 - gcc on 32-bit Ubuntu
-- OSX 10.14 with Xcode 11
+- OSX 10.14 with Xcode 11 (requires Boost::filesystem)
 - MSVC 2017 on 32 and 64-bit Windows 
 
 #### Relevant CMake flags
@@ -72,9 +79,10 @@ To ensure that `msync` found and compiled its network dependencies correctly, ru
 
 ### Next steps
 
-Once you have `msync` compiled, check out [MANUAL.md](manual.md#msync-manual) for installation and usage information.
+Once you have `msync` compiled, check out [MANUAL.md](MANUAL.md#msync-manual) for installation and usage information.
 
 ### Features (that are implemented or coming soon)
+
 - [X] Multiple account support.
 - [X] Queue posts, boosts, and favs.
 - [X] Queue up threads before sending.
@@ -91,6 +99,7 @@ Once you have `msync` compiled, check out [MANUAL.md](manual.md#msync-manual) fo
 - [ ] Allow choosing a default account.
 
 ### Roadmap (things for later)
+
 - [ ] Nicknames for accounts.
 - [ ] Queue and send profile updates.
 - [ ] Download individual posts and threads by URL or ID.
@@ -99,6 +108,7 @@ Once you have `msync` compiled, check out [MANUAL.md](manual.md#msync-manual) fo
 - [ ] [A proper manual for the weirder ins and outs of msync.](MANUAL.md)
 
 ### Build Dependencies
+
 CMake will download all of these for you, except it'll use your system's libcurl if you have it and can't update your compiler or standard library. I recommend at least having an SSL/TLS library for CMake to find and dynamically link.
 You can verify that your setup works by building tests and running `net_tests`.
 - CMake 3.12 or newer

@@ -1,4 +1,3 @@
-
 # `msync` Manual
 ## A low bandwidth store and forward Mastodon api client
 
@@ -14,7 +13,7 @@ Once you've compiled or [downloaded](https://github.com/Kansattica/msync/release
 - copy the compiled `msync` executable to somewhere in your `$PATH`. 
 - if you're on a Debian-like system, run `sudo dpkg -i msync-<version>-Linux.deb`, which will install msync into `/usr/bin`.
 
-Any of these options work, but please read the note about `msync_accounts` below. If you downloaded a prebuilt release, your executable will be called something like `msync-v0.9.5-linux-x64`. Feel free to rename it to simply `msync` or whatever else you like. 
+Any of these options work, but please read the note about `msync_accounts` below. If you downloaded a prebuilt release, your executable will be called something like `msync-v0.9.5-linux-x64`. Feel free to rename it to simply `msync` or whatever else you like. The rest of this manual will assume that your executable can be invoked simply by typing `msync` at the command line, and you can add a leading `./` or trailing `.exe` as appropriate.
 
 #### A note about `msync_accounts`
 
@@ -35,7 +34,7 @@ You can see where your `msync_accounts` directory is by running `msync location`
 
 This will register `msync` with your instance and give you a URL to visit in your browser. Go to that URL, log in if needed, click 'authorize', and copy the authorization code it gives you. `msync` will give you onscreen instructions as to what to do next. Notice that the `--account` (or `-a`, for short) switch always goes at the end. Putting it earlier won't work!
 
-Once you see `Done! You're ready to start using this account`, you're ready to go. Notice that `msync` has created an `msync_accounts` directory in the same directory as itself. Keep this somewhere safe, because it now contains a password-equivalent access token! This `msync_accounts` directory contains everything `msync` knows: your account name, your settings, anything you've queued but haven't sent, and, once you synchronize with the server, it will contain local copies of your notifications and home timeline. To move, copy, or back up your `msync` installation to another computer, simply copy that `msync_accounts` folder.
+Once you see `Done! You're ready to start using this account`, you're ready to go. `msync` has just created an `msync_accounts` directory, either in the same directory as itself or in a system-specific location. You can find out which by running `msync location`. Keep this somewhere safe, because it now contains a password-equivalent access token! This `msync_accounts` directory contains everything `msync` knows: your account name, your settings, anything you've queued but haven't sent, and, once you synchronize with the server, it will contain local copies of your notifications and home timeline. To move, copy, or back up your `msync` installation to another computer, simply copy that `msync_accounts` folder.
 
 #### A note on multiple accounts
 
@@ -128,13 +127,13 @@ All of these skip downloading files you've already downloaded, so feel free to a
 
 #### Queueing
 
-To do other useful stuff with msync, you'll have to use queues. The `msync queue` command allows you to queue up favorites, boosts, and posts to be sent when you're back online. 
+To do other useful stuff with `msync`, you'll have to use queues. The `msync queue` command allows you to queue up favorites, boosts, and posts to be sent when you're back online. 
 
 To queue up favorites, run `msync queue fav <any number of status IDs>`. You can get these status IDs from downloaded posts and notifications. They're always on a line that starts with `status id:` in `home.list` and `notifications.list`- don't put any other ID numbers into this! Boosts are the same: `msync queue boost <any number of status ids>`
 
 If you accidentally favorited or boosted a toot you'd rather not have, run `msync queue --remove fav <any number of status IDs>`. This works for favorites and boosts that you haven't sent yet (which will be removed immediately) and for ones that have already been sent (which will be removed the next time you `msync sync`).
 
-You can check the status of your queues and see what will be sent next time you sync up with `msync queue print`
+You can check the status of your queues and see what will be sent next time you sync up with `msync queue print`.
 
 If you want to just clear that queue, possibly because there's a typo'd ID in there- you can run `msync queue --clear fav` (or `boost` or `post`).
 
@@ -172,7 +171,7 @@ Posts are a little different. You still queue them up to be sent when you next `
 
 #### A note on UTF-8, Unicode, and Emojis
 
-`msync` tries its best not to touch the bytes that it sends to or from the server. This means that posts are sent to the server and written to the local timelines as close to as is as possible. Emojis and other non-ASCII characters should work fine, as long as you send and read UTF-8. Some terminal emulators have a hard time displaying UTF-8, and you may wind up having to change some setting or use a different font. I know that running `[Console]::OutputEncoding = [Text.UTF8Encoding]::UTF8` can help on Powershell, especially when it comes to specifying command line arguments that include non-ASCII characters. In addition, characters may show weird on the terminal, but go over the wire fine. 
+`msync` tries its best not to touch the bytes that it sends to or from the server. This means that posts are sent to the server and written to the local timelines as close to as is as possible. Emojis and other non-ASCII characters should work fine, as long as you send and read UTF-8. Some terminal emulators have a hard time displaying UTF-8, and you may wind up having to change some setting or use a different font. I know that running `[Console]::OutputEncoding = [Text.UTF8Encoding]::UTF8` can help on Powershell, especially when it comes to specifying command line arguments that include non-ASCII characters. Note that characters may show weird on the terminal, but go over the wire fine. 
 
 If you want to test whether your terminal renders UTF-8, running `msync yeehaw` will attempt to print a cowboy emoji (🤠). If it shows up as garbled characters, you'll have to adjust your terminal's encoding settings. If your version of `msync` creates a `msync.log` in the current directory, you can test your file viewer of choice as well. I know that Powershell makes you pass the `-Encoding utf8` option to commands such as `Get-Content`.
 
