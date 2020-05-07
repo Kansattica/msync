@@ -61,7 +61,7 @@ matrix:
       apt: g++-8 libstdc++-8-dev
 
 before_install:
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then sudo brew reinstall boost; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew reinstall boost; fi
 
 script:
   - export BUILDTYPE=Release 
