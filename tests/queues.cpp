@@ -612,7 +612,8 @@ SCENARIO("Can enqueue and dequeue files with non-ASCII paths.")
 		for (const auto filename : { u8"a friend.txt", u8"your 🤠 friend.txt" })
 		{
 			std::ofstream fi{ filename };
-			std::ofstream folderfi{ skunkzone / filename };
+			const fs::path infolder = skunkzone / filename;
+			std::ofstream folderfi{ infolder.c_str() }; // Boost insists.
 
 			fi << "Hi, I'm " << filename;
 			folderfi << "Hi, I'm " << filename << u8" in a 😎 cool folder.";
