@@ -7,6 +7,7 @@
 #include <string>
 #include <string_view>
 #include <algorithm>
+#include <locale>
 
 #include "../lib/queue/queues.hpp"
 #include "../lib/constants/constants.hpp"
@@ -132,8 +133,8 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 
 void files_match(const fs::path& account_dir, const fs::path& original, const std::string& outfile)
 {
-	const outgoing_post orig{ original };
-	const outgoing_post newfile{ account_dir / File_Queue_Directory / outfile };
+	const readonly_outgoing_post orig{ original };
+	const readonly_outgoing_post newfile{ account_dir / File_Queue_Directory / outfile };
 
 	REQUIRE(orig.parsed.text == newfile.parsed.text);
 }
@@ -392,10 +393,10 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 			THEN("the file contents are correct.")
 			{
-				const auto unsuflines = outgoing_post(unsuffixedname);
+				const auto unsuflines = readonly_outgoing_post(unsuffixedname);
 				REQUIRE(unsuflines.parsed.text == "I'm number 1");
 
-				const auto suflines = outgoing_post(suffixedname);
+				const auto suflines = readonly_outgoing_post(suffixedname);
 				REQUIRE(suflines.parsed.text == "I'm number 2");
 			}
 
@@ -598,4 +599,78 @@ SCENARIO("Queues can handle a mix of different queued calls.")
 			}
 		}
 	}
+}
+
+SCENARIO("Can enqueue and dequeue files with non-ASCII paths.")
+{
+	std::locale::global(std::locale("en_US.UTF-8"));
+
+	GIVEN("Some files with non-ASCII paths.")
+	{
+		const fs::path skunkzone = u8"cool🦨zone";
+		fs::create_directory(skunkzone);
+		for (const auto filename : { u8"a friend.txt", u8"your 🤠 friend.txt" })
+		{
+			std::ofstream fi{ filename };
+			std::ofstream folderfi{ skunkzone / filename };
+
+			fi << "Hi, I'm " << filename;
+			folderfi << "Hi, I'm " << filename << u8" in a 😎 cool folder.";
+		}
+
+		WHEN("The files are enqueued.")
+		{
+			const auto allaccounts = temporary_directory();
+			const fs::path accountdir = allaccounts.dirname / "anonymous@crime.egg";
+			const fs::path file_queue_dir = accountdir / File_Queue_Directory;
+			const fs::path queue_file = accountdir / Queue_Filename;
+
+			enqueue(queues::post, accountdir, std::vector<std::string> {
+				u8"a friend.txt", u8"your 🤠 friend.txt",
+				u8"cool🦨zone/a friend.txt", u8"cool🦨zone/your 🤠 friend.txt"
+			});
+
+			THEN("The queue file has the correct filenames in the correct order.")
+			{
+				REQUIRE(read_lines(queue_file) == std::vector<std::string> {
+					u8"POST a friend.txt",
+					u8"POST your 🤠 friend.txt",
+					u8"POST a friend.txt.1",
+					u8"POST your 🤠 friend.txt.1",
+				});
+			}
+
+			THEN("The copied files have their contents correct.")
+			{
+				REQUIRE(readonly_outgoing_post(file_queue_dir / u8"a friend.txt").parsed.text == "Hi, I'm a friend.txt");
+				REQUIRE(readonly_outgoing_post(file_queue_dir / u8"your 🤠 friend.txt").parsed.text == "Hi, I'm your 🤠 friend.txt");
+				REQUIRE(readonly_outgoing_post(file_queue_dir / u8"a friend.txt.1").parsed.text == "Hi, I'm a friend.txt in a 😎 cool folder.");
+				REQUIRE(readonly_outgoing_post(file_queue_dir / u8"your 🤠 friend.txt.1").parsed.text == "Hi, I'm your 🤠 friend.txt in a 😎 cool folder.");
+			}
+
+			AND_WHEN("Some of those files are dequeued.")
+			{
+				dequeue(queues::post, accountdir, std::vector<std::string> {
+						 u8"your 🤠 friend.txt", u8"a friend.txt.1"
+				});
+
+				THEN("The queue file has the correct filenames in the correct order.")
+				{
+					REQUIRE(read_lines(queue_file) == std::vector<std::string> {
+						u8"POST a friend.txt", u8"POST your 🤠 friend.txt.1"
+					});
+				}
+
+				THEN("The remaining files have their contents correct.")
+				{
+					REQUIRE(readonly_outgoing_post(file_queue_dir / u8"a friend.txt").parsed.text == "Hi, I'm a friend.txt");
+					REQUIRE_FALSE(fs::exists(file_queue_dir / u8"your 🤠 friend.txt"));
+					REQUIRE_FALSE(fs::exists(file_queue_dir / u8"a friend.txt.1"));
+					REQUIRE(readonly_outgoing_post(file_queue_dir / u8"your 🤠 friend.txt.1").parsed.text == "Hi, I'm your 🤠 friend.txt in a 😎 cool folder.");
+				}
+			}
+
+		}
+	}
+
 }
