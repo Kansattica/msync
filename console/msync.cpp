@@ -4,6 +4,7 @@
 #include <string>
 #include <string_view>
 #include <algorithm>
+#include <locale>
 
 #include "version.hpp"
 #include "../lib/options/global_options.hpp"
@@ -36,6 +37,9 @@ void print_iterable(const T& vec);
 
 int main(int argc, const char* argv[])
 {
+	//mostly for Windows so it interprets strings of type char as UTF-8 when constructing paths.
+	std::locale::global(std::locale("en_US.UTF-8"));
+
 	plfile() << "--- msync started ---\n";
 
 	auto parsed = parse(argc, argv, false);

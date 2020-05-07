@@ -26,9 +26,4 @@ inline std::string to_utf8(const fs::path& p)
 #endif
 }
 
-inline fs::path from_utf8(std::string s)
-{
-
-}
-
 #endif 
