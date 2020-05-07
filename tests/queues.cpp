@@ -9,9 +9,6 @@
 #include <algorithm>
 #include <locale>
 
-#include <iostream>
-#include <iomanip>
-
 #include "../lib/queue/queues.hpp"
 #include "../lib/constants/constants.hpp"
 #include "../lib/printlog/print_logger.hpp"
@@ -611,12 +608,6 @@ SCENARIO("Can enqueue and dequeue files with non-ASCII paths.")
 	GIVEN("Some files with non-ASCII paths.")
 	{
 		const test_dir skunkzone{ fs::path { u8"cool🦨zone" } };
-		for (const auto c : skunkzone.dirname.native())
-		{
-			std::cout << std::hex << (int)c << ' ';
-		}
-		std::cout << '\n';
-
 		for (const auto filename : { u8"a friend.txt", u8"your 🤠 friend.txt" })
 		{
 			std::ofstream fi{ filename };
