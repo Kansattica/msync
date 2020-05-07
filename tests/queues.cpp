@@ -607,8 +607,8 @@ SCENARIO("Can enqueue and dequeue files with non-ASCII paths.")
 
 	GIVEN("Some files with non-ASCII paths.")
 	{
-		const fs::path skunkzone = u8"./cool🦨zone";
-		fs::create_directory(skunkzone);
+		const fs::path skunkzone = u8"cool🦨zone";
+		fs::create_directories(skunkzone);
 		for (const auto filename : { u8"a friend.txt", u8"your 🤠 friend.txt" })
 		{
 			std::ofstream fi{ filename };
