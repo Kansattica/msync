@@ -65,7 +65,7 @@ matrix:
       apt: g++-8 libstdc++-8-dev
 
 script:
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then greadlink -m './cool🦨zone'; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then greadlink -m ./cool🦨zone; fi
   - export BUILDTYPE=Release 
   - mkdir -p build
   - cd build
