@@ -37,10 +37,6 @@ matrix:
   - os: osx
     osx_image: xcode11
     compiler: clang
-    addons:
-      homebrew:
-        packages:
-        - coreutils
   - os: windows
     compiler: cl64.exe
     env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64
