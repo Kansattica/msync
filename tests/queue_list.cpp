@@ -17,7 +17,7 @@ SCENARIO("queue_lists save their data when destroyed.")
 	{
 		const test_file tf = temporary_file();
 
-		queue_list opts(tf.filename);
+		queue_list opts(tf.filename());
 		opts.parsed.push_back(api_call{ api_route::fav, "thingone" });
 		opts.parsed.push_back(api_call{ api_route::unboost, "thingtwo" });
 
@@ -29,7 +29,7 @@ SCENARIO("queue_lists save their data when destroyed.")
 
 			THEN("no file is written")
 			{
-				REQUIRE_FALSE(fs::exists(tf.filename));
+				REQUIRE_FALSE(fs::exists(tf.filename()));
 			}
 		}
 
@@ -41,9 +41,9 @@ SCENARIO("queue_lists save their data when destroyed.")
 
 			THEN("the file is written")
 			{
-				REQUIRE(fs::exists(tf.filename));
+				REQUIRE(fs::exists(tf.filename()));
 
-				const auto lines = read_lines(tf.filename);
+				const auto lines = read_lines(tf.filename());
 
 				REQUIRE(lines.size() == 2);
 				REQUIRE(lines[0] == "FAV thingone");
@@ -59,9 +59,9 @@ SCENARIO("queue_lists save their data when destroyed.")
 
 			THEN("the file gets written")
 			{
-				REQUIRE(fs::exists(tf.filename));
+				REQUIRE(fs::exists(tf.filename()));
 
-				const auto lines = read_lines(tf.filename);
+				const auto lines = read_lines(tf.filename());
 
 				REQUIRE(lines.size() == 2);
 				REQUIRE(lines[0] == "FAV thingone");
@@ -79,9 +79,9 @@ SCENARIO("queue_lists save their data when destroyed.")
 
 			THEN("the file gets written without the deleted options.")
 			{
-				REQUIRE(fs::exists(tf.filename));
+				REQUIRE(fs::exists(tf.filename()));
 
-				const auto lines = read_lines(tf.filename);
+				const auto lines = read_lines(tf.filename());
 
 				REQUIRE(lines.size() == 1);
 				REQUIRE(lines[0] == "UNBOOST thingtwo");
@@ -105,7 +105,7 @@ SCENARIO("queue_lists read data when created.")
 
 		WHEN("an queue_list is created")
 		{
-			queue_list testfi(tf.filename);
+			queue_list testfi(tf.filename());
 
 			THEN("it has the parsed information from the file.")
 			{
@@ -121,7 +121,7 @@ SCENARIO("queue_lists read data when created.")
 		WHEN("an queue_list is opened and modified")
 		{
 			{
-				queue_list testfi(tf.filename);
+				queue_list testfi(tf.filename());
 
 				testfi.parsed.pop_front();
 				testfi.parsed.push_back(api_call{ api_route::fav, ":) :)" });
@@ -131,7 +131,7 @@ SCENARIO("queue_lists read data when created.")
 
 			THEN("it saves the new information back to the file.")
 			{
-				const auto lines = read_lines(tf.filename);
+				const auto lines = read_lines(tf.filename());
 
 				REQUIRE(lines.size() == 4);
 				REQUIRE(lines[0] == "UNPOST secondthing");
@@ -141,9 +141,9 @@ SCENARIO("queue_lists read data when created.")
 
 				AND_THEN("The original file is backed up.")
 				{
-					REQUIRE(fs::exists(tf.filenamebak));
+					REQUIRE(fs::exists(tf.filenamebak()));
 
-					const auto linesbak = read_lines(tf.filenamebak);
+					const auto linesbak = read_lines(tf.filenamebak());
 
 					REQUIRE(linesbak.size() == 3);
 					REQUIRE(linesbak[0] == "POST firsthing");
@@ -169,7 +169,7 @@ SCENARIO("queue_lists read data when created.")
 
 		WHEN("an queue_list is created")
 		{
-			queue_list testfi(tf.filename);
+			queue_list testfi(tf.filename());
 
 			THEN("it has the parsed information from the file.")
 			{
@@ -185,7 +185,7 @@ SCENARIO("queue_lists read data when created.")
 		WHEN("an queue_list is opened and modified")
 		{
 			{
-				queue_list testfi(tf.filename);
+				queue_list testfi(tf.filename());
 
 				testfi.parsed.pop_front();
 				testfi.parsed.push_back(api_call{ api_route::fav, ":) :)" });
@@ -195,7 +195,7 @@ SCENARIO("queue_lists read data when created.")
 
 			THEN("it saves the new information back to the file.")
 			{
-				const auto lines = read_lines(tf.filename);
+				const auto lines = read_lines(tf.filename());
 
 				REQUIRE(lines.size() == 4);
 				REQUIRE(lines[0] == "BOOST secondthing");
@@ -205,9 +205,9 @@ SCENARIO("queue_lists read data when created.")
 
 				AND_THEN("The original file is backed up.")
 				{
-					REQUIRE(fs::exists(tf.filenamebak));
+					REQUIRE(fs::exists(tf.filenamebak()));
 
-					const auto linesbak = read_lines(tf.filenamebak);
+					const auto linesbak = read_lines(tf.filenamebak());
 
 					REQUIRE(linesbak.size() == 5);
 					REQUIRE(linesbak[0] == "POST firsthing");
@@ -234,7 +234,7 @@ SCENARIO("queue_list can handle a long queue with a lot of items.")
 		std::vector<api_call> expected;
 		expected.reserve(size);
 
-		queue_list actual(queuefile.filename);
+		queue_list actual(queuefile.filename());
 
 		for (unsigned int i = 0; i < size; i++)
 		{
@@ -250,7 +250,7 @@ SCENARIO("queue_list can handle a long queue with a lot of items.")
 
 			THEN("Reading the queue again is as expected.")
 			{
-				const queue_list readqueue(queuefile.filename);
+				const queue_list readqueue(queuefile.filename());
 
 				REQUIRE(std::equal(readqueue.parsed.begin(), readqueue.parsed.end(), expected.begin(), expected.end()));
 			}

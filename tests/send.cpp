@@ -452,24 +452,24 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 		const static std::vector<std::string> expected_files{ u8"first🍕.post", "second.post", "another kind of post", "last one" };
 
 		{
-			outgoing_post first{ to_enqueue[0].filename };
+			outgoing_post first{ to_enqueue[0].filename() };
 			first.parsed.text = u8"This one just has a 🧊 body.";
 			first.parsed.reply_id = "Hi";
 
-			outgoing_post second{ to_enqueue[1].filename };
+			outgoing_post second{ to_enqueue[1].filename() };
 			second.parsed.text = "This one has a body, too.";
 			second.parsed.content_warning = "And a content warning.";
 			second.parsed.vis = visibility::priv;
 			second.parsed.reply_id = "hi2hi";
 			second.parsed.reply_to_id = "Hi";
 
-			outgoing_post third{ to_enqueue[2].filename };
+			outgoing_post third{ to_enqueue[2].filename() };
 			third.parsed.attachments = { u8"attachments🖇", "on" };
 			third.parsed.descriptions = { "with", "some", u8"descri🅱tions" };
 			third.parsed.reply_to_id = "hi2hi";
 			third.parsed.vis = visibility::direct;
 
-			outgoing_post fourth{ to_enqueue[3].filename };
+			outgoing_post fourth{ to_enqueue[3].filename() };
 			fourth.parsed.attachments = { u8"attachments🖇", "on", "this", "one" };
 			fourth.parsed.descriptions = { "with", "some", u8"descri🅱tions" };
 			fourth.parsed.reply_to_id = "777777";
@@ -499,7 +499,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 
 			THEN("the input files and attachments are untouched")
 			{
-				REQUIRE(std::all_of(to_enqueue.begin(), to_enqueue.end(), [](const auto& file) { return fs::exists(file.filename); }));
+				REQUIRE(std::all_of(to_enqueue.begin(), to_enqueue.end(), [](const auto& file) { return fs::exists(file.filename()); }));
 				REQUIRE(std::all_of(attachment_files.begin(), attachment_files.end(), [](const auto& file) { return fs::exists(file.filename); }));
 			}
 
@@ -593,7 +593,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 
 			THEN("the input files and attachments are untouched")
 			{
-				REQUIRE(std::all_of(to_enqueue.begin(), to_enqueue.end(), [](const auto& file) { return fs::exists(file.filename); }));
+				REQUIRE(std::all_of(to_enqueue.begin(), to_enqueue.end(), [](const auto& file) { return fs::exists(file.filename()); }));
 				REQUIRE(std::all_of(attachment_files.begin(), attachment_files.end(), [](const auto& file) { return fs::exists(file.filename); }));
 			}
 
@@ -691,7 +691,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 
 			THEN("the input files and attachments are untouched")
 			{
-				REQUIRE(std::all_of(to_enqueue.begin(), to_enqueue.end(), [](const auto& file) { return fs::exists(file.filename); }));
+				REQUIRE(std::all_of(to_enqueue.begin(), to_enqueue.end(), [](const auto& file) { return fs::exists(file.filename()); }));
 				REQUIRE(std::all_of(attachment_files.begin(), attachment_files.end(), [](const auto& file) { return fs::exists(file.filename); }));
 			}
 
@@ -769,7 +769,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.")
 
 			THEN("the input files and attachments are untouched")
 			{
-				REQUIRE(std::all_of(to_enqueue.begin(), to_enqueue.end(), [](const auto& file) { return fs::exists(file.filename); }));
+				REQUIRE(std::all_of(to_enqueue.begin(), to_enqueue.end(), [](const auto& file) { return fs::exists(file.filename()); }));
 				REQUIRE(std::all_of(attachment_files.begin(), attachment_files.end(), [](const auto& file) { return fs::exists(file.filename); }));
 			}
 
@@ -989,7 +989,7 @@ SCENARIO("read_params doesn't repeat idempotency keys or mutate the post file.")
 		constexpr std::string_view visibility = "direct";
 		
 		{
-			outgoing_post towrite{ fi.filename };
+			outgoing_post towrite{ fi.filename() };
 			towrite.parsed.text = expected_text;
 			towrite.parsed.content_warning = expected_cw;
 			towrite.parsed.vis = visibility::direct;
@@ -1003,7 +1003,7 @@ SCENARIO("read_params doesn't repeat idempotency keys or mutate the post file.")
 			{
 				for (int i = 0; i < trials; i++)
 				{
-					const auto params = read_params(fi.filename);
+					const auto params = read_params(fi.filename());
 					REQUIRE(params.attachments.empty());
 					REQUIRE(params.attachment_ids.empty());
 					REQUIRE(params.body == expected_text);

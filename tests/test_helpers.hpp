@@ -25,32 +25,55 @@ struct test_file
 public:
 	test_file(const char* name) : test_file(fs::path(name)) {};
 	test_file(std::string_view name) : test_file(fs::path(name.begin(), name.end())) {}; //use iterator interface for boost's benefit
-	test_file(fs::path name) : filename(std::move(name)), filenamebak(make_backup_if_not_directory())
+	test_file(fs::path name) : _filename(std::move(name)), _filenamebak(make_backup_if_not_directory())
 	{
-		fs::remove_all(filename);
+		fs::remove_all(_filename);
 
-		if (!filenamebak.empty())
-			fs::remove(filenamebak);
+		if (!_filenamebak.empty())
+			fs::remove(_filenamebak);
 	};
 
 	~test_file()
 	{
-		fs::remove_all(filename);
+		if (_filename.empty()) { return; }
 
-		if (!filenamebak.empty())
-			fs::remove(filenamebak);
+		fs::remove_all(_filename);
+
+		if (!_filenamebak.empty())
+			fs::remove(_filenamebak);
 	};
 
-	operator const fs::path::value_type* () const { return filename.c_str(); }
-	const fs::path filename;
-	const fs::path filenamebak;
+	// can be moved
+	test_file(test_file&& other) noexcept // move constructor
+		:  _filename(std::move(other._filename)), _filenamebak(std::move(other._filenamebak))
+	{
+		other._filename.clear();
+	}
+
+	test_file& operator=(test_file&& other) noexcept // move assignment
+	{
+		std::swap(_filename, other._filename);
+		std::swap(_filenamebak, other._filenamebak);
+		return *this;
+	}
+
+	test_file(test_file& other) = delete; // copy constructor
+
+	operator const fs::path::value_type* () const noexcept { return _filename.c_str(); }
+
+	const fs::path& filename() const noexcept { return _filename; }
+	const fs::path& filenamebak() const noexcept { return _filenamebak; }
+
 private:
+
+	fs::path _filename;
+	fs::path _filenamebak;
 
 	fs::path make_backup_if_not_directory()
 	{
-		if (fs::is_directory(filename))
+		if (fs::is_directory(_filename))
 			return {};
-		return fs::path{ filename }.concat(".bak");
+		return fs::path{ _filename }.concat(".bak");
 	}
 };
 

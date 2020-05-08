@@ -310,13 +310,13 @@ SCENARIO("post_list correctly serializes lists of statuses.")
 			const auto& test_post = GENERATE_REF(from_range(statuses));
 
 			{
-				post_list<mastodon_status> list{ fi.filename };
+				post_list<mastodon_status> list{ fi.filename() };
 				list.write(test_post.status);
 			}
 
 			THEN("the generated file is as expected.")
 			{
-				const auto actual = read_file(fi.filename);
+				const auto actual = read_file(fi.filename());
 				INFO("The strings mismatch at position " << mismatch_loc(actual, test_post.expected));
 				REQUIRE(actual == test_post.expected);
 			}
@@ -328,14 +328,14 @@ SCENARIO("post_list correctly serializes lists of statuses.")
 			const auto& other_test_post = GENERATE_REF(from_range(statuses));
 
 			{
-				post_list<mastodon_status> list{ fi.filename };
+				post_list<mastodon_status> list{ fi.filename() };
 				list.write(test_post.status);
 				list.write(other_test_post.status);
 			}
 
 			THEN("the generated file is as expected.")
 			{
-				const auto actual = read_file(fi.filename);
+				const auto actual = read_file(fi.filename());
 
 				size_t idx = 0;
 				idx = compare_window(test_post.expected, actual, idx);
@@ -350,17 +350,17 @@ SCENARIO("post_list correctly serializes lists of statuses.")
 			const auto& other_test_post = GENERATE_REF(from_range(statuses));
 
 			{
-				post_list<mastodon_status> list{ fi.filename };
+				post_list<mastodon_status> list{ fi.filename() };
 				list.write(test_post.status);
 			}
 			{
-				post_list<mastodon_status> list{ fi.filename };
+				post_list<mastodon_status> list{ fi.filename() };
 				list.write(other_test_post.status);
 			}
 
 			THEN("the generated file is as expected.")
 			{
-				const auto actual = read_file(fi.filename);
+				const auto actual = read_file(fi.filename());
 
 				size_t idx = 0;
 				idx = compare_window(test_post.expected, actual, idx);
@@ -474,13 +474,13 @@ SCENARIO("post_list correctly serializes lists of notifications.")
 			const auto& test_case = GENERATE_REF(from_range(notifs));
 
 			{
-				post_list<mastodon_notification> list{ fi.filename };
+				post_list<mastodon_notification> list{ fi.filename() };
 				list.write(test_case.notif);
 			}
 
 			THEN("The single notification is written as expected.")
 			{
-				const std::string actual = read_file(fi.filename);
+				const std::string actual = read_file(fi.filename());
 
 				size_t idx = 0;
 				idx = compare_window(test_case.expected_notif, actual, idx);
@@ -495,14 +495,14 @@ SCENARIO("post_list correctly serializes lists of notifications.")
 			const auto& other_test_case = GENERATE_REF(from_range(notifs));
 
 			{
-				post_list<mastodon_notification> list{ fi.filename };
+				post_list<mastodon_notification> list{ fi.filename() };
 				list.write(test_case.notif);
 				list.write(other_test_case.notif);
 			}
 
 			THEN("Both notifications are written as expected.")
 			{
-				const std::string actual = read_file(fi.filename);
+				const std::string actual = read_file(fi.filename());
 
 				size_t idx = 0;
 				idx = compare_window(test_case.expected_notif, actual, idx);
@@ -519,17 +519,17 @@ SCENARIO("post_list correctly serializes lists of notifications.")
 			const auto& other_test_case = GENERATE_REF(from_range(notifs));
 
 			{
-				post_list<mastodon_notification> list{ fi.filename };
+				post_list<mastodon_notification> list{ fi.filename() };
 				list.write(test_case.notif);
 			}
 			{
-				post_list<mastodon_notification> list{ fi.filename };
+				post_list<mastodon_notification> list{ fi.filename() };
 				list.write(other_test_case.notif);
 			}
 
 			THEN("Both notifications are written as expected.")
 			{
-				const std::string actual = read_file(fi.filename);
+				const std::string actual = read_file(fi.filename());
 
 				size_t idx = 0;
 				idx = compare_window(test_case.expected_notif, actual, idx);
