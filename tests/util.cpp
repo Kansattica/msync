@@ -306,6 +306,7 @@ SCENARIO("clean_up_html removes HTML tags and entities.")
 			std::make_tuple("this<p>&apos;that", "this'that"),
 			std::make_tuple("this<p>&amp;th<div>a</div>t", "this&that"),
 			std::make_tuple("&lt;p&gt;hello&lt;/p&gt;", "<p>hello</p>"),
+			std::make_tuple("&lt;3", "<3"),
 			std::make_tuple("<p>look at my :custom_emojo:</p>", "look at my :custom_emojo:"),
 			std::make_tuple("&hearts;&hearts;&hearts;&hearts;&hearts;&hearts;", "♥♥♥♥♥♥")
 		);
