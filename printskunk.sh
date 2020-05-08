@@ -1,8 +1,6 @@
 #!/bin/bash
 
-echo $LANG
-echo $LC_CTYPE
-echo $LC_ALL
+locale
 greadlink -m ./cool🦨zone
 LC_ALL=C mkdir ./cool🦨zone
 touch ./cool🦨zone
