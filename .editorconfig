@@ -1,3 +1,5 @@
+charset = utf-8
+
 [*.{c,cpp,hpp}]
 charset = utf-8
 indent_style = tab
