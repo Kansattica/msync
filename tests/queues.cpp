@@ -609,7 +609,8 @@ SCENARIO("Can enqueue and dequeue files with non-ASCII paths.")
 	{
 		std::vector<test_file> test_files;
 
-		const test_dir skunkzone{ fs::weakly_canonical(fs::path { u8"cool🦨zone" }) };
+		//const test_dir skunkzone{fs::path { u8"cool🦨zone" }};
+		const test_dir skunkzone{fs::path { u8"cool\U0001F9A8zone" }};
 
 		for (const auto filename : { u8"a friend.txt", u8"your 🤠 friend.txt" })
 		{
