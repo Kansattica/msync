@@ -62,7 +62,7 @@ matrix:
 
 script:
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then greadlink -m ./cool🦨zone; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then "greadlink -m ./cool\U0001F9A8zone"; fi
+  - "if [ \"$TRAVIS_OS_NAME\" = \"osx\" ]; then greadlink -m ./cool\U0001F9A8zone; fi"
   - export BUILDTYPE=Release 
   - mkdir -p build
   - cd build
