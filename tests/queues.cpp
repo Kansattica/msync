@@ -609,7 +609,7 @@ SCENARIO("Can enqueue and dequeue files with non-ASCII paths.")
 	{
 		std::vector<test_file> test_files;
 
-		const test_dir skunkzone{fs::path { u8"cool🦨zone" }};
+		const test_dir skunkzone{fs::path { u8"cool🦹‍♀️zone" }};
 
 		for (const auto filename : { u8"a friend.txt", u8"your 🤠 friend.txt" })
 		{
@@ -633,7 +633,7 @@ SCENARIO("Can enqueue and dequeue files with non-ASCII paths.")
 
 			enqueue(queues::post, accountdir, std::vector<std::string> {
 				u8"a friend.txt", u8"your 🤠 friend.txt",
-				u8"cool🦨zone/a friend.txt", u8"cool🦨zone/your 🤠 friend.txt"
+				u8"cool🦹‍♀️zone/a friend.txt", u8"cool🦹‍♀️zone/your 🤠 friend.txt"
 			});
 
 			THEN("The queue file has the correct filenames in the correct order.")

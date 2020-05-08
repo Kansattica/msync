@@ -61,7 +61,6 @@ matrix:
       apt: g++-8 libstdc++-8-dev
 
 script:
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then chmod +x ./printskunk.sh; ./printskunk.sh; fi
   - export BUILDTYPE=Release 
   - mkdir -p build
   - cd build
