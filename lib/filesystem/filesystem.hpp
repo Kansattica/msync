@@ -16,7 +16,7 @@ namespace fs = std::experimental::filesystem;
 
 #include <string>
 
-inline std::string as_utf8(const fs::path& p)
+inline std::string to_utf8(const fs::path& p)
 {
 #if MSYNC_USE_BOOST && __APPLE__
 	// this should be fine, OSX's paths should be UTF-8, and OSX is the only platform that should have to use Boost

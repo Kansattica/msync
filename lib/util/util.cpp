@@ -30,9 +30,9 @@ std::string clean_up_html(const std::string_view to_strip)
 {
 	if (to_strip.empty()) { return {}; }
 
-	const static std::regex remove_tags{ "<[^<]*>" };
-	const static std::regex replace_line_breaks{ "<br */?>" };
-	const static std::regex replace_paragraph_breaks{ "</p>\\s*<p>" };
+	const static std::regex remove_tags{ "<[^<]*?>" };
+	const static std::regex replace_line_breaks{ "<br *?/?>" };
+	const static std::regex replace_paragraph_breaks{ "</p>\\s*?<p>" };
 
 	// regex_replace will always keep the string the same length or make it shorter, so it won't cause an overflow
 	// the author of decode_html_entities says the same thing

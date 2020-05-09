@@ -38,12 +38,12 @@ bool validate_file(const fs::path& attachpath)
 	//I think .native() avoids an allocation, but that doesn't actually compile on MSVC when I tried
 	if (!fs::is_regular_file(attachpath))
 	{
-		pl() << as_utf8(attachpath) << " is not a regular file. Skipping.\n";
+		pl() << to_utf8(attachpath) << " is not a regular file. Skipping.\n";
 		return false;
 	}
 
 	// gotta turn Windows-style wide chars into regular chars. 
-	const auto extension = as_utf8(attachpath.extension());
+	const auto extension = to_utf8(attachpath.extension());
 
 	// this should really be a case insensitive comparison, but that can wait.
 	const auto compare_extension = [&extension](const auto& allowed_extension) { return extension == allowed_extension; };
@@ -59,15 +59,15 @@ bool validate_file(const fs::path& attachpath)
 
 	if (extension.empty())
 	{
-		pl() << "Warning: " << as_utf8(attachpath) << " doesn't seem to have an extension. Vanilla Mastodon might not know what to do with it.\n";
+		pl() << "Warning: " << to_utf8(attachpath) << " doesn't seem to have an extension. Vanilla Mastodon might not know what to do with it.\n";
 	}
 	else if (is_image && file_size > eight_megabytes)
 	{
-		pl() << "Warning: " << as_utf8(attachpath) << " is an image over eight megabytes. Vanilla Mastodon may not accept it.\n";
+		pl() << "Warning: " << to_utf8(attachpath) << " is an image over eight megabytes. Vanilla Mastodon may not accept it.\n";
 	}
 	else if (is_av && file_size > forty_megabytes)
 	{
-		pl() << "Warning: " << as_utf8(attachpath) << " is an audio or video file over forty megabytes. Vanilla Mastodon may not accept it.\n";
+		pl() << "Warning: " << to_utf8(attachpath) << " is an audio or video file over forty megabytes. Vanilla Mastodon may not accept it.\n";
 	}
 	else if (!is_image && !is_av)
 	{
@@ -99,7 +99,7 @@ void queue_attachments(const fs::path& postfile)
 		if (!validate_file(attachpath))
 			continue;
 
-		attach = as_utf8(attachpath);
+		attach = to_utf8(attachpath);
 
 		err.clear();
 	}
@@ -127,13 +127,13 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 
 	if (!fs::exists(postfile))
 	{
-		pl() << "Could not find " << as_utf8(postfile) << ". Skipping.\n";
+		pl() << "Could not find " << to_utf8(postfile) << ". Skipping.\n";
 		return {};
 	}
 
 	if (!fs::is_regular_file(postfile))
 	{
-		pl() << as_utf8(postfile) << " is not a file. Skipping.\n";
+		pl() << to_utf8(postfile) << " is not a file. Skipping.\n";
 		return {};
 	}
 
@@ -147,16 +147,16 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 
 	if (fs::exists(copyto))
 	{
-		plverb() << as_utf8(copyto) << " already exists. " << as_utf8(postfile) << " will be saved to ";
+		plverb() << to_utf8(copyto) << " already exists. " << to_utf8(postfile) << " will be saved to ";
 		unique_file_name(copyto);
-		plverb() << as_utf8(copyto) << '\n';
+		plverb() << to_utf8(copyto) << '\n';
 	}
 
 	fs::copy(postfile, copyto);
 
 	queue_attachments(copyto);
 
-	return as_utf8(copyto.filename());
+	return to_utf8(copyto.filename());
 }
 
 template <typename queue_t = queue_list>
@@ -226,7 +226,7 @@ void dequeue_post(const fs::path& queuedir, const fs::path& filename)
 {
 	if (!fs::remove(queuedir / filename))
 	{
-		pl() << "Could not delete " << filename << ", could not find it in " << as_utf8(queuedir) << '\n';
+		pl() << "Could not delete " << filename << ", could not find it in " << to_utf8(queuedir) << '\n';
 	}
 }
 
@@ -237,7 +237,7 @@ void dequeue(queues todequeue, const fs::path& user_account_dir, std::vector<std
 	if (todequeue == queues::post)
 	{
 		// trim path names 
-		std::transform(remove.begin(), remove.end(), remove.begin(), [](const auto& path) { return as_utf8(fs::path(path).filename()); });
+		std::transform(remove.begin(), remove.end(), remove.begin(), [](const auto& path) { return to_utf8(fs::path(path).filename()); });
 	}
 
 	auto toremove = to_api_calls(std::move(remove), get_route(todequeue, false));

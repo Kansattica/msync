@@ -14,7 +14,7 @@ SCENARIO("option_files save their data when destroyed.")
 	{
 		const test_file tf = temporary_file();
 
-		option_file opts(tf.filename);
+		option_file opts(tf.filename());
 		opts.parsed["atestoption"] = "coolstuff";
 		opts.parsed["test"] = "time";
 
@@ -26,7 +26,7 @@ SCENARIO("option_files save their data when destroyed.")
 
 			THEN("no file is written")
 			{
-				REQUIRE_FALSE(fs::exists(tf.filename));
+				REQUIRE_FALSE(fs::exists(tf.filename()));
 			}
 		}
 
@@ -38,9 +38,9 @@ SCENARIO("option_files save their data when destroyed.")
 
 			THEN("the file is written")
 			{
-				REQUIRE(fs::exists(tf.filename));
+				REQUIRE(fs::exists(tf.filename()));
 
-				const auto lines = read_lines(tf.filename);
+				const auto lines = read_lines(tf.filename());
 
 				REQUIRE(lines.size() == 3);
 				REQUIRE(lines[0] == "atestoption=coolstuff");
@@ -57,9 +57,9 @@ SCENARIO("option_files save their data when destroyed.")
 
 			THEN("the file gets written")
 			{
-				REQUIRE(fs::exists(tf.filename));
+				REQUIRE(fs::exists(tf.filename()));
 
-				const auto lines = read_lines(tf.filename);
+				const auto lines = read_lines(tf.filename());
 
 				REQUIRE(lines.size() == 3);
 				REQUIRE(lines[0] == "atestoption=coolstuff");
@@ -78,9 +78,9 @@ SCENARIO("option_files save their data when destroyed.")
 
 			THEN("the file gets written without the deleted options.")
 			{
-				REQUIRE(fs::exists(tf.filename));
+				REQUIRE(fs::exists(tf.filename()));
 
-				const auto lines = read_lines(tf.filename);
+				const auto lines = read_lines(tf.filename());
 
 				REQUIRE(lines.size() == 2);
 				REQUIRE(lines[0] == "atestoption=coolstuff");
@@ -93,7 +93,7 @@ SCENARIO("option_files save their data when destroyed.")
 	{
 		const test_file tf = temporary_file();
 
-		option_file opts{ tf.filename };
+		option_file opts{ tf.filename() };
 
 		WHEN("The option_file is moved from and destroyed")
 		{
@@ -103,9 +103,9 @@ SCENARIO("option_files save their data when destroyed.")
 
 			THEN("A file_version is still added.")
 			{
-				REQUIRE(fs::exists(tf.filename));
+				REQUIRE(fs::exists(tf.filename()));
 
-				const auto lines = read_lines(tf.filename);
+				const auto lines = read_lines(tf.filename());
 
 				REQUIRE(lines.size() == 1);
 				REQUIRE(lines[0] == "file_version=1");
@@ -129,7 +129,7 @@ SCENARIO("option_files read data when created.")
 
 		WHEN("an option_file is created")
 		{
-			option_file testfi(tf.filename);
+			option_file testfi(tf.filename());
 
 			THEN("it has the parsed information from the file.")
 			{
@@ -143,7 +143,7 @@ SCENARIO("option_files read data when created.")
 		WHEN("an option_file is opened and modified")
 		{
 			{
-				option_file testfi(tf.filename);
+				option_file testfi(tf.filename());
 
 				testfi.parsed["anotherentry"] = "foryou";
 				testfi.parsed["somecool"] = "isnowthis";
@@ -154,7 +154,7 @@ SCENARIO("option_files read data when created.")
 
 			THEN("it saves the new information back to the file.")
 			{
-				const auto lines = read_lines(tf.filename);
+				const auto lines = read_lines(tf.filename());
 
 				REQUIRE(lines.size() == 4);
 				REQUIRE(lines[0] == "anotherentry=foryou");
@@ -164,9 +164,9 @@ SCENARIO("option_files read data when created.")
 
 				AND_THEN("The original file is backed up.")
 				{
-					REQUIRE(fs::exists(tf.filenamebak));
+					REQUIRE(fs::exists(tf.filenamebak()));
 
-					const auto linesbak = read_lines(tf.filenamebak);
+					const auto linesbak = read_lines(tf.filenamebak());
 
 					REQUIRE(linesbak.size() == 3);
 					REQUIRE(linesbak[0] == "somecool=teststuff");
@@ -192,7 +192,7 @@ SCENARIO("option_files read data when created.")
 
 		WHEN("an option_file is created")
 		{
-			option_file testfi(tf.filename);
+			option_file testfi(tf.filename());
 
 			THEN("it has the parsed information from the file.")
 			{
@@ -206,7 +206,7 @@ SCENARIO("option_files read data when created.")
 		WHEN("an option_file is opened and modified")
 		{
 			{
-				option_file testfi(tf.filename);
+				option_file testfi(tf.filename());
 
 				testfi.parsed["anotherentry"] = "foryou";
 				testfi.parsed["somecool"] = "isnowthis";
@@ -217,7 +217,7 @@ SCENARIO("option_files read data when created.")
 
 			THEN("it saves the new information back to the file.")
 			{
-				const auto lines = read_lines(tf.filename);
+				const auto lines = read_lines(tf.filename());
 
 				REQUIRE(lines.size() == 4);
 				REQUIRE(lines[0] == "anotherentry=foryou");
@@ -227,9 +227,9 @@ SCENARIO("option_files read data when created.")
 
 				AND_THEN("The original file is backed up.")
 				{
-					REQUIRE(fs::exists(tf.filenamebak));
+					REQUIRE(fs::exists(tf.filenamebak()));
 
-					const auto linesbak = read_lines(tf.filenamebak);
+					const auto linesbak = read_lines(tf.filenamebak());
 
 					REQUIRE(linesbak.size() == 5);
 					REQUIRE(linesbak[0] == "somecool=teststuff");

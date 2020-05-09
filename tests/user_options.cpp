@@ -22,7 +22,7 @@ SCENARIO("User_options reads from a file when created")
 
 		WHEN("a user_options is created from a filename")
 		{
-			const user_options opt(fi.filename);
+			const user_options opt(fi.filename());
 
 			THEN("the fields are set correctly.")
 			{
@@ -40,7 +40,7 @@ SCENARIO("User_options reads from a file when created")
 
 			THEN("No .bak file is created.")
 			{
-				REQUIRE_FALSE(fs::exists(fi.filenamebak));
+				REQUIRE_FALSE(fs::exists(fi.filenamebak()));
 			}
 		}
 	}
@@ -62,13 +62,13 @@ SCENARIO("User_options saves changes back to its file")
 		WHEN("a user_options is created from a filename and a field is changed")
 		{
 			{
-				user_options opt(fi.filename);
+				user_options opt(fi.filename());
 				opt.set_option(user_option::account_name, "someoneelse");
 			}
 
 			THEN("a newly created user_options for the same path should see the change.")
 			{
-				const user_options newopt(fi.filename);
+				const user_options newopt(fi.filename());
 				REQUIRE(*newopt.try_get_option(user_option::account_name) == "someoneelse");
 				REQUIRE(*newopt.try_get_option(user_option::instance_url) == "website.egg");
 				REQUIRE(newopt.get_option(user_option::account_name) == "someoneelse");
@@ -79,9 +79,9 @@ SCENARIO("User_options saves changes back to its file")
 
 			THEN("a .bak file with the original information should be created.")
 			{
-				REQUIRE(fs::exists(fi.filenamebak));
+				REQUIRE(fs::exists(fi.filenamebak()));
 
-				const auto lines = read_lines(fi.filenamebak);
+				const auto lines = read_lines(fi.filenamebak());
 
 				REQUIRE(lines.size() == 2);
 				REQUIRE(lines[0] == "account_name=sometester");
@@ -100,7 +100,7 @@ SCENARIO("An empty user_options writes to a file when destroyed")
 		WHEN("a user_options is created with that path and modified")
 		{
 			{
-				user_options opt(fi.filename);
+				user_options opt(fi.filename());
 
 				opt.set_option(user_option::account_name, "somejerk");
 				opt.set_option(user_option::instance_url, "rude.website");
@@ -108,15 +108,15 @@ SCENARIO("An empty user_options writes to a file when destroyed")
 
 				THEN("the file is not created until the user_options is destroyed")
 				{
-					REQUIRE_FALSE(fs::exists(fi.filename));
+					REQUIRE_FALSE(fs::exists(fi.filename()));
 				}
 			}
 
 			THEN("The file is created when user_options is destroyed.")
 			{
-				REQUIRE(fs::exists(fi.filename));
+				REQUIRE(fs::exists(fi.filename()));
 
-				const auto lines = read_lines(fi.filename);
+				const auto lines = read_lines(fi.filename());
 
 				REQUIRE(lines.size() == 4);
 				REQUIRE(lines[0] == "account_name=somejerk");
@@ -127,7 +127,7 @@ SCENARIO("An empty user_options writes to a file when destroyed")
 
 			THEN("No .bak file is created.")
 			{
-				REQUIRE_FALSE(fs::exists(fi.filenamebak));
+				REQUIRE_FALSE(fs::exists(fi.filenamebak()));
 			}
 		}
 	}
@@ -148,7 +148,7 @@ SCENARIO("Get and set options manage string references correctly.")
 
 		WHEN("an option that exists in the dictionary is requested")
 		{
-			user_options opt(fi.filename);
+			user_options opt(fi.filename());
 			auto val = opt.try_get_option(user_option::account_name);
 			auto& refval = opt.get_option(user_option::account_name);
 
@@ -184,7 +184,7 @@ SCENARIO("The enum overload for get_option works.")
 	const test_file fi = temporary_file();
 	GIVEN("An empty user_options")
 	{
-		const user_options opt{fi.filename};
+		const user_options opt{fi.filename()};
 
 		WHEN("one of the three options that have sync settings is asked for.")
 		{
@@ -208,7 +208,7 @@ SCENARIO("The enum overload for get_option works.")
 
 	GIVEN("A user_options with some of the pull options set.")
 	{
-		user_options opt{fi.filename};
+		user_options opt{fi.filename()};
 		opt.set_option(user_option::pull_home, sync_settings::oldest_first);
 
 		WHEN("one of the three options that have sync settings is asked for.")
@@ -230,7 +230,7 @@ SCENARIO("The enum overload for get_option works.")
 
 			THEN("The generated file has the correct option set.")
 			{
-				const auto lines = read_lines(fi.filename);
+				const auto lines = read_lines(fi.filename());
 
 				REQUIRE(lines.size() == 2);
 				REQUIRE(lines[0] == "file_version=1");
@@ -239,7 +239,7 @@ SCENARIO("The enum overload for get_option works.")
 
 			AND_WHEN("a new user_options is created from that file")
 			{
-				const user_options neweropt(fi.filename);
+				const user_options neweropt(fi.filename());
 
 				THEN("it has the correct value.")
 				{
@@ -257,7 +257,7 @@ SCENARIO("The boolean overload for get_option works.")
 	const test_file fi = temporary_file();
 	GIVEN("An empty user_options")
 	{
-		user_options opt{fi.filename};
+		user_options opt{fi.filename()};
 
 		WHEN("one of the five boolean options is asked for.")
 		{
@@ -275,7 +275,7 @@ SCENARIO("The boolean overload for get_option works.")
 
 	GIVEN("An empty user_options")
 	{
-		user_options opt{fi.filename};
+		user_options opt{fi.filename()};
 
 		WHEN("one of the five boolean options is set to 'true' or 'yes'.")
 		{
@@ -312,7 +312,7 @@ SCENARIO("The boolean overload for get_option works.")
 
 	GIVEN("A user_options with some of the exclude options set.")
 	{
-		user_options opt{fi.filename};
+		user_options opt{fi.filename()};
 		opt.set_bool_option(user_option::exclude_boosts, true);
 
 		WHEN("one of the options that have boolean settings is asked for.")
@@ -343,7 +343,7 @@ SCENARIO("The boolean overload for get_option works.")
 
 			THEN("The generated file has the correct option set.")
 			{
-				auto lines = read_lines(fi.filename);
+				auto lines = read_lines(fi.filename());
 
 				REQUIRE(lines.size() == 2);
 				REQUIRE(lines[0] == "exclude_boosts=true");
@@ -352,7 +352,7 @@ SCENARIO("The boolean overload for get_option works.")
 
 			AND_WHEN("a new user_options is created from that file")
 			{
-				user_options neweropt(fi.filename);
+				user_options neweropt(fi.filename());
 
 				THEN("it has the correct value.")
 				{
@@ -372,12 +372,12 @@ SCENARIO("user_options correctly reports the directory it's in.")
 		const test_file fi = temporary_file();
 
 		{ // gotta make sure that file gets made
-			user_options opts{ fi.filename };
+			user_options opts{ fi.filename() };
 		}
 
 		WHEN("get_user_directory is taken from a new user_options.")
 		{
-			user_options opts{ fi.filename };
+			user_options opts{ fi.filename() };
 			const auto& userdir = opts.get_user_directory();
 
 			THEN("The directory exists.")
@@ -387,7 +387,7 @@ SCENARIO("user_options correctly reports the directory it's in.")
 
 			THEN("The directory contains the user_options.")
 			{
-				REQUIRE(fs::is_regular_file(userdir / fi.filename.filename()));
+				REQUIRE(fs::is_regular_file(userdir / fi.filename().filename()));
 			}
 		}
 	}

@@ -28,10 +28,10 @@ global_options::global_options(fs::path accounts_dir) : accounts_directory(std::
 		if (!fs::exists(configfile))
 		{
 			using namespace std::string_literals;
-			throw msync_exception("Expected to find a config file and didn't find it. Try deleting the folder and running new again: "s + as_utf8(userfolder.path()));
+			throw msync_exception("Expected to find a config file and didn't find it. Try deleting the folder and running new again: "s + to_utf8(userfolder.path()));
 		}
 
-		accounts.emplace_back(as_utf8(userfolder.path().filename()), user_options{ std::move(configfile) });
+		accounts.emplace_back(to_utf8(userfolder.path().filename()), user_options{ std::move(configfile) });
 	}
 }
 

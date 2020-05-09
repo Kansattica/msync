@@ -17,13 +17,13 @@ SCENARIO("outgoing_post correctly reads and writes posts.")
 	GIVEN("An outgoing_post with only text is filled and destroyed")
 	{
 		{
-			outgoing_post test{ fi.filename };
+			outgoing_post test{ fi.filename() };
 			test.parsed.text = "hey, I put some text in here\nand a newline";
 		}
 
 		WHEN("A new outgoing_post is made from the same file")
 		{
-			const outgoing_post result{ fi.filename };
+			const outgoing_post result{ fi.filename() };
 
 			THEN("the text is the same.")
 			{
@@ -43,14 +43,14 @@ SCENARIO("outgoing_post correctly reads and writes posts.")
 	GIVEN("An outgoing_post with text and some attachments is filled and destroyed")
 	{
 		{
-			outgoing_post test{ fi.filename };
+			outgoing_post test{ fi.filename() };
 			test.parsed.text = "hey, buddy, wanna buy some...\n\ntext?";
 			test.parsed.attachments = { "some file", "a different file", "hello!" };
 		}
 
 		WHEN("A new outgoing_post is made from the same file")
 		{
-			const outgoing_post result{ fi.filename };
+			const outgoing_post result{ fi.filename() };
 
 			THEN("the text is the same.")
 			{
@@ -90,7 +90,7 @@ SCENARIO("outgoing_post correctly reads and writes posts.")
 
 		WHEN("A new outgoing_post is made from the same file")
 		{
-			const outgoing_post result{ fi.filename };
+			const outgoing_post result{ fi.filename() };
 
 			THEN("the text is the same.")
 			{
@@ -190,12 +190,12 @@ SCENARIO("outgoing_post can handle a bunch of combinations of cooked post with t
 			std::vector<std::string>{"d: four", "", "d: attachments", "d: foryou"}
 		);
 
-		make_file(fi.filename, content_warning, reply_to, reply_id, visibility.first, attachments, descriptions, testtext, true);
+		make_file(fi.filename(), content_warning, reply_to, reply_id, visibility.first, attachments, descriptions, testtext, true);
 
 		WHEN("A new outgoing_post is made from the same file")
 		{
 			{
-				const outgoing_post result{ fi.filename };
+				const outgoing_post result{ fi.filename() };
 
 				THEN("everything is as expected.")
 				{
@@ -218,7 +218,7 @@ SCENARIO("outgoing_post can handle a bunch of combinations of cooked post with t
 
 			AND_WHEN("That post is destroyed and a new one is created")
 			{
-				const outgoing_post result{ fi.filename };
+				const outgoing_post result{ fi.filename() };
 
 				THEN("everything is as expected.")
 				{
@@ -243,7 +243,7 @@ SCENARIO("outgoing_post can handle a bunch of combinations of cooked post with t
 		WHEN("A new readonly_outgoing_post is made from the same file")
 		{
 			{
-				readonly_outgoing_post result{ fi.filename };
+				readonly_outgoing_post result{ fi.filename() };
 
 				THEN("everything is as expected.")
 				{
@@ -272,7 +272,7 @@ SCENARIO("outgoing_post can handle a bunch of combinations of cooked post with t
 
 			AND_WHEN("That post is modified, destroyed and a new one is created")
 			{
-				const readonly_outgoing_post result{ fi.filename };
+				const readonly_outgoing_post result{ fi.filename() };
 
 				THEN("everything is as expected.")
 				{
@@ -292,7 +292,7 @@ SCENARIO("outgoing_post can handle a bunch of combinations of cooked post with t
 					REQUIRE(result.parsed.reply_id == reply_id);
 
 					// no backup file is made
-					REQUIRE_FALSE(fs::exists(fi.filenamebak));
+					REQUIRE_FALSE(fs::exists(fi.filenamebak()));
 				}
 			}
 		}
@@ -302,18 +302,19 @@ SCENARIO("outgoing_post can handle a bunch of combinations of cooked post with t
 SCENARIO("outgoing_post can handle a bunch of combinations of cooked post without the snip.", "[long_run][long_run_outgoingpost]")
 {
 	logs_off = true;
+	std::locale::global(std::locale("en_US.UTF-8"));
 	const test_file fi = temporary_file();
 	GIVEN("A cooked text file without the snip.")
 	{
 		const auto testtext = GENERATE(as<std::string_view>{},
-			"Rad post for you, baby.",
-			"This\n\none's\tgot newlines",
-			"phony=option",
-			"#lookslikeacomment",
-			" ---");
+			u8"Rad post for you, baby 🕶.",
+			u8"This\n\none's\tgot newlines",
+			u8"phony=option",
+			u8"#lookslikeacomment",
+			u8" ---");
 
 		const auto content_warning = GENERATE(as<std::string_view>{},
-			"", "that good good stuff", "=");
+			"", u8"that good good 🦨 stuff", "=");
 
 		const auto reply_to = GENERATE(as<std::string_view>{},
 			"", "123980123", "X");
@@ -336,24 +337,24 @@ SCENARIO("outgoing_post can handle a bunch of combinations of cooked post withou
 		//so I'm hoping small string optimization helps here
 		const auto attachments = GENERATE(
 			std::vector<std::string>{},
-			std::vector<std::string>{"an attachment"},
+			std::vector<std::string>{u8"a 📎 attachment"},
 			std::vector<std::string>{"h,i", "there"},
 			std::vector<std::string>{"four", "entire", "attachments", "foryou"}
 		);
 
 		auto descriptions = GENERATE(
 			std::vector<std::string>{},
-			std::vector<std::string>{"d: an attachment"},
+			std::vector<std::string>{u8"d: a 📎 attachment"},
 			std::vector<std::string>{"d: h,i", "d: there"},
-			std::vector<std::string>{"d: four", "", "d: attachments", "d: foryou"}
+			std::vector<std::string>{"d: four", "", u8"d: 🦹‍♀️ attachments", "d: foryou"}
 		);
 
-		make_file(fi.filename, content_warning, reply_to, reply_id, visibility.first, attachments, descriptions, testtext, false);
+		make_file(fi.filename(), content_warning, reply_to, reply_id, visibility.first, attachments, descriptions, testtext, false);
 
 		WHEN("A new outgoing_post is made from the same file")
 		{
 			{
-				const outgoing_post result{ fi.filename };
+				const outgoing_post result{ fi.filename() };
 
 				THEN("everything is as expected.")
 				{
@@ -376,7 +377,7 @@ SCENARIO("outgoing_post can handle a bunch of combinations of cooked post withou
 
 			AND_WHEN("That post is destroyed and a new one is created")
 			{
-				const outgoing_post result{ fi.filename };
+				const outgoing_post result{ fi.filename() };
 
 				THEN("everything is as expected.")
 				{
@@ -401,7 +402,7 @@ SCENARIO("outgoing_post can handle a bunch of combinations of cooked post withou
 		WHEN("A new readonly_outgoing_post is made from the same file")
 		{
 			{
-				readonly_outgoing_post result{ fi.filename };
+				readonly_outgoing_post result{ fi.filename() };
 
 				THEN("everything is as expected.")
 				{
@@ -430,7 +431,7 @@ SCENARIO("outgoing_post can handle a bunch of combinations of cooked post withou
 
 			AND_WHEN("That post is modified, destroyed and a new one is created")
 			{
-				const readonly_outgoing_post result{ fi.filename };
+				const readonly_outgoing_post result{ fi.filename() };
 
 				THEN("everything is as expected.")
 				{
@@ -450,7 +451,7 @@ SCENARIO("outgoing_post can handle a bunch of combinations of cooked post withou
 					REQUIRE(result.parsed.reply_id == reply_id);
 
 					// no backup file is made
-					REQUIRE_FALSE(fs::exists(fi.filenamebak));
+					REQUIRE_FALSE(fs::exists(fi.filenamebak()));
 				}
 			}
 		}

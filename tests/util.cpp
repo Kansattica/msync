@@ -306,6 +306,7 @@ SCENARIO("clean_up_html removes HTML tags and entities.")
 			std::make_tuple("this<p>&apos;that", "this'that"),
 			std::make_tuple("this<p>&amp;th<div>a</div>t", "this&that"),
 			std::make_tuple("&lt;p&gt;hello&lt;/p&gt;", "<p>hello</p>"),
+			std::make_tuple("&lt;3", "<3"),
 			std::make_tuple("<p>look at my :custom_emojo:</p>", "look at my :custom_emojo:"),
 			std::make_tuple("&hearts;&hearts;&hearts;&hearts;&hearts;&hearts;", "♥♥♥♥♥♥")
 		);
@@ -350,6 +351,75 @@ SCENARIO("clean_up_html removes HTML tags and entities.")
 			}
 		}
 	}
+
+	GIVEN("A really long string.")
+	{
+		const static std::string long_str(70000, 'Q');
+
+		WHEN("The string is stripped as-is.")
+		{
+			const auto stripped = clean_up_html(long_str);
+
+			THEN("The string is unchanged.")
+			{
+				REQUIRE(stripped == long_str);
+			}
+
+		}
+
+		WHEN("The string is wrapped in paragraph tags and stripped.")
+		{
+			std::string tostrip = long_str;
+			tostrip.reserve(tostrip.size() + 7);
+			tostrip.insert(0, "<p>");
+			tostrip += "</p>";
+
+			THEN("The stripped string is unchanged.")
+			{
+				REQUIRE(long_str == clean_up_html(tostrip));
+			}
+
+			AND_WHEN("The string is wrapped in some emphasis tags and stripped.")
+			{
+				tostrip.reserve(tostrip.size() + 9);
+				tostrip.insert(0, "<em>");
+				tostrip += "</em>";
+
+				THEN("The stripped string is unchanged.")
+				{
+					REQUIRE(long_str == clean_up_html(tostrip));
+				}
+
+				AND_WHEN("Line breaks are added to the beginning, middle, and end of the string before it's stripped.")
+				{
+					tostrip.insert(0, "<br><br /><br     />");
+					tostrip.insert(5000, "<br><br/>");
+					tostrip.append("<br       />");
+
+					const auto stripped = clean_up_html(tostrip);
+
+					THEN("The stripped string has newlines in the right places.")
+					{
+						REQUIRE(stripped[0] == '\n');	
+						REQUIRE(stripped[1] == '\n');	
+						REQUIRE(stripped[2] == '\n');	
+						REQUIRE(stripped[4976] == '\n'); // position shifts when other things get removed.
+						REQUIRE(stripped[4977] == '\n');	
+						REQUIRE(stripped.back() == '\n');
+					}
+
+					THEN("The original string was not modified.")
+					{
+						REQUIRE(stripped != long_str);
+					}
+
+				}
+			}
+
+
+		}
+
+	}
 }
 
 struct bulk_replace_test_case
@@ -372,9 +442,9 @@ SCENARIO("bulk_replace_mentions finds and replaces all its arguments in a string
 			bulk_replace_test_case{ "hey, @spanky, what's up", { {"spanky", "spanky@website.egg"} }, "hey, @spanky@website.egg, what's up" },
 			bulk_replace_test_case{ "hey, @spanky, what's up. sincerely, @spanky", { {"spanky", "spanky@website.egg"}, {"spanky", "spanky@illegal.egg" } }, "hey, @spanky@website.egg, what's up. sincerely, @spanky@illegal.egg" },
 			bulk_replace_test_case{ "@mike @bike @spike heckthread @marge", 
-				{ {"mike", "mike@website.egg"}, {"bike", "bike@crime.egg"}, {"spike", "spike"}, {"marge", "marge@in.charge"} },
-				"@mike@website.egg @bike@crime.egg @spike heckthread @marge@in.charge" }
-		);
+			{ {"mike", "mike@website.egg"}, {"bike", "bike@crime.egg"}, {"spike", "spike"}, {"marge", "marge@in.charge"} },
+			"@mike@website.egg @bike@crime.egg @spike heckthread @marge@in.charge" }
+			);
 
 		WHEN("The string is replaced on.")
 		{
