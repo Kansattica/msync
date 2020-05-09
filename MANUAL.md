@@ -20,7 +20,7 @@ Any of these options work, but please read the note about `msync_accounts` below
 `msync` stores its information (account settings, downloaded posts, queued posts, etc.) in a directory named `msync_accounts`. By default, `msync` creates and looks for this directory in the same directory as the executable. If you downloaded a release with `install` in the name, installed `msync` from the .deb package, or configured `msync` with `-DMSYNC_USER_CONFIG=ON`, then msync will create `msync_accounts` in the conventional place for your platform:
 
 - On Windows, this is something like `C:\Users\username\AppData\Local`.
-- On Linux, this is the `XDG_CONFIG_HOME` environment variable, if set, and `~/.config` otherwise.
+- On Linux and OSX, this is the `XDG_CONFIG_HOME` environment variable, if set, and `~/.config` otherwise.
 
 I recommend this "install" approach over the same-directory-as-executable approach.
 

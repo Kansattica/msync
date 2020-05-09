@@ -69,7 +69,7 @@ Pass these during the first call to CMake (next to `-DCMAKE_BUILD_TYPE=Release`)
 |:-------------------:|:---------:|:-------:|--------------
 | `MSYNC_BUILD_TESTS` | boolean   |  `ON`   | If `ON`, download Catch2 and build two test executables, `tests` and `net_tests`, will also be built. |
 | `MSYNC_FILE_LOG`    | boolean   |  `ON`   | If `ON`, `msync` will create an `msync.log` file in the current directory whenever it runs with a record of what it did. | 
-| `MSYNC_USER_CONFIG` | boolean   |  `OFF`  | If `ON`, `msync` will store account information in the default location for your system. On Windows, this is something like `C:\Users\username\AppData\Local`. On Linux, this is the `XDG_CONFIG_HOME` environment variable, if set, and `~/.config` otherwise. If this is `OFF`, `msync` will store information in the same directory as the executable.  |
+| `MSYNC_USER_CONFIG` | boolean   |  `OFF`  | If `ON`, `msync` will store account information in the default location for your system. On Windows, this is something like `C:\Users\username\AppData\Local`. On Linux and OSX, this is the `XDG_CONFIG_HOME` environment variable, if set, and `~/.config` otherwise. If this is `OFF`, `msync` will store information in the same directory as the executable.  |
 |`MSYNC_DOWNLOAD_ZLIB`| boolean   |  `ON`   | If `ON` AND you're on Windows, CMake will download a built copy of zlib and statically link it to curl for compression. No effect on other platforms. |
 | `USE_SYSTEM_CURL`   | boolean   |  `ON`   | If `ON` AND CMake can find `libcurl` on your system, `msync` will use that to perform network requests. If this is `OFF` OR CMake couldn't find `libcurl`, it will download, build, and statically link `libcurl` for you. |
 
