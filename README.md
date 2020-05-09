@@ -122,3 +122,6 @@ You can verify that your setup works by building tests and running `net_tests`.
 - [zlib](https://www.zlib.net/) on Windows if `MSYNC_DOWNLOAD_ZLIB` is ON (defaults to ON).
 - [catch2](https://github.com/catchorg/Catch2) if `MSYNC_BUILD_TESTS` is ON (defaults to ON).
 
+### License
+
+GPLv3 for now, also fascists fuck off.
