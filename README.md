@@ -115,10 +115,10 @@ You can verify that your setup works by building tests and running `net_tests`.
 - a compiler with C++17 support
 - a standard library with std::filesystem support (gcc libstdc++ 8, clang libc++ 7, MSVC 2017 15.7, or Xcode 11.0) or Boost::filesystem.
 - [Nlohmann Json](https://github.com/nlohmann/json)
-- [whereami](https://github.com/gpakosz/whereami)
 - [clipp](https://github.com/muellan/clipp)
 - [CPR](https://github.com/whoshuu/cpr)
 - [curl](https://github.com/curl/curl)
-- [zlib](https://www.zlib.net/) is downloaded on Windows if `MSYNC_DOWNLOAD_ZLIB` is true (defaults to true).
-- [catch2](https://github.com/catchorg/Catch2) if `MSYNC_BUILD_TESTS` is true (defaults to true).
+- [whereami](https://github.com/gpakosz/whereami) if `MSYNC_USER_CONFIG` is OFF.
+- [zlib](https://www.zlib.net/) on Windows if `MSYNC_DOWNLOAD_ZLIB` is ON (defaults to ON).
+- [catch2](https://github.com/catchorg/Catch2) if `MSYNC_BUILD_TESTS` is ON (defaults to ON).
 
