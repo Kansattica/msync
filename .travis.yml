@@ -34,6 +34,12 @@ matrix:
         - libcurl4-openssl-dev:i386
         - linux-libc-dev:i386
         - libstdc++-8-dev
+  - os: linux
+    dist: bionic
+    compiler: gcc
+    env: BUILD_ARCH=x64 CC=gcc-8 CXX=g++-8 CONFIGURE_ARGUMENTS="-DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF -DUSE_SYSTEM_CURL=OFF"
+    addons:
+      apt: g++-8 libstdc++-8-dev
   - os: osx
     osx_image: xcode11
     compiler: clang
@@ -82,6 +88,7 @@ after_success:
   - du -h $EXELOCATION
   - export FINISHED_BINARY_NAME=msync-$TRAVIS_TAG-
   - if [[ $CONFIGURE_ARGUMENTS == *"MSYNC_USER_CONFIG=ON"* ]]; then FINISHED_BINARY_NAME+="install-"; fi
+  - if [[ $CONFIGURE_ARGUMENTS == *"USE_SYSTEM_CURL=OFF"* ]]; then FINISHED_BINARY_NAME+="staticlibcurl-"; fi
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then FINISHED_BINARY_NAME+="linux-$BUILD_ARCH-$TRAVIS_COMPILER"; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then FINISHED_BINARY_NAME+="windows-$CMAKE_GENERATOR_PLATFORM.exe"; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then FINISHED_BINARY_NAME+="osx-x64"; fi
