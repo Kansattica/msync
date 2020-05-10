@@ -1,5 +1,5 @@
 # msync
-## A low bandwidth store and forward Mastodon api client
+## A low bandwidth store and forward Mastodon API client
 
 [![Build Status](https://travis-ci.org/Kansattica/msync.svg?branch=master)](https://travis-ci.org/Kansattica/msync)
 
