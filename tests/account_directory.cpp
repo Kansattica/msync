@@ -104,9 +104,9 @@ SCENARIO("The account directory locator respects MSYNC_USER_CONFIG.")
 		}
 
 		if (oldhome == nullptr)
-			unsetenv(xdg_home);
+			REQUIRE(unsetenv(xdg_home) == 0);
 		else
-			setenv(xdg_home, old_home_val.c_str(), true);
+			REQUIRE(setenv(xdg_home, old_home_val.c_str(), true) == 0);
 	}
 	#endif
 }
