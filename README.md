@@ -11,13 +11,13 @@
 
 You can download the latest stable release of `msync` [here](https://github.com/Kansattica/msync/releases) or the Releases tab above. 
 
-Arch Linux users can use the AUR packages [msync](https://aur.archlinux.org/packages/msync/) and [msync-git](https://aur.archlinux.org/packages/msync-git/). These are maintained by someone else and I cannot test them, but I have no reason to believe they won't work.
-
 #### Which release should I download?
 
 I recommend downloading the `.deb` file if you're on a Debian-like system that can install it. Otherwise, I recommend downloading the release for your system with `install` in the filename. This version will store user data in the appropriate place for your system. The versions without `install` store user data in the same directory as the executable. See [the manual](MANUAL.md#a-note-about-msync_accounts) for more information.
 
 If you would like to build `msync` yourself, read on. If you have a fairly recent version of CMake (3.12 or later), you can simply clone the repo, make a `build` directory, run CMake inside, and CMake will download and build `msync` and its dependencies automatically. 
+
+Arch Linux users can use the AUR packages [msync](https://aur.archlinux.org/packages/msync/) and [msync-git](https://aur.archlinux.org/packages/msync-git/). These are maintained by someone else and I cannot test them, but I have no reason to believe they won't work.
 
 ##### Notes on libcurl 
 
