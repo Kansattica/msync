@@ -272,6 +272,68 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 		}
 	}
 
+	GIVEN("A default command that doesn't specify an account.")
+	{
+		constexpr int argc = 3;
+		char const* argv[]{ "msync", "config", "default" };
+
+		WHEN("the command line is parsed")
+		{
+			const auto parsed = parse(argc, argv);
+
+			THEN("the selected mode is defaultopt")
+			{
+				REQUIRE(parsed.selected == mode::setdefault);
+			}
+
+			THEN("the option is not set")
+			{
+				REQUIRE(parsed.optionval.empty());
+			}
+
+			THEN("account is not set")
+			{
+				REQUIRE(parsed.account.empty());
+			}
+
+			THEN("the parse is good")
+			{
+				REQUIRE(parsed.okay);
+			}
+		}
+	}
+
+	GIVEN("A default command that specifies an account.")
+	{
+		constexpr int argc = 5;
+		char const* argv[]{ "msync", "config", "default", "-a", "regular@folks.egg" };
+
+		WHEN("the command line is parsed")
+		{
+			const auto parsed = parse(argc, argv);
+
+			THEN("the selected mode is defaultopt")
+			{
+				REQUIRE(parsed.selected == mode::setdefault);
+			}
+
+			THEN("the option is not set")
+			{
+				REQUIRE(parsed.optionval.empty());
+			}
+
+			THEN("account is set")
+			{
+				REQUIRE(parsed.account == "regular@folks.egg");
+			}
+
+			THEN("the parse is good")
+			{
+				REQUIRE(parsed.okay);
+			}
+		}
+	}
+
 	GIVEN("A command line adding a list to be pulled.")
 	{
 		constexpr int argc = 5;

@@ -59,6 +59,9 @@ int main(int argc, const char* argv[])
 			should_print_newline = false;
 			show_all_options(options().select_account(parsed.account));
 			break;
+		case mode::setdefault:
+
+			break;
 		case mode::config:
 			should_print_newline = false;
 			assume_account(parsed.account).second.set_option(parsed.toset, parsed.optionval);
@@ -145,32 +148,27 @@ int main(int argc, const char* argv[])
 
 void do_sync(const parse_result& parsed)
 {
-	auto select_result = options().select_account(parsed.account);
-
-	if (std::holds_alternative<select_account_error>(select_result))
+	std::pair<const std::string, user_options>* user = nullptr;
+	if (!parsed.account.empty())
 	{
-		const auto error = std::get<select_account_error>(select_result);
+		auto select_result = options().select_account(parsed.account);
 
-		if (error == select_account_error::ambiguous_prefix)
+		if (std::holds_alternative<select_account_error>(select_result))
 		{
-			pl() << "Ambiguous account. Either run msync sync with no account flag to synchronize all accounts, or specify an unambiguous prefix.\n"
-					"Basically, msync doesn't know which of the following accounts you meant:\n";
-			options().foreach_account([&parsed](const auto& user) {
-				if (std::equal(parsed.account.begin(), parsed.account.end(), user.first.begin(), user.first.begin() + parsed.account.size()))
-					pl() << user.first << '\n';
-				});
-			return;
+			const auto error = std::get<select_account_error>(select_result);
+
+			if (error != select_account_error::empty_name_many_accounts) //this one just means "sync all"
+			{
+				// let assume_account print the error message
+				// (it throws if the error is set)
+				assume_account(select_result);
+				return;
+			}
 		}
-		else if (error != select_account_error::empty_name_many_accounts) //this one just means "sync all"
-		{
-			// let assume_account print the error message
-			// (it throws if the error is set)
-			assume_account(select_result);
-			return;
-		}
+
+		auto user = select_result.index() == 0 ? std::get<0>(select_result) : nullptr;
 	}
 
-	auto user = select_result.index() == 0 ? std::get<0>(select_result) : nullptr;
 
 	if (parsed.sync_opts.send)
 	{
@@ -228,10 +226,11 @@ void show_all_options(select_account_result user_result)
 
 	const auto& user = assume_account(user_result);
 	pl() << "\nSettings for " << user.first << ":\n";
+	constexpr auto first_boolean_option = user_option::is_default;
 	for (auto opt = user_option(0); opt <= user_option::pull_notifications; opt = user_option(static_cast<int>(opt) + 1))
 	{
 		const auto option_name = USER_OPTION_NAMES[static_cast<int>(opt)];
-		if (opt < user_option::exclude_follows)
+		if (opt < user_option::is_default)
 		{
 			const auto option_value = user.second.try_get_option(opt);
 			if (is_sensitive(opt))
@@ -245,7 +244,7 @@ void show_all_options(select_account_result user_result)
 				pl() << '\n';
 			}
 		}
-		else if (opt >= user_option::exclude_follows && opt <= user_option::exclude_polls)
+		else if (opt >= user_option::is_default && opt <= user_option::exclude_polls)
 		{
 			pl() << option_name << ": " << (user.second.get_bool_option(opt) ? "true" : "false") << '\n';
 		}
@@ -268,7 +267,7 @@ std::string get_account_error(select_account_error err)
 		toreturn += "The prefix you gave to the --account flag didn't match any accounts.";
 		break;
 	case select_account_error::empty_name_many_accounts:
-		toreturn += "You have more than one account registered with msync and didn't specify one with the --account flag.";
+		toreturn += "You have more than one account registered with msync and didn't specify one with the --account flag and don't have a default account set.";
 		break;
 	case select_account_error::no_accounts:
 		toreturn += "You have no accounts registered with msync. Run msync new --account username@instance.url to register one.";

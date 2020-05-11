@@ -69,6 +69,12 @@ select_account_result global_options::select_account(std::string_view name)
 		if (name.size() > entry.first.size())
 			continue;
 
+		if (name.empty() && entry.second.get_bool_option(user_option::is_default))
+		{
+			plverb() << "Matched default account " << entry.first << '\n';
+			return &entry;
+		}
+
 		// won't have string.starts_with until c++20, so
 		// if the name given is a prefix of (or equal to) this entry, it's a candidate
 		// unsigned char because https://en.cppreference.com/w/cpp/string/byte/tolower
@@ -95,6 +101,12 @@ select_account_result global_options::select_account(std::string_view name)
 	// nullptr if we found nothing, points to the account entry if we found exactly one candidate
 	if (candidate == nullptr) { return select_account_error::bad_prefix; }
 	return candidate;
+}
+
+select_account_result global_options::set_default(const std::string_view name)
+{
+	// allow user to unset default if name is empty?
+	return select_account(name);
 }
 
 std::vector<std::string_view> global_options::all_accounts() const

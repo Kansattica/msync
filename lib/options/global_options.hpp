@@ -30,6 +30,7 @@ public:
 
 	std::pair<const std::string, user_options>& add_new_account(std::string name);
 	select_account_result select_account(std::string_view name);
+	select_account_result set_default(std::string_view name);
 	std::vector<std::string_view> all_accounts() const;
 
 	template <typename Callable>

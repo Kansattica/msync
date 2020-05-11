@@ -5,6 +5,7 @@ enum class mode
 {
 	newuser,
 	showopt,
+	setdefault,
 	showallopt,
 	config,
 	configsync,

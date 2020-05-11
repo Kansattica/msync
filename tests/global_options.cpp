@@ -6,6 +6,8 @@
 #include "../lib/options/global_options.hpp"
 
 #include <string>
+#include <array>
+#include <string_view>
 using namespace std::string_view_literals;
 
 SCENARIO("add_new_account correctly handles input.")
@@ -455,6 +457,87 @@ SCENARIO("select_account selects exactly one account.")
 			{
 				using Catch::Matchers::UnorderedEquals;
 				REQUIRE_THAT(accounts, Catch::UnorderedEquals(std::vector<std::string_view>{expected_accounts.begin(), expected_accounts.end()}));
+			}
+		}
+	}
+}
+
+SCENARIO("select_account respects the is_default setting.")
+{
+	GIVEN("A global_options with several accounts, only one of which is the default.")
+	{
+		const test_dir acc = temporary_directory();
+
+		constexpr std::array<std::string_view, 4> accounts =
+			{ "someone@crime.egg", "someoneelse@crime.egg", "zimbo@illegal.egg", "zoobin@illegal.egg" };
+
+		const auto expected_default = GENERATE_COPY(from_range(accounts));
+
+		global_options opts{ acc.dirname };
+		for (const auto& acct : accounts)
+		{
+			auto& account = opts.add_new_account(std::string{ acct });
+			if (acct == expected_default)
+			{
+				account.second.set_bool_option(user_option::is_default, true);
+			}
+		} 
+
+		WHEN("An empty string is given to select_account.")
+		{
+			const auto selected = opts.select_account({});
+
+			THEN("The selected account is the default.")
+			{
+				REQUIRE(selected.index() == 0);
+				REQUIRE(std::get<0>(selected)->first == expected_default);
+				REQUIRE(std::get<0>(selected)->second.get_bool_option(user_option::is_default));
+			}
+		}
+
+		WHEN("An account name is given to select_account.")
+		{
+			THEN("The correct account is selected.")
+			{
+				for (const auto& account : accounts)
+				{
+					const auto selected = opts.select_account(account);
+					REQUIRE(selected.index() == 0);
+					REQUIRE(std::get<0>(selected)->first == account);
+				}
+			}
+		}
+
+		WHEN("An unambiguous prefix is given to select_account.")
+		{
+			const auto selected = opts.select_account("zimbo");
+
+			THEN("The selected account is the correct one.")
+			{
+				REQUIRE(selected.index() == 0);
+				REQUIRE(std::get<0>(selected)->first == "zimbo@illegal.egg");
+			}
+		}
+
+		WHEN("An ambiguous prefix is given to select_account.")
+		{
+			const auto selected = opts.select_account("SOME");
+
+			THEN("The selected account is the correct one.")
+			{
+				REQUIRE(selected.index() == 1);
+				REQUIRE(std::get<select_account_error>(selected) == select_account_error::ambiguous_prefix);
+			}
+		}
+
+		WHEN("A prefix that doesn't match anything is given to select_account.")
+		{
+			const auto selected = opts.select_account("asdfasdf");
+
+			THEN("The selected account is the correct one.")
+			{
+				REQUIRE(selected.index() == 1);
+				REQUIRE(std::get<select_account_error>(selected) == select_account_error::bad_prefix);
 			}
 		}
 	}
