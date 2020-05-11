@@ -58,7 +58,7 @@ If you want something lighter weight, I suspect you can install the [build tools
 
 `msync` currently builds and all tests pass for the following compilers and environments:
 
-- gcc and clang on 64-bit Ubuntu and Debian
+- gcc and clang on 64-bit Ubuntu
 - gcc on 32-bit Ubuntu
 - OSX 10.14 with Xcode 11 (requires Boost::filesystem)
 - MSVC 2017 on 32 and 64-bit Windows 
