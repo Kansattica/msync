@@ -398,6 +398,7 @@ SCENARIO("user_options don't save out if nothing changed.")
 	GIVEN("A user_options for an existing file.")
 	{
 		const auto fi = temporary_file();
+
 		{
 			user_options tempopt{ fi.filename() };
 			tempopt.set_option(user_option::access_token, "a token");
