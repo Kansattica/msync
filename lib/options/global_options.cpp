@@ -5,16 +5,21 @@
 #include <print_logger.hpp>
 #include <algorithm>
 #include <iterator>
+#include <limits>
 
 #include <cctype>
 
-global_options::global_options(fs::path accounts_dir) : accounts_directory(std::move(accounts_dir))
+using idx_size_t = std::vector<std::pair<const std::string, user_options>>::size_type;
+constexpr auto no_default_account = std::numeric_limits<idx_size_t>::max();
+
+global_options::global_options(fs::path accounts_dir) : default_account_idx(no_default_account), accounts_directory(std::move(accounts_dir))
 {
 	plverb() << "Reading accounts from " << accounts_directory << "\n";
 
 	if (!fs::exists(accounts_directory))
 		return;
 
+	idx_size_t idx = 0;
 	for (const auto& userfolder : fs::directory_iterator(accounts_directory))
 	{
 		if (!fs::is_directory(userfolder.path()))
@@ -31,7 +36,10 @@ global_options::global_options(fs::path accounts_dir) : accounts_directory(std::
 			throw msync_exception("Expected to find a config file and didn't find it. Try deleting the folder and running new again: "s + to_utf8(userfolder.path()));
 		}
 
-		accounts.emplace_back(to_utf8(userfolder.path().filename()), user_options{ std::move(configfile) });
+		auto& inserted = accounts.emplace_back(to_utf8(userfolder.path().filename()), user_options{ std::move(configfile) });
+		if (inserted.second.get_bool_option(user_option::is_default))
+			default_account_idx = idx;
+		idx++;
 	}
 }
 
@@ -59,6 +67,12 @@ select_account_result global_options::select_account(std::string_view name)
 	if (accounts.empty()) { return select_account_error::no_accounts; }
 
 	if (!name.empty() && name.front() == '@') { name.remove_prefix(1); } //remove leading @s
+
+	if (name.empty() && default_account_idx != no_default_account)
+	{
+		plverb() << "Matched default account " << accounts[default_account_idx].first << '\n';
+		return &accounts[default_account_idx];
+	}
 
 	std::pair<const std::string, user_options>* candidate = nullptr;
 
@@ -95,6 +109,33 @@ select_account_result global_options::select_account(std::string_view name)
 	// nullptr if we found nothing, points to the account entry if we found exactly one candidate
 	if (candidate == nullptr) { return select_account_error::bad_prefix; }
 	return candidate;
+}
+
+select_account_result global_options::set_default(const std::string_view name)
+{
+	if (name.empty())
+	{
+		if (default_account_idx != no_default_account)
+			accounts[default_account_idx].second.set_bool_option(user_option::is_default, false);
+		default_account_idx = no_default_account;
+		return nullptr;
+	}
+
+	auto selected = select_account(name);
+	if (std::holds_alternative<user_ptr>(selected))
+	{
+		if (default_account_idx != no_default_account)
+		{
+			accounts[default_account_idx].second.set_bool_option(user_option::is_default, false);
+		}
+
+		std::get<user_ptr>(selected)->second.set_bool_option(user_option::is_default, true);
+
+		// subtract the selected pointer from the start of the accounts vector to get the index
+		default_account_idx = std::get<user_ptr>(selected) - accounts.data();
+	}
+
+	return selected;
 }
 
 std::vector<std::string_view> global_options::all_accounts() const
