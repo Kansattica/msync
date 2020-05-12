@@ -64,6 +64,8 @@ or
 msync sync --max-requests 6 -a someb
 ```
 
+In `msync` versions 0.9.9 and later, you can use `msync config default --account accountname` to set that account as the default. This uses the same prefix rule as every other command, so `accountname` can be reduced to any unambiguous prefix. If an account is set as the default, it will be used as the argument for all commands that would normally throw an error if no account is specified, such as `queue` and `config`. Note that `sync` will always interpret a missing account flag as "sync all accounts". Running `msync config default` with no account specified will ensure no accounts are marked as default.
+
 Note that the `-a` flag must always go last, after all other flags and arguments.
 
 Note also that `msync sync` doesn't have to take an `--account` flag. You can use `msync sync` with an account to sync only that account, or omit the account flag to sync all your accounts.
