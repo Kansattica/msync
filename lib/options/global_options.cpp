@@ -68,7 +68,7 @@ select_account_result global_options::select_account(std::string_view name)
 
 	if (!name.empty() && name.front() == '@') { name.remove_prefix(1); } //remove leading @s
 
-	if (name.empty() && default_account_idx != -1)
+	if (name.empty() && default_account_idx != no_default_account)
 	{
 		plverb() << "Matched default account " << accounts[default_account_idx].first << '\n';
 		return &accounts[default_account_idx];
