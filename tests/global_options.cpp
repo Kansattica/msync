@@ -477,7 +477,7 @@ SCENARIO("select_account respects the is_default setting.")
 		global_options opts{ acc.dirname };
 		for (const auto& acct : accounts)
 		{
-			auto& account = opts.add_new_account(std::string{ acct });
+			opts.add_new_account(std::string{ acct });
 		} 
 
 		WHEN("The default is set with a correct, unambiguous account string.")
