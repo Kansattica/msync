@@ -66,7 +66,7 @@ int main(int argc, const char* argv[])
 			const auto result = options().set_default(parsed.account);
 			if (std::holds_alternative<select_account_error>(result))
 				throw msync_exception(get_account_error(std::get<select_account_error>(result)));
-			const auto user = std::get<0>(result);
+			const auto user = std::get<user_ptr>(result);
 			if (user == nullptr)
 				pl() << "You no longer have a default user set.";
 			else

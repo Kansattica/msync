@@ -129,10 +129,10 @@ select_account_result global_options::set_default(const std::string_view name)
 			accounts[default_account_idx].second.set_bool_option(user_option::is_default, false);
 		}
 
-		std::get<0>(selected)->second.set_bool_option(user_option::is_default, true);
+		std::get<user_ptr>(selected)->second.set_bool_option(user_option::is_default, true);
 
 		// subtract the selected pointer from the start of the accounts vector to get the index
-		default_account_idx = std::get<0>(selected) - accounts.data();
+		default_account_idx = std::get<user_ptr>(selected) - accounts.data();
 	}
 
 	return selected;
