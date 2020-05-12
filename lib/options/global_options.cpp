@@ -12,7 +12,7 @@
 using idx_size_t = std::vector<std::pair<const std::string, user_options>>::size_type;
 constexpr auto no_default_account = std::numeric_limits<idx_size_t>::max();
 
-global_options::global_options(fs::path accounts_dir) : accounts_directory(std::move(accounts_dir)), default_account_idx(no_default_account)
+global_options::global_options(fs::path accounts_dir) : default_account_idx(no_default_account), accounts_directory(std::move(accounts_dir))
 {
 	plverb() << "Reading accounts from " << accounts_directory << "\n";
 
