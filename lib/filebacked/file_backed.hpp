@@ -7,11 +7,12 @@
 
 #include <filesystem.hpp>
 
-template <typename Container, bool(*Read)(Container&, std::string&&), void(*Write)(Container&&, std::ofstream&), bool skip_blank = true, bool skip_comment = true, bool read_only = false>
+template <typename Container, bool(*Read)(Container&, std::string&&), void(*Write)(Container&&, std::ofstream&), bool skip_blank = true, bool skip_comment = true, bool read_only = false, bool initial_save_back = true>
 class file_backed
 {
 public:
 	Container parsed;
+	bool should_save_back = initial_save_back;
 
 	file_backed(fs::path filename) : backing(std::move(filename))
 	{
@@ -47,8 +48,8 @@ public:
 			// if they only wanted to look at the thing, don't save the changes
 		}
 
-		if (backing.empty())
-			return; // we got moved from, so the new version will save it
+		if (!should_save_back)
+			return; // either we got moved from, so the new version will save it, or just got told not to bother.
 
 		if (fs::exists(backing))
 		{
