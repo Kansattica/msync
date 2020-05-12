@@ -21,7 +21,8 @@ enum class select_account_error
 	bad_prefix
 };
 
-using select_account_result = std::variant<std::pair<const std::string, user_options>*, select_account_error>;
+using user_ptr = std::pair<const std::string, user_options>*;
+using select_account_result = std::variant<user_ptr, select_account_error>;
 
 struct global_options
 {
@@ -40,7 +41,7 @@ public:
 	}
 private:
 	std::vector<std::pair<const std::string, user_options>> accounts;
-	size_t default_account_idx = -1;
+	std::vector<std::pair<const std::string, user_options>>::size_type default_account_idx;
 	const fs::path accounts_directory;
 };
 #endif

@@ -5,17 +5,21 @@
 #include <print_logger.hpp>
 #include <algorithm>
 #include <iterator>
+#include <limits>
 
 #include <cctype>
 
-global_options::global_options(fs::path accounts_dir) : accounts_directory(std::move(accounts_dir))
+using idx_size_t = std::vector<std::pair<const std::string, user_options>>::size_type;
+constexpr auto no_default_account = std::numeric_limits<idx_size_t>::max();
+
+global_options::global_options(fs::path accounts_dir) : accounts_directory(std::move(accounts_dir)), default_account_idx(no_default_account)
 {
 	plverb() << "Reading accounts from " << accounts_directory << "\n";
 
 	if (!fs::exists(accounts_directory))
 		return;
 
-	size_t idx = 0;
+	idx_size_t idx = 0;
 	for (const auto& userfolder : fs::directory_iterator(accounts_directory))
 	{
 		if (!fs::is_directory(userfolder.path()))
@@ -111,9 +115,9 @@ select_account_result global_options::set_default(const std::string_view name)
 {
 	if (name.empty())
 	{
-		if (default_account_idx != -1)
+		if (default_account_idx != no_default_account)
 			accounts[default_account_idx].second.set_bool_option(user_option::is_default, false);
-		default_account_idx = -1;
+		default_account_idx = no_default_account;
 		return nullptr;
 	}
 
@@ -123,7 +127,7 @@ select_account_result global_options::set_default(const std::string_view name)
 		return selected;
 	}
 
-	if (default_account_idx != -1)
+	if (default_account_idx != no_default_account)
 	{
 		accounts[default_account_idx].second.set_bool_option(user_option::is_default, false);
 	}
