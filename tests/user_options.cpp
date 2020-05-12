@@ -408,7 +408,7 @@ SCENARIO("user_options don't save out if nothing changed.")
 			const auto original_write_time = fs::last_write_time(fi.filename());
 
 			{
-				user_options anotheropt{ fi.filename() };
+				const user_options anotheropt{ fi.filename() };
 				REQUIRE(anotheropt.get_option(user_option::access_token) == "a token");
 			}
 
