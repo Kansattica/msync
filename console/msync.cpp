@@ -70,7 +70,7 @@ int main(int argc, const char* argv[])
 			if (user == nullptr)
 				pl() << "You no longer have a default user set.";
 			else
-				pl() << user->first << " is now your default user.";
+				pl() << user->first << " is now your default user. This user will be selected if you don't provide one with the --account flag.";
 		}
 			break;
 		case mode::config:
