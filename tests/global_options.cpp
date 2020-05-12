@@ -480,6 +480,26 @@ SCENARIO("select_account respects the is_default setting.")
 			opts.add_new_account(std::string{ acct });
 		} 
 
+		WHEN("The default is set with an ambiguous prefix.")
+		{
+			const auto prefix = GENERATE("some", "Some", "SOME", "sOmE", "z", "Z");
+			const auto result = opts.set_default(prefix);
+
+			THEN("The correct error is returned.")
+			{
+				REQUIRE(std::holds_alternative<select_account_error>(result));
+				REQUIRE(std::get<select_account_error>(result) == select_account_error::ambiguous_prefix);
+			}
+
+			THEN("Nothing is set as the default.")
+			{
+				const auto selected = opts.select_account({});
+
+				REQUIRE(selected.index() == 1);
+				REQUIRE(std::get<select_account_error>(selected) == select_account_error::empty_name_many_accounts);
+			}
+		}
+
 		WHEN("The default is set with a correct, unambiguous account string.")
 		{
 			const auto prefix_length = GENERATE(0, 5, 10);
@@ -587,6 +607,27 @@ SCENARIO("select_account respects the is_default setting.")
 
 					REQUIRE(selected.index() == 1);
 					REQUIRE(std::get<select_account_error>(selected) == select_account_error::empty_name_many_accounts);
+				}
+			}
+
+			AND_WHEN("The default is set again with an ambiguous prefix.")
+			{
+				const auto prefix = GENERATE("some", "Some", "SOME", "sOmE", "z", "Z");
+				const auto result = opts.set_default(prefix);
+
+				THEN("The correct error is returned.")
+				{
+					REQUIRE(std::holds_alternative<select_account_error>(result));
+					REQUIRE(std::get<select_account_error>(result) == select_account_error::ambiguous_prefix);
+				}
+
+				THEN("The default is unchanged.")
+				{
+					const auto selected = opts.select_account({});
+
+					REQUIRE(selected.index() == 0);
+					REQUIRE(std::get<0>(selected)->first == expected_default);
+					REQUIRE(std::get<0>(selected)->second.get_bool_option(user_option::is_default));
 				}
 			}
 		}
