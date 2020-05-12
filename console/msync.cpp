@@ -68,9 +68,9 @@ int main(int argc, const char* argv[])
 				throw msync_exception(get_account_error(std::get<select_account_error>(result)));
 			const auto user = std::get<0>(result);
 			if (user == nullptr)
-				pl() << "You no longer have a default user set.\n";
+				pl() << "You no longer have a default user set.";
 			else
-				pl() << user->first << " is now your default user.\n";
+				pl() << user->first << " is now your default user.";
 		}
 			break;
 		case mode::config:
