@@ -15,6 +15,7 @@ global_options::global_options(fs::path accounts_dir) : accounts_directory(std::
 	if (!fs::exists(accounts_directory))
 		return;
 
+	size_t idx = 0;
 	for (const auto& userfolder : fs::directory_iterator(accounts_directory))
 	{
 		if (!fs::is_directory(userfolder.path()))
@@ -33,7 +34,8 @@ global_options::global_options(fs::path accounts_dir) : accounts_directory(std::
 
 		auto& inserted = accounts.emplace_back(to_utf8(userfolder.path().filename()), user_options{ std::move(configfile) });
 		if (inserted.second.get_bool_option(user_option::is_default))
-			default_account = &inserted;
+			default_account_idx = idx;
+		idx++;
 	}
 }
 
@@ -62,10 +64,10 @@ select_account_result global_options::select_account(std::string_view name)
 
 	if (!name.empty() && name.front() == '@') { name.remove_prefix(1); } //remove leading @s
 
-	if (name.empty() && default_account != nullptr)
+	if (name.empty() && default_account_idx != -1)
 	{
-		plverb() << "Matched default account " << default_account->first << '\n';
-		return default_account;
+		plverb() << "Matched default account " << accounts[default_account_idx].first << '\n';
+		return &accounts[default_account_idx];
 	}
 
 	std::pair<const std::string, user_options>* candidate = nullptr;
@@ -76,7 +78,6 @@ select_account_result global_options::select_account(std::string_view name)
 		// since name can't possibly match something it's longer than, just skip this
 		if (name.size() > entry.first.size())
 			continue;
-
 
 		// won't have string.starts_with until c++20, so
 		// if the name given is a prefix of (or equal to) this entry, it's a candidate
@@ -110,10 +111,10 @@ select_account_result global_options::set_default(const std::string_view name)
 {
 	if (name.empty())
 	{
-		if (default_account != nullptr)
-			default_account->second.set_bool_option(user_option::is_default, false);
-		default_account = nullptr;
-		return default_account;
+		if (default_account_idx != -1)
+			accounts[default_account_idx].second.set_bool_option(user_option::is_default, false);
+		default_account_idx = -1;
+		return nullptr;
 	}
 
 	auto selected = select_account(name);
@@ -122,13 +123,15 @@ select_account_result global_options::set_default(const std::string_view name)
 		return selected;
 	}
 
-	if (default_account != nullptr)
+	if (default_account_idx != -1)
 	{
-		default_account->second.set_bool_option(user_option::is_default, false);
+		accounts[default_account_idx].second.set_bool_option(user_option::is_default, false);
 	}
 	std::get<0>(selected)->second.set_bool_option(user_option::is_default, true);
-	default_account = std::get<0>(selected);
-	return default_account;
+
+	// subtract the selected pointer from the start of the accounts vector to get the index
+	default_account_idx = std::get<0>(selected) - accounts.data();
+	return selected;
 }
 
 std::vector<std::string_view> global_options::all_accounts() const

@@ -40,7 +40,7 @@ public:
 	}
 private:
 	std::vector<std::pair<const std::string, user_options>> accounts;
-	std::pair<const std::string, user_options>* default_account = nullptr;
+	size_t default_account_idx = -1;
 	const fs::path accounts_directory;
 };
 #endif
