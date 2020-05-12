@@ -31,7 +31,9 @@ global_options::global_options(fs::path accounts_dir) : accounts_directory(std::
 			throw msync_exception("Expected to find a config file and didn't find it. Try deleting the folder and running new again: "s + to_utf8(userfolder.path()));
 		}
 
-		accounts.emplace_back(to_utf8(userfolder.path().filename()), user_options{ std::move(configfile) });
+		auto& inserted = accounts.emplace_back(to_utf8(userfolder.path().filename()), user_options{ std::move(configfile) });
+		if (inserted.second.get_bool_option(user_option::is_default))
+			default_account = &inserted;
 	}
 }
 
@@ -60,6 +62,12 @@ select_account_result global_options::select_account(std::string_view name)
 
 	if (!name.empty() && name.front() == '@') { name.remove_prefix(1); } //remove leading @s
 
+	if (name.empty() && default_account != nullptr)
+	{
+		plverb() << "Matched default account " << default_account->first << '\n';
+		return default_account;
+	}
+
 	std::pair<const std::string, user_options>* candidate = nullptr;
 
 	for (auto& entry : accounts)
@@ -69,11 +77,6 @@ select_account_result global_options::select_account(std::string_view name)
 		if (name.size() > entry.first.size())
 			continue;
 
-		if (name.empty() && entry.second.get_bool_option(user_option::is_default))
-		{
-			plverb() << "Matched default account " << entry.first << '\n';
-			return &entry;
-		}
 
 		// won't have string.starts_with until c++20, so
 		// if the name given is a prefix of (or equal to) this entry, it's a candidate
@@ -105,8 +108,27 @@ select_account_result global_options::select_account(std::string_view name)
 
 select_account_result global_options::set_default(const std::string_view name)
 {
-	// allow user to unset default if name is empty?
-	return select_account(name);
+	if (name.empty())
+	{
+		if (default_account != nullptr)
+			default_account->second.set_bool_option(user_option::is_default, false);
+		default_account = nullptr;
+		return default_account;
+	}
+
+	auto selected = select_account(name);
+	if (std::holds_alternative<select_account_error>(selected))
+	{
+		return selected;
+	}
+
+	if (default_account != nullptr)
+	{
+		default_account->second.set_bool_option(user_option::is_default, false);
+	}
+	std::get<0>(selected)->second.set_bool_option(user_option::is_default, true);
+	default_account = std::get<0>(selected);
+	return default_account;
 }
 
 std::vector<std::string_view> global_options::all_accounts() const

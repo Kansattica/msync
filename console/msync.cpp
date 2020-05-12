@@ -23,6 +23,8 @@
 std::pair<const std::string, user_options>& assume_account(const std::string& account);
 std::pair<const std::string, user_options>& assume_account(select_account_result user);
 
+std::string get_account_error(select_account_error err);
+
 void do_sync(const parse_result& parsed);
 
 void show_all_options(select_account_result user_result);
@@ -60,7 +62,16 @@ int main(int argc, const char* argv[])
 			show_all_options(options().select_account(parsed.account));
 			break;
 		case mode::setdefault:
-
+		{
+			const auto result = options().set_default(parsed.account);
+			if (std::holds_alternative<select_account_error>(result))
+				throw msync_exception(get_account_error(std::get<select_account_error>(result)));
+			const auto user = std::get<0>(result);
+			if (user == nullptr)
+				pl() << "You no longer have a default user set.\n";
+			else
+				pl() << user->first << " is now your default user.\n";
+		}
 			break;
 		case mode::config:
 			should_print_newline = false;

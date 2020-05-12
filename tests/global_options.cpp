@@ -464,12 +464,13 @@ SCENARIO("select_account selects exactly one account.")
 
 SCENARIO("select_account respects the is_default setting.")
 {
+	logs_off = true;
 	GIVEN("A global_options with several accounts, only one of which is the default.")
 	{
 		const test_dir acc = temporary_directory();
 
 		constexpr std::array<std::string_view, 4> accounts =
-			{ "someone@crime.egg", "someoneelse@crime.egg", "zimbo@illegal.egg", "zoobin@illegal.egg" };
+			{ "somebody@crime.egg", "someoneelse@crime.egg", "zimbo@illegal.egg", "zoobin@illegal.egg" };
 
 		const auto expected_default = GENERATE_COPY(from_range(accounts));
 
@@ -477,67 +478,116 @@ SCENARIO("select_account respects the is_default setting.")
 		for (const auto& acct : accounts)
 		{
 			auto& account = opts.add_new_account(std::string{ acct });
-			if (acct == expected_default)
-			{
-				account.second.set_bool_option(user_option::is_default, true);
-			}
 		} 
 
-		WHEN("An empty string is given to select_account.")
+		WHEN("The default is set with a correct, unambiguous account string.")
 		{
-			const auto selected = opts.select_account({});
+			const auto prefix_length = GENERATE(0, 5, 10);
+			auto prefix_to_search = expected_default;
+			if (prefix_length != 0)
+				prefix_to_search.remove_suffix(prefix_to_search.size() - prefix_length);
 
-			THEN("The selected account is the default.")
-			{
-				REQUIRE(selected.index() == 0);
-				REQUIRE(std::get<0>(selected)->first == expected_default);
-				REQUIRE(std::get<0>(selected)->second.get_bool_option(user_option::is_default));
-			}
-		}
+			REQUIRE(opts.set_default(prefix_to_search).index() == 0);
 
-		WHEN("An account name is given to select_account.")
-		{
-			THEN("The correct account is selected.")
+			AND_WHEN("An empty string is given to select_account.")
 			{
-				for (const auto& account : accounts)
+				const auto selected = opts.select_account({});
+
+				THEN("The selected account is the default.")
 				{
-					const auto selected = opts.select_account(account);
 					REQUIRE(selected.index() == 0);
-					REQUIRE(std::get<0>(selected)->first == account);
+					REQUIRE(std::get<0>(selected)->first == expected_default);
+					REQUIRE(std::get<0>(selected)->second.get_bool_option(user_option::is_default));
 				}
 			}
-		}
 
-		WHEN("An unambiguous prefix is given to select_account.")
-		{
-			const auto selected = opts.select_account("zimbo");
-
-			THEN("The selected account is the correct one.")
+			AND_WHEN("An account name is given to select_account.")
 			{
-				REQUIRE(selected.index() == 0);
-				REQUIRE(std::get<0>(selected)->first == "zimbo@illegal.egg");
+				THEN("The correct account is selected.")
+				{
+					for (const auto& account : accounts)
+					{
+						const auto selected = opts.select_account(account);
+						REQUIRE(selected.index() == 0);
+						REQUIRE(std::get<0>(selected)->first == account);
+					}
+				}
 			}
-		}
 
-		WHEN("An ambiguous prefix is given to select_account.")
-		{
-			const auto selected = opts.select_account("SOME");
-
-			THEN("The selected account is the correct one.")
+			AND_WHEN("An unambiguous prefix is given to select_account.")
 			{
-				REQUIRE(selected.index() == 1);
-				REQUIRE(std::get<select_account_error>(selected) == select_account_error::ambiguous_prefix);
+				const auto selected = opts.select_account("zimbo");
+
+				THEN("The selected account is the correct one.")
+				{
+					REQUIRE(selected.index() == 0);
+					REQUIRE(std::get<0>(selected)->first == "zimbo@illegal.egg");
+				}
 			}
-		}
 
-		WHEN("A prefix that doesn't match anything is given to select_account.")
-		{
-			const auto selected = opts.select_account("asdfasdf");
-
-			THEN("The selected account is the correct one.")
+			AND_WHEN("An ambiguous prefix is given to select_account.")
 			{
-				REQUIRE(selected.index() == 1);
-				REQUIRE(std::get<select_account_error>(selected) == select_account_error::bad_prefix);
+				const auto selected = opts.select_account("SOME");
+
+				THEN("The selected account is the correct one.")
+				{
+					REQUIRE(selected.index() == 1);
+					REQUIRE(std::get<select_account_error>(selected) == select_account_error::ambiguous_prefix);
+				}
+			}
+
+			AND_WHEN("A prefix that doesn't match anything is given to select_account.")
+			{
+				const auto selected = opts.select_account("asdfasdf");
+
+				THEN("The selected account is the correct one.")
+				{
+					REQUIRE(selected.index() == 1);
+					REQUIRE(std::get<select_account_error>(selected) == select_account_error::bad_prefix);
+				}
+			}
+
+			AND_WHEN("The default is updated.")
+			{
+				const auto expected_new_default = GENERATE_COPY(from_range(accounts));
+
+				REQUIRE(opts.set_default(expected_new_default).index() == 0);
+
+				AND_WHEN("An empty string is given to select_account.")
+				{
+					const auto selected = opts.select_account({});
+
+					THEN("The selected account is the default.")
+					{
+						REQUIRE(selected.index() == 0);
+						REQUIRE(std::get<0>(selected)->first == expected_new_default);
+						REQUIRE(std::get<0>(selected)->second.get_bool_option(user_option::is_default));
+					}
+
+					THEN("The old default is no longer marked as the default.")
+					{
+						if (expected_default != expected_new_default)
+						{
+							const auto old_default = opts.select_account(expected_default);
+							REQUIRE(old_default.index() == 0);
+							REQUIRE(std::get<0>(old_default)->first == expected_default);
+							REQUIRE_FALSE(std::get<0>(old_default)->second.get_bool_option(user_option::is_default));
+						}
+					}
+				}
+			}
+
+			AND_WHEN("The default is cleared.")
+			{
+				REQUIRE(opts.set_default({}).index() == 0);
+
+				THEN("Passing an empty string to select_account returns an error.")
+				{
+					const auto selected = opts.select_account({});
+
+					REQUIRE(selected.index() == 1);
+					REQUIRE(std::get<select_account_error>(selected) == select_account_error::empty_name_many_accounts);
+				}
 			}
 		}
 	}
