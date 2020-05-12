@@ -177,7 +177,7 @@ void do_sync(const parse_result& parsed)
 			}
 		}
 
-		auto user = select_result.index() == 0 ? std::get<0>(select_result) : nullptr;
+		user = select_result.index() == 0 ? std::get<0>(select_result) : nullptr;
 	}
 
 
@@ -241,7 +241,7 @@ void show_all_options(select_account_result user_result)
 	for (auto opt = user_option(0); opt <= user_option::pull_notifications; opt = user_option(static_cast<int>(opt) + 1))
 	{
 		const auto option_name = USER_OPTION_NAMES[static_cast<int>(opt)];
-		if (opt < user_option::is_default)
+		if (opt < first_boolean_option)
 		{
 			const auto option_value = user.second.try_get_option(opt);
 			if (is_sensitive(opt))
@@ -255,7 +255,7 @@ void show_all_options(select_account_result user_result)
 				pl() << '\n';
 			}
 		}
-		else if (opt >= user_option::is_default && opt <= user_option::exclude_polls)
+		else if (opt >= first_boolean_option && opt <= user_option::exclude_polls)
 		{
 			pl() << option_name << ": " << (user.second.get_bool_option(opt) ? "true" : "false") << '\n';
 		}
