@@ -38,7 +38,7 @@ void make_new_account(const std::string& accountname, global_options& options)
 		const auto parsed = parse_account_name(accountname);
 		if (!parsed.has_value())
 		{
-			pl() << "Could not parse a username and instance name from: " << accountname << ". It should look like: username@instance.url\n";
+			pl() << "Could not parse a username and instance name from: " << accountname << ". It should look like: username@instance.url";
 			return;
 		}
 		// make a new account
@@ -53,6 +53,14 @@ void make_new_account(const std::string& accountname, global_options& options)
 	}
 	
 	auto& useraccount = useraccountpair->second;
+
+	if (useraccount.try_get_option(user_option::access_token) != nullptr)
+	{
+		pl() << "This user is already registered with msync.\n"
+			"If you'd like to go through the setup process again, delete the following folder in msync_accounts and try again:\n"
+			<< useraccountpair->first;
+		return;
+	}
 
 	// register the application with mastodon if needed
 	auto client_id = useraccount.try_get_option(user_option::client_id);
