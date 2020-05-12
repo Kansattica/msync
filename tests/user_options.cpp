@@ -392,3 +392,35 @@ SCENARIO("user_options correctly reports the directory it's in.")
 		}
 	}
 }
+
+SCENARIO("user_options don't save out if nothing changed.")
+{
+	GIVEN("A user_options for an existing file.")
+	{
+		const auto fi = temporary_file();
+		{
+			user_options tempopt{ fi.filename() };
+			tempopt.set_option(user_option::access_token, "a token");
+		}
+
+		WHEN("That file is opened again and not changed.")
+		{
+			const auto original_write_time = fs::last_write_time(fi.filename());
+
+			{
+				user_options anotheropt{ fi.filename() };
+				REQUIRE(anotheropt.get_option(user_option::access_token) == "a token");
+			}
+
+			THEN("The file write time was not increased.")
+			{
+				REQUIRE(original_write_time == fs::last_write_time(fi.filename()));
+			}
+
+			THEN("No .bak file was created.")
+			{
+				REQUIRE_FALSE(fs::exists(fi.filenamebak()));
+			}
+		}
+	}
+}
