@@ -10,7 +10,7 @@
 struct user_options
 {
 public:
-	user_options(fs::path toread) : user_directory(toread.parent_path()), backing(toread){};
+	user_options(fs::path toread);
 
 	const std::string* try_get_option(user_option toget) const;
 	const std::string& get_option(user_option toget) const;
