@@ -159,7 +159,7 @@ int main(int argc, const char* argv[])
 
 void do_sync(const parse_result& parsed)
 {
-	std::pair<const std::string, user_options>* user = nullptr;
+	user_ptr user = nullptr;
 	if (!parsed.account.empty())
 	{
 		auto select_result = options().select_account(parsed.account);
@@ -177,7 +177,7 @@ void do_sync(const parse_result& parsed)
 			}
 		}
 
-		user = select_result.index() == 0 ? std::get<0>(select_result) : nullptr;
+		user = std::holds_alternative<user_ptr>(select_result) ? std::get<user_ptr>(select_result) : nullptr;
 	}
 
 
@@ -290,10 +290,9 @@ std::string get_account_error(select_account_error err)
 
 std::pair<const std::string, user_options>& assume_account(select_account_result result)
 {
-
 	if (std::holds_alternative<select_account_error>(result))
 		throw msync_exception(get_account_error(std::get<select_account_error>(result)));
-	return *std::get<0>(result);
+	return *std::get<user_ptr>(result);
 }
 
 std::pair<const std::string, user_options>& assume_account(const std::string& account)
