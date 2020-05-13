@@ -100,6 +100,7 @@ void print_api_call(std::string_view url, unsigned int limit, const timeline_par
 		}
 	}
 
+	os.flush(); //print this now, don't wait for a newline
 	// no newline, print_statistics will do that
 }
 

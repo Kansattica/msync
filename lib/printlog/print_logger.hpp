@@ -38,6 +38,11 @@ struct print_logger
 		return *this;
 	}
 
+	void flush()
+	{
+		std::cout << std::flush;
+	}
+
 private:
 	std::ofstream& logfile;
 };
