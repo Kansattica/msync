@@ -98,7 +98,32 @@ Your home timeline and notifications are saved into files named `home.list` and 
 
 ##### vim
 
-asdf
+I usually use `msync` while ssh'd into a Linux server. When I do, my program of choice is vim. You can open up every home timeline and notification list `msync` has in separate tabs like this:
+
+```
+vim -p `msync location`/**/*.list
+```
+
+If you're using Bash, you may have to run `shopt -s globstar` first. 
+
+After starting vim, I suggest you run `:bufdo set autoread` to quiet the annoying errors that pop up when you let `msync` modify the files while vim is running. Doing this might wind up putting one buffer over the one you currently have open, so consider doing this in an empty `:tabe` or simply running `:q` afterwards.
+
+`gt` and `gT` move you forward and backwards through the tabs, respectively. Run `msync` commands like this:
+
+```
+:!msync sync
+```
+
+Or, to generate a new post and open it in its own tab:
+
+```
+:!msync gen
+:tabe new_post
+```
+
+This is especially useful when you want to copy reply ids, users, and content warnings from an existing post into a reply.
+
+You can move through each list with the usual vim movement keys. Page up and page down work fine, for example. To move one post or notification at a time,  I either type `/--------` (eight is the minimum number of dashes to not match the same separator twice) or simply position my cursor on one of the separators and press `*`. Once you do this, you can use `n` to go to the next post, and `N` to go to the previous post.
 
 #### Downloading attachments
 
