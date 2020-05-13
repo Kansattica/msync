@@ -56,7 +56,7 @@ void make_new_account(const std::string& accountname, global_options& options)
 
 	if (useraccount.try_get_option(user_option::access_token) != nullptr)
 	{
-		pl() << "This user is already registered with msync.\n"
+		pl() << "This user is already registered with msync. You don't have to do anything else here.\n"
 			"If you'd like to go through the setup process again, delete the following folder in msync_accounts and try again:\n"
 			<< useraccountpair->first;
 		return;
