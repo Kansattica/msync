@@ -1,7 +1,9 @@
 # `msync` Manual
-## A low bandwidth store and forward Mastodon api client
+## A low bandwidth store and forward Mastodon client
 
 Hello! Welcome to the manual for `msync`, a store and forward command line Mastodon API client. `msync` is a piece of software with some quirks, but also some (in my opinion) really cool and powerful functionality, so a manual can be a real help. You dont have to read this from top to bottom- feel free to skim the table of contents or ctrl-F for a word or phrase related to what you want to do. Or, feel free to get ahold of me on Mastodon at [@BestGirlGrace@my.hypnovir.us](https://my.hypnovir.us/@BestGirlGrace).
+
+The rest of this document will say "Mastodon", but Pleroma should work just as well. I do some cursory testing against Pleroma, but not quite as much as I do Mastodon. They implement much the same API, and msync tries its best not to rely on Mastodonisms.
 
 ### How to start using `msync`
 
