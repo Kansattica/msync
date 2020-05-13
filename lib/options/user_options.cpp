@@ -7,6 +7,11 @@
 
 #include "../exception/msync_exception.hpp"
 
+user_options::user_options(fs::path toread) : user_directory(toread.parent_path()), backing(std::move(toread))
+{
+	backing.should_save_back = false;
+}
+
 const std::string* user_options::try_get_option(user_option toget) const
 {
 	const auto val = backing.parsed.find(USER_OPTION_NAMES[static_cast<size_t>(toget)]);
@@ -67,16 +72,19 @@ const fs::path& user_options::get_user_directory() const
 
 void user_options::set_option(user_option opt, std::string value)
 {
+	backing.should_save_back = true;
 	backing.parsed.insert_or_assign(std::string{ USER_OPTION_NAMES[static_cast<size_t>(opt)] }, std::move(value));
 }
 
 void user_options::set_option(user_option opt, list_operations value)
 {
+	backing.should_save_back = true;
 	backing.parsed.insert_or_assign(std::string{ USER_OPTION_NAMES[static_cast<size_t>(opt)] }, std::string{ LIST_OPERATION_NAMES[static_cast<size_t>(value)] });
 }
 
 void user_options::set_option(user_option opt, sync_settings value)
 {
+	backing.should_save_back = true;
 	backing.parsed.insert_or_assign(std::string{ USER_OPTION_NAMES[static_cast<size_t>(opt)] }, std::string{ SYNC_SETTING_NAMES[static_cast<size_t>(value)] });
 }
 
@@ -84,6 +92,7 @@ void user_options::set_option(user_option opt, sync_settings value)
 // I have to call it set_bool_option or else c++ will try to use this overload with char* string literals
 void user_options::set_bool_option(user_option opt, bool value)
 {
+	backing.should_save_back = true;
 	// this should save a strlen call at runtime
 	static constexpr std::string_view true_sv = "true";
 	static constexpr std::string_view false_sv = "false";

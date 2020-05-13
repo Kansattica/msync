@@ -12,6 +12,7 @@ class file_backed
 {
 public:
 	Container parsed;
+	bool should_save_back = true;
 
 	file_backed(fs::path filename) : backing(std::move(filename))
 	{
@@ -47,11 +48,13 @@ public:
 			// if they only wanted to look at the thing, don't save the changes
 		}
 
-		if (backing.empty())
-			return; // we got moved from, so the new version will save it
-
 		if (fs::exists(backing))
 		{
+			// either we got moved from, so the new version will save it, or just got told not to bother.
+			// however, we should always create a file if it doesn't exist.
+			if (!should_save_back)
+				return;
+
 			// gotta make a copy here
 			const fs::path backup = fs::path{ backing }.concat(".bak");
 #ifdef _WIN32
@@ -70,12 +73,14 @@ public:
 	file_backed(file_backed&& other) noexcept // move constructor
 		:  parsed(std::move(other.parsed)), backing(std::move(other.backing))
 	{
+		other.should_save_back = false;
 	}
 
 	file_backed& operator=(file_backed&& other) noexcept // move assignment
 	{
 		std::swap(parsed, other.parsed);
 		std::swap(backing, other.backing);
+		other.should_save_back = false;
 		return *this;
 	}
 
