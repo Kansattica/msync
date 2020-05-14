@@ -135,7 +135,7 @@ This is especially useful when you want to copy reply ids, users, and content wa
 
 You can move through each list with the usual vim movement keys. Page up and page down work fine, for example. To move one post or notification at a time,  I either type `/--------` (eight is the minimum number of dashes to not match the same separator twice) or simply position my cursor on one of the separators and press `*`. Once you do this, you can use `n` to go to the next post, and `N` to go to the previous post.
 
-If you accidentally edit a file, use `:e!` to read it again from disk. When you're done with your session, `:qa!` will close all the tabs.
+If you accidentally edit a file, use `:e!` to read it again from disk. When you're done with your session, `:qa!` will close all the tabs. And, of course, you can use `ctrl-Z` and `fg` to background and foreground vim if you prefer.
 
 #### Downloading attachments
 
