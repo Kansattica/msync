@@ -61,6 +61,9 @@ struct request_response
 template <typename make_request, typename Stream>
 request_response request_with_retries(make_request req, unsigned int retries, Stream& os)
 {
+	// Basically, before this is called, a URL is printed, and console IO buffers until it sees a newline.
+	// I want people to see the URL for the request that's happening, while it's happening.
+	os.flush();
 	const auto start_time = std::chrono::steady_clock::now();
 	for (unsigned int i = 0; i < retries; i++)
 	{
