@@ -188,10 +188,14 @@ void do_sync(const parse_result& parsed)
 		if (user == nullptr) 
 		{
 			options().foreach_account([&send](const auto& user) {
+				pl() << "Processing queue for " << user.first << '\n';
 				send.send(user.second.get_user_directory(), user.second.get_option(user_option::instance_url), user.second.get_option(user_option::access_token)); });
 		}
 		else
+		{
+			pl() << "Processing queue for " << user->first << '\n';
 			send.send(user->second.get_user_directory(), user->second.get_option(user_option::instance_url), user->second.get_option(user_option::access_token));
+		}
 	}
 
 	if (parsed.sync_opts.get)
