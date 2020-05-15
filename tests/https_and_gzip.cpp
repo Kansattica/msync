@@ -2,7 +2,7 @@
 
 #include <cpr/cpr.h>
 
-SCENARIO("Can make SSL requests to a site.")
+SCENARIO("Can make SSL requests to a site.", "[!mayfail]")
 {
 	GIVEN("An HTTPS URL")
 	{
@@ -11,6 +11,18 @@ SCENARIO("Can make SSL requests to a site.")
 		WHEN("a request is made")
 		{
 			const auto response = cpr::Get(cpr::Url{ url });
+
+			CHECKED_IF ((response.error.code == cpr::ErrorCode::CONNECTION_FAILURE ||
+				response.error.code == cpr::ErrorCode::HOST_RESOLUTION_FAILURE))
+			{
+				CAPTURE(url);
+				FAIL("Looks like I couldn't connect to the internet."
+					" If you are online, this might just be a temporary hiccup."
+					" Feel free to try again."
+					"\nThis test checks three different sites."
+					" If it only fails for one, it's likely the problem is only with that site, or only temporary, and you should be good.");
+				return;
+			}
 
 			THEN("the call is a success, the body is not empty, and the response is gzipped.")
 			{
