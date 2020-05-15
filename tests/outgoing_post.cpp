@@ -10,6 +10,8 @@
 #include "test_helpers.hpp"
 #include "../postfile/outgoing_post.hpp"
 
+#include "../lib/fixlocale/fix_locale.hpp"
+
 SCENARIO("outgoing_post correctly reads and writes posts.")
 {
 	logs_off = true;
@@ -299,10 +301,10 @@ SCENARIO("outgoing_post can handle a bunch of combinations of cooked post with t
 	}
 }
 
-SCENARIO("outgoing_post can handle a bunch of combinations of cooked post without the snip.", "[long_run][long_run_outgoingpost]")
+SCENARIO("outgoing_post can handle a bunch of combinations of cooked post without the snip.", "[long_run][long_run_outgoingpost][locale]")
 {
 	logs_off = true;
-	std::locale::global(std::locale("en_US.UTF-8"));
+	fix_locale();
 	const test_file fi = temporary_file();
 	GIVEN("A cooked text file without the snip.")
 	{
