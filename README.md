@@ -96,11 +96,13 @@ Once you have `msync` compiled, check out [MANUAL.md](MANUAL.md#msync-manual) fo
 - [X] Attachment support.
 - [ ] Following support.
 - [X] Ability to exclude notifications by type.
-- [ ] Allow choosing a default account.
+- [X] Allow choosing a default account.
+- [ ] Support for adding and removing filters.
 
 ### Roadmap (things for later)
 
 - [ ] Nicknames for accounts.
+- [ ] Dropping filtered posts.
 - [ ] Queue and send profile updates.
 - [ ] Download individual posts and threads by URL or ID.
 - [X] Poll support (polls download and render properly, voting not implemented yet).
