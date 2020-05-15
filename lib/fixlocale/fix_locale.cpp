@@ -11,5 +11,5 @@ void fix_locale()
 	{
 		std::locale::global(std::locale("en_US.UTF-8"));
 	}
-	catch (std::runtime_error) { }
+	catch (const std::runtime_error&) { }
 }
