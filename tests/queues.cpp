@@ -601,7 +601,7 @@ SCENARIO("Queues can handle a mix of different queued calls.")
 	}
 }
 
-SCENARIO("Can enqueue and dequeue files with non-ASCII paths.")
+SCENARIO("Can enqueue and dequeue files with non-ASCII paths.", "[locale]")
 {
 	fix_locale();
 

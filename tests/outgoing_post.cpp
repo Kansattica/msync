@@ -301,7 +301,7 @@ SCENARIO("outgoing_post can handle a bunch of combinations of cooked post with t
 	}
 }
 
-SCENARIO("outgoing_post can handle a bunch of combinations of cooked post without the snip.", "[long_run][long_run_outgoingpost]")
+SCENARIO("outgoing_post can handle a bunch of combinations of cooked post without the snip.", "[long_run][long_run_outgoingpost][locale]")
 {
 	logs_off = true;
 	fix_locale();

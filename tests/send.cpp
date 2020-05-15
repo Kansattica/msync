@@ -426,7 +426,7 @@ int unique_idempotency_keys(std::initializer_list<uint_fast64_t> keys)
 	return number_of_tests;
 }
 
-SCENARIO("Send correctly sends new posts and deletes existing ones.")
+SCENARIO("Send correctly sends new posts and deletes existing ones.", "[locale]")
 {
 	fix_locale();
 	logs_off = true;
