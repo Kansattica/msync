@@ -98,7 +98,7 @@ After your account is set up, running `msync sync --verbose` will connect to you
 
 #### Reading the home timeline and notifications
 
-Your home timeline and notifications are saved into files named `home.list` and `notifications.list` in your `msync_accounts` folder under the appropriate user account. You can find where these files are located by running `msync location` or `msync sync --verbose`. `msync` doesn't provide a built-in way to look at these files so that you can use your own tool. Here's a few ways that work for me to get you started.
+Your home timeline and notifications are saved into files named `home.list` and `notifications.list` in your `msync_accounts` folder under the appropriate user account. You can find where these files are located by running `msync location` or `msync sync --verbose`. `msync` doesn't provide a built-in way to look at these files. It's designed so that you can use whatever tool you prefer for reading text files. Here's a few ways that work for me to get you started.
 
 ##### vim
 
