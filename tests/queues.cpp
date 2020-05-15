@@ -7,8 +7,8 @@
 #include <string>
 #include <string_view>
 #include <algorithm>
-#include <locale>
 
+#include "../lib/fixlocale/fix_locale.hpp"
 #include "../lib/queue/queues.hpp"
 #include "../lib/constants/constants.hpp"
 #include "../lib/printlog/print_logger.hpp"
@@ -603,7 +603,7 @@ SCENARIO("Queues can handle a mix of different queued calls.")
 
 SCENARIO("Can enqueue and dequeue files with non-ASCII paths.")
 {
-	std::locale::global(std::locale("en_US.UTF-8"));
+	fix_locale();
 
 	GIVEN("Some files with non-ASCII paths.")
 	{

@@ -32,6 +32,7 @@ add_library(postfile STATIC "")
 add_library(postlist STATIC "")
 add_library(net STATIC "")
 add_library(accountdirectory STATIC "")
+add_library(fixlocale STATIC "")
 add_library(netinterface INTERFACE)
 add_library(filebacked INTERFACE)
 add_library(entities INTERFACE)
@@ -50,6 +51,7 @@ add_subdirectory(lib/options)
 add_subdirectory(lib/constants)
 add_subdirectory(lib/net)
 add_subdirectory(lib/accountdirectory)
+add_subdirectory(lib/fixlocale)
 add_subdirectory(lib/postfile)
 add_subdirectory(lib/postlist)
 add_subdirectory(lib/exception)
@@ -85,7 +87,8 @@ target_link_libraries(queue PRIVATE constants printlog filebacked exception post
 
 target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options queue postfile)
 
-target_link_libraries(msync PRIVATE options optionparsing printlog ${CPR_LIBRARIES} util nlohmannjson exception postfile queue sync net netinterface accountdirectory)
+target_link_libraries(msync PRIVATE options optionparsing printlog ${CPR_LIBRARIES} util nlohmannjson exception postfile queue sync net netinterface accountdirectory
+	fixlocale)
 
 
 if (MSYNC_BUILD_TESTS)

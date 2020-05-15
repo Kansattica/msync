@@ -4,6 +4,7 @@
 #include "../lib/netinterface/net_interface.hpp"
 #include "../lib/queue/queues.hpp"
 #include "../lib/constants/constants.hpp"
+#include "../lib/fixlocale/fix_locale.hpp"
 
 #include "test_helpers.hpp"
 #include "mock_network.hpp"
@@ -15,7 +16,6 @@
 #include <utility>
 #include <algorithm>
 #include <initializer_list>
-#include <locale>
 #include <print_logger.hpp>
 
 struct id_mock_args : public basic_mock_args
@@ -428,7 +428,7 @@ int unique_idempotency_keys(std::initializer_list<uint_fast64_t> keys)
 
 SCENARIO("Send correctly sends new posts and deletes existing ones.")
 {
-	std::locale::global(std::locale("en_US.UTF-8"));
+	fix_locale();
 	logs_off = true;
 	const test_dir dir = temporary_directory();
 

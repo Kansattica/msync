@@ -4,7 +4,6 @@
 #include <string>
 #include <string_view>
 #include <algorithm>
-#include <locale>
 
 #include "version.hpp"
 #include "../lib/options/global_options.hpp"
@@ -19,6 +18,7 @@
 #include "../lib/accountdirectory/account_directory.hpp"
 #include "new_account.hpp"
 #include "optionparsing/parse_options.hpp"
+#include "../fixlocale/fix_locale.hpp"
 
 std::pair<const std::string, user_options>& assume_account(const std::string& account);
 std::pair<const std::string, user_options>& assume_account(select_account_result user);
@@ -39,8 +39,7 @@ void print_iterable(const T& vec);
 
 int main(int argc, const char* argv[])
 {
-	//mostly for Windows so it interprets strings of type char as UTF-8 when constructing paths.
-	std::locale::global(std::locale("en_US.UTF-8"));
+	fix_locale();
 
 	plfile() << "--- msync started ---\n";
 
