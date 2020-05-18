@@ -28,6 +28,7 @@ void fix_locale()
 	//pre-10 Windows doesn't really have UTF-8 support, so just try to do it and fail silently
 
 	// later: see if I can just add a utf-8 codecvt facet to the current locale
+	// also, write a test for this
 	if (!is_utf8(std::locale().name()))
 	{
 		try
