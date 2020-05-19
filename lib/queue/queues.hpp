@@ -14,8 +14,6 @@ enum class queues
 	post
 };
 
-fs::path get_file_queue_directory(const fs::path& user_account_dir);
-
 // enqueue and dequeue mutate and move from the vector for efficiency
 void enqueue(queues toenqueue, const fs::path& user_account_dir, std::vector<std::string>&& add);
 void dequeue(queues todequeue, const fs::path& user_account_dir, std::vector<std::string>&& remove);

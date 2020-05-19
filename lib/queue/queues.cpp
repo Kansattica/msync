@@ -8,7 +8,6 @@
 #include <array>
 #include <msync_exception.hpp>
 
-
 fs::path get_file_queue_directory(const fs::path& user_account_dir)
 {
 	return user_account_dir / File_Queue_Directory;
