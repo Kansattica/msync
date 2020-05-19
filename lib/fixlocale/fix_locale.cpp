@@ -29,11 +29,15 @@ void fix_locale()
 
 	// later: see if I can just add a utf-8 codecvt facet to the current locale
 	// also, write a test for this
-	if (!is_utf8(std::locale().name()))
+	auto def = std::locale("");
+	const auto& def_codecvt = std::use_facet<std::codecvt<wchar_t, char, mbstate_t>>(def);
+	if (!is_utf8(def.name()))
 	{
 		try
 		{
-			std::locale::global(std::locale("en_US.UTF-8"));
+			auto loc = std::locale(".65001");
+			const auto& codecvt = std::use_facet<std::codecvt<wchar_t, char, mbstate_t>>(loc);
+			std::locale::global(loc);
 		}
 		catch (const std::runtime_error&) {}
 	}
