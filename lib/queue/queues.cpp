@@ -232,7 +232,7 @@ void dequeue(api_route todequeue, const fs::path& user_account_dir, std::vector<
 		std::transform(remove.begin(), remove.end(), remove.begin(), [](const auto& path) { return to_utf8(fs::path(path).filename()); });
 	}
 
-	auto toremove = to_api_calls(std::move(remove), undo_route(todequeue));
+	auto toremove = to_api_calls(std::move(remove), todequeue);
 
 	// stable_partition is O(n) (assuming it can allocate a temporary buffer)
 	// but doing a O(n) find call for each one makes it O(n^2)
