@@ -104,20 +104,19 @@ void queue_attachments(const fs::path& postfile)
 	}
 }
 
-
-api_route get_route(const api_route queue, const bool remove)
+api_route undo_route(const api_route queue)
 {
 	switch (queue)
 	{
 	case api_route::boost:
-		return remove ? api_route::unboost : api_route::boost;
+		 return api_route::unboost;
 	case api_route::fav:
-		return remove ? api_route::unfav : api_route::fav;
+		return api_route::unfav;
 	case api_route::post:
-		return remove ? api_route::unpost : api_route::post;
+		return api_route::unpost;
 	}
 
-	throw msync_exception("Whoops, that shouldn't happen in this get_route business.");
+	throw msync_exception("Whoops, that shouldn't happen in this undo_route business.");
 }
 
 std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
@@ -180,14 +179,13 @@ std::vector<api_call> to_api_calls(std::vector<std::string>&& add, api_route tar
 void enqueue(const api_route toenqueue, const fs::path& user_account_dir, std::vector<std::string>&& add)
 {
 	queue_list toaddto = open_queue(user_account_dir);
-	const auto target_route = get_route(toenqueue, false);
 
 	if (toenqueue == api_route::post)
 	{
 		const fs::path filequeuedir = get_file_queue_directory(user_account_dir);
-		std::transform(add.begin(), add.end(), std::back_inserter(toaddto.parsed), [&filequeuedir, target_route](const auto& id)
+		std::transform(add.begin(), add.end(), std::back_inserter(toaddto.parsed), [&filequeuedir, toenqueue](const auto& id)
 			{
-				return api_call{ target_route, queue_post(filequeuedir, id) };
+				return api_call{ toenqueue, queue_post(filequeuedir, id) };
 			});
 	}
 	else
@@ -208,7 +206,7 @@ void enqueue(const api_route toenqueue, const fs::path& user_account_dir, std::v
 		// favs and boosts do
 
 
-		for (api_call& incoming_call : to_api_calls(std::move(add), target_route))
+		for (api_call& incoming_call : to_api_calls(std::move(add), toenqueue))
 		{
 			if (std::find(toaddto.parsed.begin(), toaddto.parsed.end(), incoming_call) == toaddto.parsed.end())
 			{
@@ -239,7 +237,7 @@ void dequeue(api_route todequeue, const fs::path& user_account_dir, std::vector<
 		std::transform(remove.begin(), remove.end(), remove.begin(), [](const auto& path) { return to_utf8(fs::path(path).filename()); });
 	}
 
-	auto toremove = to_api_calls(std::move(remove), get_route(todequeue, false));
+	auto toremove = to_api_calls(std::move(remove), undo_route(todequeue));
 
 	// stable_partition is O(n) (assuming it can allocate a temporary buffer)
 	// but doing a O(n) find call for each one makes it O(n^2)
@@ -284,7 +282,7 @@ void dequeue(api_route todequeue, const fs::path& user_account_dir, std::vector<
 	//basically, if a thing isn't in the queue, enqueue removing that thing. unboosting, unfaving, deleting a post
 	//consider removing duplicate removes?
 
-	const auto remove_route = get_route(todequeue, true);
+	const auto remove_route = undo_route(todequeue);
 	std::for_each(toremove_pivot, toremove.end(),
 		[&toremovefrom, remove_route](api_call& queuedel) { toremovefrom.parsed.push_back(api_call{ remove_route, std::move(queuedel.argument) }); });
 }
@@ -292,8 +290,8 @@ void dequeue(api_route todequeue, const fs::path& user_account_dir, std::vector<
 void clear(api_route toclear, const fs::path& user_account_dir)
 {
 	queue_list clearthis = open_queue(user_account_dir);
-	const auto toclearinsert = get_route(toclear, true);
-	const auto toclearremove = get_route(toclear, false);
+	const auto toclearinsert = toclear;
+	const auto toclearremove = undo_route(toclear);
 
 	clearthis.parsed.erase(std::remove_if(clearthis.parsed.begin(), clearthis.parsed.end(), [toclearinsert, toclearremove](const api_call& call)
 		{
