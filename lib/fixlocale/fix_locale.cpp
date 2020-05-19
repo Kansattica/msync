@@ -29,15 +29,14 @@ void fix_locale()
 
 	// later: see if I can just add a utf-8 codecvt facet to the current locale
 	// also, write a test for this
-	auto def = std::locale("");
-	const auto& def_codecvt = std::use_facet<std::codecvt<wchar_t, char, mbstate_t>>(def);
-	if (!is_utf8(def.name()))
+
+	// calling locale with an empty string is supposed to get the user's preferred locale settings
+	// it hasn't on any Windows machine I've tried, but it's worth checking, I guess?
+	if (!is_utf8(std::locale("").name()))
 	{
 		try
 		{
-			auto loc = std::locale(".65001");
-			const auto& codecvt = std::use_facet<std::codecvt<wchar_t, char, mbstate_t>>(loc);
-			std::locale::global(loc);
+			std::locale::global(std::locale(".65001"));
 		}
 		catch (const std::runtime_error&) {}
 	}
