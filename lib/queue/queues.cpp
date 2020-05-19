@@ -105,15 +105,15 @@ void queue_attachments(const fs::path& postfile)
 }
 
 
-api_route get_route(const queues queue, const bool remove)
+api_route get_route(const api_route queue, const bool remove)
 {
 	switch (queue)
 	{
-	case queues::boost:
+	case api_route::boost:
 		return remove ? api_route::unboost : api_route::boost;
-	case queues::fav:
+	case api_route::fav:
 		return remove ? api_route::unfav : api_route::fav;
-	case queues::post:
+	case api_route::post:
 		return remove ? api_route::unpost : api_route::post;
 	}
 
@@ -177,12 +177,12 @@ std::vector<api_call> to_api_calls(std::vector<std::string>&& add, api_route tar
 	return to_return;
 }
 
-void enqueue(const queues toenqueue, const fs::path& user_account_dir, std::vector<std::string>&& add)
+void enqueue(const api_route toenqueue, const fs::path& user_account_dir, std::vector<std::string>&& add)
 {
 	queue_list toaddto = open_queue(user_account_dir);
 	const auto target_route = get_route(toenqueue, false);
 
-	if (toenqueue == queues::post)
+	if (toenqueue == api_route::post)
 	{
 		const fs::path filequeuedir = get_file_queue_directory(user_account_dir);
 		std::transform(add.begin(), add.end(), std::back_inserter(toaddto.parsed), [&filequeuedir, target_route](const auto& id)
@@ -229,11 +229,11 @@ void dequeue_post(const fs::path& queuedir, const fs::path& filename)
 	}
 }
 
-void dequeue(queues todequeue, const fs::path& user_account_dir, std::vector<std::string>&& remove)
+void dequeue(api_route todequeue, const fs::path& user_account_dir, std::vector<std::string>&& remove)
 {
 	queue_list toremovefrom = open_queue(user_account_dir);
 
-	if (todequeue == queues::post)
+	if (todequeue == api_route::post)
 	{
 		// trim path names 
 		std::transform(remove.begin(), remove.end(), remove.begin(), [](const auto& path) { return to_utf8(fs::path(path).filename()); });
@@ -272,7 +272,7 @@ void dequeue(queues todequeue, const fs::path& user_account_dir, std::vector<std
 			return std::find(removefrom_pivot, toremovefrom.parsed.end(), id) != toremovefrom.parsed.end();
 		});
 
-	if (todequeue == queues::post)
+	if (todequeue == api_route::post)
 	{
 		const fs::path filequeuedir = get_file_queue_directory(user_account_dir);
 		std::for_each(toremove.begin(), toremove_pivot,
@@ -289,7 +289,7 @@ void dequeue(queues todequeue, const fs::path& user_account_dir, std::vector<std
 		[&toremovefrom, remove_route](api_call& queuedel) { toremovefrom.parsed.push_back(api_call{ remove_route, std::move(queuedel.argument) }); });
 }
 
-void clear(queues toclear, const fs::path& user_account_dir)
+void clear(api_route toclear, const fs::path& user_account_dir)
 {
 	queue_list clearthis = open_queue(user_account_dir);
 	const auto toclearinsert = get_route(toclear, true);
@@ -301,7 +301,7 @@ void clear(queues toclear, const fs::path& user_account_dir)
 		}), clearthis.parsed.end());
 
 
-	if (toclear == queues::post)
+	if (toclear == api_route::post)
 	{
 		fs::remove_all(get_file_queue_directory(user_account_dir));
 	}

@@ -918,7 +918,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 			THEN("the correct queue is selected.")
 			{
-				REQUIRE(result.queue_opt.selected == queues::fav);
+				REQUIRE(result.queue_opt.selected == api_route::fav);
 			}
 
 			THEN("the post IDs are parsed.")
@@ -950,7 +950,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 			THEN("the correct queue is selected")
 			{
-				REQUIRE(result.queue_opt.selected == queues::boost);
+				REQUIRE(result.queue_opt.selected == api_route::boost);
 			}
 
 			THEN("the post IDs are parsed.")
@@ -982,7 +982,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 			THEN("the correct queue is selected")
 			{
-				REQUIRE(result.queue_opt.selected == queues::post);
+				REQUIRE(result.queue_opt.selected == api_route::post);
 			}
 
 			THEN("the post IDs are parsed.")
@@ -1014,7 +1014,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 			THEN("the correct queue is selected")
 			{
-				REQUIRE(result.queue_opt.selected == queues::post);
+				REQUIRE(result.queue_opt.selected == api_route::post);
 			}
 
 			THEN("the correct action is selected.")

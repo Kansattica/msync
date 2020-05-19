@@ -159,8 +159,8 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 	constexpr std::string_view accesstoken = "sometoken";
 
 	const auto queue = GENERATE(
-		std::make_tuple(queues::fav, "/favourite", "/unfavourite", "FAV "),
-		std::make_tuple(queues::boost, "/reblog", "/unreblog", "BOOST "));
+		std::make_tuple(api_route::fav, "/favourite", "/unfavourite", "FAV "),
+		std::make_tuple(api_route::boost, "/reblog", "/unreblog", "BOOST "));
 
 	const std::vector<std::string> testvect = GENERATE(
 		std::vector<std::string>{ "someid", "someotherid", "mrid" },
@@ -476,7 +476,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[locale]"
 			fourth.parsed.vis = visibility::unlisted;
 		}
 
-		enqueue(queues::post, account, std::vector<std::string>{expected_files});
+		enqueue(api_route::post, account, std::vector<std::string>{expected_files});
 
 		mock_network_post mockpost;
 		mock_network_delete mockdel;
@@ -913,11 +913,11 @@ SCENARIO("Send correctly sends from and modifies a queue of mixed API calls.")
 
 	GIVEN("A queue with some ids to add and a good connection")
 	{
-		dequeue(queues::boost, account, { "worstpost" });
-		enqueue(queues::boost, account, { "somekindapost", "anotherkindapost" });
-		enqueue(queues::fav, account, { "somekindapost", "mrs. goodpost" });
-		dequeue(queues::post, account, { "real stinker" });
-		dequeue(queues::fav, account, { "badpost" });
+		dequeue(api_route::boost, account, { "worstpost" });
+		enqueue(api_route::boost, account, { "somekindapost", "anotherkindapost" });
+		enqueue(api_route::fav, account, { "somekindapost", "mrs. goodpost" });
+		dequeue(api_route::post, account, { "real stinker" });
+		dequeue(api_route::fav, account, { "badpost" });
 
 		WHEN("the queue is sent")
 		{

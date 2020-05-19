@@ -3,7 +3,7 @@
 #include <iostream>                              // for ostream, cout
 #include <print_logger.hpp>                      // for verbose_logs
 #include "../../lib/postfile/outgoing_post.hpp"  // for post_content
-#include "../../lib/queue/queues.hpp"            // for queues, queues::boost
+#include "../../lib/queue/queues.hpp"            // for queues, api_route::boost
 
 using namespace clipp;
 
@@ -97,9 +97,9 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 				option("-c", "--clear").set(ret.queue_opt.to_do, queue_action::clear).doc("Remove everything in the specified queue.")) %
 			"queue options",
 			one_of(
-				command("fav").set(ret.queue_opt.selected, queues::fav) & opt_values("post ids", ret.queue_opt.queued),
-				command("boost").set(ret.queue_opt.selected, queues::boost) & opt_values("post ids", ret.queue_opt.queued),
-				command("post").set(ret.queue_opt.selected, queues::post) & opt_values("filenames", ret.queue_opt.queued),
+				command("fav").set(ret.queue_opt.selected, api_route::fav) & opt_values("post ids", ret.queue_opt.queued),
+				command("boost").set(ret.queue_opt.selected, api_route::boost) & opt_values("post ids", ret.queue_opt.queued),
+				command("post").set(ret.queue_opt.selected, api_route::post) & opt_values("filenames", ret.queue_opt.queued),
 				command("print").set(ret.queue_opt.to_do, queue_action::print))
 			.doc("queue commands"));
 
