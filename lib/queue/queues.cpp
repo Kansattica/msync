@@ -114,9 +114,10 @@ api_route undo_route(const api_route queue)
 		return api_route::unfav;
 	case api_route::post:
 		return api_route::unpost;
+	default:
+		throw msync_exception("Whoops, that shouldn't happen in this undo_route business.");
 	}
 
-	throw msync_exception("Whoops, that shouldn't happen in this undo_route business.");
 }
 
 std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
