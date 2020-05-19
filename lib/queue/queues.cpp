@@ -200,11 +200,6 @@ void enqueue(const api_route toenqueue, const fs::path& user_account_dir, std::v
 		// you could argue that order doesn't matter for favs and boosts, and I think that, too, but 
 		// - it absolutely matters for posts, especially since posts can be replies to others
 		// - if this part of the program is called 'queue', it should implement a queue
-		// - if I had to write this again, I'd probably not have separate queues for boosts and favs, and just
-		// have it be a big list of API calls to make. I'm probably going to revisit that decision once I start 
-		// adding profile updates, poll voting, and other stuff that can get the "fire and forget" treatment like
-		// favs and boosts do
-
 
 		for (api_call& incoming_call : to_api_calls(std::move(add), toenqueue))
 		{
