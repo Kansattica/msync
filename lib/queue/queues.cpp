@@ -33,8 +33,8 @@ bool validate_file(const fs::path& attachpath)
 	constexpr auto eight_megabytes = 8 * 1024 * 1024;
 	constexpr auto forty_megabytes = 40 * 1024 * 1024;
 
-	//basically, if you don't do this .string() thing when printing a path, Windows wraps it in quotes and escapes the backslashes
-	//I think .native() avoids an allocation, but that doesn't actually compile on MSVC when I tried
+	//basically, if you don't convert to a string when printing a path, it gets wrapped in quotes and escapes the backslashes
+	//and, on Windows, you want to convert to a UTF-8 string to maintain msync's UTF-8 everywhere promise.
 	if (!fs::is_regular_file(attachpath))
 	{
 		pl() << to_utf8(attachpath) << " is not a regular file. Skipping.\n";
