@@ -8,14 +8,10 @@
 #include <string_view>
 #include <algorithm>
 #include <utility>
-#include <tuple> // for std::tie
 #include <deque>
-#include <optional>
-#include <unordered_map>
 
 #include "../netinterface/net_interface.hpp"
 #include "../queue/queues.hpp"
-#include "../util/util.hpp"
 #include "../postfile/outgoing_post.hpp"
 #include "../constants/constants.hpp"
 
