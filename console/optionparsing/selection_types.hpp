@@ -24,7 +24,7 @@ struct queue_options
 {
 	std::vector<std::string> queued;
 	queue_action to_do = queue_action::add;
-	queues selected;
+	api_route selected;
 };
 
 struct gen_options

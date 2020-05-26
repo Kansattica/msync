@@ -8,7 +8,6 @@
 #include <array>
 #include <msync_exception.hpp>
 
-
 fs::path get_file_queue_directory(const fs::path& user_account_dir)
 {
 	return user_account_dir / File_Queue_Directory;
@@ -34,8 +33,8 @@ bool validate_file(const fs::path& attachpath)
 	constexpr auto eight_megabytes = 8 * 1024 * 1024;
 	constexpr auto forty_megabytes = 40 * 1024 * 1024;
 
-	//basically, if you don't do this .string() thing when printing a path, Windows wraps it in quotes and escapes the backslashes
-	//I think .native() avoids an allocation, but that doesn't actually compile on MSVC when I tried
+	//basically, if you don't convert to a string when printing a path, it gets wrapped in quotes and escapes the backslashes
+	//and, on Windows, you want to convert to a UTF-8 string to maintain msync's UTF-8 everywhere promise.
 	if (!fs::is_regular_file(attachpath))
 	{
 		pl() << to_utf8(attachpath) << " is not a regular file. Skipping.\n";
@@ -105,20 +104,20 @@ void queue_attachments(const fs::path& postfile)
 	}
 }
 
-
-api_route get_route(const queues queue, const bool remove)
+api_route undo_route(const api_route queue)
 {
 	switch (queue)
 	{
-	case queues::boost:
-		return remove ? api_route::unboost : api_route::boost;
-	case queues::fav:
-		return remove ? api_route::unfav : api_route::fav;
-	case queues::post:
-		return remove ? api_route::unpost : api_route::post;
+	case api_route::boost:
+		 return api_route::unboost;
+	case api_route::fav:
+		return api_route::unfav;
+	case api_route::post:
+		return api_route::unpost;
+	default:
+		throw msync_exception("Whoops, that shouldn't happen in this undo_route business.");
 	}
 
-	throw msync_exception("Whoops, that shouldn't happen in this get_route business.");
 }
 
 std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
@@ -178,17 +177,16 @@ std::vector<api_call> to_api_calls(std::vector<std::string>&& add, api_route tar
 	return to_return;
 }
 
-void enqueue(const queues toenqueue, const fs::path& user_account_dir, std::vector<std::string>&& add)
+void enqueue(const api_route toenqueue, const fs::path& user_account_dir, std::vector<std::string>&& add)
 {
 	queue_list toaddto = open_queue(user_account_dir);
-	const auto target_route = get_route(toenqueue, false);
 
-	if (toenqueue == queues::post)
+	if (toenqueue == api_route::post)
 	{
 		const fs::path filequeuedir = get_file_queue_directory(user_account_dir);
-		std::transform(add.begin(), add.end(), std::back_inserter(toaddto.parsed), [&filequeuedir, target_route](const auto& id)
+		std::transform(add.begin(), add.end(), std::back_inserter(toaddto.parsed), [&filequeuedir, toenqueue](const auto& id)
 			{
-				return api_call{ target_route, queue_post(filequeuedir, id) };
+				return api_call{ toenqueue, queue_post(filequeuedir, id) };
 			});
 	}
 	else
@@ -203,13 +201,8 @@ void enqueue(const queues toenqueue, const fs::path& user_account_dir, std::vect
 		// you could argue that order doesn't matter for favs and boosts, and I think that, too, but 
 		// - it absolutely matters for posts, especially since posts can be replies to others
 		// - if this part of the program is called 'queue', it should implement a queue
-		// - if I had to write this again, I'd probably not have separate queues for boosts and favs, and just
-		// have it be a big list of API calls to make. I'm probably going to revisit that decision once I start 
-		// adding profile updates, poll voting, and other stuff that can get the "fire and forget" treatment like
-		// favs and boosts do
 
-
-		for (api_call& incoming_call : to_api_calls(std::move(add), target_route))
+		for (api_call& incoming_call : to_api_calls(std::move(add), toenqueue))
 		{
 			if (std::find(toaddto.parsed.begin(), toaddto.parsed.end(), incoming_call) == toaddto.parsed.end())
 			{
@@ -230,17 +223,17 @@ void dequeue_post(const fs::path& queuedir, const fs::path& filename)
 	}
 }
 
-void dequeue(queues todequeue, const fs::path& user_account_dir, std::vector<std::string>&& remove)
+void dequeue(api_route todequeue, const fs::path& user_account_dir, std::vector<std::string>&& remove)
 {
 	queue_list toremovefrom = open_queue(user_account_dir);
 
-	if (todequeue == queues::post)
+	if (todequeue == api_route::post)
 	{
 		// trim path names 
 		std::transform(remove.begin(), remove.end(), remove.begin(), [](const auto& path) { return to_utf8(fs::path(path).filename()); });
 	}
 
-	auto toremove = to_api_calls(std::move(remove), get_route(todequeue, false));
+	auto toremove = to_api_calls(std::move(remove), todequeue);
 
 	// stable_partition is O(n) (assuming it can allocate a temporary buffer)
 	// but doing a O(n) find call for each one makes it O(n^2)
@@ -273,7 +266,7 @@ void dequeue(queues todequeue, const fs::path& user_account_dir, std::vector<std
 			return std::find(removefrom_pivot, toremovefrom.parsed.end(), id) != toremovefrom.parsed.end();
 		});
 
-	if (todequeue == queues::post)
+	if (todequeue == api_route::post)
 	{
 		const fs::path filequeuedir = get_file_queue_directory(user_account_dir);
 		std::for_each(toremove.begin(), toremove_pivot,
@@ -285,16 +278,16 @@ void dequeue(queues todequeue, const fs::path& user_account_dir, std::vector<std
 	//basically, if a thing isn't in the queue, enqueue removing that thing. unboosting, unfaving, deleting a post
 	//consider removing duplicate removes?
 
-	const auto remove_route = get_route(todequeue, true);
+	const auto remove_route = undo_route(todequeue);
 	std::for_each(toremove_pivot, toremove.end(),
 		[&toremovefrom, remove_route](api_call& queuedel) { toremovefrom.parsed.push_back(api_call{ remove_route, std::move(queuedel.argument) }); });
 }
 
-void clear(queues toclear, const fs::path& user_account_dir)
+void clear(api_route toclear, const fs::path& user_account_dir)
 {
 	queue_list clearthis = open_queue(user_account_dir);
-	const auto toclearinsert = get_route(toclear, true);
-	const auto toclearremove = get_route(toclear, false);
+	const auto toclearinsert = toclear;
+	const auto toclearremove = undo_route(toclear);
 
 	clearthis.parsed.erase(std::remove_if(clearthis.parsed.begin(), clearthis.parsed.end(), [toclearinsert, toclearremove](const api_call& call)
 		{
@@ -302,7 +295,7 @@ void clear(queues toclear, const fs::path& user_account_dir)
 		}), clearthis.parsed.end());
 
 
-	if (toclear == queues::post)
+	if (toclear == api_route::post)
 	{
 		fs::remove_all(get_file_queue_directory(user_account_dir));
 	}

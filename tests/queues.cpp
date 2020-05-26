@@ -35,8 +35,8 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 		WHEN("some items are enqueued")
 		{
 			const auto totest = GENERATE(
-				std::make_tuple(queues::boost, "BOOST "sv, "UNBOOST "sv),
-				std::make_tuple(queues::fav, "FAV "sv, "UNFAV "sv)
+				std::make_tuple(api_route::boost, "BOOST "sv, "UNBOOST "sv),
+				std::make_tuple(api_route::fav, "FAV "sv, "UNFAV "sv)
 				);
 
 			std::vector<std::string> someids{ "12345", "67890", "123123123123123123123", "longtextboy", "friend" };
@@ -165,7 +165,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 			std::vector<std::string> toq{ postfiles[idx].filename().string() };
 			std::string justfilename = postfiles[idx].filename().filename().string();
 
-			enqueue(queues::post, accountdir, std::vector<std::string>{toq});
+			enqueue(api_route::post, accountdir, std::vector<std::string>{toq});
 
 			THEN("the post is copied to the user's account folder")
 			{
@@ -181,7 +181,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 			AND_WHEN("that post is dequeued")
 			{
-				dequeue(queues::post, accountdir, std::move(toq));
+				dequeue(api_route::post, accountdir, std::move(toq));
 
 				CAPTURE(justfilename);
 				THEN("msync's copy of the post is deleted")
@@ -210,7 +210,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 			AND_WHEN("the list is cleared")
 			{
-				clear(queues::post, accountdir);
+				clear(api_route::post, accountdir);
 
 				THEN("the queue file is empty.")
 				{
@@ -247,7 +247,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 		WHEN("the post is enqueued")
 		{
-			enqueue(queues::post, accountdir, { "somepost" });
+			enqueue(api_route::post, accountdir, { "somepost" });
 
 			THEN("the text is as expected")
 			{
@@ -280,7 +280,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 		WHEN("both are enqueued")
 		{
-			enqueue(queues::post, accountdir, std::vector<std::string>{ postfiles[0].filename().string(), postfiles[1].filename().string() });
+			enqueue(api_route::post, accountdir, std::vector<std::string>{ postfiles[0].filename().string(), postfiles[1].filename().string() });
 
 			const fs::path unsuffixedname = file_queue_dir / "thisisapost.hi";
 			const fs::path suffixedname = file_queue_dir / "thisisapost.hi.1";
@@ -323,7 +323,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 				std::string thisfile = idx == 0 ? "thisisapost.hi" : "thisisapost.hi.1";
 				std::string otherfile = idx == 1 ? "thisisapost.hi" : "thisisapost.hi.1";
 
-				dequeue(queues::post, accountdir, std::vector<std::string> { thisfile });
+				dequeue(api_route::post, accountdir, std::vector<std::string> { thisfile });
 
 				THEN("msync's copy of the dequeued file is deleted.")
 				{
@@ -351,7 +351,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 			AND_WHEN("the list is cleared")
 			{
-				clear(queues::post, accountdir);
+				clear(api_route::post, accountdir);
 
 				THEN("the queue file is empty.")
 				{
@@ -380,7 +380,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 		WHEN("both are enqueued")
 		{
-			enqueue(queues::post, accountdir, std::vector<std::string>{ postfiles[0].filename().string(), postfiles[1].filename().string() });
+			enqueue(api_route::post, accountdir, std::vector<std::string>{ postfiles[0].filename().string(), postfiles[1].filename().string() });
 
 			const fs::path unsuffixedname = file_queue_dir / "thisisapost";
 			const fs::path suffixedname = file_queue_dir / "thisisapost.1";
@@ -423,7 +423,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 				std::string thisfile = idx == 0 ? "thisisapost" : "thisisapost.1";
 				std::string otherfile = idx == 1 ? "thisisapost" : "thisisapost.1";
 
-				dequeue(queues::post, accountdir, std::vector<std::string> { thisfile });
+				dequeue(api_route::post, accountdir, std::vector<std::string> { thisfile });
 
 				THEN("msync's copy of the dequeued file is deleted.")
 				{
@@ -451,7 +451,7 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 			AND_WHEN("the list is cleared")
 			{
-				clear(queues::post, accountdir);
+				clear(api_route::post, accountdir);
 
 				THEN("the queue file is empty.")
 				{
@@ -492,24 +492,24 @@ SCENARIO("Queues can handle a mix of different queued calls.")
 		{
 			REQUIRE(!fs::exists(queue_file));
 
-			dequeue(queues::post, accountdir, { "69420", "somepost", "a real lousy one" });
+			dequeue(api_route::post, accountdir, { "69420", "somepost", "a real lousy one" });
 
 			REQUIRE(read_lines(queue_file) == std::vector<std::string>{"UNPOST 69420", "UNPOST somepost", "UNPOST a real lousy one"});
 
-			enqueue(queues::boost, accountdir, { "boosty", "cool guy", "friend!", "someone else" });
+			enqueue(api_route::boost, accountdir, { "boosty", "cool guy", "friend!", "someone else" });
 
 			REQUIRE(read_lines(queue_file) == 
 				std::vector<std::string>{"UNPOST 69420", "UNPOST somepost", "UNPOST a real lousy one",
 					"BOOST boosty", "BOOST cool guy", "BOOST friend!", "BOOST someone else" });
 
-			enqueue(queues::fav, accountdir, { "favvy", "cool guy", "friend!" });
+			enqueue(api_route::fav, accountdir, { "favvy", "cool guy", "friend!" });
 
 			REQUIRE(read_lines(queue_file) == 
 				std::vector<std::string>{"UNPOST 69420", "UNPOST somepost", "UNPOST a real lousy one",
 					"BOOST boosty", "BOOST cool guy", "BOOST friend!", "BOOST someone else",
 					"FAV favvy", "FAV cool guy", "FAV friend!" });
 
-			dequeue(queues::boost, accountdir, { "someone else", "cool guy", "whoopsie" });
+			dequeue(api_route::boost, accountdir, { "someone else", "cool guy", "whoopsie" });
 
 			REQUIRE(read_lines(queue_file) == 
 				std::vector<std::string>{"UNPOST 69420", "UNPOST somepost", "UNPOST a real lousy one",
@@ -517,7 +517,7 @@ SCENARIO("Queues can handle a mix of different queued calls.")
 					"FAV favvy", "FAV cool guy", "FAV friend!",
 					"UNBOOST whoopsie"});
 
-			enqueue(queues::post, accountdir, { "one post" });
+			enqueue(api_route::post, accountdir, { "one post" });
 
 			REQUIRE(read_lines(queue_file) == 
 				std::vector<std::string>{"UNPOST 69420", "UNPOST somepost", "UNPOST a real lousy one",
@@ -528,7 +528,7 @@ SCENARIO("Queues can handle a mix of different queued calls.")
 
 			REQUIRE(read_lines(file_queue_dir / "one post") == std::vector<std::string> { "visibility=default", "--- post body below this line ---", "hey, I'm number 1" });
 
-			dequeue(queues::fav, accountdir, { "friend!", "whoopsie", "sorry about that" });
+			dequeue(api_route::fav, accountdir, { "friend!", "whoopsie", "sorry about that" });
 
 			REQUIRE(read_lines(queue_file) == 
 				std::vector<std::string>{"UNPOST 69420", "UNPOST somepost", "UNPOST a real lousy one",
@@ -538,7 +538,7 @@ SCENARIO("Queues can handle a mix of different queued calls.")
 					"POST one post",
 					"UNFAV whoopsie", "UNFAV sorry about that"});
 
-			enqueue(queues::fav, accountdir, { "sorry about that" });
+			enqueue(api_route::fav, accountdir, { "sorry about that" });
 
 			REQUIRE(read_lines(queue_file) == 
 				std::vector<std::string>{"UNPOST 69420", "UNPOST somepost", "UNPOST a real lousy one",
@@ -551,7 +551,7 @@ SCENARIO("Queues can handle a mix of different queued calls.")
 
 			AND_WHEN("The post queue is cleared.")
 			{
-				clear(queues::post, accountdir);
+				clear(api_route::post, accountdir);
 
 				THEN("The file is as expected.")
 				{
@@ -571,7 +571,7 @@ SCENARIO("Queues can handle a mix of different queued calls.")
 
 			AND_WHEN("The fav queue is cleared.")
 			{
-				clear(queues::fav, accountdir);
+				clear(api_route::fav, accountdir);
 
 				THEN("The file is as expected.")
 				{
@@ -585,7 +585,7 @@ SCENARIO("Queues can handle a mix of different queued calls.")
 
 			AND_WHEN("The boost queue is cleared.")
 			{
-				clear(queues::boost, accountdir);
+				clear(api_route::boost, accountdir);
 
 				THEN("The file is as expected.")
 				{
@@ -631,7 +631,7 @@ SCENARIO("Can enqueue and dequeue files with non-ASCII paths.", "[locale]")
 			const fs::path file_queue_dir = accountdir / File_Queue_Directory;
 			const fs::path queue_file = accountdir / Queue_Filename;
 
-			enqueue(queues::post, accountdir, std::vector<std::string> {
+			enqueue(api_route::post, accountdir, std::vector<std::string> {
 				u8"a friend.txt", u8"your 🤠 friend.txt",
 				u8"cool🦹‍♀️zone/a friend.txt", u8"cool🦹‍♀️zone/your 🤠 friend.txt"
 			});
@@ -656,7 +656,7 @@ SCENARIO("Can enqueue and dequeue files with non-ASCII paths.", "[locale]")
 
 			AND_WHEN("Some of those files are dequeued.")
 			{
-				dequeue(queues::post, accountdir, std::vector<std::string> {
+				dequeue(api_route::post, accountdir, std::vector<std::string> {
 						 u8"your 🤠 friend.txt", u8"a friend.txt.1"
 				});
 
