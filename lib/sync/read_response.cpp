@@ -26,7 +26,7 @@ std::string read_error(const std::string_view response_json)
 	// from nginx, for instance
 	if (parsed == json::value_t::discarded)
 	{
-		return "";
+		return {};
 	}
 
 	return get_if_set<std::string>(parsed, "error"sv);
