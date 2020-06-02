@@ -7,8 +7,8 @@
 class msync_exception : public std::exception
 {
 public:
-	msync_exception(const char* what_arg) : noalloc_what_msg(what_arg) {}
-	msync_exception(std::string what_arg) : what_msg(what_arg) {}
+	msync_exception(const char* what_arg) noexcept : noalloc_what_msg(what_arg) {}
+	msync_exception(std::string what_arg) noexcept : what_msg(std::move(what_arg)) {}
 	const char* what() const noexcept
 	{
 		if (noalloc_what_msg != nullptr)
