@@ -27,14 +27,15 @@ net_response handle_response(cpr::Response&& response)
 
 	to_return.status_code = response.status_code;
 
-	to_return.retryable_error = response.error.code == cpr::ErrorCode::OPERATION_TIMEDOUT || (response.status_code >= 500 && response.status_code < 600);
+	// Some timeouts look like CONNECTION_FAILUREs and should be retried.
+	to_return.retryable_error = response.error.code == cpr::ErrorCode::OPERATION_TIMEDOUT || response.error.code == cpr::ErrorCode::CONNECTION_FAILURE || (response.status_code >= 500 && response.status_code < 600);
 
-	// I don't think we can trust response.error, it says OK even if the status code is 400 something
+	// I think response.error refers to whether curl itself reported an error, as opposed to the remote server
 	to_return.okay = !response.error && response.status_code >= 200 && response.status_code < 300;
 
 	// if we're not okay, try and get the error message
 	// but this is only some kinds of error.
-	// if Mastodon returns an error (and not nginx),
+	// if Mastodon returns an error (and not nginx or curl),
 	// then response.error.message will be empty, but response.text will have important stuff in it
 	// for example, if the user sends a bad post, you'll get a 422 and the error is in response.text
 
