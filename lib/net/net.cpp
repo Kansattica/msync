@@ -27,8 +27,14 @@ net_response handle_response(cpr::Response&& response)
 
 	to_return.status_code = response.status_code;
 
+	to_return.retryable_error = response.error.code == cpr::ErrorCode::OPERATION_TIMEDOUT || (response.status_code >= 500 && response.status_code < 600);
+
 	// Some timeouts look like CONNECTION_FAILUREs and should be retried.
-	to_return.retryable_error = response.error.code == cpr::ErrorCode::OPERATION_TIMEDOUT || response.error.code == cpr::ErrorCode::CONNECTION_FAILURE || (response.status_code >= 500 && response.status_code < 600);
+	if (!to_return.retryable_error && response.error.code == cpr::ErrorCode::CONNECTION_FAILURE)
+	{
+		constexpr std::string_view timed_out {"timed out"};
+		to_return.retryable_error = response.error.message.find(timed_out) != std::string::npos;
+	}
 
 	// I think response.error refers to whether curl itself reported an error, as opposed to the remote server
 	to_return.okay = !response.error && response.status_code >= 200 && response.status_code < 300;
