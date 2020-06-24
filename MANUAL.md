@@ -118,6 +118,12 @@ After starting vim, I suggest you run `:bufdo set autoread` to quiet the annoyin
 :q
 ```
 
+Alternatively, you can simply add this line to your `.vimrc`.
+
+```
+set autoread
+```
+
 `gt` and `gT` move you forward and backwards through the tabs, respectively. Run `msync` commands like this:
 
 ```
