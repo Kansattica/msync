@@ -107,6 +107,7 @@ Once you have `msync` compiled, check out [MANUAL.md](MANUAL.md#msync-manual) fo
 - [ ] Download individual posts and threads by URL or ID.
 - [X] Poll support (polls download and render properly, voting not implemented yet).
 - [ ] Nicer UI, like a minimal webpage to show downloaded posts in.
+- [ ] Save sync progress when msync is killed by ctrl-C.
 - [ ] [A proper manual for the weirder ins and outs of msync.](MANUAL.md)
 
 ### Build Dependencies
