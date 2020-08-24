@@ -93,7 +93,7 @@ After your account is set up, running `msync sync --verbose` will connect to you
 - Especially when using `--max-requests`, tell `msync` whether you want it to get the newest posts first or the oldest by using `msync config sync (home|notifications) (newest|oldest|off)`
 - If you plan on always syncing every message every time, instead of using `--max-requests`, I suggest using `oldest` instead of `newest`. When syncing oldest-first, `msync` can write the messages to disk as they come in, letting you see the files update immediately AND not having to store every message in memory until the end.
 - Note that you can also not sync a timeline at all with `msync config sync home off`
-- If you don't care about a specific type of notification, you can stop `msync` from retrieving them when you sync with `msync config exclude_boosts true`, and same for `favs`, `follows`, `mentions`, and `polls`. `msync` treats anything start with a `t`, `T`, `y`, or `Y` as truthy, and everything else as falsy. So `exclude_favs true`, `exclude_favs YES`, and `exclude_favs Yeehaw` are equivalent.
+- If you don't care about a specific type of notification, you can stop `msync` from retrieving them when you sync with `msync config exclude_boosts true`, and same for `favs`, `follows`, `mentions`, and `polls`. `msync` treats anything starting with a `t`, `T`, `y`, or `Y` as truthy, and everything else as falsy. So `exclude_favs true`, `exclude_favs YES`, and `exclude_favs Yeehaw` are equivalent.
 - I'll write more about configuration later, but for now, you can see all your settings and registered accounts with `msync config showall`.
 
 #### Reading the home timeline and notifications
