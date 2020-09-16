@@ -6,6 +6,7 @@
 #include <utility>
 #include <optional>
 #include <vector>
+#include <chrono>
 
 std::string make_api_url(std::string_view instance_url, std::string_view api_route);
 
@@ -19,6 +20,7 @@ std::optional<parsed_account> parse_account_name(const std::string& name);
 
 std::string clean_up_html(std::string_view to_strip);
 std::string& bulk_replace_mentions(std::string& str, const std::vector<std::pair<std::string_view, std::string_view>>& to_replace);
+std::chrono::system_clock::time_point parse_ISO8601_timestamp(const std::string& timestamp);
 
 template <bool allowEmpty = false>
 std::vector<std::string_view> split_string(const std::string_view tosplit, const char on)
@@ -63,5 +65,7 @@ void join_iterable(Iterator begin, Iterator end, const Sep& sep, Stream& stream)
 			stream << sep;
 	}
 }
+
+
 
 #endif

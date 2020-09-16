@@ -3,4 +3,5 @@ target_sources_local(util
 	util.cpp
 	util.hpp
 	entities.c
+	utc.cpp
 	)

@@ -1,6 +1,10 @@
 #include "util.hpp"
 
 #include <regex>
+#include <sstream>
+#include <iomanip>
+
+#include "utc.cpp"
 
 std::string make_api_url(const std::string_view instance_url, const std::string_view api_route)
 {
@@ -21,6 +25,22 @@ std::optional<parsed_account> parse_account_name(const std::string& name)
 	}
 
 	return {};
+}
+
+std::chrono::system_clock::time_point parse_ISO8601_timestamp(const std::string& timestamp)
+{
+	//adapted from https://stackoverflow.com/a/13790747/5587653
+	constexpr auto format = "%Y-%m-%dT%H:%M:%S";
+
+	struct tm tm;
+
+	std::istringstream iss(timestamp);
+	iss >> std::get_time(&tm, format);
+
+	tm.tm_isdst = -1; //autodetermine whether we're in DST
+	
+	const auto time = timegm_const(&tm);
+	return std::chrono::system_clock::from_time_t(time);
 }
 
 // if src is null, modifies dest in place

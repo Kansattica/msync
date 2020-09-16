@@ -465,3 +465,47 @@ SCENARIO("bulk_replace_mentions finds and replaces all its arguments in a string
 
 	}
 }
+
+struct time_test_case
+{
+	std::string timestamp;
+	int year;
+	int mon;
+	int day;
+	int hour;
+	int min;
+	int sec;
+};
+
+SCENARIO("We can correctly parse ISO 8601 timestamps.")
+{
+	GIVEN("An ISO 8601 timestamp in UTC.")
+	{
+		// we ignore the decimal portion of the time
+		const auto test_case = GENERATE(
+			time_test_case{ "2020-09-15T18:15:22.938077Z", 120, 8, 15, 18, 15, 22 },
+			time_test_case{ "2020-09-15T18:15:00.928077Z", 120, 8, 15, 18, 15, 0 },
+			time_test_case{ "2025-11-25T22:02:52.123412Z", 125, 10, 25, 22, 2, 52 }
+		);
+
+		WHEN("The timestamp is parsed.")
+		{
+			const auto timepoint = parse_ISO8601_timestamp(test_case.timestamp);
+
+			THEN("The resulting date and time are correct.")
+			{
+				const std::time_t since_epoch = std::chrono::system_clock::to_time_t(timepoint);
+
+				const std::tm* utctime = std::gmtime(&since_epoch);
+
+				// https://en.cppreference.com/w/cpp/chrono/c/tm
+				REQUIRE(utctime->tm_sec == test_case.sec);
+				REQUIRE(utctime->tm_min == test_case.min);
+				REQUIRE(utctime->tm_hour == test_case.hour);
+				REQUIRE(utctime->tm_mday == test_case.day);
+				REQUIRE(utctime->tm_mon == test_case.mon); //january is the 0th month
+				REQUIRE(utctime->tm_year == test_case.year); //years since 1900
+			}
+		}
+	}
+}
