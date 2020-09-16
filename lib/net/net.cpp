@@ -6,8 +6,6 @@
 
 #include <filesystem.hpp>
 
-#include <iomanip>
-#include <iostream>
 #include <thread>
 
 #include "../util/util.hpp"
@@ -33,18 +31,9 @@ net_response handle_response(cpr::Response&& response)
 
 	to_return.status_code = response.status_code;
 
-	std::string remaining = response.header["X-RateLimit-Remaining"];
-	std::cout << " (RL:" << remaining << ')';
 	if (response.status_code == 429)
 	{
-		std::cout << "Hit the rate limit.\nX-RateLimit-Limit: " << response.header["X-RateLimit-Limit"]
-		<< "\nX-RateLimit-Remaining: " << response.header["X-RateLimit-Remaining"]
-		<< "\nX-RateLimit-Reset: " << response.header["X-RateLimit-Reset"];
-
 		const auto resets_at = parse_ISO8601_timestamp(response.header["X-RateLimit-Reset"]);
-
-		const auto reset_time = std::chrono::system_clock::to_time_t(resets_at);
-		std::cout << "\nWaiting until " << std::put_time(std::localtime(&reset_time), "%F %T %z") << ".\n";
 		std::this_thread::sleep_until(resets_at);
 		to_return.retryable_error = true;
 		to_return.okay = false;
