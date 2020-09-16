@@ -4,8 +4,6 @@
 #include <sstream>
 #include <iomanip>
 
-#include "utc.cpp"
-
 std::string make_api_url(const std::string_view instance_url, const std::string_view api_route)
 {
 	std::string to_return{ "https://" };
@@ -26,6 +24,8 @@ std::optional<parsed_account> parse_account_name(const std::string& name)
 
 	return {};
 }
+
+std::time_t timegm_const(std::tm const* t);
 
 std::chrono::system_clock::time_point parse_ISO8601_timestamp(const std::string& timestamp)
 {
