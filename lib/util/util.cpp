@@ -37,6 +37,10 @@ std::chrono::system_clock::time_point parse_ISO8601_timestamp(const std::string&
 	std::istringstream iss(timestamp);
 	iss >> std::get_time(&tm, format);
 
+	// this function exists to parse rate limit timestamps, so pick a sensible default for that
+	if (iss.fail())
+		return std::chrono::system_clock::now() + std::chrono::minutes(1);
+
 	tm.tm_isdst = -1; //autodetermine whether we're in DST
 	
 	const auto time = timegm_const(&tm);

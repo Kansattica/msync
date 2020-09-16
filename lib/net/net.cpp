@@ -6,10 +6,6 @@
 
 #include <filesystem.hpp>
 
-#include <thread>
-
-#include "../util/util.hpp"
-
 std::string_view ensure_small_string(const std::string_view sv)
 {
 	// I want to ensure that, when a string is constructed from this, it's cheap to make
@@ -31,10 +27,11 @@ net_response handle_response(cpr::Response&& response)
 
 	to_return.status_code = response.status_code;
 
+	// It might be reasonable to wait if X-RateLimit-Remaining is 0, 
+	// but that means we'd wind up spuriously waiting if we run out of ratelimit but don't need to make any more requests.
 	if (response.status_code == 429)
 	{
-		const auto resets_at = parse_ISO8601_timestamp(response.header["X-RateLimit-Reset"]);
-		std::this_thread::sleep_until(resets_at);
+		to_return.message = std::move(response.header["X-RateLimit-Reset"]);
 		to_return.retryable_error = true;
 		to_return.okay = false;
 		return to_return;

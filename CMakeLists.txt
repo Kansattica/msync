@@ -63,7 +63,7 @@ add_subdirectory(console)
 target_include_directories(netinterface INTERFACE lib/netinterface)
 target_link_libraries(netinterface INTERFACE filesystem)
 
-target_link_libraries(net PRIVATE ${CPR_LIBRARIES} netinterface filesystem util)
+target_link_libraries(net PRIVATE ${CPR_LIBRARIES} netinterface filesystem)
 
 target_include_directories(filebacked INTERFACE lib/filebacked)
 target_link_libraries(filebacked INTERFACE filesystem)
