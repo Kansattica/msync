@@ -6,7 +6,8 @@
 #include <vector>
 #include <tuple>
 #include <sstream>
-#include <ctime>
+#include <time.h> //ctime doesn't have gmtime_s
+
 
 using namespace std::string_view_literals;
 
@@ -14,7 +15,7 @@ SCENARIO("make_api_url correctly concatenates URLs and paths.")
 {
 	GIVEN("An instance URL and API route")
 	{
-		const auto input = GENERATE(
+		const auto& input = GENERATE(
 			std::make_tuple("coolinstance.social", "/api/v1/register", "https://coolinstance.social/api/v1/register"),
 			std::make_tuple("aplace.egg", "/api/v1/howdy", "https://aplace.egg/api/v1/howdy"),
 			std::make_tuple("instance.place", "/api/v1/yes", "https://instance.place/api/v1/yes"));
@@ -35,7 +36,7 @@ SCENARIO("parse_account_name correctly parses account names into a username and 
 {
 	GIVEN("A correct account name")
 	{
-		const auto input = GENERATE(
+		const auto& input = GENERATE(
 			std::make_tuple("GoddessGrace@goodchristian.website", "GoddessGrace", "goodchristian.website"),
 			std::make_tuple("@GoddessGrace@goodchristian.website", "GoddessGrace", "goodchristian.website"),
 			std::make_tuple("BestGirl102@good.time.website", "BestGirl102", "good.time.website"),
@@ -495,17 +496,23 @@ SCENARIO("We can correctly parse ISO 8601 timestamps.")
 
 			THEN("The resulting date and time are correct.")
 			{
-				const std::time_t since_epoch = std::chrono::system_clock::to_time_t(timepoint);
+				const time_t since_epoch = std::chrono::system_clock::to_time_t(timepoint);
 
-				const std::tm* utctime = std::gmtime(&since_epoch);
+				struct tm utctime;
+				std::memset(&utctime, 0, sizeof(struct tm));
+#ifdef _WIN32
+				gmtime_s(&utctime, &since_epoch);
+#else
+				gmtime_s(&since_epoch, &utctime);
+#endif
 
 				// https://en.cppreference.com/w/cpp/chrono/c/tm
-				REQUIRE(utctime->tm_sec == test_case.sec);
-				REQUIRE(utctime->tm_min == test_case.min);
-				REQUIRE(utctime->tm_hour == test_case.hour);
-				REQUIRE(utctime->tm_mday == test_case.day);
-				REQUIRE(utctime->tm_mon == test_case.mon); //january is the 0th month
-				REQUIRE(utctime->tm_year == test_case.year); //years since 1900
+				REQUIRE(utctime.tm_sec == test_case.sec);
+				REQUIRE(utctime.tm_min == test_case.min);
+				REQUIRE(utctime.tm_hour == test_case.hour);
+				REQUIRE(utctime.tm_mday == test_case.day);
+				REQUIRE(utctime.tm_mon == test_case.mon); //january is the 0th month
+				REQUIRE(utctime.tm_year == test_case.year); //years since 1900
 			}
 		}
 	}

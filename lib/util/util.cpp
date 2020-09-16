@@ -32,18 +32,19 @@ std::chrono::system_clock::time_point parse_ISO8601_timestamp(const std::string&
 	//adapted from https://stackoverflow.com/a/13790747/5587653
 	constexpr auto format = "%Y-%m-%dT%H:%M:%S";
 
-	struct tm tm;
+	std::tm parsed_time;
+	std::memset(&parsed_time, 0, sizeof(std::tm));
 
 	std::istringstream iss(timestamp);
-	iss >> std::get_time(&tm, format);
+	iss >> std::get_time(&parsed_time, format);
 
 	// this function exists to parse rate limit timestamps, so pick a sensible default for that
 	if (iss.fail())
 		return std::chrono::system_clock::now() + std::chrono::minutes(1);
 
-	tm.tm_isdst = -1; //autodetermine whether we're in DST
+	parsed_time.tm_isdst = -1; //autodetermine whether we're in DST
 	
-	const auto time = timegm_const(&tm);
+	const auto time = timegm_const(&parsed_time);
 	return std::chrono::system_clock::from_time_t(time);
 }
 
