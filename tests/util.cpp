@@ -516,4 +516,19 @@ SCENARIO("We can correctly parse ISO 8601 timestamps.")
 			}
 		}
 	}
+
+	GIVEN("An unparseable timestamp.")
+	{
+		const std::string test_case = GENERATE("asdfadf", "", "2020-09-15T18:15:22asdf", "a string", "123456789");
+
+		WHEN("The timestamp is parsed.")
+		{
+			const auto timepoint = parse_ISO8601_timestamp(test_case);
+
+			THEN("The returned time point is a minute in the future.")
+			{
+				REQUIRE(timepoint == std::chrono::system_clock::now() + std::chrono::minutes(1));
+			}
+		}
+	}
 }
