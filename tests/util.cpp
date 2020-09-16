@@ -499,11 +499,10 @@ SCENARIO("We can correctly parse ISO 8601 timestamps.")
 				const time_t since_epoch = std::chrono::system_clock::to_time_t(timepoint);
 
 				struct tm utctime;
-				std::memset(&utctime, 0, sizeof(struct tm));
 #ifdef _WIN32
 				gmtime_s(&utctime, &since_epoch);
 #else
-				gmtime_s(&since_epoch, &utctime);
+				gmtime_r(&since_epoch, &utctime);
 #endif
 
 				// https://en.cppreference.com/w/cpp/chrono/c/tm

@@ -3,6 +3,7 @@
 #include <regex>
 #include <sstream>
 #include <iomanip>
+#include <cstring> //memset
 
 std::string make_api_url(const std::string_view instance_url, const std::string_view api_route)
 {
