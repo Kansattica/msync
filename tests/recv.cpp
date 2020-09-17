@@ -310,6 +310,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 				mock_get.arguments.clear();
 				mock_get.total_post_count += 10;
 				mock_get.total_notif_count += 15;
+
 				mock_get.should_rate_limt = true;
 				mock_get.set_succeed_after(2);
 
@@ -354,6 +355,9 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 					verify_file(home_timeline_file, expected_home_statuses, "status id: ");
 					verify_file(notifications_file, expected_notifications, "notification id: ");
 				}
+
+				mock_get.set_succeed_after(1);
+				mock_get.should_rate_limt = false;
 			}
 		}
 	}
