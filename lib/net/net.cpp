@@ -27,8 +27,16 @@ net_response handle_response(cpr::Response&& response)
 
 	to_return.status_code = response.status_code;
 
+	// https://docs.joinmastodon.org/api/rate-limits/
 	// It might be reasonable to wait if X-RateLimit-Remaining is 0, 
 	// but that means we'd wind up spuriously waiting if we run out of ratelimit but don't need to make any more requests.
+	// msync rarely knows it has to make zero more requests.
+	// The only case would be if it finished sending all its boosts, favs, and posts and didn't sync timelines or notifications at all.
+	// Which is pretty unlikely, since to hit the rate limit while just sending, you'd have to do one of:
+	// - delete upwards of 30 posts or boosts
+	// - upload 30 media attachments
+	// - make over 300 posts or calls to other API endpoints
+	// so the ratelimit zero thing is probably a good idea
 	if (response.status_code == 429)
 	{
 		to_return.message = std::move(response.header["X-RateLimit-Reset"]);

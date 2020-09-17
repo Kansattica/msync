@@ -74,17 +74,16 @@ request_response request_with_retries(make_request req, unsigned int retries, St
 
 		const auto end_time = std::chrono::steady_clock::now();
 
-		if (response.status_code == 429)
-		{
-			const auto resets_at = parse_ISO8601_timestamp(response.message);
-
-			const auto estimated_wait = resets_at - std::chrono::system_clock::now();
-			os << "\n429: Rate limited. Waiting " << std::chrono::duration_cast<std::chrono::minutes>(estimated_wait).count() << " minutes.";
-			std::this_thread::sleep_until(resets_at);
-		}
-
 		if (response.retryable_error)
 		{
+			if (response.status_code == 429)
+			{
+				const auto resets_at = parse_ISO8601_timestamp(response.message);
+
+				const auto estimated_wait = resets_at - std::chrono::system_clock::now();
+				os << "\n429: Rate limited. Waiting " << std::chrono::duration_cast<std::chrono::minutes>(estimated_wait).count() << " minutes.";
+				std::this_thread::sleep_until(resets_at);
+			}
 			// should retry
 			continue;
 		}
