@@ -69,7 +69,7 @@ struct mock_network_get : public mock_network
 	unsigned int total_notif_count = 240;
 
 	bool should_rate_limt = false;
-	std::chrono::seconds rate_limit_wait = std::chrono::seconds(30);
+	std::chrono::seconds rate_limit_wait = std::chrono::seconds(20);
 	
 	net_response operator()(std::string_view url, std::string_view access_token, const timeline_params& params, unsigned int limit)
 	{
