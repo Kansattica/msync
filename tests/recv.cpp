@@ -71,7 +71,7 @@ struct mock_network_get : public mock_network
 	unsigned int total_notif_count = 240;
 
 	bool should_rate_limt = false;
-	std::chrono::seconds rate_limit_wait = std::chrono::seconds(10);
+	std::chrono::seconds rate_limit_wait = std::chrono::seconds(30);
 	
 	net_response operator()(std::string_view url, std::string_view access_token, const timeline_params& params, unsigned int limit)
 	{
@@ -320,7 +320,9 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 				THEN("The appropriate amount of time was waited after a rate-limited call.")
 				{
 					const auto target_time = start_time + (2 * mock_get.rate_limit_wait);
-					REQUIRE(std::chrono::system_clock::now() >= target_time);
+					const auto now = std::chrono::system_clock::now();
+					CAPTURE(target_time.time_since_epoch(), now.time_since_epoch());
+					REQUIRE(now >= target_time);
 				}
 
 				THEN("Two calls were made to each endpoint.")
