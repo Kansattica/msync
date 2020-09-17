@@ -1,13 +1,13 @@
 #include "../lib/util/util.hpp"
 #include <catch2/catch.hpp>
 
+#include "test_helpers.hpp"
+
 #include <string>
 #include <string_view>
 #include <vector>
 #include <tuple>
 #include <sstream>
-#include <time.h> //ctime doesn't have gmtime_s
-
 
 using namespace std::string_view_literals;
 
@@ -499,11 +499,8 @@ SCENARIO("We can correctly parse ISO 8601 timestamps.")
 				const time_t since_epoch = std::chrono::system_clock::to_time_t(timepoint);
 
 				struct tm utctime{};
-#ifdef _WIN32
-				gmtime_s(&utctime, &since_epoch);
-#else
-				gmtime_r(&since_epoch, &utctime);
-#endif
+
+				wrap_gmtime(&utctime, &since_epoch);
 
 				// https://en.cppreference.com/w/cpp/chrono/c/tm
 				REQUIRE(utctime.tm_sec == test_case.sec);
