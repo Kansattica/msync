@@ -1,4 +1,6 @@
 #include "../lib/util/util.hpp"
+
+#define CATCH_CONFIG_ENABLE_CHRONO_STRINGMAKER
 #include <catch2/catch.hpp>
 
 #include "test_helpers.hpp"
