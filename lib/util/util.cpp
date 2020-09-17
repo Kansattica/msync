@@ -3,7 +3,6 @@
 #include <regex>
 #include <sstream>
 #include <iomanip>
-#include <cstring> //memset
 
 std::string make_api_url(const std::string_view instance_url, const std::string_view api_route)
 {
@@ -33,8 +32,8 @@ std::chrono::system_clock::time_point parse_ISO8601_timestamp(const std::string&
 	//adapted from https://stackoverflow.com/a/13790747/5587653
 	constexpr auto format = "%Y-%m-%dT%H:%M:%S";
 
-	std::tm parsed_time;
-	std::memset(&parsed_time, 0, sizeof(std::tm));
+	// zero out for portability and safety
+	std::tm parsed_time{};
 
 	std::istringstream iss(timestamp);
 	iss >> std::get_time(&parsed_time, format);
