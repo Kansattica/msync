@@ -284,9 +284,12 @@ void dequeue(api_route todequeue, const fs::path& user_account_dir, std::vector<
 			[&filequeuedir](const auto& apicall) { dequeue_post(filequeuedir, apicall.argument); });
 	}
 
+	// gotta calculate this before erasing stuff
+	const auto removed_count = toremovefrom.parsed.end() - removefrom_pivot;
+
 	toremovefrom.parsed.erase(removefrom_pivot, toremovefrom.parsed.end());
 
-	plverb() << "Removed " << toremovefrom.parsed.end() - removefrom_pivot << " items for account " << user_account_dir.filename() << ".\n";
+	plverb() << "Removed " << removed_count << " items for account " << user_account_dir.filename() << ".\n";
 
 	//basically, if a thing isn't in the queue, enqueue removing that thing. unboosting, unfaving, deleting a post
 	//consider removing duplicate removes?
