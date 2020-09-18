@@ -88,7 +88,7 @@ request_response request_with_retries(make_request req, unsigned int retries, St
 					const auto mins = std::chrono::duration_cast<std::chrono::minutes>(estimated_wait).count();
 					os << mins << pluralize(mins, " minute, ", " minutes, ");
 				}
-				os << estimated_wait.count() % 60 << pluralize(estimated_wait.count(), " second.", " seconds.") << " Timestamp: " << response.message;
+				os << estimated_wait.count() % 60 << pluralize(estimated_wait.count(), " second.", " seconds.");
 				os.flush(); // tell the user what they're waiting for
 				std::this_thread::sleep_until(resets_at);
 			}
