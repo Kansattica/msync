@@ -27,24 +27,6 @@ net_response handle_response(cpr::Response&& response)
 
 	to_return.status_code = response.status_code;
 
-	// https://docs.joinmastodon.org/api/rate-limits/
-	// Waiting if X-RateLimit-Remaining is 0 is a good idea.
-	// It means we wind up spuriously waiting if we run out of ratelimit but don't need to make any more requests.
-	// but msync rarely knows it has to make zero more requests.
-	// The only case would be if it finished sending all its boosts, favs, and posts and didn't sync timelines or notifications at all,
-	// because the only way to know you're done receiving is to get something back with fewer posts than you asked for.
-	// Which is pretty unlikely, since to hit the rate limit while just sending, you'd have to do one of:
-	// - delete upwards of 30 posts or boosts
-	// - upload 30 media attachments
-	// - make over 300 posts or calls to other API endpoints
-	// so the ratelimit zero thing is probably a good idea.
-	if (response.status_code == 429 || response.header["X-RateLimit-Remaining"][0] == '0')
-	{
-		to_return.message = std::move(response.header["X-RateLimit-Reset"]);
-		to_return.retryable_error = true;
-		to_return.okay = false;
-		return to_return;
-	}
 
 	to_return.retryable_error = response.error.code == cpr::ErrorCode::OPERATION_TIMEDOUT || (response.status_code >= 500 && response.status_code < 600);
 
@@ -57,6 +39,25 @@ net_response handle_response(cpr::Response&& response)
 
 	// I think response.error refers to whether curl itself reported an error, as opposed to the remote server
 	to_return.okay = !response.error && response.status_code >= 200 && response.status_code < 300;
+
+	// https://docs.joinmastodon.org/api/rate-limits/
+	// Waiting if X-RateLimit-Remaining is 0 is a good idea.
+	// It means we wind up spuriously waiting if we run out of ratelimit but don't need to make any more requests.
+	// but msync rarely knows it has to make zero more requests.
+	// The only case would be if it finished sending all its boosts, favs, and posts and didn't sync timelines or notifications at all,
+	// because the only way to know you're done receiving is to get something back with fewer posts than you asked for.
+	// Which is pretty unlikely, since to hit the rate limit while just sending, you'd have to do one of:
+	// - delete upwards of 30 posts or boosts
+	// - upload 30 media attachments
+	// - make over 300 posts or calls to other API endpoints
+	// so the ratelimit zero thing is probably a good idea.
+	if (response.status_code == 429 || (to_return.okay && response.header["X-RateLimit-Remaining"][0] == '0'))
+	{
+		to_return.message = std::move(response.header["X-RateLimit-Reset"]);
+		to_return.retryable_error = true;
+		to_return.okay = false;
+		return to_return;
+	}
 
 	// if we're not okay, try and get the error message
 	// but this is only some kinds of error.
