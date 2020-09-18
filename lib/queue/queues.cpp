@@ -189,7 +189,7 @@ void enqueue(const api_route toenqueue, const fs::path& user_account_dir, std::v
 				return api_call{ toenqueue, queue_post(filequeuedir, id) };
 			});
 
-		plverb() << "Enqueued " << add.size() << " posts for " << user_account_dir.filename() << '.';
+		plverb() << "Enqueued " << add.size() << " posts for " << user_account_dir.filename() << ".\n";
 	}
 	else
 	{
@@ -219,7 +219,7 @@ void enqueue(const api_route toenqueue, const fs::path& user_account_dir, std::v
 			}
 		}
 
-		plverb() << "Enqueued " << queued << " items and skipped " << skipped << " duplicates for account " << user_account_dir.filename() << '.';
+		plverb() << "Enqueued " << queued << " items and skipped " << skipped << " duplicates for account " << user_account_dir.filename() << ".\n";
 	}
 
 	// consider looking for those "delete" guys, the ones with the - at the end, and having this cancel them out, 
@@ -298,7 +298,7 @@ void dequeue(api_route todequeue, const fs::path& user_account_dir, std::vector<
 	std::for_each(toremove_pivot, toremove.end(),
 		[&toremovefrom, remove_route](api_call& queuedel) { toremovefrom.parsed.push_back(api_call{ remove_route, std::move(queuedel.argument) }); });
 
-	plverb() << "Enqueued " << toremove.end() - toremove_pivot << " deletions for account " << user_account_dir.filename() << '.';
+	plverb() << "Enqueued " << toremove.end() - toremove_pivot << " deletions for account " << user_account_dir.filename() << ".\n";
 }
 
 void clear(api_route toclear, const fs::path& user_account_dir)
