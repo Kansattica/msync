@@ -42,10 +42,10 @@ std::chrono::system_clock::time_point parse_ISO8601_timestamp(const std::string&
 	if (iss.fail())
 		return std::chrono::system_clock::now() + std::chrono::minutes(1);
 
-	parsed_time.tm_isdst = -1; //autodetermine whether we're in DST
-	
 	const auto time = timegm_const(&parsed_time);
-	return std::chrono::system_clock::from_time_t(time);
+
+	// round seconds up because we can't parse the decimal seconds from the timestamp.
+	return std::chrono::system_clock::from_time_t(time) + std::chrono::seconds(1);
 }
 
 // if src is null, modifies dest in place

@@ -485,11 +485,13 @@ SCENARIO("We can correctly parse ISO 8601 timestamps.")
 {
 	GIVEN("An ISO 8601 timestamp in UTC.")
 	{
-		// we ignore the decimal portion of the time
+		// we ignore the decimal portion of the time.
+		// notice that the seconds value always gets bumped up,
+		// because C++ doesn't have tools for reading fractional seconds.
 		const auto test_case = GENERATE(
-			time_test_case{ "2020-09-15T18:15:22.938077Z", 120, 8, 15, 18, 15, 22 },
-			time_test_case{ "2020-09-15T18:15:00.928077Z", 120, 8, 15, 18, 15, 0 },
-			time_test_case{ "2025-11-25T22:02:52.123412Z", 125, 10, 25, 22, 2, 52 }
+			time_test_case{ "2020-09-15T18:15:22.938077Z", 120, 8, 15, 18, 15, 23 },
+			time_test_case{ "2020-09-15T18:15:00.928077Z", 120, 8, 15, 18, 15, 1 },
+			time_test_case{ "2025-11-25T22:02:52.123412Z", 125, 10, 25, 22, 2, 53 }
 		);
 
 		WHEN("The timestamp is parsed.")
