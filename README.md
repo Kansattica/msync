@@ -98,6 +98,7 @@ Once you have `msync` compiled, check out [MANUAL.md](MANUAL.md#msync-manual) fo
 - [X] Ability to exclude notifications by type.
 - [X] Allow choosing a default account.
 - [ ] Support for adding and removing filters.
+- [X] Respecting rate limits.
 
 ### Roadmap (things for later)
 
