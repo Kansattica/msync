@@ -83,7 +83,7 @@ target_link_libraries(postlist PRIVATE filesystem entities)
 
 target_link_libraries(printlog PRIVATE constants)
 
-target_link_libraries(queue PRIVATE constants printlog filebacked exception postfile) 
+target_link_libraries(queue PRIVATE constants printlog filebacked exception postfile util) 
 
 target_link_libraries(optionparsing PRIVATE clipp::clipp printlog options queue postfile)
 
