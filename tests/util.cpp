@@ -1,5 +1,9 @@
 #include "../lib/util/util.hpp"
+
+#define CATCH_CONFIG_ENABLE_CHRONO_STRINGMAKER
 #include <catch2/catch.hpp>
+
+#include "test_helpers.hpp"
 
 #include <string>
 #include <string_view>
@@ -13,7 +17,7 @@ SCENARIO("make_api_url correctly concatenates URLs and paths.")
 {
 	GIVEN("An instance URL and API route")
 	{
-		const auto input = GENERATE(
+		const auto& input = GENERATE(
 			std::make_tuple("coolinstance.social", "/api/v1/register", "https://coolinstance.social/api/v1/register"),
 			std::make_tuple("aplace.egg", "/api/v1/howdy", "https://aplace.egg/api/v1/howdy"),
 			std::make_tuple("instance.place", "/api/v1/yes", "https://instance.place/api/v1/yes"));
@@ -34,7 +38,7 @@ SCENARIO("parse_account_name correctly parses account names into a username and 
 {
 	GIVEN("A correct account name")
 	{
-		const auto input = GENERATE(
+		const auto& input = GENERATE(
 			std::make_tuple("GoddessGrace@goodchristian.website", "GoddessGrace", "goodchristian.website"),
 			std::make_tuple("@GoddessGrace@goodchristian.website", "GoddessGrace", "goodchristian.website"),
 			std::make_tuple("BestGirl102@good.time.website", "BestGirl102", "good.time.website"),
@@ -463,5 +467,69 @@ SCENARIO("bulk_replace_mentions finds and replaces all its arguments in a string
 			}
 		}
 
+	}
+}
+
+struct time_test_case
+{
+	std::string timestamp;
+	int year;
+	int mon;
+	int day;
+	int hour;
+	int min;
+	int sec;
+};
+
+SCENARIO("We can correctly parse ISO 8601 timestamps.")
+{
+	GIVEN("An ISO 8601 timestamp in UTC.")
+	{
+		// we ignore the decimal portion of the time.
+		// notice that the seconds value always gets bumped up,
+		// because C++ doesn't have tools for reading fractional seconds.
+		const auto test_case = GENERATE(
+			time_test_case{ "2020-09-15T18:15:22.938077Z", 120, 8, 15, 18, 15, 23 },
+			time_test_case{ "2020-09-15T18:15:00.928077Z", 120, 8, 15, 18, 15, 1 },
+			time_test_case{ "2025-11-25T22:02:52.123412Z", 125, 10, 25, 22, 2, 53 }
+		);
+
+		WHEN("The timestamp is parsed.")
+		{
+			const auto timepoint = parse_ISO8601_timestamp(test_case.timestamp);
+
+			THEN("The resulting date and time are correct.")
+			{
+				const time_t since_epoch = std::chrono::system_clock::to_time_t(timepoint);
+
+				struct tm utctime{};
+
+				wrap_gmtime(&utctime, &since_epoch);
+
+				// https://en.cppreference.com/w/cpp/chrono/c/tm
+				REQUIRE(utctime.tm_sec == test_case.sec);
+				REQUIRE(utctime.tm_min == test_case.min);
+				REQUIRE(utctime.tm_hour == test_case.hour);
+				REQUIRE(utctime.tm_mday == test_case.day);
+				REQUIRE(utctime.tm_mon == test_case.mon); //january is the 0th month
+				REQUIRE(utctime.tm_year == test_case.year); //years since 1900
+			}
+		}
+	}
+
+	GIVEN("An unparseable timestamp.")
+	{
+		const std::string test_case = GENERATE("asdfadf", "", "2020-09-15T18:15:asasdf", "a string", "123456789");
+
+		WHEN("The timestamp is parsed.")
+		{
+			const auto timepoint = parse_ISO8601_timestamp(test_case);
+
+			THEN("The returned time point is about a minute in the future.")
+			{
+				REQUIRE(timepoint >= std::chrono::system_clock::now() + std::chrono::seconds(59));
+				REQUIRE(timepoint <= std::chrono::system_clock::now() + std::chrono::seconds(61));
+			}
+		}
 	}
 }

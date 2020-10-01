@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <string_view>
+#include <time.h> //ctime doesn't have gmtime_s
 
 std::vector<std::string> read_lines(const fs::path& toread);
 size_t count_files_in_directory(const fs::path& tocheck);
@@ -18,6 +19,8 @@ std::vector<std::string> make_expected_ids(const std::vector<std::string>& ids, 
 
 bool flip_coin();
 int zero_to_n(int n);
+
+void wrap_gmtime(struct tm* utctime, const time_t* since_epoch);
 
 //ensures a file doesn't exist before and after each test run.
 struct test_file

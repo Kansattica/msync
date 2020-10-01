@@ -16,6 +16,7 @@ std::string_view ensure_small_string(const std::string_view sv)
 	const size_t start_at = sv.size() < 20 ? 0 : sv.size() - 20;
 	return sv.substr(start_at);
 }
+
 std::string make_bearer(const std::string_view access_token)
 {
 	return std::string{ "Bearer " }.append(access_token);
@@ -38,6 +39,15 @@ net_response handle_response(cpr::Response&& response)
 
 	// I think response.error refers to whether curl itself reported an error, as opposed to the remote server
 	to_return.okay = !response.error && response.status_code >= 200 && response.status_code < 300;
+
+	// https://docs.joinmastodon.org/api/rate-limits/
+	if (response.status_code == 429)
+	{
+		to_return.message = std::move(response.header["X-RateLimit-Reset"]);
+		to_return.retryable_error = true;
+		to_return.okay = false;
+		return to_return;
+	}
 
 	// if we're not okay, try and get the error message
 	// but this is only some kinds of error.

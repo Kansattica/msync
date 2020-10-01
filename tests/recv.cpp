@@ -1,3 +1,4 @@
+#define CATCH_CONFIG_ENABLE_CHRONO_STRINGMAKER
 #include <catch2/catch.hpp>
 
 #include "../lib/sync/recv.hpp"
@@ -13,9 +14,9 @@
 #include <vector>
 #include <algorithm>
 #include <string_view>
-#include <charconv>
-#include <system_error>
 #include <tuple>
+#include <chrono>
+#include <sstream>
 
 #include "to_chars_patch.hpp"
 
@@ -67,6 +68,9 @@ struct mock_network_get : public mock_network
 	unsigned int total_post_count = 310;
 	unsigned int total_notif_count = 240;
 
+	bool should_rate_limt = false;
+	std::chrono::seconds rate_limit_wait = std::chrono::seconds(20);
+	
 	net_response operator()(std::string_view url, std::string_view access_token, const timeline_params& params, unsigned int limit)
 	{
 		arguments.push_back(get_mock_args{{0, std::string{url}, std::string{access_token}},
@@ -79,9 +83,24 @@ struct mock_network_get : public mock_network
 		toreturn.status_code = status_code;
 		if (!toreturn.okay)
 		{
+			if (toreturn.retryable_error && should_rate_limt)
+			{
+				toreturn.status_code = 429;
+
+				const auto wait_until = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now() + rate_limit_wait);
+				struct tm wait_until_struct {};
+				wrap_gmtime(&wait_until_struct, &wait_until);
+
+				std::ostringstream timestamp;
+				timestamp << std::put_time(&wait_until_struct, "%FT%T.12312Z");
+				toreturn.message = timestamp.str();
+				return toreturn;
+			}
+
 			toreturn.message = R"({ "error": "some problem" })";
 			return toreturn;
 		}
+
 		
 		// if the url ends in "notifications" do notifications. if it ends in "home", do statuses
 		const auto [json_func, lowest_id, total_count] = [url, this]() {
@@ -262,6 +281,59 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 					REQUIRE(args[0].limit == 30);
 					REQUIRE(args[1].url == expected_home_endpoint);
 					REQUIRE(args[1].limit == 40);
+				}
+
+				THEN("The correct last IDs are saved back to the account.")
+				{
+					std::array<char, 10> id_char_buf;
+
+					REQUIRE(account.second.get_option(user_option::last_home_id) == sv_to_chars(lowest_post_id + mock_get.total_post_count, id_char_buf));
+					REQUIRE(account.second.get_option(user_option::last_notification_id) == sv_to_chars(lowest_notif_id + mock_get.total_notif_count, id_char_buf));
+				}
+
+				THEN("Both files have the expected number of posts, and the IDs are strictly increasing.")
+				{
+					// the -1 is because adding 10 to the post count only adds 9 new statuses because you already got the 0th status last time
+					// this feels weird because of the weird mix of half-open ranges and fully closed ranges, but I believe it's correct
+					constexpr int expected_home_statuses = 40 * 5 + 10 - 1;
+					constexpr int expected_notifications = 30 * 5 + 15 - 1;
+
+					verify_file(home_timeline_file, expected_home_statuses, "status id: ");
+					verify_file(notifications_file, expected_notifications, "notification id: ");
+				}
+			}
+
+			AND_WHEN("More posts and notifications are added and get is called again, but we're rate limited.")
+			{
+				mock_get.arguments.clear();
+				mock_get.total_post_count += 10;
+				mock_get.total_notif_count += 15;
+
+				mock_get.should_rate_limt = true;
+				mock_get.set_succeed_after(2);
+
+				const auto start_time = std::chrono::system_clock::now();
+				post_getter.get(account.second);
+
+				THEN("The appropriate amount of time was waited after a rate-limited call.")
+				{
+					// cut it a second of slack because of clock jitter and stuff
+					const auto target_time = start_time + (2 * mock_get.rate_limit_wait) - std::chrono::seconds(1);
+					REQUIRE(std::chrono::system_clock::now() >= target_time);
+				}
+
+				THEN("Two calls were made to each endpoint.")
+				{
+					const auto& args = mock_get.arguments;
+					REQUIRE(args.size() == 4);
+					REQUIRE(args[0].url == expected_notification_endpoint);
+					REQUIRE(args[0].limit == 30);
+					REQUIRE(args[1].url == expected_notification_endpoint);
+					REQUIRE(args[1].limit == 30);
+					REQUIRE(args[2].url == expected_home_endpoint);
+					REQUIRE(args[2].limit == 40);
+					REQUIRE(args[3].url == expected_home_endpoint);
+					REQUIRE(args[3].limit == 40);
 				}
 
 				THEN("The correct last IDs are saved back to the account.")

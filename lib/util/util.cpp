@@ -1,6 +1,8 @@
 #include "util.hpp"
 
 #include <regex>
+#include <sstream>
+#include <iomanip>
 
 std::string make_api_url(const std::string_view instance_url, const std::string_view api_route)
 {
@@ -21,6 +23,29 @@ std::optional<parsed_account> parse_account_name(const std::string& name)
 	}
 
 	return {};
+}
+
+std::time_t timegm_const(std::tm const* t);
+
+std::chrono::system_clock::time_point parse_ISO8601_timestamp(const std::string& timestamp)
+{
+	//adapted from https://stackoverflow.com/a/13790747/5587653
+	constexpr auto format = "%Y-%m-%dT%H:%M:%S";
+
+	// zero out for portability and safety
+	std::tm parsed_time{};
+
+	std::istringstream iss(timestamp);
+	iss >> std::get_time(&parsed_time, format);
+
+	// this function exists to parse rate limit timestamps, so pick a sensible default for that
+	if (iss.fail())
+		return std::chrono::system_clock::now() + std::chrono::minutes(1);
+
+	const auto time = timegm_const(&parsed_time);
+
+	// round seconds up because we can't parse the decimal seconds from the timestamp.
+	return std::chrono::system_clock::from_time_t(time) + std::chrono::seconds(1);
 }
 
 // if src is null, modifies dest in place

@@ -4,10 +4,13 @@
 #include <string_view>
 #include <optional>
 #include <chrono>
+#include <thread>
+#include <iomanip>
 
 #include <filesystem.hpp>
 
 #include "../netinterface/net_interface.hpp"
+#include "../util/util.hpp"
 
 #include "read_response.hpp"
 
@@ -58,6 +61,7 @@ struct request_response
 	long long time_ms;
 };
 
+
 template <typename make_request, typename Stream>
 request_response request_with_retries(make_request req, unsigned int retries, Stream& os)
 {
@@ -71,10 +75,23 @@ request_response request_with_retries(make_request req, unsigned int retries, St
 
 		const auto end_time = std::chrono::steady_clock::now();
 
-		// later, handle what happens if we get rate limited
-
 		if (response.retryable_error)
 		{
+			if (response.status_code == 429)
+			{
+				const auto resets_at = parse_ISO8601_timestamp(response.message);
+
+				const auto estimated_wait = std::chrono::duration_cast<std::chrono::seconds>(resets_at - std::chrono::system_clock::now());
+				os << "\n429: Rate limited. Waiting ";
+				if (estimated_wait >= std::chrono::minutes(1))
+				{
+					const auto mins = std::chrono::duration_cast<std::chrono::minutes>(estimated_wait).count();
+					os << mins << pluralize(mins, " minute, ", " minutes, ");
+				}
+				os << estimated_wait.count() % 60 << pluralize(estimated_wait.count(), " second.", " seconds.");
+				os.flush(); // tell the user what they're waiting for
+				std::this_thread::sleep_until(resets_at);
+			}
 			// should retry
 			continue;
 		}

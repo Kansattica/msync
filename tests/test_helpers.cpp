@@ -66,6 +66,16 @@ int zero_to_n(int n)
 	return dis(gen);
 }
 
+void wrap_gmtime(struct tm* utctime, const time_t* since_epoch)
+{
+#ifdef _WIN32
+	gmtime_s(utctime, since_epoch);
+#else
+	gmtime_r(since_epoch, utctime);
+#endif
+
+}
+
 const fs::path& test_base_dir()
 {
 	const static fs::path base_dir = fs::temp_directory_path() / "msync_test_files";

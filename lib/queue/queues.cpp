@@ -4,6 +4,7 @@
 #include <system_error>
 #include <print_logger.hpp>
 #include "../postfile/outgoing_post.hpp"
+#include "../util/util.hpp"
 #include <algorithm>
 #include <array>
 #include <msync_exception.hpp>
@@ -188,6 +189,8 @@ void enqueue(const api_route toenqueue, const fs::path& user_account_dir, std::v
 			{
 				return api_call{ toenqueue, queue_post(filequeuedir, id) };
 			});
+
+		plverb() << "Enqueued " << add.size() << pluralize(add.size(), " post", " posts") << " for " << user_account_dir.filename() << ".\n";
 	}
 	else
 	{
@@ -202,13 +205,22 @@ void enqueue(const api_route toenqueue, const fs::path& user_account_dir, std::v
 		// - it absolutely matters for posts, especially since posts can be replies to others
 		// - if this part of the program is called 'queue', it should implement a queue
 
+		int queued, skipped;
+		queued = skipped = 0;
 		for (api_call& incoming_call : to_api_calls(std::move(add), toenqueue))
 		{
 			if (std::find(toaddto.parsed.begin(), toaddto.parsed.end(), incoming_call) == toaddto.parsed.end())
 			{
 				toaddto.parsed.push_back(std::move(incoming_call));
+				queued++;
+			}
+			else
+			{
+				skipped++;
 			}
 		}
+
+		plverb() << "Enqueued " << queued << pluralize(queued, " item", " items") << " and skipped " << skipped << pluralize(skipped, " duplicate", " duplicates") << " for account " << user_account_dir.filename() << ".\n";
 	}
 
 	// consider looking for those "delete" guys, the ones with the - at the end, and having this cancel them out, 
@@ -273,7 +285,12 @@ void dequeue(api_route todequeue, const fs::path& user_account_dir, std::vector<
 			[&filequeuedir](const auto& apicall) { dequeue_post(filequeuedir, apicall.argument); });
 	}
 
+	// gotta calculate this before erasing stuff
+	const auto removed_count = toremovefrom.parsed.end() - removefrom_pivot;
+
 	toremovefrom.parsed.erase(removefrom_pivot, toremovefrom.parsed.end());
+
+	plverb() << "Removed " << removed_count << pluralize(removed_count, " item", " items") << " for account " << user_account_dir.filename() << ".\n";
 
 	//basically, if a thing isn't in the queue, enqueue removing that thing. unboosting, unfaving, deleting a post
 	//consider removing duplicate removes?
@@ -281,6 +298,9 @@ void dequeue(api_route todequeue, const fs::path& user_account_dir, std::vector<
 	const auto remove_route = undo_route(todequeue);
 	std::for_each(toremove_pivot, toremove.end(),
 		[&toremovefrom, remove_route](api_call& queuedel) { toremovefrom.parsed.push_back(api_call{ remove_route, std::move(queuedel.argument) }); });
+
+	const auto enqueued_deletes = toremove.end() - toremove_pivot;
+	plverb() << "Enqueued " << enqueued_deletes << pluralize(enqueued_deletes, " deletion", " deletions") << " for account " << user_account_dir.filename() << ".\n";
 }
 
 void clear(api_route toclear, const fs::path& user_account_dir)
