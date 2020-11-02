@@ -50,6 +50,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+  
+    - name: Enable cross-compilation
+      if: env.BUILD_ARCH == 'i386'
+      run: sudo dpkg --add-architecture i386
 
     - name: Install dependencies
       if: matrix.os == 'ubuntu-latest'
