@@ -91,6 +91,7 @@ jobs:
     
     - name: Smoke Test
       working-directory: ${{runner.workspace}}/build
+      shell: bash
       run: |
         if [ "${{ matrix.os }}" == "windows-latest" ]; then EXELOCATION=./msync.exe; else EXELOCATION=./msync; fi
         $EXELOCATION
