@@ -94,7 +94,7 @@ jobs:
       shell: bash
       run: |
         ls
-        if [ "${{ matrix.os }}" == "windows-latest" ]; then EXELOCATION=./msync.exe; else EXELOCATION=./msync; fi
+        if [ "${{ matrix.os }}" == "windows-latest" ]; then EXELOCATION=./$BUILD_TYPE/msync.exe; else EXELOCATION=./msync; fi
         $EXELOCATION
         $EXELOCATION version
         $EXELOCATION yeehaw
