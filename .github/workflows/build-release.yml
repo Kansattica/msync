@@ -29,7 +29,7 @@ jobs:
             compiler: gcc-9
             cxx_compiler: g++-9
             arch: i386
-            env: CXXFLAGS="-m32" CFLAGS="-m32"
+            cflags: -m32
             apt: gcc-9-multilib g++-9-multilib libcurl4-openssl-dev:i386 linux-libc-dev:i386
           - os: macos-latest
           - os: windows-latest
@@ -80,6 +80,8 @@ jobs:
       env:
         CC: ${{ matrix.compiler }}
         CXX: ${{ matrix.cxx_compiler }}
+        CFLAGS: ${{ matrix.cflags }}
+        CXXFLAGS: ${{ matrix.cflags }}
 
     - name: Build
       working-directory: ${{runner.workspace}}/build
