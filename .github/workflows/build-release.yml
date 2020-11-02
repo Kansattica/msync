@@ -30,7 +30,7 @@ jobs:
             cxx_compiler: g++-9
             arch: i386
             env: CXXFLAGS="-m32" CFLAGS="-m32"
-            apt: gcc-9-multilib g++-9-multilib libstdc++-9-dev-i386-cross libcurl4-openssl-dev:i386 linux-libc-dev:i386 libstdc++-9-dev
+            apt: gcc-9-multilib g++-9-multilib libcurl4-openssl-dev:i386 linux-libc-dev:i386
           - os: macos-latest
           - os: windows-latest
             env: CMAKE_GENERATOR="Visual Studio 15 2017" CMAKE_GENERATOR_PLATFORM=x64
