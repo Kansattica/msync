@@ -14,17 +14,17 @@ jobs:
         include:
           - os: ubuntu-latest
             compiler: gcc-8
-            cxx-compiler: g++-8
+            cxx_compiler: g++-8
             arch: x64
             apt: libcurl4-openssl-dev
           - os: ubuntu-latest
             compiler: clang-8
-            cxx-compiler: clang++-8
+            cxx_compiler: clang++-8
             arch: x64
             apt: libcurl4-openssl-dev
           - os: ubuntu-latest
             compiler: gcc-8
-            cxx-compiler: g++-8
+            cxx_compiler: g++-8
             arch: i386
             env: CXXFLAGS="-m32" CFLAGS="-m32"
             apt: gcc-8-multilib g++-8-multilib libstdc++-8-dev-i386-cross libcurl4-openssl-dev:i386 linux-libc-dev:i386 libstdc++-8-dev
@@ -43,7 +43,7 @@ jobs:
             configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
           - os: ubuntu-latest
             compiler: gcc-8
-            cxx-compiler: g++-8
+            cxx_compiler: g++-8
             arch: x64
             configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
             make_deb: true
@@ -74,6 +74,9 @@ jobs:
       # and build directories, but this is only available with CMake 3.13 and higher.  
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
       run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=Release ${{ matrix.configure_args }}
+      env:
+        CC: ${{ matrix.compiler }}
+        CXX: ${{ matrix.cxx_compiler }}
 
     - name: Build
       working-directory: ${{runner.workspace}}/build
