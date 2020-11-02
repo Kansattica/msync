@@ -53,7 +53,9 @@ jobs:
   
     - name: Enable cross-compilation if needed
       if: matrix.os == 'ubuntu-latest'
-      run: if [ "$BUILD_ARCH" = "i386" ]; then sudo dpkg --add-architecture i386 && sudo apt update; fi
+      run: |
+        echo $BUILD_ARCH
+        if [ "$BUILD_ARCH" = "i386" ]; then sudo dpkg --add-architecture i386 && sudo apt update; fi
 
     - name: Install dependencies
       if: matrix.os == 'ubuntu-latest'
