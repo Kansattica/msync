@@ -101,16 +101,6 @@ jobs:
     - name: Install Boost For Earlier OSX Versions
       if: matrix.os == 'macos-latest' && matrix.deployment_target < 10.15
       run: brew install boost
-    
-    - name: Install Realpath For OSX
-      if: matrix.os == 'macos-latest'
-      run: |
-        git clone https://github.com/harto/realpath-osx.git
-        cd realpath-osx
-        make
-        sudo make install
-        cd ..
-        rm -rf realpath-osx
 
     - name: Install Linux Dependencies
       if: matrix.os == 'ubuntu-latest'
@@ -152,6 +142,12 @@ jobs:
         $EXELOCATION
         $EXELOCATION version
         $EXELOCATION yeehaw
+        if ! command -v realpath &> /dev/null
+        then
+           function realpath() {
+              readlink -f $1          
+           }
+        fi
         FINISHED_BINARY_NAME=msync-${{ steps.format_version.outputs.replaced }}-
         if [[ "${{ matrix.configure_args }}" == *"MSYNC_USER_CONFIG=ON"* ]]; then FINISHED_BINARY_NAME+="install-"; else FINISHED_BINARY_NAME+="portable-"; fi
         if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then FINISHED_BINARY_NAME+="linux-${{ matrix.arch }}-${{ steps.compiler_name.outputs.replaced }}"; fi
