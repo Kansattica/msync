@@ -1,7 +1,6 @@
-name: CMake
+name: Build and Release
 
 on: [push, pull_request]
-
 
 jobs:
   build:
