@@ -133,15 +133,15 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C $BUILD_TYPE --output-on-failure --schedule-random -j 2
     
+    - name: Strip Linux binaries
+      working-directory: ${{runner.workspace}}/build
+      if: matrix.os == 'ubuntu-latest'
+      run: strip --strip-unneeded ./msync    
+
     - name: Make .deb package
       working-directory: ${{runner.workspace}}/build
       if: matrix.make_deb
       run: cpack
-    
-    - name: Strip Linux binaries
-      working-directory: ${{runner.workspace}}/build
-      if: matrix.os == 'ubuntu-latest'
-      run: strip --strip-unneeded ./msync
       
     - name: Prepare release notes
       run: git tag -l --format='%(contents)' ${{ github.ref }} > ${{runner.workspace}}/build/msync_release_notes.md
