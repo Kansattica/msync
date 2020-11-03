@@ -139,7 +139,7 @@ jobs:
         if [ "${{ matrix.os }}" = "windows-latest" ]; then FINISHED_BINARY_NAME+="windows-${{ matrix.arch }}.exe"; fi
         if [ "${{ matrix.os }}" = "macos-latest" ]; then FINISHED_BINARY_NAME+="osx-${{ matrix.deployment_target}}-x64"; fi
         echo $FINISHED_BINARY_NAME
-        mv $EXELOCATION $FINISHED_BINARY_NAME
+        cp $EXELOCATION $FINISHED_BINARY_NAME
         echo "::set-output name=exe_location::$(realpath $FINISHED_BINARY_NAME)"
         echo "::set-output name=binary_name::$FINISHED_BINARY_NAME"
 
@@ -153,7 +153,7 @@ jobs:
     - name: Strip Linux binaries
       working-directory: ${{runner.workspace}}/build
       if: matrix.os == 'ubuntu-latest'
-      run: strip --strip-unneeded ./msync    
+      run: strip --strip-unneeded ${{ steps.find-exe.outputs.exe_location }}
 
     - name: Make .deb package
       id: make-debian-package
