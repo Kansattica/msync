@@ -172,7 +172,7 @@ jobs:
         # A file, directory or wildcard pattern that describes what to upload
         path: ${{ steps.find-exe.outputs.exe_location }}
         # The desired behavior if no files are found using the provided path.
-        error: true
+        if-no-files-found: error
     
     - name: Upload .deb package as artifact
       uses: actions/upload-artifact@v2.2.0
@@ -183,7 +183,7 @@ jobs:
         # A file, directory or wildcard pattern that describes what to upload
         path: ${{ steps.make-debian-package.outputs.deb_path }}
         # The desired behavior if no files are found using the provided path.
-        error: true
+        if-no-files-found: error
     
     - name: Upload release binary
       id: upload-release-asset 
