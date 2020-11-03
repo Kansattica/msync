@@ -113,7 +113,7 @@ jobs:
       working-directory: ${{runner.workspace}}/build
       shell: bash
       run: |
-        if [ "${{ matrix.os }}" == "windows-latest" ]; then EXELOCATION=./$BUILD_TYPE/msync.exe; else EXELOCATION=./msync; fi
+        if [ "${{ matrix.os }}" == "windows-latest" ]; then EXELOCATION=${{runner.workspace}}/build/$BUILD_TYPE/msync.exe; else EXELOCATION=${{runner.workspace}}/build/msync; fi
         $EXELOCATION
         $EXELOCATION version
         $EXELOCATION yeehaw
@@ -144,8 +144,7 @@ jobs:
       run: strip --strip-unneeded ./msync
       
     - name: Prepare release notes
-      working-directory: ${{runner.workspace}}/build
-      run: git tag -l --format='%(contents)' ${{ github.ref }} > msync_release_notes.md
+      run: git tag -l --format='%(contents)' ${{ github.ref }} > ${{runner.workspace}}/build/msync_release_notes.md
     
     - name: Create release
       id: create_release
