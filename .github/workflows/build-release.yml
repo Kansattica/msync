@@ -64,17 +64,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    - name: Get branch and tag names
-      id: branch_name
-      shell: bash
-      run: |
-        echo $GITHUB_REF
-        echo ${GITHUB_REF#refs/*/}
-        echo ${GITHUB_REF#refs/heads/}
-        echo ${GITHUB_REF#refs/tags/}
-        echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
-        echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
-        echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+    - name: Get Version
+      id: get_version
+      # You may pin to the exact commit or the version.
+      uses: battila7/get-version-action@v2.0.0
   
     - name: Enable cross-compilation if needed
       if: matrix.os == 'ubuntu-latest' && matrix.arch == 'i386'
@@ -125,7 +118,7 @@ jobs:
         $EXELOCATION version
         $EXELOCATION yeehaw
         echo "::set-output name=exe_location::$EXELOCATION"
-        FINISHED_BINARY_NAME=msync-${{ steps.branch_name.outputs.SOURCE_TAG }}-
+        FINISHED_BINARY_NAME=msync-${{ steps.get_version.outputs.version }}-
         if [[ "${{ matrix.configure_args }}" == *"MSYNC_USER_CONFIG=ON"* ]]; then FINISHED_BINARY_NAME+="install-"; else FINISHED_BINARY_NAME+="portable-"; fi
         if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then FINISHED_BINARY_NAME+="linux-${{ matrix.arch }}-${{ matrix.compiler }}"; fi
         if [ "${{ matrix.os }}" = "windows-latest" ]; then FINISHED_BINARY_NAME+="windows-${{ matrix.arch }}.exe"; fi
@@ -164,7 +157,7 @@ jobs:
         # The name of the tag. This should come from the webhook payload, `github.GITHUB_REF` when a user pushes a new tag
         tag_name: ${{ github.ref }}
         # The name of the release. For example, `Release v1.0.1`
-        release_name: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+        release_name: ${{ steps.get_version.outputs.version }}
         body_path: ${{runner.workspace}}/build/msync_release_notes.md
     
     - name: Upload release binary
