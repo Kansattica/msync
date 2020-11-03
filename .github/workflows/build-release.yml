@@ -133,7 +133,7 @@ jobs:
       # Execute the build.  You can specify a specific target with "--target <NAME>"
       run: cmake --build . --config $BUILD_TYPE --parallel 2
     
-    - name: Smoke Test
+    - name: Find, Check, and Name Binary
       id: find-exe
       working-directory: ${{runner.workspace}}/build
       shell: bash
@@ -142,7 +142,6 @@ jobs:
         $EXELOCATION
         $EXELOCATION version
         $EXELOCATION yeehaw
-        echo "::set-output name=exe_location::$EXELOCATION"
         FINISHED_BINARY_NAME=msync-${{ steps.format_version.outputs.replaced }}-
         if [[ "${{ matrix.configure_args }}" == *"MSYNC_USER_CONFIG=ON"* ]]; then FINISHED_BINARY_NAME+="install-"; else FINISHED_BINARY_NAME+="portable-"; fi
         if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then FINISHED_BINARY_NAME+="linux-${{ matrix.arch }}-${{ steps.compiler_name.outputs.replaced }}"; fi
