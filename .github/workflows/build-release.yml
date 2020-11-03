@@ -168,9 +168,7 @@ jobs:
       id: make-debian-package
       working-directory: ${{runner.workspace}}/build
       if: matrix.make_deb
-      run: | 
-        cpack
-        cp *.deb ~/compiled_artifacts/
+      run: cpack && cp *.deb ~/compiled_artifacts/
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2.2.0
@@ -187,6 +185,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+
       - name: Make Artifact Directory
         run: mkdir artifacts
 
