@@ -116,7 +116,7 @@ jobs:
         FINISHED_BINARY_NAME=msync-${{ github.ref }}-
         if [[ "${{ matrix.configure_args }}" == *"MSYNC_USER_CONFIG=ON"* ]]; then FINISHED_BINARY_NAME+="install-"; else FINISHED_BINARY_NAME+="portable-"; fi
         if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then FINISHED_BINARY_NAME+="linux-${{ matrix.arch }}-${{ matrix.compiler }}"; fi
-        if [ "${{ matrix.os }}" = "windows-latest ]; then FINISHED_BINARY_NAME+="windows-${{ matrix.arch }}.exe"; fi
+        if [ "${{ matrix.os }}" = "windows-latest" ]; then FINISHED_BINARY_NAME+="windows-${{ matrix.arch }}.exe"; fi
         if [ "${{ matrix.os }}" = "macos-latest" ]; then FINISHED_BINARY_NAME+="osx-${{ matrix.deployment_target}}-x64"; fi
         echo $FINISHED_BINARY_NAME
         echo "::set-output name=binary_name::$FINISHED_BINARY_NAME"
