@@ -139,9 +139,13 @@ jobs:
       run: strip --strip-unneeded ./msync    
 
     - name: Make .deb package
+      id: make-debian-package
       working-directory: ${{runner.workspace}}/build
       if: matrix.make_deb
-      run: cpack
+      run: | 
+        cpack
+        echo "::set-output name=deb_path::$(realpath *.deb)"
+        echo "::set-output name=deb_name::$(basename *.deb)"  
       
     - name: Prepare release notes
       run: git tag -l --format='%(contents)' ${{ github.ref }} > ${{runner.workspace}}/build/msync_release_notes.md
@@ -162,11 +166,11 @@ jobs:
     - name: Upload release binary
       id: upload-release-asset 
       uses: actions/upload-release-asset@v1
-      if: startsWith(github.ref, 'refs/tags/v')
+      if: startsWith(github.ref, 'refs/tags/v') && matrix.make_deb
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ${{ steps.find-exe.outputs.exe_location }}
-        asset_name: ${{ steps.find-exe.outputs.binary_name }}
+        asset_path: ${{ steps.make-debian-package.outputs.deb_path }}
+        asset_name: ${{ steps.make-debian-package.outputs.deb_name }}
         asset_content_type: application/octet-stream
