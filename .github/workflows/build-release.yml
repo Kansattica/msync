@@ -39,7 +39,9 @@ jobs:
             make_deb: true
             apt: libcurl4-openssl-dev
           - os: macos-latest
+            deployment_target: '10.15'
           - os: macos-latest
+            deployment_target: '10.15'
             configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
           - os: macos-latest
             use_boost: true
@@ -49,12 +51,16 @@ jobs:
             use_boost: true
             deployment_target: '10.14'
           - os: windows-latest
+            arch: x64
             configure_args: -A x64
           - os: windows-latest
+            arch: Win32
             configure_args: -A Win32
           - os: windows-latest
+            arch: x64
             configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF -A x64
           - os: windows-latest
+            arch: Win32
             configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF -A Win32
 
     steps:
@@ -100,14 +106,22 @@ jobs:
       run: cmake --build . --config $BUILD_TYPE --parallel 2
     
     - name: Smoke Test
+      id: find-exe
       working-directory: ${{runner.workspace}}/build
       shell: bash
       run: |
-        ls
         if [ "${{ matrix.os }}" == "windows-latest" ]; then EXELOCATION=./$BUILD_TYPE/msync.exe; else EXELOCATION=./msync; fi
         $EXELOCATION
         $EXELOCATION version
         $EXELOCATION yeehaw
+        echo "::set-output name=exe_location::$EXELOCATION"
+        FINISHED_BINARY_NAME=msync-${{ github.ref }}-
+        if [[ "${{ matrix.configure_args }}" == *"MSYNC_USER_CONFIG=ON"* ]]; then FINISHED_BINARY_NAME+="install-"; else FINISHED_BINARY_NAME+="portable-"; fi
+        if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then FINISHED_BINARY_NAME+="linux-${{ matrix.arch }}-${{ matrix.compiler }}"; fi
+        if [ "${{ matrix.os }}" = "windows-latest ]; then FINISHED_BINARY_NAME+="windows-${{ matrix.arch }}.exe"; fi
+        if [ "${{ matrix.os }}" = "macos-latest" ]; then FINISHED_BINARY_NAME+="osx-${{ matrix.deployment_target}}-x64"; fi
+        echo $FINISHED_BINARY_NAME
+        echo "::set-output name=binary_name::$FINISHED_BINARY_NAME"
 
     - name: Test
       working-directory: ${{runner.workspace}}/build
@@ -115,4 +129,41 @@ jobs:
       # Execute tests defined by the CMake configuration.  
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C $BUILD_TYPE --output-on-failure --schedule-random -j 2
+    
+    - name: Make .deb package
+      working-directory: ${{runner.workspace}}/build
+      if: matrix.make_deb
+      run: cpack
+    
+    - name: Strip Linux binaries
+      working-directory: ${{runner.workspace}}/build
+      if: matrix.os == 'ubuntu-latest'
+      run: strip --strip-unneeded ./msync
       
+    - name: Prepare release notes
+      working-directory: ${{runner.workspace}}/build
+      run: git tag -l --format='%(contents)' $TRAVIS_TAG > msync_release_notes.md
+    
+    - name: Create a Release
+      id: create_release
+      uses: actions/create-release@v1.1.4
+      if: startsWith(github.ref, 'refs/tags/v')
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        # The name of the tag. This should come from the webhook payload, `github.GITHUB_REF` when a user pushes a new tag
+        tag_name: ${{ github.ref }}
+        # The name of the release. For example, `Release v1.0.1`
+        release_name: ${{ github.ref }}
+        body_path: ${{runner.workspace}}/build/msync_release_notes.md
+    
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: ${{ steps.find-exe.outputs.exe_location }}
+        asset_name: ${{ steps.find-exe.outputs.binary_name }}
+        asset_content_type: application/octet-stream
