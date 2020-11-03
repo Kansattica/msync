@@ -148,7 +148,7 @@ jobs:
       
     - name: Prepare release notes
       working-directory: ${{runner.workspace}}/build
-      run: git tag -l --format='%(contents)' $TRAVIS_TAG > msync_release_notes.md
+      run: git tag -l --format='%(contents)' ${{ github.ref }} > msync_release_notes.md
     
     - name: Create release
       id: create_release
