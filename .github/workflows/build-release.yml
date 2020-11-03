@@ -68,6 +68,21 @@ jobs:
       id: get_version
       # You may pin to the exact commit or the version.
       uses: battila7/get-version-action@v2.0.0
+      
+    - name: Format version
+      id: format_version
+      # You may pin to the exact commit or the version.
+      # uses: frabert/replace-string-action@4ec615c8a75164a61d8fb333ad5e2e86ff038af1
+      uses: frabert/replace-string-action@v1.2
+      with:
+        # Regular expression pattern
+        pattern: '(/)'
+        # The input string
+        string: ${{ steps.get_version.outputs.version }}
+        # What to replace with
+        replace-with: _
+        # Flags to use when matching
+        flags: g 
   
     - name: Enable cross-compilation if needed
       if: matrix.os == 'ubuntu-latest' && matrix.arch == 'i386'
@@ -118,7 +133,7 @@ jobs:
         $EXELOCATION version
         $EXELOCATION yeehaw
         echo "::set-output name=exe_location::$EXELOCATION"
-        FINISHED_BINARY_NAME=msync-${{ steps.get_version.outputs.version }}-
+        FINISHED_BINARY_NAME=msync-${{ steps.format_version.outputs.replaced }}-
         if [[ "${{ matrix.configure_args }}" == *"MSYNC_USER_CONFIG=ON"* ]]; then FINISHED_BINARY_NAME+="install-"; else FINISHED_BINARY_NAME+="portable-"; fi
         if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then FINISHED_BINARY_NAME+="linux-${{ matrix.arch }}-${{ matrix.compiler }}"; fi
         if [ "${{ matrix.os }}" = "windows-latest" ]; then FINISHED_BINARY_NAME+="windows-${{ matrix.arch }}.exe"; fi
