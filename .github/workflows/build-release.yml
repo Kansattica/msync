@@ -142,20 +142,14 @@ jobs:
         $EXELOCATION
         $EXELOCATION version
         $EXELOCATION yeehaw
-        if ! command -v realpath &> /dev/null
-        then
-           function realpath() {
-              readlink -f $1          
-           }
-        fi
         FINISHED_BINARY_NAME=msync-${{ steps.format_version.outputs.replaced }}-
         if [[ "${{ matrix.configure_args }}" == *"MSYNC_USER_CONFIG=ON"* ]]; then FINISHED_BINARY_NAME+="install-"; else FINISHED_BINARY_NAME+="portable-"; fi
         if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then FINISHED_BINARY_NAME+="linux-${{ matrix.arch }}-${{ steps.compiler_name.outputs.replaced }}"; fi
         if [ "${{ matrix.os }}" = "windows-latest" ]; then FINISHED_BINARY_NAME+="windows-${{ matrix.arch }}.exe"; fi
         if [ "${{ matrix.os }}" = "macos-latest" ]; then FINISHED_BINARY_NAME+="osx-${{ matrix.deployment_target}}-x64"; fi
         echo $FINISHED_BINARY_NAME
-        cp $EXELOCATION $FINISHED_BINARY_NAME
-        echo "::set-output name=exe_location::$(realpath $FINISHED_BINARY_NAME)"
+        mkdir ~/compiled_artifacts
+        cp $EXELOCATION ~/compiled_artifacts/$FINISHED_BINARY_NAME
         echo "::set-output name=binary_name::$FINISHED_BINARY_NAME"
 
     - name: Test
@@ -168,7 +162,7 @@ jobs:
     - name: Strip Linux Binaries
       working-directory: ${{runner.workspace}}/build
       if: matrix.os == 'ubuntu-latest'
-      run: strip --strip-unneeded ./msync ${{ steps.find-exe.outputs.exe_location }}
+      run: strip --strip-unneeded msync ~/compiled_artifacts/*
 
     - name: Make Debian Package
       id: make-debian-package
@@ -176,6 +170,7 @@ jobs:
       if: matrix.make_deb
       run: | 
         cpack
+        cp *.deb ~/compiled_artifacts/
         echo "::set-output name=deb_path::$(realpath *.deb)"
         echo "::set-output name=deb_name::$(basename *.deb)"  
 
@@ -185,18 +180,7 @@ jobs:
         # Artifact name
         name: ${{ steps.find-exe.outputs.binary_name }} # optional, default is artifact
         # A file, directory or wildcard pattern that describes what to upload
-        path: ${{ steps.find-exe.outputs.exe_location }}
-        # The desired behavior if no files are found using the provided path.
-        if-no-files-found: error
-    
-    - name: Upload Debian Package As Artifact
-      uses: actions/upload-artifact@v2.2.0
-      if: matrix.make_deb
-      with:
-        # Artifact name
-        name: ${{ steps.make-debian-package.outputs.deb_name }} # optional, default is artifact
-        # A file, directory or wildcard pattern that describes what to upload
-        path: ${{ steps.make-debian-package.outputs.deb_path }}
+        path: ~/compiled_artifacts/*
         # The desired behavior if no files are found using the provided path.
         if-no-files-found: error
   
