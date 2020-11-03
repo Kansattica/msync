@@ -39,17 +39,15 @@ jobs:
             make_deb: true
             apt: libcurl4-openssl-dev
           - os: macos-latest
-            deployment_target: '10.15'
+            deployment_target: 10.15
           - os: macos-latest
-            deployment_target: '10.15'
+            deployment_target: 10.15
             configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
           - os: macos-latest
-            use_boost: true
-            deployment_target: '10.14'
+            deployment_target: 10.14
           - os: macos-latest
             configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
-            use_boost: true
-            deployment_target: '10.14'
+            deployment_target: 10.14
           - os: windows-latest
             arch: x64
             configure_args: -A x64
@@ -71,7 +69,7 @@ jobs:
       run: sudo dpkg --add-architecture i386 && sudo apt update
 
     - name: Install OSX dependencies
-      if: matrix.os == 'macos-latest' && matrix.use_boost
+      if: matrix.os == 'macos-latest' && matrix.deployment_target < 10.15
       run: brew install boost
 
     - name: Install Linux dependencies
