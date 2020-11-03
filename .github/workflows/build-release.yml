@@ -68,11 +68,11 @@ jobs:
       with:
         xcode-version: '10.3'
 
-    - name: Use older OSX SDK if needed
+    - name: Install OSX dependencies
       if: matrix.os == 'macos-latest' && matrix.use_boost
       run: brew install boost
 
-    - name: Install dependencies
+    - name: Install Linux dependencies
       if: matrix.os == 'ubuntu-latest'
       run: sudo apt-fast install -y ${{ matrix.apt }}
       
