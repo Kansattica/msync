@@ -163,7 +163,7 @@ jobs:
     - name: Strip Linux binaries
       working-directory: ${{runner.workspace}}/build
       if: matrix.os == 'ubuntu-latest'
-      run: strip --strip-unneeded ${{ steps.find-exe.outputs.exe_location }}
+      run: strip --strip-unneeded ./msync ${{ steps.find-exe.outputs.exe_location }}
 
     - name: Make .deb package
       id: make-debian-package
