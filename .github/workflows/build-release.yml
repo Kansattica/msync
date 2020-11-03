@@ -64,12 +64,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    - name: Get version
+    - name: Get Version
       id: get_version
       # You may pin to the exact commit or the version.
       uses: battila7/get-version-action@v2.0.0
       
-    - name: Format version
+    - name: Format Version
       id: format_version
       uses: frabert/replace-string-action@v1.2
       with:
@@ -82,7 +82,7 @@ jobs:
         # Flags to use when matching
         flags: g 
         
-    - name: Clean up compiler name
+    - name: Clean Up Compiler Name
       id: compiler_name
       if: matrix.os == 'ubuntu-latest'
       uses: frabert/replace-string-action@v1.2
@@ -94,15 +94,15 @@ jobs:
         # What to replace with
         replace-with: '$1'
         
-    - name: Enable cross-compilation if needed
+    - name: Enable Cross-Compilation If Needed
       if: matrix.os == 'ubuntu-latest' && matrix.arch == 'i386'
       run: sudo dpkg --add-architecture i386 && sudo apt update
 
-    - name: Install OSX dependencies
+    - name: Install OSX Dependencies
       if: matrix.os == 'macos-latest' && matrix.deployment_target < 10.15
       run: brew install boost
 
-    - name: Install Linux dependencies
+    - name: Install Linux Dependencies
       if: matrix.os == 'ubuntu-latest'
       run: sudo apt-fast install -y ${{ matrix.apt }}
       
@@ -159,12 +159,12 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C $BUILD_TYPE --output-on-failure --schedule-random -j 2
     
-    - name: Strip Linux binaries
+    - name: Strip Linux Binaries
       working-directory: ${{runner.workspace}}/build
       if: matrix.os == 'ubuntu-latest'
       run: strip --strip-unneeded ./msync ${{ steps.find-exe.outputs.exe_location }}
 
-    - name: Make .deb package
+    - name: Make Debian Package
       id: make-debian-package
       working-directory: ${{runner.workspace}}/build
       if: matrix.make_deb
@@ -173,7 +173,7 @@ jobs:
         echo "::set-output name=deb_path::$(realpath *.deb)"
         echo "::set-output name=deb_name::$(basename *.deb)"  
 
-    - name: Upload binary as artifact
+    - name: Upload Binary As Artifact
       uses: actions/upload-artifact@v2.2.0
       with:
         # Artifact name
@@ -183,7 +183,7 @@ jobs:
         # The desired behavior if no files are found using the provided path.
         if-no-files-found: error
     
-    - name: Upload .deb package as artifact
+    - name: Upload Debian Package As Artifact
       uses: actions/upload-artifact@v2.2.0
       if: matrix.make_deb
       with:
@@ -199,32 +199,32 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Make artifact directory
+      - name: Make Artifact Directory
         run: mkdir artifacts
 
-      - name: Download build artifacts
+      - name: Download Built Artifacts
         id: download-artifacts
         uses: actions/download-artifact@v2.0.5
         with:
           path: artifacts
         
-      - name: List artifacts
+      - name: List Artifacts
         run: |
           echo ${{ steps.download-artifacts.outputs.download-path }}
           ls -R ${{ steps.download-artifacts.outputs.download-path }}
           
-      - name: Prepare release notes
+      - name: Prepare Release Notes
         id: release-notes
         run: |
           git tag -l --format='%(contents)' ${{ github.ref }} > msync_release_notes.md
           cat msync_release_notes.md
           echo "::set-output name=release_notes_path::$(realpath msync_release_notes.md)"          
     
-      - name: Get version
+      - name: Get Version
         id: get_version
         uses: battila7/get-version-action@v2.0.0
 
-      - name: Create release
+      - name: Create Release
         id: create_release
         uses: actions/create-release@v1.1.4
         if: startsWith(github.ref, 'refs/tags/v')
@@ -238,7 +238,7 @@ jobs:
           body_path: ${{ steps.release-notes.outputs.release_notes_path }}
           draft: true
 
-      - name: Upload release assets
+      - name: Upload Release Assets
         if: startsWith(github.ref, 'refs/tags/v')
         uses: alexellis/upload-assets@0.2.3
         env:
