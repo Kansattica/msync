@@ -1,6 +1,6 @@
 name: CMake
 
-on: [push, pull_request, tags]
+on: [push, pull_request]
 
 
 jobs:
