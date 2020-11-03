@@ -98,9 +98,19 @@ jobs:
       if: matrix.os == 'ubuntu-latest' && matrix.arch == 'i386'
       run: sudo dpkg --add-architecture i386 && sudo apt update
 
-    - name: Install OSX Dependencies
+    - name: Install Boost For Earlier OSX Versions
       if: matrix.os == 'macos-latest' && matrix.deployment_target < 10.15
       run: brew install boost
+    
+    - name: Install Realpath For OSX
+      if: matrix.os == 'macos-latest'
+      run: |
+        git clone https://github.com/harto/realpath-osx.git
+        cd realpath-osx
+        make
+        sudo make install
+        cd ..
+        rm -rf realpath-osx
 
     - name: Install Linux Dependencies
       if: matrix.os == 'ubuntu-latest'
