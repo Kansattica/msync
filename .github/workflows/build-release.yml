@@ -64,7 +64,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    - name: Get Version
+    - name: Get version
       id: get_version
       # You may pin to the exact commit or the version.
       uses: battila7/get-version-action@v2.0.0
@@ -139,6 +139,8 @@ jobs:
         if [ "${{ matrix.os }}" = "windows-latest" ]; then FINISHED_BINARY_NAME+="windows-${{ matrix.arch }}.exe"; fi
         if [ "${{ matrix.os }}" = "macos-latest" ]; then FINISHED_BINARY_NAME+="osx-${{ matrix.deployment_target}}-x64"; fi
         echo $FINISHED_BINARY_NAME
+        mv $EXELOCATION $FINISHED_BINARY_NAME
+        echo "::set-output name=exe_location::$(realpath $FINISHED_BINARY_NAME)"
         echo "::set-output name=binary_name::$FINISHED_BINARY_NAME"
 
     - name: Test
@@ -161,23 +163,6 @@ jobs:
         cpack
         echo "::set-output name=deb_path::$(realpath *.deb)"
         echo "::set-output name=deb_name::$(basename *.deb)"  
-      
-    - name: Prepare release notes
-      run: git tag -l --format='%(contents)' ${{ github.ref }} > ${{runner.workspace}}/build/msync_release_notes.md
-    
-    - name: Create release
-      id: create_release
-      uses: actions/create-release@v1.1.4
-      if: startsWith(github.ref, 'refs/tags/v')
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        # The name of the tag. This should come from the webhook payload, `github.GITHUB_REF` when a user pushes a new tag
-        tag_name: ${{ github.ref }}
-        # The name of the release. For example, `Release v1.0.1`
-        release_name: ${{ steps.get_version.outputs.version }}
-        body_path: ${{runner.workspace}}/build/msync_release_notes.md
-        draft: true
 
     - name: Upload binary as artifact
       uses: actions/upload-artifact@v2.2.0
@@ -199,39 +184,55 @@ jobs:
         path: ${{ steps.make-debian-package.outputs.deb_path }}
         # The desired behavior if no files are found using the provided path.
         if-no-files-found: error
-    
-    - name: Upload release binary
-      id: upload-release-asset 
-      uses: actions/upload-release-asset@v1
-      if: startsWith(github.ref, 'refs/tags/v')
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ${{ steps.find-exe.outputs.exe_location }}
-        asset_name: ${{ steps.find-exe.outputs.binary_name }}
-        asset_content_type: application/octet-stream
-
-    - name: Upload .deb package 
-      uses: actions/upload-release-asset@v1
-      if: startsWith(github.ref, 'refs/tags/v') && matrix.make_deb
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ${{ steps.make-debian-package.outputs.deb_path }}
-        asset_name: ${{ steps.make-debian-package.outputs.deb_name }}
-        asset_content_type: application/octet-strea
   
   release:
     #if: startsWith(github.ref, 'refs/tags/v')
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Make artifact directory
+        run: mkdir artifacts
+
       - name: Download build artifacts
         id: download-artifacts
         uses: actions/download-artifact@v2.0.5
+        with:
+          path: artifacts
+        
       - name: List artifacts
         run: |
-          echo ${{steps.download-artifacts.outputs.download-path}}
-          ls -R ${{steps.download-artifacts.outputs.download-path}}
+          echo ${{ steps.download-artifacts.outputs.download-path }}
+          ls -R ${{ steps.download-artifacts.outputs.download-path }}
+          
+      - name: Prepare release notes
+        id: release-notes
+        run: |
+          git tag -l --format='%(contents)' ${{ github.ref }} > msync_release_notes.md
+          cat msync_release_notes.md
+          echo "::set-output name=release_notes_path::$(realpath msync_release_notes.md)"          
+    
+      - name: Get version
+        id: get_version
+        uses: battila7/get-version-action@v2.0.0
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1.1.4
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # The name of the tag. This should come from the webhook payload, `github.GITHUB_REF` when a user pushes a new tag
+          tag_name: ${{ github.ref }}
+          # The name of the release. For example, `Release v1.0.1`
+          release_name: ${{ steps.get_version.outputs.version }}
+          body_path: ${{ steps.release-notes.outputs.release_notes_path }}
+          draft: true
+
+      - name: Upload release assets
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: alexellis/upload-assets@0.2.3
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          asset_paths: '["artifacts/**/*"]'
