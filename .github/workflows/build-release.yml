@@ -43,9 +43,11 @@ jobs:
             configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
           - os: macos-latest
             use_boost: true
+            deployment_target: '10.14'
           - os: macos-latest
             configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
             use_boost: true
+            deployment_target: '10.14'
           - os: windows-latest
             configure_args: -A x64
           - os: windows-latest
@@ -61,12 +63,6 @@ jobs:
     - name: Enable cross-compilation if needed
       if: matrix.os == 'ubuntu-latest' && matrix.arch == 'i386'
       run: sudo dpkg --add-architecture i386 && sudo apt update
-    
-    - name: Setup Xcode version
-      uses: maxim-lobanov/setup-xcode@v1.2.1
-      if: matrix.os == 'macos-latest' && matrix.use_boost
-      with:
-        xcode-version: '10.3'
 
     - name: Install OSX dependencies
       if: matrix.os == 'macos-latest' && matrix.use_boost
@@ -95,6 +91,7 @@ jobs:
         CXX: ${{ matrix.cxx_compiler }}
         CFLAGS: ${{ matrix.cflags }}
         CXXFLAGS: ${{ matrix.cflags }}
+        CMAKE_OSX_DEPLOYMENT_TARGET: ${{ matrix.deployment_target }}
 
     - name: Build
       working-directory: ${{runner.workspace}}/build
