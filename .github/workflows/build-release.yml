@@ -84,7 +84,7 @@ jobs:
         
     - name: Clean up compiler name
       id: compiler_name
-      if: matrix.os == "ubuntu-latest"
+      if: matrix.os == 'ubuntu-latest'
       uses: frabert/replace-string-action@v1.2
       with:
         # Regular expression pattern
