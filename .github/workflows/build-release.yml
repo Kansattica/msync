@@ -236,4 +236,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          asset_paths: '["artifacts/**/*"]'
+          asset_paths: '["./artifacts/**/msync*"]'
