@@ -208,6 +208,7 @@ jobs:
         id: release-notes
         working-directory: ${{runner.workspace}}/code
         run: |
+          pwd
           git tag -l --format='%(contents)' ${{ steps.get_version.outputs.version }}
           echo "And for the file."
           git tag -l --format='%(contents)' ${{ steps.get_version.outputs.version }} > msync_release_notes.md
