@@ -66,7 +66,6 @@ jobs:
      
     - name: Get Version
       id: get_version
-      # You may pin to the exact commit or the version.
       uses: battila7/get-version-action@v2.0.0
     
     - name: Format Version
@@ -187,6 +186,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
           path: code
+
+      - name: Get Version
+        id: get_version
+        uses: battila7/get-version-action@v2.0.0
 
       - name: Download Built Artifacts
         id: download-artifacts
