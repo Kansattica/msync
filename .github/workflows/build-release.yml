@@ -63,11 +63,22 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    
+     
     - name: Get Version
       id: get_version
       # You may pin to the exact commit or the version.
       uses: battila7/get-version-action@v2.0.0
+    
+    - name: Messing With Git
+      shell: bash
+      run: |
+        git show
+        echo "---------"
+        git tag -l --format='%(contents)' ${{ steps.get_version.outputs.version }}
+        echo "---------"
+        git tag -l --format='%(contents)' $GITHUB_REF
+        echo "---------"
+        git tag -n99 --format='%(contents)' --contains
       
     - name: Format Version
       id: format_version
