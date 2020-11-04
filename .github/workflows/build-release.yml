@@ -72,6 +72,8 @@ jobs:
     - name: Messing With Git
       shell: bash
       run: |
+        git fetch --tags --depth=1 origin +refs/tags/*:refs/tags/*
+        echo "---------"
         git tag -l --format='%(contents)' ${{ steps.get_version.outputs.version }}
         echo "---------"
         git tag -l --format='%(contents)' $GITHUB_REF
