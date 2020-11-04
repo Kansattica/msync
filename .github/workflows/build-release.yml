@@ -186,9 +186,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
-      - name: Make Artifact Directory
-        run: mkdir artifacts
+        with:
+          path: code
 
       - name: Download Built Artifacts
         id: download-artifacts
@@ -203,6 +202,7 @@ jobs:
           
       - name: Prepare Release Notes
         id: release-notes
+        working-directory: ${{runner.workspace}}/code
         run: |
           git tag -l --format='%(contents)' ${{ github.ref }} > msync_release_notes.md
           cat msync_release_notes.md
