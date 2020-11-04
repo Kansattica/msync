@@ -69,17 +69,6 @@ jobs:
       # You may pin to the exact commit or the version.
       uses: battila7/get-version-action@v2.0.0
     
-    - name: Messing With Git
-      shell: bash
-      run: |
-        git fetch --tags --depth=1 origin +refs/tags/*:refs/tags/*
-        echo "---------"
-        git tag -l --format='%(contents)' ${{ steps.get_version.outputs.version }}
-        echo "---------"
-        git tag -l --format='%(contents)' $GITHUB_REF
-        echo "---------"
-        git tag -n99 --format='%(contents)' --contains
-      
     - name: Format Version
       id: format_version
       uses: frabert/replace-string-action@v1.2
@@ -210,22 +199,12 @@ jobs:
           echo ${{ steps.download-artifacts.outputs.download-path }}
           ls -R ${{ steps.download-artifacts.outputs.download-path }}
       
-      - name: Get Version
-        id: get_version
-        uses: battila7/get-version-action@v2.0.0
-          
       - name: Prepare Release Notes
         id: release-notes
         run: |
-          pwd
-          ls
           cd code
-          ls
-          git show
-          git tag -l --format='%(contents)' ${{ steps.get_version.outputs.version }}
-          echo "And for the file."
-          git tag -l --format='%(contents)' ${{ steps.get_version.outputs.version }} > msync_release_notes.md
-          ls
+          git fetch --tags --depth=1 origin +refs/tags/*:refs/tags/*
+          git tag -n99 --format='%(contents)' --contains > msync_release_notes.md
           cat msync_release_notes.md
           echo "::set-output name=release_notes_path::$(realpath msync_release_notes.md)"
 
