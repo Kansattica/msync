@@ -50,14 +50,14 @@ jobs:
           - os: windows-latest
             arch: Win32
             configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF -A Win32
-          - os: macos-latest
+          - os: macos-10.15
             deployment_target: 10.15
-          - os: macos-latest
+          - os: macos-10.15
             deployment_target: 10.15
             configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
-          - os: macos-latest
+          - os: macos-10.15
             deployment_target: 10.14
-          - os: macos-latest
+          - os: macos-10.15
             configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
             deployment_target: 10.14
 
@@ -99,7 +99,7 @@ jobs:
       run: sudo dpkg --add-architecture i386 && sudo apt update
 
     - name: Install Boost For Earlier OSX Versions
-      if: matrix.os == 'macos-latest' && matrix.deployment_target < 10.15
+      if: matrix.os == 'macos-10.15' && matrix.deployment_target < 10.15
       run: brew install boost
 
     - name: Install Linux Dependencies
@@ -146,7 +146,7 @@ jobs:
         if [[ "${{ matrix.configure_args }}" == *"MSYNC_USER_CONFIG=ON"* ]]; then FINISHED_BINARY_NAME+="install-"; else FINISHED_BINARY_NAME+="portable-"; fi
         if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then FINISHED_BINARY_NAME+="linux-${{ matrix.arch }}-${{ steps.compiler_name.outputs.replaced }}"; fi
         if [ "${{ matrix.os }}" = "windows-latest" ]; then FINISHED_BINARY_NAME+="windows-${{ matrix.arch }}.exe"; fi
-        if [ "${{ matrix.os }}" = "macos-latest" ]; then FINISHED_BINARY_NAME+="osx-${{ matrix.deployment_target}}-x64"; fi
+        if [ "${{ matrix.os }}" = "macos-10.15" ]; then FINISHED_BINARY_NAME+="osx-${{ matrix.deployment_target}}-x64"; fi
         mkdir ~/compiled_artifacts
         cp $EXELOCATION ~/compiled_artifacts/$FINISHED_BINARY_NAME
         echo "::set-output name=binary_name::$FINISHED_BINARY_NAME"
