@@ -222,11 +222,12 @@ jobs:
           # The name of the release. For example, `Release v1.0.1`
           release_name: ${{ steps.get_version.outputs.version }}
           body_path: ${{ steps.release-notes.outputs.release_notes_path }}
-          draft: true
+          draft: false
+          prerelease: true
 
       - name: Upload Release Assets
         uses: alexellis/upload-assets@0.2.3
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          asset_paths: '["./artifacts/**/msync*"]'
+          asset_paths: '["artifacts/**/msync*"]'
