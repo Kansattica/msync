@@ -201,6 +201,13 @@ jobs:
         run: |
           echo ${{ steps.download-artifacts.outputs.download-path }}
           ls -R ${{ steps.download-artifacts.outputs.download-path }}
+
+      - name: Gather Artifacts
+        run: |
+          mkdir justthefacts
+          shopt -s globstar
+          mv artifacts/**/* justthefacts
+          ls justthefacts
       
       - name: Prepare Release Notes
         id: release-notes
@@ -222,12 +229,11 @@ jobs:
           # The name of the release. For example, `Release v1.0.1`
           release_name: ${{ steps.get_version.outputs.version }}
           body_path: ${{ steps.release-notes.outputs.release_notes_path }}
-          draft: false
-          prerelease: true
+          draft: true
 
       - name: Upload Release Assets
         uses: alexellis/upload-assets@0.2.3
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          asset_paths: '["artifacts/**/*"]'
+          asset_paths: '["justthefacts/*"]'
