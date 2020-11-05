@@ -7,7 +7,7 @@
 
 ### Get msync
 
-You can download the latest stable release of `msync` [here](https://github.com/Kansattica/msync/releases) or the Releases tab above. 
+You can download the latest stable release of `msync` [here](https://github.com/Kansattica/msync/releases) or the Releases link to the right. 
 
 #### Which release should I download?
 
