@@ -9,6 +9,9 @@ platform:
 steps:
   - name: build
     image: ubuntu:20.04
+    environment:
+      DEBIAN_FRONTEND=noninteractive
+      TZ=America/Los_Angeles
     commands:
     - apt update && apt install -y build-essential cmake libcurl4-gnutls-dev
     - cmake -E make_directory build
@@ -30,6 +33,9 @@ platform:
 steps:
   - name: build
     image: ubuntu:20.04
+    environment:
+      DEBIAN_FRONTEND=noninteractive
+      TZ=America/Los_Angeles
     commands:
     - apt update && apt install -y build-essential cmake libcurl4-gnutls-dev
     - cmake -E make_directory build
