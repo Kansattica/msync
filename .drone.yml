@@ -1,0 +1,18 @@
+kind: pipeline
+type: docker
+name: arm
+
+platform:
+  arch: arm64
+
+steps:
+  - name: build
+    image: rikorose/gcc-cmake
+    commands:
+    - cmake -E make_directory build
+    - cd build
+    - cmake .. -DCMAKE_BUILD_TYPE=Release -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
+    - cmake --build . --config Release --parallel
+    - ctest -C Release --output-on-failure --schedule-random -j
+    - mv msync linux-arm64-${DRONE_TAG}-install
+    - ls
