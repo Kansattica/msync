@@ -217,7 +217,7 @@ private:
 			// if you get less than you asked for, you're done
 		} while (loop_iterations > 0 && (incoming.size() == limit));
 
-		plverb() << "Wrote " << total_posts_written << pluralize(total_posts_written, "post.", " posts.") << '\n';
+		plverb() << "Wrote " << total_posts_written << pluralize(total_posts_written, " post.", " posts.") << '\n';
 		return highest_id_seen;
 	}
 };
