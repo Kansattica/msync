@@ -13,7 +13,6 @@ steps:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
-    - cat /proc/cpuinfo
     - apt update && apt install -y build-essential cmake libcurl4-gnutls-dev git
     - cmake -E make_directory build
     - cd build
