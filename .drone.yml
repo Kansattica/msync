@@ -8,7 +8,7 @@ platform:
 
 steps:
   - name: build
-    image: rikorose/gcc-cmake
+    image: spritsail/alpine-cmake
     commands:
     - cmake -E make_directory build
     - cd build
@@ -28,7 +28,7 @@ platform:
 
 steps:
   - name: build
-    image: rikorose/gcc-cmake
+    image: spritsail/alpine-cmake
     commands:
     - cmake -E make_directory build
     - cd build
