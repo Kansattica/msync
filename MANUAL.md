@@ -9,13 +9,13 @@ The rest of this document will say "Mastodon", but Pleroma should work just as w
 
 #### Installing
 
-Once you've compiled or [downloaded](https://github.com/Kansattica/msync/releases) `msync` (see [README.md](./README.md)), you have a few options:
+Once you've compiled or [downloaded](https://github.com/Kansattica/msync/releases) `msync` (see [README.md](./README.md#which-release-should-i-download)), you have a few options:
 
 - leave it where it is and use it in place, or copy it to a folder in your home directory and use it from there.
 - copy the compiled `msync` executable to somewhere in your `$PATH`. 
 - if you're on a Debian-like system, run `sudo dpkg -i msync-<version>-Linux.deb`, which will install msync into `/usr/bin`.
 
-Any of these options work, but please read the note about `msync_accounts` below. If you downloaded a prebuilt release, your executable will be called something like `msync-v0.9.5-linux-x64`. Feel free to rename it to simply `msync` or whatever else you like. The rest of this manual will assume that your executable can be invoked simply by typing `msync` at the command line, and you can add a leading `./` or trailing `.exe` as appropriate.
+Any of these options work, but please read the note about `msync_accounts` below. If you downloaded a prebuilt release, your executable will be called something like `msync-v0.9.5-install-linux-x64-gcc`. Download the release for your operating system and architecture, and see below for the difference between `portable` and `install` builds. Feel free to rename it to simply `msync` or whatever else you like. The rest of this manual will assume that your executable can be invoked simply by typing `msync` at the command line, and you can add a leading `./` or trailing `.exe` as appropriate.
 
 #### A note about `msync_accounts`
 

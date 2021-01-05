@@ -7,11 +7,13 @@
 
 ### Get msync
 
-You can download the latest stable release of `msync` [here](https://github.com/Kansattica/msync/releases) or the Releases tab above. 
+You can download the latest stable release of `msync` [here](https://github.com/Kansattica/msync/releases) or the Releases link to the right. 
 
 #### Which release should I download?
 
 I recommend downloading the `.deb` file if you're on a Debian-like system that can install it. Otherwise, I recommend downloading the release for your system with `install` in the filename. This version will store user data in the appropriate place for your system. The versions without `install` store user data in the same directory as the executable. See [the manual](MANUAL.md#a-note-about-msync_accounts) for more information.
+
+If you're on OSX, the builds for 10.15 use std::filesystem APIs that are only available on OSX 10.15.
 
 If you would like to build `msync` yourself, read on. If you have a fairly recent version of CMake (3.12 or later), you can simply clone the repo, make a `build` directory, run CMake inside, and CMake will download and build `msync` and its dependencies automatically. 
 
@@ -44,7 +46,7 @@ Older Linux releases might require you to `apt install libstdc++-8-dev` or their
 
 #### Building on macOS
 
-The instructions for building on Linux should mostly work, though note that Apple only officially supports std::filesystem on Xcode 11.1 and Catalina/10.15 and up. `msync` does support pre-10.15 versions with Boost::filesystem, which you can install through Homebrew. I don't have a Mac to test on, but I do ensure that it builds and all unit tests pass. I test on OSX 10.14.6 with Xcode 11 and Boost::filesystem 1.72.0.
+The instructions for building on Linux should mostly work, though note that Apple only officially supports std::filesystem on Xcode 11.1 and Catalina/10.15 and up. `msync` does support pre-10.15 versions with Boost::filesystem, which you can install through Homebrew. I don't have a Mac to test on, but I do ensure that it builds and all unit tests pass. I test on OSX 10.15, producing builds for both 10.14 with Boost::filesystem 1.72.0 and 10.15 with Apple's std::filesystem implementation.
 
 #### Building on Windows
 
@@ -58,8 +60,10 @@ If you want something lighter weight, I suspect you can install the [build tools
 
 - gcc and clang on 64-bit Ubuntu
 - gcc on 32-bit Ubuntu
-- OSX 10.14 with Xcode 11 (requires Boost::filesystem)
+- OSX 10.15 with Xcode 12 
 - MSVC 2017 on 32 and 64-bit Windows 
+
+OSX 10.14 with Boost::filesystem should still work, but I've since changed CI providers and can't test on 10.14 any more.
 
 #### Relevant CMake flags
 

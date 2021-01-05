@@ -1,0 +1,239 @@
+name: Build and Release
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    if: "!contains(github.event.head_commit.message, 'no ci')"
+    # The CMake configure and build commands are platform agnostic and should work equally
+    # well on Windows or Mac.  You can convert this to a matrix build if you need
+    # cross-platform coverage.
+    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    runs-on: ${{ matrix.os }}
+    env:
+      BUILD_TYPE: Release
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            compiler: gcc-9
+            cxx_compiler: g++-9
+            arch: x64
+            apt: libcurl4-openssl-dev
+          - os: ubuntu-latest
+            compiler: clang-8
+            cxx_compiler: clang++-8
+            arch: x64
+            apt: libcurl4-openssl-dev
+          - os: ubuntu-latest
+            compiler: gcc-9
+            cxx_compiler: g++-9
+            arch: i386
+            cflags: -m32
+            apt: gcc-9-multilib g++-9-multilib libcurl4-openssl-dev:i386 linux-libc-dev:i386
+          - os: ubuntu-latest
+            compiler: gcc-9
+            cxx_compiler: g++-9
+            arch: x64
+            configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
+            make_deb: true
+            apt: libcurl4-openssl-dev
+          - os: windows-latest
+            arch: x64
+            configure_args: -A x64
+          - os: windows-latest
+            arch: Win32
+            configure_args: -A Win32
+          - os: windows-latest
+            arch: x64
+            configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF -A x64
+          - os: windows-latest
+            arch: Win32
+            configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF -A Win32
+          - os: macos-10.15
+            deployment_target: 10.15
+          - os: macos-10.15
+            deployment_target: 10.15
+            configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
+          - os: macos-10.15
+            deployment_target: 10.14
+          - os: macos-10.15
+            configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
+            deployment_target: 10.14
+
+    steps:
+    - uses: actions/checkout@v2
+     
+    - name: Get Version
+      id: get_version
+      uses: battila7/get-version-action@v2.0.0
+    
+    - name: Format Version
+      id: format_version
+      uses: frabert/replace-string-action@v1.2
+      with:
+        # Regular expression pattern
+        pattern: '(/)'
+        # The input string
+        string: ${{ steps.get_version.outputs.version }}
+        # What to replace with
+        replace-with: _
+        # Flags to use when matching
+        flags: g 
+        
+    - name: Clean Up Compiler Name
+      id: compiler_name
+      if: matrix.os == 'ubuntu-latest'
+      uses: frabert/replace-string-action@v1.2
+      with:
+        # Regular expression pattern
+        pattern: '([a-z]+)-[0-9]+'
+        # The input string
+        string: ${{ matrix.compiler }}
+        # What to replace with
+        replace-with: '$1'
+        
+    - name: Enable Cross-Compilation If Needed
+      if: matrix.os == 'ubuntu-latest' && matrix.arch == 'i386'
+      run: sudo dpkg --add-architecture i386 && sudo apt update
+
+    - name: Install Boost For Earlier OSX Versions
+      if: matrix.os == 'macos-10.15' && matrix.deployment_target < 10.15
+      run: brew install boost
+
+    - name: Install Linux Dependencies
+      if: matrix.os == 'ubuntu-latest'
+      run: sudo apt-fast install -y ${{ matrix.apt }}
+      
+    - name: Create Build Environment
+      # Some projects don't allow in-source building, so create a separate build directory
+      # We'll use this as our working directory for all subsequent commands
+      run: cmake -E make_directory ${{runner.workspace}}/build
+
+    - name: Configure CMake
+      # Use a bash shell so we can use the same syntax for environment variable
+      # access regardless of the host operating system
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      # Note the current convention is to use the -S and -B options here to specify source 
+      # and build directories, but this is only available with CMake 3.13 and higher.  
+      # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE ${{ matrix.configure_args }}
+      env:
+        CC: ${{ matrix.compiler }}
+        CXX: ${{ matrix.cxx_compiler }}
+        CFLAGS: ${{ matrix.cflags }}
+        CXXFLAGS: ${{ matrix.cflags }}
+        MACOSX_DEPLOYMENT_TARGET: ${{ matrix.deployment_target }}
+
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      # Execute the build.  You can specify a specific target with "--target <NAME>"
+      run: cmake --build . --config $BUILD_TYPE --parallel 2
+    
+    - name: Find, Check, and Name Binary
+      id: find-exe
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: |
+        if [ "${{ matrix.os }}" == "windows-latest" ]; then EXELOCATION="${{runner.workspace}}\build\\$BUILD_TYPE\msync.exe"; else EXELOCATION=${{runner.workspace}}/build/msync; fi
+        $EXELOCATION
+        $EXELOCATION version
+        $EXELOCATION yeehaw
+        FINISHED_BINARY_NAME=msync-${{ steps.format_version.outputs.replaced }}-
+        if [[ "${{ matrix.configure_args }}" == *"MSYNC_USER_CONFIG=ON"* ]]; then FINISHED_BINARY_NAME+="install-"; else FINISHED_BINARY_NAME+="portable-"; fi
+        if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then FINISHED_BINARY_NAME+="linux-${{ matrix.arch }}-${{ steps.compiler_name.outputs.replaced }}"; fi
+        if [ "${{ matrix.os }}" = "windows-latest" ]; then FINISHED_BINARY_NAME+="windows-${{ matrix.arch }}.exe"; fi
+        if [ "${{ matrix.os }}" = "macos-10.15" ]; then FINISHED_BINARY_NAME+="osx-${{ matrix.deployment_target}}-x64"; fi
+        mkdir ~/compiled_artifacts
+        cp $EXELOCATION ~/compiled_artifacts/$FINISHED_BINARY_NAME
+        echo "::set-output name=binary_name::$FINISHED_BINARY_NAME"
+
+    - name: Test
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      # Execute tests defined by the CMake configuration.  
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      run: ctest -C $BUILD_TYPE --output-on-failure --schedule-random -j 2
+    
+    - name: Strip Linux Binaries
+      working-directory: ${{runner.workspace}}/build
+      if: matrix.os == 'ubuntu-latest'
+      run: strip --strip-unneeded msync ~/compiled_artifacts/*
+
+    - name: Make Debian Package
+      id: make-debian-package
+      working-directory: ${{runner.workspace}}/build
+      if: matrix.make_deb
+      run: cpack && cp *.deb ~/compiled_artifacts/
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2.2.0
+      with:
+        # Artifact name
+        name: ${{ steps.find-exe.outputs.binary_name }} # optional, default is artifact
+        # A file, directory or wildcard pattern that describes what to upload
+        path: ~/compiled_artifacts/*
+        # The desired behavior if no files are found using the provided path.
+        if-no-files-found: error
+  
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: code
+
+      - name: Get Version
+        id: get_version
+        uses: battila7/get-version-action@v2.0.0
+
+      - name: Download Built Artifacts
+        id: download-artifacts
+        uses: actions/download-artifact@v2.0.5
+        with:
+          path: artifacts
+        
+      - name: List Artifacts
+        run: |
+          echo ${{ steps.download-artifacts.outputs.download-path }}
+          ls -R ${{ steps.download-artifacts.outputs.download-path }}
+
+      - name: Gather Artifacts
+        run: |
+          mkdir justthefacts
+          find artifacts -type f -print -exec mv {} justthefacts \;
+          ls justthefacts
+      
+      - name: Prepare Release Notes
+        id: release-notes
+        run: |
+          cd code
+          git fetch --tags --depth=1 origin +refs/tags/*:refs/tags/*
+          git tag -n99 --format='%(contents)' --contains > msync_release_notes.md
+          cat msync_release_notes.md
+          echo "::set-output name=release_notes_path::$(realpath msync_release_notes.md)"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1.1.4
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # The name of the tag. This should come from the webhook payload, `github.GITHUB_REF` when a user pushes a new tag
+          tag_name: ${{ github.ref }}
+          # The name of the release. For example, `Release v1.0.1`
+          release_name: ${{ steps.get_version.outputs.version }}
+          body_path: ${{ steps.release-notes.outputs.release_notes_path }}
+          draft: false
+          prerelease: true
+
+      - name: Upload Release Assets
+        uses: alexellis/upload-assets@0.2.3
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          asset_paths: '["justthefacts/*"]'

@@ -9,4 +9,6 @@ if((CMAKE_BUILD_TYPE MATCHES Release) OR (CMAKE_BUILD_TYPE MATCHES MinSizeRel) O
 	else()
 		message(STATUS "IPO / LTO not supported: <${error}>")
 	endif()
+else()
+	message("Not testing for IPO / LTO support because build type is ${CMAKE_BUILD_TYPE}.")
 endif()
