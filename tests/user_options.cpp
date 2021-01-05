@@ -193,15 +193,8 @@ SCENARIO("The enum overload for get_option works.")
 
 			THEN("the result has the correct default.")
 			{
-				//newest_first for home, oldest_first for the other two
-				if (option == user_option::pull_home)
-				{
-					REQUIRE(result == sync_settings::newest_first);
-				}
-				else
-				{
-					REQUIRE(result == sync_settings::oldest_first);
-				}
+				//always oldest_first for the other two
+				REQUIRE(result == sync_settings::oldest_first);
 			}
 		}
 	}
