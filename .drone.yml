@@ -3,6 +3,7 @@ type: docker
 name: ARM build and release (install)
 
 platform:
+  os: linux
   arch: arm64
 
 steps:
@@ -22,6 +23,7 @@ type: docker
 name: ARM build and release (portable)
 
 platform:
+  os: linux
   arch: arm64
 
 steps:
