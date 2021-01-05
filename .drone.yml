@@ -18,6 +18,9 @@ steps:
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
     - cmake --build . --config Release --parallel
+    - ./msync
+    - ./msync version
+    - ./msync yeehaw
     - ctest -C Release --output-on-failure --schedule-random -j
     - mv msync linux-arm64-${DRONE_TAG}-install
     - ls
@@ -42,6 +45,9 @@ steps:
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release 
     - cmake --build . --config Release --parallel
+    - ./msync
+    - ./msync version
+    - ./msync yeehaw
     - ctest -C Release --output-on-failure --schedule-random -j
     - mv msync linux-arm64-${DRONE_TAG}-portable
     - ls
