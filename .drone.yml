@@ -21,7 +21,7 @@ steps:
     - ./msync
     - ./msync version
     - ./msync yeehaw
-    - ctest -C Release --output-on-failure --schedule-random -j
+    - ctest -C Release --output-on-failure --schedule-random -j 8
     - mkdir ../dist
     - mv msync ../dist/linux-arm64-${DRONE_TAG}-install
     - ls ../dist
@@ -59,7 +59,7 @@ steps:
     - ./msync
     - ./msync version
     - ./msync yeehaw
-    - ctest -C Release --output-on-failure --schedule-random -j
+    - ctest -C Release --output-on-failure --schedule-random -j 8
     - mkdir ../dist
     - mv msync ../dist/linux-arm64-${DRONE_TAG}-portable
     - ls ../dist
