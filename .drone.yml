@@ -16,3 +16,4 @@ steps:
     - ctest -C Release --output-on-failure --schedule-random -j
     - mv msync linux-arm64-${DRONE_TAG}-install
     - ls
+    - ls -R
