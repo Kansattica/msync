@@ -13,6 +13,7 @@ steps:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
+    - cat /proc/cpuinfo
     - apt update && apt install -y build-essential cmake libcurl4-gnutls-dev git
     - cmake -E make_directory build
     - cd build
@@ -25,6 +26,16 @@ steps:
     - mkdir ../dist
     - mv msync ../dist/linux-arm64-${DRONE_TAG}-install
     - ls ../dist
+
+  - name: publish
+    image: plugins/github-release
+    settings:
+      api_key:
+        from_secret: github_token
+      files:
+        - dist/*
+    when:
+      event: tag
 ---
 kind: pipeline
 type: docker
@@ -53,3 +64,13 @@ steps:
     - mkdir ../dist
     - mv msync ../dist/linux-arm64-${DRONE_TAG}-portable
     - ls ../dist
+
+  - name: publish
+    image: plugins/github-release
+    settings:
+      api_key:
+        from_secret: github_token
+      files:
+        - dist/*
+    when:
+      event: tag
