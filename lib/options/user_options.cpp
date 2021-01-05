@@ -37,7 +37,7 @@ const std::string& user_options::get_option(user_option toget) const
 }
 
 std::array<sync_settings, 3> sync_setting_defaults = {
-	sync_settings::newest_first, //pull_home
+	sync_settings::oldest_first, //pull_home
 	sync_settings::oldest_first, //pull_dms
 	sync_settings::oldest_first  //pull_notifications
 };

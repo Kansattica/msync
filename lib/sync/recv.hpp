@@ -139,7 +139,7 @@ private:
 
 			incoming = deserialize<mastodon_entity>(response.message);
 
-			plverb() << "Downloaded " << incoming.size() << " posts, ";
+			plverb() << "Downloaded " << incoming.size() << pluralize(incoming.size(), " post, ", " posts, ");
 
 			if (!incoming.empty())
 			{
@@ -148,14 +148,14 @@ private:
 				total.insert(total.end(), std::make_move_iterator(incoming.begin()), std::make_move_iterator(incoming.end()));
 			}
 
-			plverb() << total.size() << " posts buffered.\n";
+			plverb() << total.size() << pluralize(total.size(), " post", " posts") << " buffered.\n";
 
 			loop_iterations--;
 
 			// if you get less than you asked for, you're done
 		} while (loop_iterations > 0 && (incoming.size() == limit));
 
-		plverb() << "Writing " << total.size() << " posts.\n";
+		plverb() << "Writing " << total.size() << pluralize(total.size(), " post.", " posts.") << '\n';
 
 		if (!total.empty())
 		{
@@ -184,6 +184,8 @@ private:
 		unsigned int loop_iterations = max_requests;
 		if (loop_iterations == 0)
 			loop_iterations = std::numeric_limits<unsigned int>::max();
+
+		size_t total_posts_written = 0;
 		do
 		{
 			print_api_call(url, limit, query_parameters, pl());
@@ -199,7 +201,8 @@ private:
 
 			incoming = deserialize<mastodon_entity>(response.message);
 
-			plverb() << "Writing " << incoming.size() << " posts.\n";
+			plverb() << "Writing " << incoming.size() << pluralize(incoming.size(), " post.", " posts.") << '\n';
+			total_posts_written += incoming.size();
 
 			if (!incoming.empty())
 			{
@@ -214,6 +217,7 @@ private:
 			// if you get less than you asked for, you're done
 		} while (loop_iterations > 0 && (incoming.size() == limit));
 
+		plverb() << "Wrote a total of " << total_posts_written << pluralize(total_posts_written, " post.", " posts.") << '\n';
 		return highest_id_seen;
 	}
 };
