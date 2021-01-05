@@ -10,7 +10,7 @@ steps:
   - name: build
     image: ubuntu:20.04
     commands:
-    - sudo apt install -y build-essential cmake libcurl4-gnutls-dev
+    - apt install -y build-essential cmake libcurl4-gnutls-dev
     - cmake -E make_directory build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
@@ -31,7 +31,7 @@ steps:
   - name: build
     image: ubuntu:20.04
     commands:
-    - sudo apt install -y build-essential cmake libcurl4-gnutls-dev
+    - apt install -y build-essential cmake libcurl4-gnutls-dev
     - cmake -E make_directory build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release 
