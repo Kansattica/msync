@@ -22,8 +22,9 @@ steps:
     - ./msync version
     - ./msync yeehaw
     - ctest -C Release --output-on-failure --schedule-random -j
-    - mv msync linux-arm64-${DRONE_TAG}-install
-    - ls
+    - mkdir ../dist
+    - mv msync ../dist/linux-arm64-${DRONE_TAG}-install
+    - ls ../dist
 ---
 kind: pipeline
 type: docker
@@ -49,5 +50,6 @@ steps:
     - ./msync version
     - ./msync yeehaw
     - ctest -C Release --output-on-failure --schedule-random -j
-    - mv msync linux-arm64-${DRONE_TAG}-portable
-    - ls
+    - mkdir ../dist
+    - mv msync ../dist/linux-arm64-${DRONE_TAG}-portable
+    - ls ../dist
