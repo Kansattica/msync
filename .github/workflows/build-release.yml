@@ -34,6 +34,13 @@ jobs:
           - os: ubuntu-latest
             compiler: gcc-9
             cxx_compiler: g++-9
+            arch: i386
+            cflags: -m32
+            configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
+            apt: gcc-9-multilib g++-9-multilib libcurl4-openssl-dev:i386 linux-libc-dev:i386
+          - os: ubuntu-latest
+            compiler: gcc-9
+            cxx_compiler: g++-9
             arch: x64
             configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
             make_deb: true
