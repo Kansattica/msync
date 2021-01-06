@@ -229,7 +229,7 @@ jobs:
           release_name: ${{ steps.get_version.outputs.version }}
           body_path: ${{ steps.release-notes.outputs.release_notes_path }}
           draft: false
-          prerelease: true
+          prerelease: false
 
       - name: Upload Release Assets
         uses: alexellis/upload-assets@0.2.3
