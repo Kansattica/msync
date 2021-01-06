@@ -220,7 +220,7 @@ Posts are a little different. You still queue them up to be sent when you next `
     - Basically, when you run `msync sync`, your queued posts are sent as normal. If a post has a `reply_id`, after it's published, any posts with a `reply_to` equal to that `reply_id` will have their `reply_to` set to the actual published ID of that post. This will persist even if the subsequent post fails to send for some reason. 
     - If a post has an invalid `reply_to`, the remote server won't accept it. You can edit the queued version of the post in `msync_accounts/<username@instance.url>/queuedposts` and sync again.
 
-#### A note on UTF-8, Unicode, and Emojis
+#### A note on UTF-8, Unicode, and Emoji
 
 `msync` tries its best not to touch the bytes that it sends to or from the server. This means that posts are sent to the server and written to the local timelines as close to as is as possible. Emojis and other non-ASCII characters should work fine, as long as you send and read UTF-8. Some terminal emulators have a hard time displaying UTF-8, and you may wind up having to change some setting or use a different font. I know that running `[Console]::OutputEncoding = [Text.UTF8Encoding]::UTF8` can help on Powershell, especially when it comes to specifying command line arguments that include non-ASCII characters. Note that characters may show weird on the terminal, but go over the wire fine. 
 
