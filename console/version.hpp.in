@@ -5,7 +5,7 @@ constexpr const char* MSYNC_VERSION = "@PROJECT_VERSION@";
 
 constexpr const char* MSYNC_LICENSE = R"(
 	msync - a command line store and forward Mastodon client.
-	Copyright (C) 2020 Grace Lovelace
+	Copyright (C) 2021 Grace Lovelace
 
 	Fascists fuck off, trans rights, and also:
 
