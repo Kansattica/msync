@@ -79,6 +79,8 @@ SCENARIO("parse_account_name correctly parses account names into a username and 
 			"as;dfhasldfasd",
 			"badcharacter**@website.com",
 			"knockitoff@too.dang.many.subdomains",
+			"@@someinstance",
+			"@@some.instance",
 			"noinstance@",
 			"@nousername",
 			"what",
