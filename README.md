@@ -5,6 +5,14 @@
 
 `msync` currently supports queueing and sending posts, boosts, and favorites for any number of accounts, as well as downloading the home timeline and notifications.
 
+`msync` is for everyone, but it's really designed for:
+
+- Unreliable, slow, or not always-on internet connections.
+- Computers or connections that can't handle the Mastodon web frontend.
+- Systems that run "headless" or otherwise can't use a graphical Mastodon client.
+- Use in automated scripts.
+- Anyone who prefers to use a keyboard.
+
 ### Get msync
 
 You can download the latest stable release of `msync` [here](https://github.com/Kansattica/msync/releases) or the Releases link to the right. 
