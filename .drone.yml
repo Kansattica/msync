@@ -1,0 +1,75 @@
+kind: pipeline
+type: docker
+name: ARM build and release (install)
+
+platform:
+  os: linux
+  arch: arm64
+
+steps:
+  - name: build
+    image: ubuntu:20.04
+    environment:
+      DEBIAN_FRONTEND: noninteractive
+      TZ: America/Los_Angeles
+    commands:
+    - apt update && apt install -y build-essential cmake libcurl4-gnutls-dev git
+    - cmake -E make_directory build
+    - cd build
+    - cmake .. -DCMAKE_BUILD_TYPE=Release -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
+    - cmake --build . --config Release --parallel
+    - ./msync
+    - ./msync version
+    - ./msync yeehaw
+    - ctest -C Release --output-on-failure --schedule-random -j 8
+    - mkdir ../dist
+    - mv msync ../dist/linux-arm64-${DRONE_TAG}-install
+    - ls ../dist
+
+  - name: publish
+    image: plugins/github-release
+    settings:
+      api_key:
+        from_secret: github_token
+      files:
+        - dist/*
+    when:
+      event: tag
+---
+kind: pipeline
+type: docker
+name: ARM build and release (portable)
+
+platform:
+  os: linux
+  arch: arm64
+
+steps:
+  - name: build
+    image: ubuntu:20.04
+    environment:
+      DEBIAN_FRONTEND: noninteractive
+      TZ: America/Los_Angeles
+    commands:
+    - apt update && apt install -y build-essential cmake libcurl4-gnutls-dev git
+    - cmake -E make_directory build
+    - cd build
+    - cmake .. -DCMAKE_BUILD_TYPE=Release 
+    - cmake --build . --config Release --parallel
+    - ./msync
+    - ./msync version
+    - ./msync yeehaw
+    - ctest -C Release --output-on-failure --schedule-random -j 8
+    - mkdir ../dist
+    - mv msync ../dist/linux-arm64-${DRONE_TAG}-portable
+    - ls ../dist
+
+  - name: publish
+    image: plugins/github-release
+    settings:
+      api_key:
+        from_secret: github_token
+      files:
+        - dist/*
+    when:
+      event: tag

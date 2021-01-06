@@ -11,7 +11,7 @@ You can download the latest stable release of `msync` [here](https://github.com/
 
 #### Which release should I download?
 
-I recommend downloading the `.deb` file if you're on a Debian-like system that can install it. Otherwise, I recommend downloading the release for your system with `install` in the filename. This version will store user data in the appropriate place for your system. The versions without `install` store user data in the same directory as the executable. See [the manual](MANUAL.md#a-note-about-msync_accounts) for more information.
+I recommend downloading the `.deb` file if you're on a x64 Debian-like system that can install it. Otherwise, I recommend downloading the release for your system with `install` in the filename. This version will store user data in the appropriate place for your system. The versions without `install` store user data in the same directory as the executable. See [the manual](MANUAL.md#a-note-about-msync_accounts) for more information.
 
 If you're on OSX, the builds for 10.15 use std::filesystem APIs that are only available on OSX 10.15.
 
@@ -58,8 +58,9 @@ If you want something lighter weight, I suspect you can install the [build tools
 
 `msync` currently builds and all tests pass for the following compilers and environments:
 
-- gcc and clang on 64-bit Ubuntu
-- gcc on 32-bit Ubuntu
+- gcc and clang on 64-bit (x64) Ubuntu
+- gcc on 32-bit (i386) Ubuntu
+- gcc on arm64 Ubuntu
 - OSX 10.15 with Xcode 12 
 - MSVC 2017 on 32 and 64-bit Windows 
 
