@@ -86,7 +86,7 @@ When I say `msync` is a store and forward client. What this means is that `msync
 
 #### Tab completion
 
-`msync` comes with tab completion for bash and zsh. To use it, simply `source msync_completion.sh` in your .bashrc, .zshrc, or equivalent. There's more advice in the file itself.
+`msync` comes with tab completion for bash and zsh. To use it, simply `source msync_completion.sh` in your .bashrc, .zshrc, or equivalent. There's more advice in the file itself, at `scripts/msync_completion.sh`
 
 #### The home timeline and notifications
 
@@ -194,7 +194,7 @@ If you want to just clear that queue, possibly because there's a typo'd ID in th
 
 Posts are a little different. You still queue them up to be sent when you next `sync` up, but there's an extra step involved. `msync queue post <any number of file paths>` takes, well, a number of file paths. The contents of these will be interpreted as text files and sent as posts when you `msync sync` up next. A few notes on posts:
 
-- Most of the time, I use `msync gen` to create files that I then fill with my posts. Run `msync` without any options to see all the switches that `msync gen` takes- these allow you to set privacy, content warnings, replies, and file attachments and descriptions. When I want to make a post with msync, I do this most of the time:
+- I usually use `msync gen` to create files that I then fill with my posts. Run `msync` without any options to see all the switches that `msync gen` takes- these allow you to set privacy, content warnings, replies, and file attachments and descriptions. When I want to make a post with msync, I do this most of the time:
 
 ```
     msync gen
@@ -203,6 +203,7 @@ Posts are a little different. You still queue them up to be sent when you next `
     msync sync
 ```
 
+- The scripts folder has a file called `quickpost.sh`. Running `source quickpost.sh` will automate this process for you. After it's been sourced, typing `qpost` at the shell will create a temporary file, open it in your `$EDITOR` and automatically enqueue it.
 - `msync queue post` will copy the files you specify into your `msync_accounts` folder, so don't feel obligated to keep them around after you queue them.
 - `msync` does *not* copy attachments when you queue them. Attachment paths are converted to absolute file paths and uploaded in place when you `msync sync` up next.
 - The `--body` option to `msync gen` can be useful, especially for prefilling someone's handle in the body of a post, but be careful- your shell might do unwanted things with characters like `!` and `$`. 
