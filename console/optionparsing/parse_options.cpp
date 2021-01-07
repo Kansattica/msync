@@ -60,7 +60,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 				(settableoptions & opt_value("value", ret.optionval).set(ret.selected, mode::config) % "If given, set the specified option to that. Otherwise, show the corresponding value.")) %
 			"config commands");
 
-	const auto syncMode = (command("sync").set(ret.selected, mode::sync).doc("Synchronize your account[s] with their server[s]. Synchronizes all accounts unless one is specified with -a.") &
+	const auto syncMode = (command("sync", "s").set(ret.selected, mode::sync).doc("Synchronize your account[s] with their server[s]. Synchronizes all accounts unless one is specified with -a.") &
 			(
 			(option("-r", "--retries") & value("retries", ret.sync_opts.retries)) % "Retry failed requests n times. (default: 3)",
 			(option("-p", "--posts") & value("count", ret.sync_opts.per_call)) % "When receiving, get this many posts or notifications per call. Decrease this if you have a flaky connection. (default: 40 for statuses, 30 for notifications)",
