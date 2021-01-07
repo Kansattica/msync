@@ -207,6 +207,7 @@ Posts are a little different. You still queue them up to be sent when you next `
 - `qpost` will prefill the file with any command line arguments it gets. `qpost hello there` will open a file containing `hello there`. This works for simple posts, but be wary of any punctuation that might get mangled by the shell.
 - `msync queue post` will copy the files you specify into your `msync_accounts` folder, so don't feel obligated to keep them around after you queue them.
 - `msync` does *not* copy attachments when you queue them. Attachment paths are converted to absolute file paths and uploaded in place when you `msync sync` up next.
+- `msync` supports image descriptions. The first description goes to the first attachment and so on. Descriptions without an image will generate a warning.
 - The `--body` option to `msync gen` can be useful, especially for prefilling someone's handle in the body of a post, but be careful- your shell might do unwanted things with characters like `!` and `$`. 
 - If you're replying to someone else's post, make sure you:
     - use the same (or whatever necessary) visibility setting- `msync` will default to whatever your account's default visibility setting is. 
