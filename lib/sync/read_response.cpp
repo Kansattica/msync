@@ -41,7 +41,10 @@ void from_json(const json& j, mastodon_poll_option& option)
 void from_json(const json& j, mastodon_poll& poll)
 {
 	j["id"].get_to(poll.id);
-	j["expires_at"].get_to(poll.expires_at);
+	
+	const auto& expiry = j["expires_at"];
+	if (!expiry.is_null())
+		expiry.get_to(poll.expires_at);
 	j["expired"].get_to(poll.expired);
 	j["votes_count"].get_to(poll.total_votes);
 	j["options"].get_to(poll.options);
