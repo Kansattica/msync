@@ -884,9 +884,9 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 SCENARIO("The command line parser correctly parses when the user wants to interact with the queue.")
 {
+	const auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
 	GIVEN("A command line that just says 'queue'")
 	{
-		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
 		constexpr int argc = 2;
 		char const* argv[]{ "msync", qcommand };
 
@@ -901,11 +901,11 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 		}
 	}
 
-	GIVEN("A command line that adds a bunch of things to the fav queue.")
+	GIVEN("A command line that adds a bunch of things to the post ID queues.")
 	{
-		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
+		const auto commandtype = GENERATE(as<const char*>{}, "fav", "boost", "context");
 		constexpr int argc = 6;
-		char const* argv[]{ "msync", qcommand, "fav", "12345", "6789", "123FQ43" };
+		char const* argv[]{ "msync", qcommand, commandtype, "12345", "6789", "123FQ43" };
 
 		WHEN("the command line is parsed")
 		{
@@ -935,9 +935,10 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 	GIVEN("A command line that removes a bunch of things from the boost queue.")
 	{
-		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
+		const auto commandtype = GENERATE(as<const char*>{}, "fav", "boost", "context");
+		const auto opt = GENERATE(as<const char*>{}, "-r", "--remove");
 		constexpr int argc = 7;
-		char const* argv[]{ "msync", qcommand, "-r", "boost", "12345", "6789", "bwingus" };
+		char const* argv[]{ "msync", qcommand, opt, commandtype, "12345", "6789", "bwingus" };
 
 		WHEN("the command line is parsed")
 		{
@@ -967,7 +968,6 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 	GIVEN("A command line that enqueues a post")
 	{
-		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
 		constexpr int argc = 4;
 		char const* argv[]{ "msync", qcommand, "post", "msync.post" };
 
@@ -999,9 +999,9 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 	GIVEN("A command line that clears the post queue.")
 	{
-		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
+		const auto opt = GENERATE(as<const char*>{}, "-c", "--clear");
 		constexpr int argc = 4;
-		char const* argv[]{ "msync", qcommand, "-c", "post" };
+		char const* argv[]{ "msync", qcommand, opt, "post" };
 
 		WHEN("the command line is parsed")
 		{
@@ -1026,7 +1026,6 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 	GIVEN("A command line that prints the current queue.")
 	{
-		auto qcommand = GENERATE(as<const char*>{}, "queue", "q");
 		constexpr int argc = 3;
 		char const* argv[]{ "msync", qcommand, "print" };
 
