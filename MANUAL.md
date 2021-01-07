@@ -84,6 +84,10 @@ When I say `msync` is a store and forward client. What this means is that `msync
 - Anyone who prefers to use a keyboard.
 - Use in automated scripts.
 
+#### Tab completion
+
+`msync` comes with tab completion for bash and zsh. To use it, simply `source msync_completion.sh` in your .bashrc, .zshrc, or equivalent. There's more advice in the file itself, at `scripts/msync_completion.sh`.
+
 #### The home timeline and notifications
 
 After your account is set up, running `msync sync --verbose` will connect to your instance and, if all is well, start downloading notifications and statuses. The `--verbose` is optional (and can be shortened to `-v`), but it will make `msync` tell you where to find the downloaded timeline and notifications. These will be stored at `msync_accounts/[username@instance.url]/home.list` and `msync_accounts/[username@instance.url]/notifications.list`, respectively. You can locate your `msync_accounts` folder at any time by running `msync location`. There's a lot of ways you can look at these files, but the important things to know the process are:
@@ -190,7 +194,7 @@ If you want to just clear that queue, possibly because there's a typo'd ID in th
 
 Posts are a little different. You still queue them up to be sent when you next `sync` up, but there's an extra step involved. `msync queue post <any number of file paths>` takes, well, a number of file paths. The contents of these will be interpreted as text files and sent as posts when you `msync sync` up next. A few notes on posts:
 
-- Most of the time, I use `msync gen` to create files that I then fill with my posts. Run `msync` without any options to see all the switches that `msync gen` takes- these allow you to set privacy, content warnings, replies, and file attachments and descriptions. When I want to make a post with msync, I do this most of the time:
+- I usually use `msync gen` to create files that I then fill with my posts. Run `msync` without any options to see all the switches that `msync gen` takes- these allow you to set privacy, content warnings, replies, and file attachments and descriptions. When I want to make a post with msync, I do this most of the time:
 
 ```
     msync gen
@@ -199,8 +203,11 @@ Posts are a little different. You still queue them up to be sent when you next `
     msync sync
 ```
 
+- The scripts folder has a file called `quickpost.sh` that helps automate this process for simple posts. Run `source quickpost.sh` to enable it. After it's been sourced, typing `qpost` at the shell will create a temporary file, open it in your `$EDITOR` and automatically enqueue it.
+- `qpost` will prefill the file with any command line arguments it gets. `qpost hello there` will open a file containing `hello there`. This works for simple posts, but be wary of any punctuation that might get mangled by the shell.
 - `msync queue post` will copy the files you specify into your `msync_accounts` folder, so don't feel obligated to keep them around after you queue them.
 - `msync` does *not* copy attachments when you queue them. Attachment paths are converted to absolute file paths and uploaded in place when you `msync sync` up next.
+- `msync` supports image descriptions. The first description goes to the first attachment and so on. Descriptions without an image will generate a warning.
 - The `--body` option to `msync gen` can be useful, especially for prefilling someone's handle in the body of a post, but be careful- your shell might do unwanted things with characters like `!` and `$`. 
 - If you're replying to someone else's post, make sure you:
     - use the same (or whatever necessary) visibility setting- `msync` will default to whatever your account's default visibility setting is. 
