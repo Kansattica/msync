@@ -46,17 +46,17 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 				command("default").set(ret.selected, mode::setdefault).doc("Set the specified account as the default."),
 				in_sequence(command("sync").set(ret.selected, mode::configsync),
 					one_of(command("home").set(ret.toset, user_option::pull_home),
-						command("dms").set(ret.toset, user_option::pull_dms),
+//						command("dms").set(ret.toset, user_option::pull_dms),
 						command("notifications").set(ret.toset, user_option::pull_notifications)),
 					one_of(command("newest").set(ret.sync_opts.mode, sync_settings::newest_first),
 						command("oldest").set(ret.sync_opts.mode, sync_settings::oldest_first),
 						command("off").set(ret.sync_opts.mode, sync_settings::dont_sync)))
-				.doc("Whether to synchronize an account's home timeline, direct messages, and notifications, and whether to do it newest first, oldest first, or not at all."),
-				in_sequence(command("list").set(ret.selected, mode::configlist),
+				.doc("Whether to synchronize an account's home timeline and notifications, and whether to do it newest first, oldest first, or not at all."),
+/*				in_sequence(command("list").set(ret.selected, mode::configlist),
 					one_of(command("add").set(ret.listops, list_operations::add),
 						command("remove").set(ret.listops, list_operations::remove)),
 					value("list name", ret.optionval))
-				.doc("Add and remove lists from being synchronized for an account"),
+				.doc("Add and remove lists from being synchronized for an account"),*/
 				(settableoptions & opt_value("value", ret.optionval).set(ret.selected, mode::config) % "If given, set the specified option to that. Otherwise, show the corresponding value.")) %
 			"config commands");
 
