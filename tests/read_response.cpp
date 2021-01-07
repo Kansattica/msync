@@ -157,6 +157,50 @@ SCENARIO("read_status correctly reads and cleans the relevant fields from a JSON
 		}
 	}
 
+	GIVEN("A json string representing a status with an anonymous poll with a null expiry.")
+	{
+		static constexpr std::string_view status_json = R"({"id":"103563474507592337","created_at":"2020-01-28T23:13:32.102Z","in_reply_to_id":null,"in_reply_to_account_id":null,"sensitive":false,"spoiler_text":"","visibility":"public","language":"en","uri":"https://test.website.egg/users/BestGirlGrace/statuses/103563474507592337","url":"https://test.website.egg/@BestGirlGrace/103563474507592337","replies_count":4,"reblogs_count":3,"favourites_count":2,"content":"\u003cp\u003etest poll\u003c/p\u003e","reblog":null,"application":{"name":"Willed Into Being","website":null},"account":{"id":"1","username":"BestGirlGrace","acct":"BestGirlGrace","display_name":"Vx. Modemoiselle :qvp:","locked":false,"bot":false,"created_at":"2018-08-16T04:45:49.523Z","note":"\u003cp\u003eThe buzz in your brain, the tingle behind your eyes, the good girl sneaking through your thoughts. Your favorite free-floating, reality-hacking, mind-tweaking, shitposting, horny, skunky, viral, infowitch.\u003c/p\u003e\u003cp\u003eHeader by @CorruptveSpirit@twitter, avi by @dogscribss@twitter\u003c/p\u003e","url":"https://test.website.egg/@BestGirlGrace","avatar":"https://test.website.egg/system/accounts/avatars/000/000/001/original/2c3b6b7ff75a3d40.gif?1573254299","avatar_static":"https://test.website.egg/system/accounts/avatars/000/000/001/static/2c3b6b7ff75a3d40.png?1573254299","header":"https://test.website.egg/system/accounts/headers/000/000/001/original/ba0b91a0c6545d9a.gif?1536301933","header_static":"https://test.website.egg/system/accounts/headers/000/000/001/static/ba0b91a0c6545d9a.png?1536301933","followers_count":1520,"following_count":725,"statuses_count":51291,"last_status_at":"2020-01-30T17:19:38.409Z","emojis":[{"shortcode":"qvp","url":"https://test.website.egg/system/custom_emojis/images/000/036/475/original/3470be8e5f2bf943.png?1564727510","static_url":"https://test.website.egg/system/custom_emojis/images/000/036/475/static/3470be8e5f2bf943.png?1564727510","visible_in_picker":true}],"fields":[{"name":"Pronouns","value":"she/her","verified_at":null},{"name":"Hornt Writing","value":"\u003ca href=\"https://perfect.hypnovir.us\" rel=\"me nofollow noopener\" target=\"_blank\"\u003e\u003cspan class=\"invisible\"\u003ehttps://\u003c/span\u003e\u003cspan class=\"\"\u003eperfect.hypnovir.us\u003c/span\u003e\u003cspan class=\"invisible\"\u003e\u003c/span\u003e\u003c/a\u003e","verified_at":"2019-07-08T07:50:47.669+00:00"},{"name":"Fax Number","value":"(580) 4-GRACE-5","verified_at":null},{"name":"I made","value":"\u003ca href=\"https://github.com/Kansattica/Fluency\" rel=\"me nofollow noopener\" target=\"_blank\"\u003e\u003cspan class=\"invisible\"\u003ehttps://\u003c/span\u003e\u003cspan class=\"\"\u003egithub.com/Kansattica/Fluency\u003c/span\u003e\u003cspan class=\"invisible\"\u003e\u003c/span\u003e\u003c/a\u003e","verified_at":null}]},"media_attachments":[],"mentions":[],"tags":[],"emojis":[],"card":null,"poll":{"id":"7786","expires_at":null,"expired":false,"multiple":false,"votes_count":33,"voters_count":33,"options":[{"title":"yee","votes_count":13},{"title":"haw","votes_count":20}],"emojis":[]}})";
+		WHEN("The status is read.")
+		{
+			const auto status = read_status(status_json);
+
+			THEN("The result is as expected.")
+			{
+				REQUIRE(status.id == "103563474507592337");
+				REQUIRE(status.url == "https://test.website.egg/users/BestGirlGrace/statuses/103563474507592337");
+				REQUIRE(status.content_warning.empty());
+				REQUIRE(status.content == "test poll");
+				REQUIRE(status.visibility == "public");
+				REQUIRE(status.created_at == "2020-01-28T23:13:32.102Z");
+				REQUIRE(status.reply_to_post_id.empty());
+				REQUIRE(status.original_post_url.empty());
+				REQUIRE(status.boosted_by.empty());
+				REQUIRE(status.favorites == 2);
+				REQUIRE(status.boosts == 3);
+				REQUIRE(status.replies == 4);
+				REQUIRE(status.attachments.empty());
+
+				REQUIRE(status.author.id == "1");
+				REQUIRE(status.author.account_name == "BestGirlGrace");
+				REQUIRE(status.author.display_name == "Vx. Modemoiselle :qvp:");
+				REQUIRE(status.author.note == "The buzz in your brain, the tingle behind your eyes, the good girl sneaking through your thoughts. Your favorite free-floating, reality-hacking, mind-tweaking, shitposting, horny, skunky, viral, infowitch.\n\nHeader by @CorruptveSpirit@twitter, avi by @dogscribss@twitter");
+				REQUIRE(status.author.url == "https://test.website.egg/@BestGirlGrace");
+				REQUIRE(status.author.avatar == "https://test.website.egg/system/accounts/avatars/000/000/001/original/2c3b6b7ff75a3d40.gif?1573254299");
+				REQUIRE(status.author.fields == expected_fields);
+				REQUIRE(status.author.is_bot == false);
+
+				REQUIRE(status.poll.has_value());
+				REQUIRE_FALSE(status.poll->expired);
+				REQUIRE(status.poll->expires_at == "");
+				REQUIRE(status.poll->id == "7786");
+				REQUIRE(status.poll->options == std::vector<mastodon_poll_option> { {"yee", 13 }, { "haw", 20 } });
+				REQUIRE(status.poll->total_votes == 33);
+				REQUIRE(status.poll->voted_for.empty());
+				REQUIRE_FALSE(status.poll->you_voted);
+			}
+		}
+	}
+
 	GIVEN("A json string representing a status with a poll as seen by a logged-in user.")
 	{
 		static constexpr std::string_view status_json = R"({"id":"103563474507592337","created_at":"2020-01-28T23:13:32.102Z","in_reply_to_id":null,"in_reply_to_account_id":null,"sensitive":false,"spoiler_text":"","visibility":"public","language":"en","uri":"https://test.website.egg/users/BestGirlGrace/statuses/103563474507592337","url":"https://test.website.egg/@BestGirlGrace/103563474507592337","replies_count":4,"reblogs_count":3,"favourites_count":2,"content":"\u003cp\u003etest poll\u003c/p\u003e","reblog":null,"application":{"name":"Willed Into Being","website":null},"account":{"id":"1","username":"BestGirlGrace","acct":"BestGirlGrace","display_name":"Vx. Modemoiselle :qvp:","locked":false,"bot":false,"created_at":"2018-08-16T04:45:49.523Z","note":"\u003cp\u003eThe buzz in your brain, the tingle behind your eyes, the good girl sneaking through your thoughts. Your favorite free-floating, reality-hacking, mind-tweaking, shitposting, horny, skunky, viral, infowitch.\u003c/p\u003e\u003cp\u003eHeader by @CorruptveSpirit@twitter, avi by @dogscribss@twitter\u003c/p\u003e","url":"https://test.website.egg/@BestGirlGrace","avatar":"https://test.website.egg/system/accounts/avatars/000/000/001/original/2c3b6b7ff75a3d40.gif?1573254299","avatar_static":"https://test.website.egg/system/accounts/avatars/000/000/001/static/2c3b6b7ff75a3d40.png?1573254299","header":"https://test.website.egg/system/accounts/headers/000/000/001/original/ba0b91a0c6545d9a.gif?1536301933","header_static":"https://test.website.egg/system/accounts/headers/000/000/001/static/ba0b91a0c6545d9a.png?1536301933","followers_count":1520,"following_count":725,"statuses_count":51291,"last_status_at":"2020-01-30T17:19:38.409Z","emojis":[{"shortcode":"qvp","url":"https://test.website.egg/system/custom_emojis/images/000/036/475/original/3470be8e5f2bf943.png?1564727510","static_url":"https://test.website.egg/system/custom_emojis/images/000/036/475/static/3470be8e5f2bf943.png?1564727510","visible_in_picker":true}],"fields":[{"name":"Pronouns","value":"she/her","verified_at":null},{"name":"Hornt Writing","value":"\u003ca href=\"https://perfect.hypnovir.us\" rel=\"me nofollow noopener\" target=\"_blank\"\u003e\u003cspan class=\"invisible\"\u003ehttps://\u003c/span\u003e\u003cspan class=\"\"\u003eperfect.hypnovir.us\u003c/span\u003e\u003cspan class=\"invisible\"\u003e\u003c/span\u003e\u003c/a\u003e","verified_at":"2019-07-08T07:50:47.669+00:00"},{"name":"Fax Number","value":"(580) 4-GRACE-5","verified_at":null},{"name":"I made","value":"\u003ca href=\"https://github.com/Kansattica/Fluency\" rel=\"me nofollow noopener\" target=\"_blank\"\u003e\u003cspan class=\"invisible\"\u003ehttps://\u003c/span\u003e\u003cspan class=\"\"\u003egithub.com/Kansattica/Fluency\u003c/span\u003e\u003cspan class=\"invisible\"\u003e\u003c/span\u003e\u003c/a\u003e","verified_at":null}]},"media_attachments":[],"mentions":[],"tags":[],"emojis":[],"card":null,"poll":{ "id": "34830", "expires_at": "2019-12-05T04:05:08.302Z", "expired": false, "multiple": false, "votes_count": 10, "voters_count": null, "voted": true, "own_votes": [ 1 ], "options": [ { "title": "accept", "votes_count": 6 }, { "title": "deny", "votes_count": 4 } ], "emojis": [] }})";
