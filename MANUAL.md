@@ -86,7 +86,7 @@ When I say `msync` is a store and forward client. What this means is that `msync
 
 #### Tab completion
 
-`msync` comes with tab completion for bash and zsh. To use it, simply `source msync_completion.sh` in your .bashrc, .zshrc, or equivalent. There's more advice in the file itself, at `scripts/msync_completion.sh`
+`msync` comes with tab completion for bash and zsh. To use it, simply `source msync_completion.sh` in your .bashrc, .zshrc, or equivalent. There's more advice in the file itself, at `scripts/msync_completion.sh`.
 
 #### The home timeline and notifications
 
@@ -203,7 +203,7 @@ Posts are a little different. You still queue them up to be sent when you next `
     msync sync
 ```
 
-- The scripts folder has a file called `quickpost.sh`. Running `source quickpost.sh` will automate this process for you. After it's been sourced, typing `qpost` at the shell will create a temporary file, open it in your `$EDITOR` and automatically enqueue it.
+- The scripts folder has a file called `quickpost.sh` that helps automate this process for simple posts. Run `source quickpost.sh` to enable it. After it's been sourced, typing `qpost` at the shell will create a temporary file, open it in your `$EDITOR` and automatically enqueue it.
 - `msync queue post` will copy the files you specify into your `msync_accounts` folder, so don't feel obligated to keep them around after you queue them.
 - `msync` does *not* copy attachments when you queue them. Attachment paths are converted to absolute file paths and uploaded in place when you `msync sync` up next.
 - The `--body` option to `msync gen` can be useful, especially for prefilling someone's handle in the body of a post, but be careful- your shell might do unwanted things with characters like `!` and `$`. 
