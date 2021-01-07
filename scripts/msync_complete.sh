@@ -20,7 +20,7 @@ function _msync() {
 	# look at the last word to see what to propose next. This usually works, but not if the last thing was a command line option.
 	case "$prev" in
 		$cmd)
-			COMPREPLY=($( compgen -W 'new config sync gen generate q queue yeehaw location license version help' -- $word ))
+			COMPREPLY=($( compgen -W 'new config sync gen generate queue yeehaw location license version help' -- $word ))
 			return 0;
 			;;
 		'config')
