@@ -82,7 +82,13 @@ bool get_and_write(make_request& method, const fs::path& user_account_dir, unsig
 	const auto context_response = simple_call(adapted_get, "GET", retries, request_url, access_token);
 	if (!context_response.success) { return false; }
 
-	write_posts(read_context(context_response.message), read_status(status_response.message), user_account_dir / File_Context_Directory / post_id);
+	// build up the target file location to minimize the number of intermediate strings that get thrown away
+
+	auto post_file = user_account_dir / Thread_Directory;
+	post_file /= post_id;
+	post_file += ".list";
+
+	write_posts(read_context(context_response.message), read_status(status_response.message), post_file);
 
 	return true;
 }
