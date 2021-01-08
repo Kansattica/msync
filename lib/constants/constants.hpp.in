@@ -22,7 +22,7 @@ inline CONSTANT_PATH_DECLARATION List_Options_Filename{ "lists.config" };
 inline CONSTANT_PATH_DECLARATION Queue_Filename{ "sync.queue" };
 
 inline CONSTANT_PATH_DECLARATION File_Queue_Directory{ "queuedposts" };
-inline CONSTANT_PATH_DECLARATION File_Context_Directory{ "fetchedthreads" };
+inline CONSTANT_PATH_DECLARATION Thread_Directory{ "fetched" };
 
 inline CONSTANT_PATH_DECLARATION Home_Timeline_Filename{ "home.list" };
 inline CONSTANT_PATH_DECLARATION Notifications_Filename{ "notifications.list" };
