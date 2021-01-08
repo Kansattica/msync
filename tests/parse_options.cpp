@@ -906,9 +906,9 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 	GIVEN("A command line that adds a bunch of things to the post ID queues.")
 	{
-		const auto commandtype = GENERATE(as<const char*>{}, "fav", "boost", "context");
+		const auto commandtype = GENERATE(std::make_pair("fav", api_route::fav), std::make_pair("boost", api_route::boost), std::make_pair("context", api_route::context));
 		constexpr int argc = 6;
-		char const* argv[]{ "msync", qcommand, commandtype, "12345", "6789", "123FQ43" };
+		char const* argv[]{ "msync", qcommand, commandtype.first, "12345", "6789", "123FQ43" };
 
 		WHEN("the command line is parsed")
 		{
@@ -921,7 +921,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 			THEN("the correct queue is selected.")
 			{
-				REQUIRE(result.queue_opt.selected == api_route::fav);
+				REQUIRE(result.queue_opt.selected == commandtype.second);
 			}
 
 			THEN("the post IDs are parsed.")
@@ -938,10 +938,10 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 	GIVEN("A command line that removes a bunch of things from the boost queue.")
 	{
-		const auto commandtype = GENERATE(as<const char*>{}, "fav", "boost", "context");
+		const auto commandtype = GENERATE(std::make_pair("fav", api_route::fav), std::make_pair("boost", api_route::boost), std::make_pair("context", api_route::context));
 		const auto opt = GENERATE(as<const char*>{}, "-r", "--remove");
 		constexpr int argc = 7;
-		char const* argv[]{ "msync", qcommand, opt, commandtype, "12345", "6789", "bwingus" };
+		char const* argv[]{ "msync", qcommand, opt, commandtype.first, "12345", "6789", "bwingus" };
 
 		WHEN("the command line is parsed")
 		{
@@ -954,7 +954,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 			THEN("the correct queue is selected")
 			{
-				REQUIRE(result.queue_opt.selected == api_route::boost);
+				REQUIRE(result.queue_opt.selected == commandtype.second);
 			}
 
 			THEN("the post IDs are parsed.")
