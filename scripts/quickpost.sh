@@ -9,7 +9,7 @@ qpost()
 	if [ -s "$postfile" ]
 	then
 		msync queue post "$postfile"
-		echo "Enqueued $postfile".
+		echo "Enqueued $postfile"
 	else
 		echo "File empty. Not enqueueing."
 	fi
