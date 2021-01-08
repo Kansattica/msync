@@ -49,7 +49,7 @@ jobs:
             arch: x64
             configure_args: -A x64
           - os: windows-latest
-            arch: Win32
+            arch: win32
             configure_args: -A Win32
           - os: windows-latest
             arch: x64
