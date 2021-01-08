@@ -66,6 +66,12 @@ struct mastodon_status
 	std::optional<mastodon_poll> poll;
 };
 
+struct mastodon_context
+{
+	std::vector<mastodon_status> ancestors;
+	std::vector<mastodon_status> descendants;
+};
+
 enum class notif_type
 {
 	unknown, follow, mention, boost, favorite, poll
