@@ -11,7 +11,6 @@ std::ostream& operator<<(std::ostream& out, const mastodon_status& status);
 std::ostream& operator<<(std::ostream& out, const mastodon_notification& notification);
 std::ostream& operator<<(std::ostream& out, const mastodon_poll& poll);
 
-// currently supposed to work with statuses and notifications
 template <typename post_type>
 class post_list
 {

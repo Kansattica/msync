@@ -2,7 +2,6 @@
 #define MSYNC_SEND_HPP
 
 #include <print_logger.hpp>
-#include <filesystem.hpp>
 
 #include <string>
 #include <string_view>
@@ -51,14 +50,14 @@ private:
 		case api_route::unfav:
 		case api_route::boost:
 		case api_route::unboost:
-			return simple_call(post, "POST", retries, paramaterize_url(urls.status_url(), to_make.argument, ROUTE_LOOKUP[static_cast<uint8_t>(to_make.queued_call)]), access_token);
+			return simple_call(post, "POST", retries, paramaterize_url(urls.status_url(), to_make.argument, ROUTE_LOOKUP[static_cast<uint8_t>(to_make.queued_call)]), access_token).success;
 		case api_route::post:
 			// posts are a little trickier
 			return send_post(user_account_dir, access_token, urls.status_url(), urls.media_url(), to_make.argument);
 		case api_route::unpost:
-			return simple_call(del, "DELETE", retries, paramaterize_url(urls.status_url(), to_make.argument, ROUTE_LOOKUP[static_cast<uint8_t>(to_make.queued_call)]), access_token);
+			return simple_call(del, "DELETE", retries, paramaterize_url(urls.status_url(), to_make.argument, ROUTE_LOOKUP[static_cast<uint8_t>(to_make.queued_call)]), access_token).success;
 		case api_route::context:
-			return get_and_write(get_method, retries, paramaterize_url(urls.status_url(), to_make.argument, ROUTE_LOOKUP[static_cast<uint8_t>(to_make.queued_call)]), access_token);
+			return get_and_write(get_method, user_account_dir, retries, urls.status_url(), to_make.argument, access_token);
 		default:
 			return false;
 		}
