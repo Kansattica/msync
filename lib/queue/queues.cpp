@@ -115,6 +115,9 @@ api_route undo_route(const api_route queue)
 		return api_route::unfav;
 	case api_route::post:
 		return api_route::unpost;
+	// can't really undo context
+	case api_route::context:
+		return api_route::context;
 	default:
 		throw msync_exception("Whoops, that shouldn't happen in this undo_route business.");
 	}
@@ -291,6 +294,10 @@ void dequeue(api_route todequeue, const fs::path& user_account_dir, std::vector<
 	toremovefrom.parsed.erase(removefrom_pivot, toremovefrom.parsed.end());
 
 	plverb() << "Removed " << removed_count << pluralize(removed_count, " item", " items") << " for account " << user_account_dir.filename() << ".\n";
+
+	// context doesn't have an undo operation.
+	if (todequeue == api_route::context)
+		return;
 
 	//basically, if a thing isn't in the queue, enqueue removing that thing. unboosting, unfaving, deleting a post
 	//consider removing duplicate removes?
