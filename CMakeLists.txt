@@ -44,6 +44,8 @@ add_executable(msync "")
 # see https://crascit.com/2016/01/31/enhanced-source-file-handling-with-target_sources/
 include(cmake/compatibility.cmake)
 
+# For the files that get "configured" (transformed by cmake with configure-time variables), add this warning at the top so I don't edit the wrong file.
+set(INFILEWARNING "* Whoa there, buckaroo!\n* Changes to this file will be lost next time CMake runs!\n* You want to change the file with the name ending with .in.")
 add_subdirectory(lib/queue)
 add_subdirectory(lib/sync)
 add_subdirectory(lib/filesystem)
