@@ -182,7 +182,7 @@ void do_sync(const parse_result& parsed)
 
 	if (parsed.sync_opts.send)
 	{
-		send_posts send{ simple_post, simple_delete, new_status, upload_media };
+		send_posts send{ simple_post, simple_delete, new_status, upload_media, get_timeline_and_notifs };
 		send.retries = parsed.sync_opts.retries;
 		if (user == nullptr) 
 		{

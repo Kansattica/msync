@@ -147,6 +147,12 @@ void from_json(const json& j, mastodon_status& status)
 	}
 }
 
+void from_json(const json& j, mastodon_context& context)
+{
+	j["ancestors"].get_to(context.ancestors);
+	j["descendants"].get_to(context.descendants);
+}
+
 NLOHMANN_JSON_SERIALIZE_ENUM(notif_type, {
 		{ notif_type::unknown, "???" }, //nlohmann json will pick the first one in the list if it can't parse
 		{ notif_type::follow, "follow" },
@@ -187,6 +193,11 @@ mastodon_notification read_notification(const std::string_view notification_json
 std::vector<mastodon_notification> read_notifications(const std::string_view notifications_json)
 {
 	return json::parse(notifications_json).get<std::vector<mastodon_notification>>();
+}
+
+mastodon_context read_context(const std::string_view context_json)
+{
+	return json::parse(context_json).get<mastodon_context>();
 }
 
 std::string read_upload_id(const std::string_view attachment_json)
