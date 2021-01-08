@@ -127,6 +127,24 @@ struct mock_network_upload : public mock_network
 	}
 };
 
+struct mock_network_get : public mock_network
+{
+	std::vector<get_mock_args> arguments;
+	net_response operator()(std::string_view url, std::string_view access_token, const timeline_params& params, unsigned int limit)
+	{
+		arguments.push_back(get_mock_args{{0, std::string{url}, std::string{access_token}},
+			std::string{params.min_id}, std::string{params.max_id}, std::string{params.since_id}, copy_excludes(params.exclude_notifs), limit });
+
+		net_response toreturn;
+		toreturn.message = R"({"ancestors":)";
+		toreturn.message += make_json_array(make_status_json, 0, 11);
+		toreturn.message += R"(],"descendants":[)";
+		toreturn.message += make_json_array(make_status_json, 11, 15);
+		toreturn.message += "]}";
+		return toreturn;
+	}
+};
+
 std::string make_expected_url(const std::string_view id, const std::string_view route, const std::string_view instance_url)
 {
 	std::string toreturn{ "https://" };
@@ -177,8 +195,9 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			mock_network_delete mockdel;
 			mock_network_new_status mocknew;
 			mock_network_upload mockupload;
+			mock_network_get mockget;
 
-			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload };
+			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload, mockget };
 
 			send.send(account, instanceurl, accesstoken);
 
@@ -225,8 +244,9 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			mock_network_delete mockdel;
 			mock_network_new_status mocknew;
 			mock_network_upload mockupload;
+			mock_network_get mockget;
 
-			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload };
+			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload, mockget };
 
 			send.send(account, instanceurl, accesstoken);
 
@@ -286,8 +306,9 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			mock_network_delete mockdel;
 			mock_network_new_status mocknew;
 			mock_network_upload mockupload;
+			mock_network_get mockget;
 
-			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload };
+			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload, mockget };
 
 			send.retries = retries.first;
 
@@ -352,8 +373,9 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			mock_network_delete mockdel;
 			mock_network_new_status mocknew;
 			mock_network_upload mockupload;
+			mock_network_get mockget;
 
-			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload };
+			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload, mockget };
 
 			send.retries = retries.first;
 
@@ -482,8 +504,9 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[locale]"
 		mock_network_delete mockdel;
 		mock_network_new_status mocknew;
 		mock_network_upload mockupload;
+		mock_network_get mockget;
 
-		auto send = send_posts{ mockpost, mockdel, mocknew, mockupload };
+		auto send = send_posts{ mockpost, mockdel, mocknew, mockupload, mockget };
 
 		WHEN("the posts are sent over a good connection")
 		{
@@ -925,8 +948,9 @@ SCENARIO("Send correctly sends from and modifies a queue of mixed API calls.")
 			mock_network_delete mockdel;
 			mock_network_new_status mocknew;
 			mock_network_upload mockupload;
+			mock_network_get mockget;
 
-			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload };
+			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload, mockget };
 
 			sequence = 0;
 			send.send(account, instanceurl, accesstoken);
