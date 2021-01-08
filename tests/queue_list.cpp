@@ -13,17 +13,18 @@
 
 SCENARIO("queue_lists save their data when destroyed.")
 {
-	GIVEN("An queue_list with some values.")
+	GIVEN("A queue_list with some values.")
 	{
 		const test_file tf = temporary_file();
 
 		queue_list opts(tf.filename());
 		opts.parsed.push_back(api_call{ api_route::fav, "thingone" });
 		opts.parsed.push_back(api_call{ api_route::unboost, "thingtwo" });
+		opts.parsed.push_back(api_call{ api_route::context, "thingtwo" });
 
-		REQUIRE(opts.parsed.size() == 2);
+		REQUIRE(opts.parsed.size() == 3);
 
-		WHEN("an queue_list is moved from")
+		WHEN("A queue_list is moved from")
 		{
 			const queue_list newopts(std::move(opts));
 
@@ -33,7 +34,7 @@ SCENARIO("queue_lists save their data when destroyed.")
 			}
 		}
 
-		WHEN("an queue_list is moved from with the move constructor and destroyed")
+		WHEN("A queue_list is moved from with the move constructor and destroyed")
 		{
 			{
 				const queue_list newopts(std::move(opts));
@@ -45,13 +46,14 @@ SCENARIO("queue_lists save their data when destroyed.")
 
 				const auto lines = read_lines(tf.filename());
 
-				REQUIRE(lines.size() == 2);
+				REQUIRE(lines.size() == 3);
 				REQUIRE(lines[0] == "FAV thingone");
 				REQUIRE(lines[1] == "UNBOOST thingtwo");
+				REQUIRE(lines[2] == "CONTEXT thingtwo");
 			}
 		}
 
-		WHEN("an queue_list is moved from with move assignment and destroyed")
+		WHEN("A queue_list is moved from with move assignment and destroyed")
 		{
 			{
 				const queue_list newopts = std::move(opts);
@@ -63,9 +65,10 @@ SCENARIO("queue_lists save their data when destroyed.")
 
 				const auto lines = read_lines(tf.filename());
 
-				REQUIRE(lines.size() == 2);
+				REQUIRE(lines.size() == 3);
 				REQUIRE(lines[0] == "FAV thingone");
 				REQUIRE(lines[1] == "UNBOOST thingtwo");
+				REQUIRE(lines[2] == "CONTEXT thingtwo");
 			}
 		}
 
@@ -83,8 +86,9 @@ SCENARIO("queue_lists save their data when destroyed.")
 
 				const auto lines = read_lines(tf.filename());
 
-				REQUIRE(lines.size() == 1);
+				REQUIRE(lines.size() == 2);
 				REQUIRE(lines[0] == "UNBOOST thingtwo");
+				REQUIRE(lines[1] == "CONTEXT thingtwo");
 			}
 		}
 	}
@@ -92,7 +96,7 @@ SCENARIO("queue_lists save their data when destroyed.")
 
 SCENARIO("queue_lists read data when created.")
 {
-	GIVEN("An queue_list on disk with some data.")
+	GIVEN("A queue_list on disk with some data.")
 	{
 		const test_file tf = temporary_file();
 
@@ -103,7 +107,7 @@ SCENARIO("queue_lists read data when created.")
 			fout << "UNPOST thirdthing\n";
 		}
 
-		WHEN("an queue_list is created")
+		WHEN("A queue_list is created")
 		{
 			queue_list testfi(tf.filename());
 
@@ -118,7 +122,7 @@ SCENARIO("queue_lists read data when created.")
 			}
 		}
 
-		WHEN("an queue_list is opened and modified")
+		WHEN("A queue_list is opened and modified")
 		{
 			{
 				queue_list testfi(tf.filename());
@@ -154,7 +158,7 @@ SCENARIO("queue_lists read data when created.")
 		}
 	}
 
-	GIVEN("An queue_list on disk with some data and some stuff to skip.")
+	GIVEN("A queue_list on disk with some data and some stuff to skip.")
 	{
 		const test_file tf = temporary_file();
 
@@ -167,7 +171,7 @@ SCENARIO("queue_lists read data when created.")
 			fout << "FAV thirdthing\n";
 		}
 
-		WHEN("an queue_list is created")
+		WHEN("A queue_list is created")
 		{
 			queue_list testfi(tf.filename());
 
@@ -182,7 +186,7 @@ SCENARIO("queue_lists read data when created.")
 			}
 		}
 
-		WHEN("an queue_list is opened and modified")
+		WHEN("A queue_list is opened and modified")
 		{
 			{
 				queue_list testfi(tf.filename());
@@ -224,8 +228,8 @@ SCENARIO("queue_lists read data when created.")
 SCENARIO("queue_list can handle a long queue with a lot of items.")
 {
 	constexpr unsigned int size = 10000;
-	constexpr std::array<api_route, 6> routes = { api_route::fav, api_route::unfav,
-		api_route::boost, api_route::unboost, api_route::post, api_route::unpost };
+	constexpr std::array<api_route, 7> routes = { api_route::fav, api_route::unfav,
+		api_route::boost, api_route::unboost, api_route::post, api_route::unpost, api_route::context };
 
 	GIVEN("A bunch of API calls to enqueue and an empty queue_list.")
 	{
