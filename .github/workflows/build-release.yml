@@ -49,13 +49,13 @@ jobs:
             arch: x64
             configure_args: -A x64
           - os: windows-latest
-            arch: Win32
+            arch: win32
             configure_args: -A Win32
           - os: windows-latest
             arch: x64
             configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF -A x64
           - os: windows-latest
-            arch: Win32
+            arch: win32
             configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF -A Win32
           - os: macos-10.15
             deployment_target: 10.15
