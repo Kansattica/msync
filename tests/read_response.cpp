@@ -26,6 +26,13 @@ const static std::vector<mastodon_account_field> expected_fields = {
 	{ "I made", "https://github.com/Kansattica/Fluency" },
 };
 
+const static std::vector<mastodon_account_field> expected_new_fields = {
+	{ "Pronouns", "she/her" },
+	{ "Writing", "https://justa.normal.egg" },
+	{ "Fax", "(580) 4-GRACE-5" },
+	{ "Projects", "https://princess.software" },
+};
+
 const static std::vector<mastodon_account_field> expected_bot_fields = {
 	{ "Source", "https://github.com/catleeball/tmnt_wikipedia_bot" },
 	{ "Author", "https://twitter.com/__eel__" },
@@ -359,6 +366,92 @@ SCENARIO("read_statuses correctly reads and cleans the relevant fields from an a
 		}
 	}
 
+}
+
+void assert_context_author(const mastodon_account& author)
+{
+	REQUIRE(author.id == "1");
+	REQUIRE(author.account_name == "BestGirlGrace");
+	REQUIRE(author.display_name == "Vx. Princess Grace :qvp:");
+	REQUIRE(author.note == "I'm a gay crime skunk who writes internet porn and I demand to be treated with respect. Please don't follow me if you're under 18.\n\nFeel free to send a follow request if we've talked before. At least DM me or like a post so I know why you're here.\n\nHeader and avi by @fluxom_alt!");
+	REQUIRE(author.url ==  "https://test.website.egg/@BestGirlGrace");
+	REQUIRE(author.avatar == "https://anothertest.website.egg/system/accounts/avatars/000/000/001/original/8cb0e18d0db0f6c0.png");
+	REQUIRE(author.fields == expected_new_fields);
+	REQUIRE_FALSE(author.is_bot);
+
+}
+
+SCENARIO("read_context correctly deserializes a context object.")
+{
+	GIVEN("A json context object representing a thread.")
+	{
+		WHEN("That object is deserialized.")
+		{
+			const auto result = read_context(context_json);
+
+			THEN("The results are as expected.")
+			{
+				REQUIRE(result.ancestors.size() == 1);
+				REQUIRE(result.ancestors[0].id == "105539247080254892");
+				REQUIRE(result.ancestors[0].url == "https://test.website.egg/users/BestGirlGrace/statuses/105539247080254892");
+				REQUIRE(result.ancestors[0].content_warning.empty());
+				REQUIRE(result.ancestors[0].content == "test thread post 1");
+				REQUIRE(result.ancestors[0].visibility == "private");
+				REQUIRE(result.ancestors[0].created_at == "2021-01-11T21:38:29.058Z");
+				REQUIRE(result.ancestors[0].reply_to_post_id.empty());
+				REQUIRE(result.ancestors[0].original_post_url.empty());
+				REQUIRE(result.ancestors[0].boosted_by.empty());
+				REQUIRE(result.ancestors[0].boosted_by_display_name.empty());
+				REQUIRE_FALSE(result.ancestors[0].boosted_by_bot);
+				REQUIRE(result.ancestors[0].favorites == 0);
+				REQUIRE(result.ancestors[0].boosts == 0);
+				REQUIRE(result.ancestors[0].replies == 0);
+				REQUIRE(result.ancestors[0].attachments.empty());
+				REQUIRE_FALSE(result.ancestors[0].poll.has_value());
+
+				assert_context_author(result.ancestors[0].author);
+
+				REQUIRE(result.descendants.size() == 2);
+				REQUIRE(result.descendants[0].id == "105539248172091186");
+				REQUIRE(result.descendants[0].url == "https://test.website.egg/users/BestGirlGrace/statuses/105539248172091186");
+				REQUIRE(result.descendants[0].content_warning.empty());
+				REQUIRE(result.descendants[0].content == "test thread post 3");
+				REQUIRE(result.descendants[0].visibility == "private");
+				REQUIRE(result.descendants[0].created_at == "2021-01-11T21:38:45.694Z");
+				REQUIRE(result.descendants[0].reply_to_post_id == "105539247642691774");
+				REQUIRE(result.descendants[0].original_post_url.empty());
+				REQUIRE(result.descendants[0].boosted_by.empty());
+				REQUIRE(result.descendants[0].boosted_by_display_name.empty());
+				REQUIRE_FALSE(result.descendants[0].boosted_by_bot);
+				REQUIRE(result.descendants[0].favorites == 0);
+				REQUIRE(result.descendants[0].boosts == 0);
+				REQUIRE(result.descendants[0].replies == 0);
+				REQUIRE(result.descendants[0].attachments.empty());
+				REQUIRE_FALSE(result.descendants[0].poll.has_value());
+
+				assert_context_author(result.descendants[0].author);
+
+				REQUIRE(result.descendants[1].id == "105539249606393432");
+				REQUIRE(result.descendants[1].url == "https://test.website.egg/users/BestGirlGrace/statuses/105539249606393432");
+				REQUIRE(result.descendants[1].content_warning == "you guessed it");
+				REQUIRE(result.descendants[1].content == "test thread post four");
+				REQUIRE(result.descendants[1].visibility == "private");
+				REQUIRE(result.descendants[1].created_at == "2021-01-11T21:39:07.572Z");
+				REQUIRE(result.descendants[1].reply_to_post_id == "105539248172091186");
+				REQUIRE(result.descendants[1].original_post_url.empty());
+				REQUIRE(result.descendants[1].boosted_by.empty());
+				REQUIRE(result.descendants[1].boosted_by_display_name.empty());
+				REQUIRE_FALSE(result.descendants[1].boosted_by_bot);
+				REQUIRE(result.descendants[1].favorites == 0);
+				REQUIRE(result.descendants[1].boosts == 0);
+				REQUIRE(result.descendants[1].replies == 0);
+				REQUIRE(result.descendants[1].attachments.empty());
+				REQUIRE_FALSE(result.descendants[1].poll.has_value());
+
+				assert_context_author(result.descendants[1].author);
+			}
+		}
+	}
 }
 
 SCENARIO("read_upload_id correctly reads the ID from a JSON status.")
