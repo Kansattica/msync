@@ -88,6 +88,10 @@ When I say `msync` is a store and forward client. What this means is that `msync
 
 `msync` comes with tab completion for bash and zsh. To use it, simply `source msync_completion.sh` in your .bashrc, .zshrc, or equivalent. There's more advice in the file itself, at `scripts/msync_completion.sh`.
 
+#### Man page
+
+Running `msync` without any arguments or `msync help` will print msync's help information in `man` page format.
+
 #### The home timeline and notifications
 
 After your account is set up, running `msync sync --verbose` will connect to your instance and, if all is well, start downloading notifications and statuses. The `--verbose` is optional (and can be shortened to `-v`), but it will make `msync` tell you where to find the downloaded timeline and notifications. These will be stored at `msync_accounts/[username@instance.url]/home.list` and `msync_accounts/[username@instance.url]/notifications.list`, respectively. You can locate your `msync_accounts` folder at any time by running `msync location`. There's a lot of ways you can look at these files, but the important things to know the process are:
