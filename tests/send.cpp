@@ -144,16 +144,16 @@ struct mock_network_context_get : public mock_network
 		{
 			toreturn.message = R"({"ancestors":)";
 			// should add 10 messages [1, 10]
-			toreturn.message += make_json_array(make_status_json, 0, ancestors + 1);
+			toreturn.message += make_json_array(make_status_json, 1, ancestors + 1, false);
 			toreturn.message += R"(,"descendants":)";
 			// should add 5 messages [14, 18]
 			// remember that make_json_array never makes a post with the maximum or minimum id
-			toreturn.message += make_json_array(make_status_json, ancestors + 3, ancestors + 3 + descendants + 1);
+			toreturn.message += make_json_array(make_status_json, ancestors + 4, ancestors + 3 + descendants, false);
 			toreturn.message += '}';
 		}
 		else
 		{
-			make_status_json("something", toreturn.message);
+			make_status_json(url.substr(url.find_last_of('/') + 1), toreturn.message);
 		}
 
 		return toreturn;

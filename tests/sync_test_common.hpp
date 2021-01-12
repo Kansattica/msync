@@ -2,7 +2,7 @@
 #define SYNC_TEST_COMMON_HPP
 
 template <typename make_object>
-std::string make_json_array(make_object func, unsigned int min_id, unsigned int max_id)
+std::string make_json_array(make_object func, unsigned int min_id, unsigned int max_id, bool descending = true)
 {
 	std::array<char, 10> char_buf;
 
@@ -10,7 +10,12 @@ std::string make_json_array(make_object func, unsigned int min_id, unsigned int 
 
 	// basically, it shouldn't return max_id or min_id itself
 	// and the newest (highest ID) goes first
-	for (unsigned int id = max_id; id > min_id; id--)
+
+	const int direction = descending ? -1 : 1;
+	if (!descending)
+		std::swap(min_id, max_id);
+
+	for (unsigned int id = max_id; id != min_id; id += direction)
 	{
 		func(sv_to_chars(id, char_buf), toreturn);
 		toreturn.append(1, ',');
