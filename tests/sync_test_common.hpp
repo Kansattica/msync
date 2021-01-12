@@ -27,4 +27,40 @@ inline std::vector<std::string> copy_excludes(std::vector<std::string_view>* ex)
 
 	return std::vector<std::string>(ex->begin(), ex->end());
 }
+
+inline void verify_file(const fs::path& file, int expected_count, const std::string& id_starts_with)
+{
+	static constexpr std::string_view dashes = "--------------";
+
+	const auto lines = read_lines(file);
+
+	bool read_next = true;
+	unsigned int last_id = 0;
+	unsigned int total = 0;
+
+	for (const auto& line : lines)
+	{
+		if (line == dashes)
+		{
+			read_next = true;
+			continue;
+		}
+
+		if (read_next)
+		{
+			read_next = false;
+			REQUIRE_THAT(line, Catch::StartsWith(id_starts_with));
+
+			unsigned int this_id;
+			std::from_chars(line.data() + id_starts_with.size(), line.data() + line.size(), this_id);
+
+			REQUIRE(this_id > last_id);
+
+			last_id = this_id;
+			total++;
+		}
+	}
+
+	REQUIRE(expected_count == total);
+}
 #endif
