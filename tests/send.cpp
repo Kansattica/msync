@@ -136,14 +136,20 @@ struct mock_network_context_get : public mock_network
 			std::string{params.min_id}, std::string{params.max_id}, std::string{params.since_id}, copy_excludes(params.exclude_notifs), limit });
 
 		net_response toreturn;
-		if (
-			// if it ends in /context, return this. otherwise, return just one status
-			
-		toreturn.message = R"({"ancestors":)";
-		toreturn.message += make_json_array(make_status_json, 1, 12);
-		toreturn.message += R"(,"descendants":)";
-		toreturn.message += make_json_array(make_status_json, 11, 15);
-		toreturn.message += '}';
+		// if it ends in /context, return this. otherwise, return just one status
+		if (url.substr(url.find_last_of('/')) == "/context")
+		{
+			toreturn.message = R"({"ancestors":)";
+			toreturn.message += make_json_array(make_status_json, 1, 12);
+			toreturn.message += R"(,"descendants":)";
+			toreturn.message += make_json_array(make_status_json, 11, 15);
+			toreturn.message += '}';
+		}
+		else
+		{
+			make_status_json("something", toreturn.message);
+		}
+
 		return toreturn;
 	}
 };
@@ -1014,13 +1020,30 @@ SCENARIO("Send correctly sends from and modifies a queue of mixed API calls.")
 
 				REQUIRE(mockget.arguments[1].access_token == accesstoken);
 				REQUIRE(mockget.arguments[1].sequence == 9);
-				REQUIRE(mockget.arguments[1].url == make_expected_url("regularpost", "context", instanceurl));
+				REQUIRE(mockget.arguments[1].url == make_expected_url("regularpost", "/context", instanceurl));
 				REQUIRE(mockget.arguments[1].min_id.empty());
 				REQUIRE(mockget.arguments[1].max_id.empty());
 				REQUIRE(mockget.arguments[1].since_id.empty());
 				REQUIRE(mockget.arguments[1].exclude_notifs.empty());
 				REQUIRE(mockget.arguments[1].limit == 0);
 
+				REQUIRE(mockget.arguments[2].access_token == accesstoken);
+				REQUIRE(mockget.arguments[2].sequence == 10);
+				REQUIRE(mockget.arguments[2].url == make_expected_url("timepost", "", instanceurl));
+				REQUIRE(mockget.arguments[2].min_id.empty());
+				REQUIRE(mockget.arguments[2].max_id.empty());
+				REQUIRE(mockget.arguments[2].since_id.empty());
+				REQUIRE(mockget.arguments[2].exclude_notifs.empty());
+				REQUIRE(mockget.arguments[2].limit == 0);
+
+				REQUIRE(mockget.arguments[3].access_token == accesstoken);
+				REQUIRE(mockget.arguments[3].sequence == 11);
+				REQUIRE(mockget.arguments[3].url == make_expected_url("timepost", "/context", instanceurl));
+				REQUIRE(mockget.arguments[3].min_id.empty());
+				REQUIRE(mockget.arguments[3].max_id.empty());
+				REQUIRE(mockget.arguments[3].since_id.empty());
+				REQUIRE(mockget.arguments[3].exclude_notifs.empty());
+				REQUIRE(mockget.arguments[3].limit == 0);
 			}
 		}
 	}
