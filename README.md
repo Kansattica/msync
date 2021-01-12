@@ -112,6 +112,7 @@ Once you have `msync` compiled, check out [MANUAL.md](MANUAL.md#msync-manual) fo
 - [X] Allow choosing a default account.
 - [ ] Support for adding and removing filters.
 - [X] Respecting rate limits.
+- [X] Ability to request the rest of the posts in a thread.
 
 ### Roadmap (things for later)
 

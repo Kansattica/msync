@@ -88,6 +88,10 @@ When I say `msync` is a store and forward client. What this means is that `msync
 
 `msync` comes with tab completion for bash and zsh. To use it, simply `source msync_completion.sh` in your .bashrc, .zshrc, or equivalent. There's more advice in the file itself, at `scripts/msync_completion.sh`.
 
+#### Man page
+
+Running `msync` without any arguments or `msync help` will print msync's help information in `man` page format.
+
 #### The home timeline and notifications
 
 After your account is set up, running `msync sync --verbose` will connect to your instance and, if all is well, start downloading notifications and statuses. The `--verbose` is optional (and can be shortened to `-v`), but it will make `msync` tell you where to find the downloaded timeline and notifications. These will be stored at `msync_accounts/[username@instance.url]/home.list` and `msync_accounts/[username@instance.url]/notifications.list`, respectively. You can locate your `msync_accounts` folder at any time by running `msync location`. There's a lot of ways you can look at these files, but the important things to know the process are:
@@ -226,6 +230,15 @@ Posts are a little different. You still queue them up to be sent when you next `
         - The `reply_id` of a post queued in front of this one. 
     - Basically, when you run `msync sync`, your queued posts are sent as normal. If a post has a `reply_id`, after it's published, any posts with a `reply_to` equal to that `reply_id` will have their `reply_to` set to the actual published ID of that post. This will persist even if the subsequent post fails to send for some reason. 
     - If a post has an invalid `reply_to`, the remote server won't accept it. You can edit the queued version of the post in `msync_accounts/<username@instance.url>/queuedposts` and sync again.
+
+
+- If you see a post on your timeline and want to see the rest of the thread, you can queue up a request for context next time you sync. Use `msync queue context <id>` to have `msync` fetch all the posts before and after that one in the thread. Next time you `msync sync`, it'll fetch the post in question, as well as all the posts above and below it in the thread. This doesn't get everything- it won't fetch replies to other posts in the thread, for example- but it's useful for seeing what a reply is to or digging up the rest of a thread. Threads fetched like this are storied in  `msync_accounts/<username@instance.url>/threads` as `<status id>.list`, so they get picked up if you use a wildcard to open your timelines like this:
+
+```
+vim -p `msync location`/**/*.list
+```
+
+- If you fetch context for a the same thread at a later date, `msync` will automatically overwite the existing file to ensure you have the most recent version of the thread.
 
 #### A note on UTF-8, Unicode, and Emoji
 

@@ -36,7 +36,7 @@ void print_truncated_string(std::string_view toprint, Stream& str)
 		truncated = true;
 	}
 
-	if (!toprint.empty() && toprint.back() == '\n')
+	while (!toprint.empty() && toprint.back() == '\n')
 		toprint.remove_suffix(1);
 
 	str << toprint;

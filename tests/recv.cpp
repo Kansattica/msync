@@ -6,6 +6,7 @@
 
 #include "test_helpers.hpp"
 #include "mock_network.hpp"
+#include "sync_test_common.hpp"
 #include "../lib/netinterface/net_interface.hpp"
 
 #include "../lib/constants/constants.hpp"
@@ -19,48 +20,10 @@
 #include <chrono>
 #include <sstream>
 
-#include "to_chars_patch.hpp"
-
 using namespace std::string_view_literals;
-
-template <typename make_object>
-std::string make_json_array(make_object func, unsigned int min_id, unsigned int max_id)
-{
-	std::array<char, 10> char_buf;
-
-	std::string toreturn(1, '[');
-
-	// basically, it shouldn't return max_id or min_id itself
-	// and the newest (highest ID) goes first
-	for (unsigned int id = max_id; id > min_id; id--)
-	{
-		func(sv_to_chars(id, char_buf), toreturn);
-		toreturn.append(1, ',');
-	}
-	toreturn.pop_back(); //get rid of that last comma
-	if (!toreturn.empty())
-		toreturn += ']';
-	return toreturn;
-}
-
-struct get_mock_args : basic_mock_args
-{
-	std::string min_id;
-	std::string max_id;
-	std::string since_id;
-	std::vector<std::string> exclude_notifs;
-	unsigned int limit;
-};
 
 constexpr unsigned int lowest_post_id = 1000000;
 constexpr unsigned int lowest_notif_id = 10000;
-
-std::vector<std::string> copy_excludes(std::vector<std::string_view>* ex)
-{
-	if (ex == nullptr) { return {}; }
-
-	return std::vector<std::string>(ex->begin(), ex->end());
-}
 
 struct mock_network_get : public mock_network
 {
@@ -165,42 +128,6 @@ struct mock_network_get : public mock_network
 		return toreturn;
 	}
 };
-
-void verify_file(const fs::path& file, int expected_count, const std::string& id_starts_with)
-{
-	static constexpr std::string_view dashes = "--------------";
-
-	const auto lines = read_lines(file);
-
-	bool read_next = true;
-	unsigned int last_id = 0;
-	unsigned int total = 0;
-
-	for (const auto& line : lines)
-	{
-		if (line == dashes)
-		{
-			read_next = true;
-			continue;
-		}
-
-		if (read_next)
-		{
-			read_next = false;
-			REQUIRE_THAT(line, Catch::StartsWith(id_starts_with));
-
-			unsigned int this_id;
-			std::from_chars(line.data() + id_starts_with.size(), line.data() + line.size(), this_id);
-
-			REQUIRE(this_id > last_id);
-
-			last_id = this_id;
-			total++;
-		}
-	}
-
-	REQUIRE(expected_count == total);
-}
 
 SCENARIO("Recv downloads and writes the correct number of posts.")
 {

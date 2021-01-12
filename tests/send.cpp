@@ -8,6 +8,7 @@
 
 #include "test_helpers.hpp"
 #include "mock_network.hpp"
+#include "sync_test_common.hpp"
 
 #include <string_view>
 #include <vector>
@@ -127,6 +128,38 @@ struct mock_network_upload : public mock_network
 	}
 };
 
+struct mock_network_context_get : public mock_network
+{
+	std::vector<get_mock_args> arguments;
+	static constexpr int ancestors = 10;
+	static constexpr int descendants = 5;
+	net_response operator()(std::string_view url, std::string_view access_token, const timeline_params& params, unsigned int limit)
+	{
+		arguments.push_back(get_mock_args{{++sequence, std::string{url}, std::string{access_token}},
+			std::string{params.min_id}, std::string{params.max_id}, std::string{params.since_id}, copy_excludes(params.exclude_notifs), limit });
+
+		net_response toreturn;
+		// if it ends in /context, return this. otherwise, return just one status
+		if (url.substr(url.find_last_of('/')) == "/context")
+		{
+			toreturn.message = R"({"ancestors":)";
+			// should add 10 messages [1, 10]
+			toreturn.message += make_json_array(make_status_json, 1, ancestors + 1, false);
+			toreturn.message += R"(,"descendants":)";
+			// should add 5 messages [14, 18]
+			// remember that make_json_array never makes a post with the maximum or minimum id
+			toreturn.message += make_json_array(make_status_json, ancestors + 4, ancestors + 3 + descendants, false);
+			toreturn.message += '}';
+		}
+		else
+		{
+			make_status_json(url.substr(url.find_last_of('/') + 1), toreturn.message);
+		}
+
+		return toreturn;
+	}
+};
+
 std::string make_expected_url(const std::string_view id, const std::string_view route, const std::string_view instance_url)
 {
 	std::string toreturn{ "https://" };
@@ -177,8 +210,9 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			mock_network_delete mockdel;
 			mock_network_new_status mocknew;
 			mock_network_upload mockupload;
+			mock_network_context_get mockget;
 
-			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload };
+			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload, mockget };
 
 			send.send(account, instanceurl, accesstoken);
 
@@ -225,8 +259,9 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			mock_network_delete mockdel;
 			mock_network_new_status mocknew;
 			mock_network_upload mockupload;
+			mock_network_context_get mockget;
 
-			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload };
+			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload, mockget };
 
 			send.send(account, instanceurl, accesstoken);
 
@@ -286,8 +321,9 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			mock_network_delete mockdel;
 			mock_network_new_status mocknew;
 			mock_network_upload mockupload;
+			mock_network_context_get mockget;
 
-			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload };
+			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload, mockget };
 
 			send.retries = retries.first;
 
@@ -352,8 +388,9 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 			mock_network_delete mockdel;
 			mock_network_new_status mocknew;
 			mock_network_upload mockupload;
+			mock_network_context_get mockget;
 
-			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload };
+			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload, mockget };
 
 			send.retries = retries.first;
 
@@ -482,8 +519,9 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[locale]"
 		mock_network_delete mockdel;
 		mock_network_new_status mocknew;
 		mock_network_upload mockupload;
+		mock_network_context_get mockget;
 
-		auto send = send_posts{ mockpost, mockdel, mocknew, mockupload };
+		auto send = send_posts{ mockpost, mockdel, mocknew, mockupload, mockget };
 
 		WHEN("the posts are sent over a good connection")
 		{
@@ -918,6 +956,7 @@ SCENARIO("Send correctly sends from and modifies a queue of mixed API calls.")
 		enqueue(api_route::fav, account, { "somekindapost", "mrs. goodpost" });
 		dequeue(api_route::post, account, { "real stinker" });
 		dequeue(api_route::fav, account, { "badpost" });
+		enqueue(api_route::context, account, { "11", "13" });
 
 		WHEN("the queue is sent")
 		{
@@ -925,8 +964,9 @@ SCENARIO("Send correctly sends from and modifies a queue of mixed API calls.")
 			mock_network_delete mockdel;
 			mock_network_new_status mocknew;
 			mock_network_upload mockupload;
+			mock_network_context_get mockget;
 
-			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload };
+			auto send = send_posts{ mockpost, mockdel, mocknew, mockupload, mockget };
 
 			sequence = 0;
 			send.send(account, instanceurl, accesstoken);
@@ -942,6 +982,7 @@ SCENARIO("Send correctly sends from and modifies a queue of mixed API calls.")
 				REQUIRE(mockdel.arguments.size() == 1);
 				REQUIRE(mocknew.arguments.size() == 0);
 				REQUIRE(mockupload.arguments.size() == 0);
+				REQUIRE(mockget.arguments.size() == 4);
 			}
 
 			THEN("the correct calls were made")
@@ -974,6 +1015,52 @@ SCENARIO("Send correctly sends from and modifies a queue of mixed API calls.")
 				REQUIRE(mockpost.arguments[5].sequence == 7);
 				REQUIRE(mockpost.arguments[5].url == make_expected_url("badpost", "/unfavourite", instanceurl));
 
+				REQUIRE(mockget.arguments[0].access_token == accesstoken);
+				REQUIRE(mockget.arguments[0].sequence == 8);
+				REQUIRE(mockget.arguments[0].url == make_expected_url("11", "", instanceurl));
+				REQUIRE(mockget.arguments[0].min_id.empty());
+				REQUIRE(mockget.arguments[0].max_id.empty());
+				REQUIRE(mockget.arguments[0].since_id.empty());
+				REQUIRE(mockget.arguments[0].exclude_notifs.empty());
+				REQUIRE(mockget.arguments[0].limit == 0);
+
+				REQUIRE(mockget.arguments[1].access_token == accesstoken);
+				REQUIRE(mockget.arguments[1].sequence == 9);
+				REQUIRE(mockget.arguments[1].url == make_expected_url("11", "/context", instanceurl));
+				REQUIRE(mockget.arguments[1].min_id.empty());
+				REQUIRE(mockget.arguments[1].max_id.empty());
+				REQUIRE(mockget.arguments[1].since_id.empty());
+				REQUIRE(mockget.arguments[1].exclude_notifs.empty());
+				REQUIRE(mockget.arguments[1].limit == 0);
+
+				REQUIRE(mockget.arguments[2].access_token == accesstoken);
+				REQUIRE(mockget.arguments[2].sequence == 10);
+				REQUIRE(mockget.arguments[2].url == make_expected_url("13", "", instanceurl));
+				REQUIRE(mockget.arguments[2].min_id.empty());
+				REQUIRE(mockget.arguments[2].max_id.empty());
+				REQUIRE(mockget.arguments[2].since_id.empty());
+				REQUIRE(mockget.arguments[2].exclude_notifs.empty());
+				REQUIRE(mockget.arguments[2].limit == 0);
+
+				REQUIRE(mockget.arguments[3].access_token == accesstoken);
+				REQUIRE(mockget.arguments[3].sequence == 11);
+				REQUIRE(mockget.arguments[3].url == make_expected_url("13", "/context", instanceurl));
+				REQUIRE(mockget.arguments[3].min_id.empty());
+				REQUIRE(mockget.arguments[3].max_id.empty());
+				REQUIRE(mockget.arguments[3].since_id.empty());
+				REQUIRE(mockget.arguments[3].exclude_notifs.empty());
+				REQUIRE(mockget.arguments[3].limit == 0);
+			}
+
+			THEN("The context calls are correctly written to disk.")
+			{
+				for (const auto& filename : { "11", "13" })
+				{
+					auto contextpath = account / Thread_Directory;
+					contextpath /= filename;
+					contextpath += ".list";
+					verify_file(contextpath, mock_network_context_get::ancestors + mock_network_context_get::descendants, "status id: ");
+				}
 			}
 		}
 	}

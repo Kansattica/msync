@@ -2,7 +2,6 @@
 #define MSYNC_SEND_HPP
 
 #include <print_logger.hpp>
-#include <filesystem.hpp>
 
 #include <string>
 #include <string_view>
@@ -20,13 +19,13 @@
 #include "send_helpers.hpp"
 #include "deferred_url_builder.hpp"
 
-template <typename post_request, typename delete_request, typename post_new_status, typename upload_attachments>
+template <typename post_request, typename delete_request, typename post_new_status, typename upload_attachments, typename get_posts>
 struct send_posts
 {
 public:
 	unsigned int retries = 3;
 
-	send_posts(post_request& post, delete_request& del, post_new_status& new_status, upload_attachments& upload) : post(post), del(del), new_status(new_status), upload(upload) { }
+	send_posts(post_request& post, delete_request& del, post_new_status& new_status, upload_attachments& upload, get_posts& get_method) : post(post), del(del), new_status(new_status), upload(upload), get_method(get_method) { }
 
 	void send(const fs::path& user_account_dir, const std::string_view instance_url, const std::string_view access_token)
 	{
@@ -41,6 +40,7 @@ private:
 	delete_request& del;
 	post_new_status& new_status;
 	upload_attachments& upload;
+	get_posts& get_method;
 
 	bool make_api_call(const api_call& to_make, deferred_url_builder& urls, const fs::path& user_account_dir, std::string_view access_token)
 	{
@@ -50,12 +50,14 @@ private:
 		case api_route::unfav:
 		case api_route::boost:
 		case api_route::unboost:
-			return simple_call(post, "POST", retries, paramaterize_url(urls.status_url(), to_make.argument, ROUTE_LOOKUP[static_cast<uint8_t>(to_make.queued_call)]), access_token);
+			return simple_call(post, "POST", retries, paramaterize_url(urls.status_url(), to_make.argument, ROUTE_LOOKUP[static_cast<uint8_t>(to_make.queued_call)]), access_token).success;
 		case api_route::post:
 			// posts are a little trickier
 			return send_post(user_account_dir, access_token, urls.status_url(), urls.media_url(), to_make.argument);
 		case api_route::unpost:
-			return simple_call(del, "DELETE", retries, paramaterize_url(urls.status_url(), to_make.argument, ROUTE_LOOKUP[static_cast<uint8_t>(to_make.queued_call)]), access_token);
+			return simple_call(del, "DELETE", retries, paramaterize_url(urls.status_url(), to_make.argument, ROUTE_LOOKUP[static_cast<uint8_t>(to_make.queued_call)]), access_token).success;
+		case api_route::context:
+			return get_and_write(get_method, user_account_dir, retries, urls.status_url(), to_make.argument, access_token);
 		default:
 			return false;
 		}

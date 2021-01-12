@@ -92,13 +92,14 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 			 in_sequence(option("-p", "--privacy", "--visibility"), visibilities).doc("Set the post's visibility.")
 			) % "generate options");
 
-	const auto queueMode = (command("queue", "q").set(ret.selected, mode::queue).doc("Manage queued favs, boosts, and posts") &
+	const auto queueMode = (command("queue", "q").set(ret.selected, mode::queue).doc("Manage queued favs, boosts, requests, and posts") &
 			one_of(option("-r", "--remove").set(ret.queue_opt.to_do, queue_action::remove).doc("Remove the post ids or filenames from the queue instead of adding them. If not in the queue, queue unfaving, unboosting, or deleting the post so it happens on next sync."),
 				option("-c", "--clear").set(ret.queue_opt.to_do, queue_action::clear).doc("Remove everything in the specified queue.")) %
 			"queue options",
 			one_of(
 				command("fav").set(ret.queue_opt.selected, api_route::fav) & opt_values("post ids", ret.queue_opt.queued),
 				command("boost").set(ret.queue_opt.selected, api_route::boost) & opt_values("post ids", ret.queue_opt.queued),
+				command("context").set(ret.queue_opt.selected, api_route::context) & opt_values("post ids", ret.queue_opt.queued),
 				command("post").set(ret.queue_opt.selected, api_route::post) & opt_values("filenames", ret.queue_opt.queued),
 				command("print").set(ret.queue_opt.to_do, queue_action::print))
 			.doc("queue commands"));

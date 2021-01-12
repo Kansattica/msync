@@ -5,7 +5,7 @@
 
 // not +1 because unknown doesn't get a string
 constexpr std::array<std::string_view, static_cast<uint8_t>(api_route::unknown)> ROUTE_NAMES = {
-	"FAV", "UNFAV", "BOOST", "UNBOOST", "POST", "UNPOST"
+	"FAV", "UNFAV", "BOOST", "UNBOOST", "POST", "UNPOST", "CONTEXT"
 };
 
 std::string_view print_route(api_route route)

@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include "../postfile/outgoing_post.hpp"
+#include "../postlist/post_list.hpp"
 
 std::string paramaterize_url(const std::string_view before, const std::string_view middle, const std::string_view after)
 {
@@ -91,4 +92,30 @@ file_status_params read_params(const fs::path& path)
 	toreturn.visibility = post.parsed.visibility_string();
 
 	return toreturn;
+}
+
+void write_posts(const mastodon_context& context, const mastodon_status& status, const fs::path& path)
+{
+	plverb() << "Writing context to " << path << ".\n";
+
+	{
+		// let RAII clean up this parent path at the end of the scope
+		const auto thread_dir = path.parent_path();
+		if (!fs::exists(thread_dir))
+		{
+			fs::create_directories(thread_dir);
+		}
+	}
+
+	if (fs::exists(path))
+	{
+		plverb() << "Overwriting existing context.\n";
+		fs::remove(path);
+	}
+	post_list<mastodon_status> writer { path };
+
+	auto write = [&writer](const auto& post) { writer.write(post); };
+	std::for_each(context.ancestors.begin(), context.ancestors.end(), write);
+	writer.write(status);
+	std::for_each(context.descendants.begin(), context.descendants.end(), write);
 }
