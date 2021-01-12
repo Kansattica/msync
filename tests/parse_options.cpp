@@ -1358,7 +1358,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		// try every combination of bits. note that the ranges are half-open, including the 0 and excluding the maximum.
 		// this test isn't as exhaustive as it could be, because if it was, it'd take forever to run
 		const auto combination = GENERATE(range(0, 0b11111 + 1));
-		const auto attach = GENERATE(0, 1, 2, 3);
+		const auto attach = GENERATE(0, 1, 2);
 		const auto description = GENERATE(0, 1);
 		const auto vis = pick_visibility();
 
@@ -1391,10 +1391,7 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 			options.push_back(std::move(opt));
 		}
 
-		if (attach != 3)
-		{
-			pick_attachment(attach, expected, options);
-		}
+		pick_attachment(attach, expected, options);
 
 		pick_description(description, expected, options);
 
