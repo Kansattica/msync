@@ -8,6 +8,7 @@
 
 #include "test_helpers.hpp"
 #include "mock_network.hpp"
+#include "sync_test_common.hpp"
 
 #include <string_view>
 #include <vector>

@@ -1,5 +1,5 @@
 add_executable(tests "")
-target_sources_local(tests PRIVATE main.cpp option_file.cpp test_helpers.hpp test_helpers.cpp user_options.cpp global_options.cpp util.cpp option_enums.cpp queue_list.cpp queues.cpp send.cpp recv.cpp read_response.cpp outgoing_post.cpp parse_options.cpp post_list.cpp mock_network.hpp account_directory.cpp deferred_url_builder.cpp to_chars_patch.hpp print_logger.cpp exception.cpp)
+target_sources_local(tests PRIVATE main.cpp option_file.cpp test_helpers.hpp test_helpers.cpp user_options.cpp global_options.cpp util.cpp option_enums.cpp queue_list.cpp queues.cpp send.cpp recv.cpp read_response.cpp outgoing_post.cpp parse_options.cpp post_list.cpp mock_network.hpp account_directory.cpp deferred_url_builder.cpp to_chars_patch.hpp print_logger.cpp exception.cpp read_response_json.hpp sync_test_common.hpp)
 target_link_libraries(tests PRIVATE Catch2::Catch2 options optionparsing constants util filesystem queue printlog postfile sync netinterface accountdirectory postlist entities exception fixlocale)
 
 add_executable(net_tests "")
