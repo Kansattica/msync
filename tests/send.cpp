@@ -132,12 +132,15 @@ struct mock_network_context_get : public mock_network
 	std::vector<get_mock_args> arguments;
 	net_response operator()(std::string_view url, std::string_view access_token, const timeline_params& params, unsigned int limit)
 	{
-		arguments.push_back(get_mock_args{{0, std::string{url}, std::string{access_token}},
+		arguments.push_back(get_mock_args{{++sequence, std::string{url}, std::string{access_token}},
 			std::string{params.min_id}, std::string{params.max_id}, std::string{params.since_id}, copy_excludes(params.exclude_notifs), limit });
 
 		net_response toreturn;
+		if (
+			// if it ends in /context, return this. otherwise, return just one status
+			
 		toreturn.message = R"({"ancestors":)";
-		toreturn.message += make_json_array(make_status_json, 0, 11);
+		toreturn.message += make_json_array(make_status_json, 1, 12);
 		toreturn.message += R"(,"descendants":)";
 		toreturn.message += make_json_array(make_status_json, 11, 15);
 		toreturn.message += '}';
@@ -941,6 +944,7 @@ SCENARIO("Send correctly sends from and modifies a queue of mixed API calls.")
 		enqueue(api_route::fav, account, { "somekindapost", "mrs. goodpost" });
 		dequeue(api_route::post, account, { "real stinker" });
 		dequeue(api_route::fav, account, { "badpost" });
+		enqueue(api_route::context, account, { "regularpost", "timepost" });
 
 		WHEN("the queue is sent")
 		{
@@ -966,6 +970,7 @@ SCENARIO("Send correctly sends from and modifies a queue of mixed API calls.")
 				REQUIRE(mockdel.arguments.size() == 1);
 				REQUIRE(mocknew.arguments.size() == 0);
 				REQUIRE(mockupload.arguments.size() == 0);
+				REQUIRE(mockget.arguments.size() == 4);
 			}
 
 			THEN("the correct calls were made")
@@ -997,6 +1002,24 @@ SCENARIO("Send correctly sends from and modifies a queue of mixed API calls.")
 				REQUIRE(mockpost.arguments[5].access_token == accesstoken);
 				REQUIRE(mockpost.arguments[5].sequence == 7);
 				REQUIRE(mockpost.arguments[5].url == make_expected_url("badpost", "/unfavourite", instanceurl));
+
+				REQUIRE(mockget.arguments[0].access_token == accesstoken);
+				REQUIRE(mockget.arguments[0].sequence == 8);
+				REQUIRE(mockget.arguments[0].url == make_expected_url("regularpost", "", instanceurl));
+				REQUIRE(mockget.arguments[0].min_id.empty());
+				REQUIRE(mockget.arguments[0].max_id.empty());
+				REQUIRE(mockget.arguments[0].since_id.empty());
+				REQUIRE(mockget.arguments[0].exclude_notifs.empty());
+				REQUIRE(mockget.arguments[0].limit == 0);
+
+				REQUIRE(mockget.arguments[1].access_token == accesstoken);
+				REQUIRE(mockget.arguments[1].sequence == 9);
+				REQUIRE(mockget.arguments[1].url == make_expected_url("regularpost", "context", instanceurl));
+				REQUIRE(mockget.arguments[1].min_id.empty());
+				REQUIRE(mockget.arguments[1].max_id.empty());
+				REQUIRE(mockget.arguments[1].since_id.empty());
+				REQUIRE(mockget.arguments[1].exclude_notifs.empty());
+				REQUIRE(mockget.arguments[1].limit == 0);
 
 			}
 		}

@@ -83,7 +83,6 @@ bool get_and_write(make_request& method, const fs::path& user_account_dir, unsig
 	if (!context_response.success) { return false; }
 
 	// build up the target file location to minimize the number of intermediate strings that get thrown away
-
 	auto post_file = user_account_dir / Thread_Directory;
 	post_file /= post_id;
 	post_file += ".list";
