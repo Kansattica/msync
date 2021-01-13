@@ -117,6 +117,7 @@ Once you have `msync` compiled, check out [MANUAL.md](MANUAL.md#msync-manual) fo
 
 - [ ] Nicknames for accounts.
 - [ ] Dropping filtered posts.
+- [ ] Access to moderation tools.
 - [ ] Queue and send profile updates.
 - [X] Download individual posts and threads by ID.
 - [X] Poll support (polls download and render properly, voting not implemented yet).
