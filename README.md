@@ -112,14 +112,13 @@ Once you have `msync` compiled, check out [MANUAL.md](MANUAL.md#msync-manual) fo
 - [X] Allow choosing a default account.
 - [ ] Support for adding and removing filters.
 - [X] Respecting rate limits.
-- [X] Ability to request the rest of the posts in a thread.
 
 ### Roadmap (things for later)
 
 - [ ] Nicknames for accounts.
 - [ ] Dropping filtered posts.
 - [ ] Queue and send profile updates.
-- [ ] Download individual posts and threads by URL or ID.
+- [X] Download individual posts and threads by ID.
 - [X] Poll support (polls download and render properly, voting not implemented yet).
 - [ ] Nicer UI, like a minimal webpage to show downloaded posts in.
 - [ ] Save sync progress when msync is killed by ctrl-C.
