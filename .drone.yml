@@ -30,7 +30,7 @@ steps:
   - name: wait to publish
     image: ubuntu:20.04
     commands:
-    - sleep 5m
+    - sleep 10m
     when:
       event: tag
 
@@ -76,7 +76,7 @@ steps:
   - name: wait to publish
     image: ubuntu:20.04
     commands:
-    - sleep 5m
+    - sleep 10m
     when:
       event: tag
 
