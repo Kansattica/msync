@@ -9,7 +9,7 @@ The rest of this document will say "Mastodon", but Pleroma should work just as w
 
 #### Installing
 
-Once you've compiled or [downloaded](https://github.com/Kansattica/msync/releases) `msync` (see [README.md](./README.md#which-release-should-i-download)), you have a few options:
+Once you've compiled, [ordered](https://princess.software/order/), or [downloaded](https://github.com/Kansattica/msync/releases) `msync` (see [README.md](./README.md#which-release-should-i-download)), you have a few options:
 
 - leave it where it is and use it in place, or copy it to a folder in your home directory and use it from there.
 - copy the compiled `msync` executable to somewhere in your `$PATH`. 

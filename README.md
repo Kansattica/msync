@@ -17,6 +17,8 @@
 
 You can download the latest stable release of `msync` [here](https://github.com/Kansattica/msync/releases) or the Releases link to the right. 
 
+If you're freeling adventurous, you can order a [floppy disk release](https://princess.software/order/).
+
 #### Which release should I download?
 
 I recommend downloading the `.deb` file if you're on a x64 Debian-like system that can install it. Otherwise, I recommend downloading the release for your system with `install` in the filename. This version will store user data in the appropriate place for your system. The versions without `install` store user data in the same directory as the executable. See [the manual](MANUAL.md#a-note-about-msync_accounts) for more information.
