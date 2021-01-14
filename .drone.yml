@@ -66,6 +66,11 @@ steps:
     - mv msync ../dist/msync-${DRONE_TAG}-portable-linux-arm64-gcc
     - ls ../dist
 
+  - name: wait to publish
+    image: ubuntu:20.04
+    commands:
+    - sleep 5m
+
   - name: publish
     image: plugins/github-release
     settings:
