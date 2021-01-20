@@ -26,6 +26,8 @@ constexpr std::array<std::string_view, static_cast<uint8_t>(api_route::unknown)>
  "/unfavourite", 
  "/reblog",
  "/unreblog", 
+ "/bookmark",
+ "/unbookmark", 
  "", 
  "",
  "/context"

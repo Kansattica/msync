@@ -99,6 +99,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 			one_of(
 				command("fav").set(ret.queue_opt.selected, api_route::fav) & opt_values("post ids", ret.queue_opt.queued),
 				command("boost").set(ret.queue_opt.selected, api_route::boost) & opt_values("post ids", ret.queue_opt.queued),
+				command("bookmark").set(ret.queue_opt.selected, api_route::bookmark) & opt_values("post ids", ret.queue_opt.queued),
 				command("context").set(ret.queue_opt.selected, api_route::context) & opt_values("post ids", ret.queue_opt.queued),
 				command("post").set(ret.queue_opt.selected, api_route::post) & opt_values("filenames", ret.queue_opt.queued),
 				command("print").set(ret.queue_opt.to_do, queue_action::print))

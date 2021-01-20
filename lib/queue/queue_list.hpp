@@ -12,6 +12,8 @@ enum class api_route : uint8_t
 	unfav,
 	boost,
 	unboost,
+	bookmark,
+	unbookmark,
 	post,
 	unpost, // you might call it "delete post"
 	context,
