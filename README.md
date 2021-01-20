@@ -17,7 +17,7 @@
 
 You can download the latest stable release of `msync` [here](https://github.com/Kansattica/msync/releases) or the Releases link to the right. 
 
-If you're freeling adventurous, you can order a [floppy disk release](https://princess.software/order/).
+If you're feeling adventurous, you can order a [floppy disk release](https://princess.software/order/).
 
 #### Which release should I download?
 
