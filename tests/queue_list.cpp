@@ -21,6 +21,8 @@ SCENARIO("queue_lists save their data when destroyed.")
 		opts.parsed.push_back(api_call{ api_route::fav, "thingone" });
 		opts.parsed.push_back(api_call{ api_route::unboost, "thingtwo" });
 		opts.parsed.push_back(api_call{ api_route::context, "thingtwo" });
+		opts.parsed.push_back(api_call{ api_route::bookmark, "thingthree" });
+		opts.parsed.push_back(api_call{ api_route::unbookmark, "thingfour" });
 
 		REQUIRE(opts.parsed.size() == 3);
 
@@ -46,10 +48,12 @@ SCENARIO("queue_lists save their data when destroyed.")
 
 				const auto lines = read_lines(tf.filename());
 
-				REQUIRE(lines.size() == 3);
+				REQUIRE(lines.size() == 5);
 				REQUIRE(lines[0] == "FAV thingone");
 				REQUIRE(lines[1] == "UNBOOST thingtwo");
 				REQUIRE(lines[2] == "CONTEXT thingtwo");
+				REQUIRE(lines[3] == "BOOKMARK thingthree");
+				REQUIRE(lines[4] == "UNBOOKMARK thingfour");
 			}
 		}
 
@@ -65,10 +69,12 @@ SCENARIO("queue_lists save their data when destroyed.")
 
 				const auto lines = read_lines(tf.filename());
 
-				REQUIRE(lines.size() == 3);
+				REQUIRE(lines.size() == 5);
 				REQUIRE(lines[0] == "FAV thingone");
 				REQUIRE(lines[1] == "UNBOOST thingtwo");
 				REQUIRE(lines[2] == "CONTEXT thingtwo");
+				REQUIRE(lines[3] == "BOOKMARK thingthree");
+				REQUIRE(lines[4] == "UNBOOKMARK thingfour");
 			}
 		}
 
@@ -86,9 +92,11 @@ SCENARIO("queue_lists save their data when destroyed.")
 
 				const auto lines = read_lines(tf.filename());
 
-				REQUIRE(lines.size() == 2);
+				REQUIRE(lines.size() == 4);
 				REQUIRE(lines[0] == "UNBOOST thingtwo");
 				REQUIRE(lines[1] == "CONTEXT thingtwo");
+				REQUIRE(lines[2] == "BOOKMARK thingthree");
+				REQUIRE(lines[3] == "UNBOOKMARK thingfour");
 			}
 		}
 	}
@@ -228,8 +236,8 @@ SCENARIO("queue_lists read data when created.")
 SCENARIO("queue_list can handle a long queue with a lot of items.")
 {
 	constexpr unsigned int size = 10000;
-	constexpr std::array<api_route, 7> routes = { api_route::fav, api_route::unfav,
-		api_route::boost, api_route::unboost, api_route::post, api_route::unpost, api_route::context };
+	constexpr std::array<api_route, 9> routes = { api_route::fav, api_route::unfav,
+		api_route::boost, api_route::unboost, api_route::post, api_route::unpost, api_route::bookmark, api_route::unbookmark, api_route::context };
 
 	GIVEN("A bunch of API calls to enqueue and an empty queue_list.")
 	{

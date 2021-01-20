@@ -22,7 +22,7 @@ bool prefix_match(std::string_view actual, std::string_view prefix, std::string_
 		std::equal(actual.begin() + prefix.length(), actual.end(), expected.begin(), expected.end());
 }
 
-SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
+SCENARIO("Queues correctly enqueue and dequeue boosts, favs, and bookmarks.")
 {
 	logs_off = true;
 	const test_dir allaccounts = temporary_directory();
@@ -36,7 +36,8 @@ SCENARIO("Queues correctly enqueue and dequeue boosts and favs.")
 		{
 			const auto totest = GENERATE(
 				std::make_tuple(api_route::boost, "BOOST "sv, "UNBOOST "sv),
-				std::make_tuple(api_route::fav, "FAV "sv, "UNFAV "sv)
+				std::make_tuple(api_route::fav, "FAV "sv, "UNFAV "sv),
+				std::make_tuple(api_route::bookmark, "BOOKMARK "sv, "UNBOOKMARK "sv)
 				);
 
 			std::vector<std::string> someids{ "12345", "67890", "123123123123123123123", "longtextboy", "friend" };
