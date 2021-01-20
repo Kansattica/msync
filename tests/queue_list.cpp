@@ -24,7 +24,7 @@ SCENARIO("queue_lists save their data when destroyed.")
 		opts.parsed.push_back(api_call{ api_route::bookmark, "thingthree" });
 		opts.parsed.push_back(api_call{ api_route::unbookmark, "thingfour" });
 
-		REQUIRE(opts.parsed.size() == 3);
+		REQUIRE(opts.parsed.size() == 5);
 
 		WHEN("A queue_list is moved from")
 		{
