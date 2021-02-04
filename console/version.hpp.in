@@ -27,7 +27,7 @@ constexpr const char* MSYNC_LICENSE = R"(
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-	Please contact grace@hypnovir.us with licensing questions.
+	Please contact grace@princess.software with licensing questions.
 )";
 
 #define MSYNC_FILE_LOG_ENABLED "@MSYNC_FILE_LOG@"
