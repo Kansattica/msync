@@ -8,7 +8,7 @@ qpost()
 	$EDITOR "$postfile"
 	if [ -s "$postfile" ]
 	then
-		msync queue post "$postfile" --verbose
+		msync queue post "$postfile"
 	else
 		echo "File empty. Not enqueueing."
 	fi
