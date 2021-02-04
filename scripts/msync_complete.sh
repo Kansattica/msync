@@ -53,7 +53,7 @@ function _msync() {
 			return 0;
 			;;
 		'-r' | '--remove' | '-c' | '--clear')
-			COMPREPLY=($( compgen -W 'fav boost post print context' -- $word ));
+			COMPREPLY=($( compgen -W 'fav boost post context' -- $word ));
 			return 0;
 			;;
 		'post' | '-f' | '--file' | '--attach' | '--attachment')
