@@ -73,9 +73,10 @@ void make_new_account(const std::string& accountname, global_options& options)
 		const auto r = cpr::Post(cpr::Url{make_api_url(instanceurl, "/api/v1/apps")},
 						   cpr::Payload{{"client_name", "msync"}, {"redirect_uris", redirect_uri}, {"scopes", scopes}, {"website", "https://github.com/kansattica/msync"}});
 
-		if (r.error)
+		if (r.error || r.status_code != 200)
 		{
 			pl() << "Could not register app with server. Responded with error code " << r.status_code << ": " << r.error.message << ".\n"
+			"Response body: " << r.text << "\n"
 			"Please double check your instance URL, ensure you're connected to the internet, and try again.";
 			return;
 		}
