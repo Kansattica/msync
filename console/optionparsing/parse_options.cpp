@@ -93,8 +93,8 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 			) % "generate options");
 
 	const auto queueMode = (command("queue", "q").set(ret.selected, mode::queue).doc("Manage queued favs, boosts, requests, and posts") &
-			one_of(option("-r", "--remove").set(ret.queue_opt.to_do, queue_action::remove).doc("Remove the post ids or filenames from the queue instead of adding them. If not in the queue, queue unfaving, unboosting, or deleting the post so it happens on next sync."),
-				option("-c", "--clear").set(ret.queue_opt.to_do, queue_action::clear).doc("Remove everything in the specified queue.")) %
+			one_of(option("remove", "r", "-r", "--remove").set(ret.queue_opt.to_do, queue_action::remove).doc("Remove the post ids or filenames from the queue instead of adding them. If not in the queue, queue unfaving, unboosting, or deleting the post so it happens on next sync."),
+				option("clear", "c", "-c", "--clear").set(ret.queue_opt.to_do, queue_action::clear).doc("Remove everything in the specified queue.")) %
 			"queue options",
 			one_of(
 				command("fav").set(ret.queue_opt.selected, api_route::fav) & opt_values("post ids", ret.queue_opt.queued),

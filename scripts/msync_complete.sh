@@ -49,10 +49,10 @@ function _msync() {
 			return 0;
 			;;
 		'queue' | 'q')
-			COMPREPLY=($( compgen -W '-r --remove -c --clear fav boost post print context' -- $word ));
+			COMPREPLY=($( compgen -W 'remove -r --remove clear -c --clear fav boost post print context' -- $word ));
 			return 0;
 			;;
-		'-r' | '--remove' | '-c' | '--clear')
+		'-r' | '--remove' | '-c' | '--clear' | 'remove' | 'r' | 'c' | 'clear')
 			COMPREPLY=($( compgen -W 'fav boost post context' -- $word ));
 			return 0;
 			;;
