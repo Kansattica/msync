@@ -244,7 +244,6 @@ void fill_options(std::vector<command_line_option>& options, gen_options& expect
 
 void permute_and_check(std::vector<command_line_option>& options, const gen_options& expected)
 {
-
 	// static and doing the pass-by-mutable-ref thing because there's really no sense in 
 	// freeing and reallocating for every test case
 	// check_parse clears it every time, but keeps the capacity
