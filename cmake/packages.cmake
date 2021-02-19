@@ -19,7 +19,7 @@ message(STATUS "Downloading clipp...")
 FetchContent_Declare(
 	clipplib
 	GIT_REPOSITORY https://github.com/muellan/clipp.git
-	GIT_TAG		   2c32b2f1f7cc530b1ec1f62c92f698643bb368db
+	GIT_TAG 	4cda95d8c1536c3778773a4468a350a7ea8bcd3f
 	)
 
 FetchContent_GetProperties(clipplib)
@@ -155,7 +155,7 @@ if (MSYNC_BUILD_TESTS)
 	FetchContent_Declare(
 		catch2lib
 		GIT_REPOSITORY	https://github.com/catchorg/Catch2.git
-		GIT_TAG 		v2.11.1
+		GIT_TAG 		v2.13.4
 		GIT_SHALLOW		TRUE
 		)
 
