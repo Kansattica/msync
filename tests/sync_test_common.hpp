@@ -33,7 +33,7 @@ inline std::vector<std::string> copy_excludes(std::vector<std::string_view>* ex)
 	return std::vector<std::string>(ex->begin(), ex->end());
 }
 
-inline void verify_file(const fs::path& file, int expected_count, const std::string& id_starts_with)
+inline void verify_file(const fs::path& file, size_t expected_count, const std::string& id_starts_with)
 {
 	static constexpr std::string_view dashes = "--------------";
 
@@ -41,7 +41,7 @@ inline void verify_file(const fs::path& file, int expected_count, const std::str
 
 	bool read_next = true;
 	unsigned int last_id = 0;
-	unsigned int total = 0;
+	size_t total = 0;
 
 	for (const auto& line : lines)
 	{
