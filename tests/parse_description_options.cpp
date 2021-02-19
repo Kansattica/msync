@@ -22,7 +22,6 @@ struct command_line_option
 	}
 };
 
-
 void pick_attachment(int number, gen_options& expected, std::vector<command_line_option>& options)
 {
 	switch (number)
