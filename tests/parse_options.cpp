@@ -939,7 +939,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 	GIVEN("A command line that removes a bunch of things from the boost queue.")
 	{
 		const auto commandtype = GENERATE(std::make_pair("fav", api_route::fav), std::make_pair("boost", api_route::boost), std::make_pair("context", api_route::context));
-		const auto opt = GENERATE(as<const char*>{}, "-r", "--remove");
+		const auto opt = GENERATE(as<const char*>{}, "-r", "--remove", "r", "remove");
 		constexpr int argc = 7;
 		char const* argv[]{ "msync", qcommand, opt, commandtype.first, "12345", "6789", "bwingus" };
 
@@ -1002,7 +1002,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 	GIVEN("A command line that clears the post queue.")
 	{
-		const auto opt = GENERATE(as<const char*>{}, "-c", "--clear");
+		const auto opt = GENERATE(as<const char*>{}, "-c", "--clear", "c", "clear");
 		constexpr int argc = 4;
 		char const* argv[]{ "msync", qcommand, opt, "post" };
 

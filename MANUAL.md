@@ -190,11 +190,11 @@ To do other useful stuff with `msync`, you'll have to use queues. The `msync que
 
 To queue up favorites, run `msync queue fav <any number of status IDs>`. You can get these status IDs from downloaded posts and notifications. They're always on a line that starts with `status id:` in `home.list` and `notifications.list`- don't put any other ID numbers into this! Boosts are the same: `msync queue boost <any number of status ids>`
 
-If you accidentally favorited or boosted a toot you'd rather not have, run `msync queue --remove fav <any number of status IDs>`. This works for favorites and boosts that you haven't sent yet (which will be removed immediately) and for ones that have already been sent (which will be removed the next time you `msync sync`).
+If you accidentally favorited or boosted a toot you'd rather not have, run `msync queue remove fav <any number of status IDs>`. This works for favorites and boosts that you haven't sent yet (which will be removed immediately) and for ones that have already been sent (which will be removed the next time you `msync sync`).
 
 You can check the status of your queues and see what will be sent next time you sync up with `msync queue print`.
 
-If you want to just clear that queue, possibly because there's a typo'd ID in there- you can run `msync queue --clear fav` (or `boost` or `post`).
+If you want to just clear that queue, possibly because there's a typo'd ID in there- you can run `msync queue clear fav` (or `boost` or `post` or `context`).
 
 Posts are a little different. You still queue them up to be sent when you next `sync` up, but there's an extra step involved. `msync queue post <any number of file paths>` takes, well, a number of file paths. The contents of these will be interpreted as text files and sent as posts when you `msync sync` up next. A few notes on posts:
 
