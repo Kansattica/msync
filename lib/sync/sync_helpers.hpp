@@ -36,12 +36,18 @@ void print_truncated_string(std::string_view toprint, Stream& str)
 		truncated = true;
 	}
 
-	while (!toprint.empty() && toprint.back() == '\n')
-		toprint.remove_suffix(1);
+	const auto newline_idx = toprint.find('\n');
+	if (newline_idx != std::string::npos)
+	{
+		toprint.remove_suffix(toprint.size() - newline_idx);
+		truncated = true;
+	}
 
 	str << toprint;
 	if (truncated)
 		str << "...";
+	else if (toprint.empty())
+		str << "(no body)";
 }
 
 template <typename Stream>
