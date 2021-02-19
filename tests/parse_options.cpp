@@ -719,6 +719,8 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 		const char* arg = GENERATE(as<const char*>{}, "-g", "--get-only", "--recv-only");
 		std::array<char const*, 3> argv{ "msync", subcommand, arg };
 
+		CAPTURE(argv);
+
 		WHEN("the command line is parsed")
 		{
 			const auto parsed = parse((int)argv.size(), argv.data());
@@ -802,6 +804,8 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 		const char* posts = GENERATE(as<const char*>{}, "-p", "--posts");
 		const char* max = GENERATE(as<const char*>{}, "-m", "--max-requests");
 		std::array<char const*, 6> argv{ "msync", subcommand,  posts, "60", max, "100" };
+
+		CAPTURE(argv);
 
 		WHEN("the command line is parsed")
 		{
