@@ -240,6 +240,10 @@ vim -p `msync location`/**/*.list
 
 - If you fetch context for a the same thread at a later date, `msync` will automatically overwite the existing file to ensure you have the most recent version of the thread.
 
+#### `msync` doesn't like my filename!
+
+The command line parser library `msync` uses has a few edge cases. It seems to have issues parsing filenames that begin with the same prefix as a command msync uses. If you're trying to generate a file that starts with `post` or attach a file named `favicon.png`, the parser might get mad at you. I suggest renaming the file or, in the case of `msync gen`, entering a different name on the command line and updating it to the correct one in the generated file.
+
 #### A note on UTF-8, Unicode, and Emoji
 
 `msync` tries its best not to touch the bytes that it sends to or from the server. This means that posts are sent to the server and written to the local timelines as close to as is as possible. Emojis and other non-ASCII characters should work fine, as long as you send and read UTF-8. Some terminal emulators have a hard time displaying UTF-8, and you may wind up having to change some setting or use a different font. I know that running `[Console]::OutputEncoding = [Text.UTF8Encoding]::UTF8` can help on Powershell, especially when it comes to specifying command line arguments that include non-ASCII characters. Note that characters may show weird on the terminal, but go over the wire fine. 
