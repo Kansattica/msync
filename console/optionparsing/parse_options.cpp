@@ -125,7 +125,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 
 		ret.selected = mode::help; //possible for, say, config to be set but still be a parse fail
 
-		//clipp::debug::print(cout, result);
+		//clipp::debug::print(std::cout, result);
 	}
 
 	ret.okay = static_cast<bool>(result);

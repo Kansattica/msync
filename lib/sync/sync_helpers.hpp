@@ -46,6 +46,8 @@ void print_truncated_string(std::string_view toprint, Stream& str)
 	str << toprint;
 	if (truncated)
 		str << "...";
+	else if (toprint.empty())
+		str << "(no body)";
 }
 
 template <typename Stream>
