@@ -115,7 +115,7 @@ clipp::group make_cli(parse_result& ret)
 
 parse_result parse(const int argc, const char* argv[], const bool silent)
 {
-	parse_result ret;
+	static parse_result ret;
 	const static auto cli = make_cli(ret);
 
 	//skip the first result.
