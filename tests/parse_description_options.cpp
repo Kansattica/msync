@@ -46,25 +46,6 @@ void pick_attachment(int number, gen_options& expected, std::vector<command_line
 	}
 }
 
-void pick_description(int number, gen_options& expected, std::vector<command_line_option>& options)
-{
-	switch (number)
-	{
-	case 0:
-		options.push_back(command_line_option{ {"-d", "some🕳descrip"} });
-		expected.post.descriptions.push_back("some🕳descrip");
-		break;
-	case 1:
-		options.push_back(command_line_option{ {"--description", "describer"}, 0, 1 });
-		options.push_back(command_line_option{ {"-d", "some file!"}, 0, 2 });
-		expected.post.descriptions.push_back("describer");
-		expected.post.descriptions.push_back("some file!");
-		break;
-	case 2:
-		break;
-	}
-}
-
 auto pick_visibility()
 {
 	switch (zero_to_n(7))
@@ -292,7 +273,7 @@ void permute_and_check(std::vector<command_line_option>& options, const gen_opti
 	}
 }
 
-SCENARIO("The command line parser recognizes when the user wants to generate a file with a description.", "[long_run][long_run_parseopts]")
+SCENARIO("The command line parser recognizes when the user wants to generate a file with a single description.", "[long_run][long_run_parseopts]")
 {
 	GIVEN("A combination of options for the file generator")
 	{
@@ -300,7 +281,6 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		// this test isn't as exhaustive as it could be, because if it was, it'd take forever to run
 		const auto combination = GENERATE(range(0, 0b11111 + 1));
 		const auto attach = GENERATE(0, 1, 2, 3);
-		const auto description = GENERATE(0, 1);
 		const auto vis = pick_visibility();
 
 		gen_options expected;
@@ -310,7 +290,39 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		static std::vector<command_line_option> options;
 		options.clear();
 
-		pick_description(description, expected, options);
+		options.push_back(command_line_option{ {"-d", "some🕳descrip"} });
+		expected.post.descriptions.push_back("some🕳descrip");
+
+		fill_options(options, expected, combination, attach, vis);
+
+		WHEN("the command line is parsed")
+		{
+			permute_and_check(options, expected);
+		}
+	}
+}
+
+SCENARIO("The command line parser recognizes when the user wants to generate a file with two descriptions.", "[long_run][long_run_parseopts]")
+{
+	GIVEN("A combination of options for the file generator")
+	{
+		// try every combination of bits. note that the ranges are half-open, including the 0 and excluding the maximum.
+		// this test isn't as exhaustive as it could be, because if it was, it'd take forever to run
+		const auto combination = GENERATE(range(0, 0b11111 + 1));
+		const auto attach = GENERATE(0, 1, 2, 3);
+		const auto vis = pick_visibility();
+
+		gen_options expected;
+
+		// this guy is going to be refilled and emptied a bunch
+		// make 'em static and clear it every time to keep the capacity
+		static std::vector<command_line_option> options;
+		options.clear();
+
+		options.push_back(command_line_option{ {"--description", "describer"}, 0, 1 });
+		options.push_back(command_line_option{ {"-d", "some file!"}, 0, 2 });
+		expected.post.descriptions.push_back("describer");
+		expected.post.descriptions.push_back("some file!");
 
 		fill_options(options, expected, combination, attach, vis);
 
