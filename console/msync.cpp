@@ -43,7 +43,7 @@ int main(int argc, const char* argv[])
 
 	plfile() << "--- msync started ---\n";
 
-	auto parsed = parse(argc, argv, false);
+	const auto& parsed = parse(argc, argv, false);
 
 	bool should_print_newline = true;
 	try
@@ -89,10 +89,10 @@ int main(int argc, const char* argv[])
 			switch (parsed.queue_opt.to_do)
 			{
 			case queue_action::add:
-				enqueue(parsed.queue_opt.selected, assume_account(parsed.account).second.get_user_directory(), std::move(parsed.queue_opt.queued));
+				enqueue(parsed.queue_opt.selected, assume_account(parsed.account).second.get_user_directory(), parsed.queue_opt.queued);
 				break;
 			case queue_action::remove:
-				dequeue(parsed.queue_opt.selected, assume_account(parsed.account).second.get_user_directory(), std::move(parsed.queue_opt.queued));
+				dequeue(parsed.queue_opt.selected, assume_account(parsed.account).second.get_user_directory(), parsed.queue_opt.queued);
 				break;
 			case queue_action::clear:
 				clear(parsed.queue_opt.selected, assume_account(parsed.account).second.get_user_directory());
@@ -105,7 +105,7 @@ int main(int argc, const char* argv[])
 		case mode::gen:
 		{ //notice the braces- this is a scope
 			outgoing_post post(parsed.gen_opt.filename);
-			post.parsed = std::move(parsed.gen_opt.post);
+			post.parsed = parsed.gen_opt.post;
 		}
 		pl() << "Wrote post template to " << parsed.gen_opt.filename;
 		break;

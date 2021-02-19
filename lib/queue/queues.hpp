@@ -7,9 +7,10 @@
 #include "queue_list.hpp"
 #include <filesystem.hpp>
 
-// enqueue and dequeue mutate and move from the vector for efficiency
-void enqueue(api_route toenqueue, const fs::path& user_account_dir, std::vector<std::string>&& add);
-void dequeue(api_route todequeue, const fs::path& user_account_dir, std::vector<std::string>&& remove);
+// enqueue and dequeue mutate the vector for efficiency
+// note that they're passed by value
+void enqueue(api_route toenqueue, const fs::path& user_account_dir, std::vector<std::string> add);
+void dequeue(api_route todequeue, const fs::path& user_account_dir, std::vector<std::string> remove);
 
 void clear(api_route toclear, const fs::path& user_account_dir);
 
