@@ -129,7 +129,7 @@ struct mock_network_get : public mock_network
 	}
 };
 
-SCENARIO("Recv downloads and writes the correct number of posts.", "[perf]")
+SCENARIO("Recv downloads and writes the correct number of posts.")
 {
 	logs_off = true;
 
