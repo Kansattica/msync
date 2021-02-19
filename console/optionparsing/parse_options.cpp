@@ -113,9 +113,12 @@ clipp::group make_cli(parse_result& ret)
 		(command("help").set(ret.selected, mode::help)), universalOptions);
 }
 
-parse_result parse(const int argc, const char* argv[], const bool silent)
+// make this global and return a reference to it because it makes testing faster and easier
+// otherwise, the command line parser tests waste a bunch of time recreating the clipp cli every time
+parse_result ret;
+const parse_result& parse(const int argc, const char* argv[], const bool silent)
 {
-	static parse_result ret;
+	ret = {};
 	const static auto cli = make_cli(ret);
 
 	//skip the first result.
