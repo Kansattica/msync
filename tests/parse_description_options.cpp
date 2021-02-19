@@ -98,7 +98,7 @@ void check_parse(std::vector<const char*>& argv, const std::vector<command_line_
 		argv.insert(argv.end(), option.options.begin(), option.options.end());
 	}
 
-	const auto parsed = parse((int)argv.size(), argv.data());
+	const auto& parsed = parse((int)argv.size(), argv.data());
 
 	THEN("the options are parsed as expected")
 	{

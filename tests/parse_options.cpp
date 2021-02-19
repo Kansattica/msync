@@ -18,7 +18,7 @@ SCENARIO("The command line parser recognizes when the user wants to start a new 
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is new user")
 			{
@@ -44,7 +44,7 @@ SCENARIO("The command line parser recognizes when the user wants to start a new 
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is new user")
 			{
@@ -73,7 +73,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is config")
 			{
@@ -109,7 +109,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is config")
 			{
@@ -145,7 +145,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is showopt")
 			{
@@ -181,7 +181,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is showopt")
 			{
@@ -217,7 +217,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is showallopt")
 			{
@@ -248,7 +248,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is showallopt")
 			{
@@ -279,7 +279,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is defaultopt")
 			{
@@ -310,7 +310,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is defaultopt")
 			{
@@ -342,7 +342,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is configlist")
 			{
@@ -378,7 +378,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is configlist")
 			{
@@ -414,7 +414,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is configsync")
 			{
@@ -450,7 +450,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is configsync")
 			{
@@ -486,7 +486,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is configsync")
 			{
@@ -527,7 +527,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is sync")
 			{
@@ -558,7 +558,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is sync")
 			{
@@ -589,7 +589,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is sync")
 			{
@@ -621,7 +621,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is sync")
 			{
@@ -653,7 +653,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is sync")
 			{
@@ -684,7 +684,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is sync")
 			{
@@ -723,7 +723,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse((int)argv.size(), argv.data());
+			const auto& parsed = parse((int)argv.size(), argv.data());
 
 			THEN("the selected mode is sync")
 			{
@@ -763,7 +763,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse((int)argv.size(), argv.data());
+			const auto& parsed = parse((int)argv.size(), argv.data());
 
 			THEN("the selected mode is sync")
 			{
@@ -809,7 +809,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse((int)argv.size(), argv.data());
+			const auto& parsed = parse((int)argv.size(), argv.data());
 
 			THEN("the selected mode is sync")
 			{
@@ -855,7 +855,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 			WHEN("the command line is parsed")
 			{
-				const auto parsed = parse((int)argv.size(), argv.data());
+				const auto& parsed = parse((int)argv.size(), argv.data());
 
 				THEN("the selected mode is sync")
 				{
@@ -899,7 +899,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 		WHEN("the command line is parsed")
 		{
-			auto result = parse(argc, argv);
+			const auto& result = parse(argc, argv);
 
 			THEN("the parse is bad.")
 			{
@@ -916,7 +916,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 		WHEN("the command line is parsed")
 		{
-			auto result = parse(argc, argv);
+			const auto& result = parse(argc, argv);
 
 			THEN("the parse is good.")
 			{
@@ -949,7 +949,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 		WHEN("the command line is parsed")
 		{
-			auto result = parse(argc, argv);
+			const auto& result = parse(argc, argv);
 
 			THEN("the parse is good.")
 			{
@@ -980,7 +980,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 		WHEN("the command line is parsed")
 		{
-			auto result = parse(argc, argv);
+			const auto& result = parse(argc, argv);
 
 			THEN("the parse is good.")
 			{
@@ -1012,7 +1012,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 		WHEN("the command line is parsed")
 		{
-			auto result = parse(argc, argv);
+			const auto& result = parse(argc, argv);
 
 			THEN("the parse is good.")
 			{
@@ -1038,7 +1038,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 		WHEN("the command line is parsed")
 		{
-			auto result = parse(argc, argv);
+			const auto& result = parse(argc, argv);
 
 			THEN("the parse is good.")
 			{
@@ -1062,7 +1062,7 @@ SCENARIO("The command line parser recognizes when the user requests yeehaw.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto result = parse(2, argv);
+			const auto& result = parse(2, argv);
 
 			THEN("the parse is good.")
 			{
@@ -1084,7 +1084,7 @@ SCENARIO("The command line parser recognizes when the user requests yeehaw.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto result = parse(3, argv);
+			const auto& result = parse(3, argv);
 
 			THEN("the parse is good.")
 			{
@@ -1109,7 +1109,7 @@ SCENARIO("The command line parser recognizes when the user requests msync's vers
 
 		WHEN("the command line is parsed")
 		{
-			const auto result = parse(2, argv);
+			const auto& result = parse(2, argv);
 
 			THEN("the parse is good.")
 			{
@@ -1134,7 +1134,7 @@ SCENARIO("The command line parser recognizes when the user requests msync's lice
 
 		WHEN("the command line is parsed")
 		{
-			const auto result = parse(2, argv);
+			const auto& result = parse(2, argv);
 
 			THEN("the parse is good.")
 			{
@@ -1157,7 +1157,7 @@ SCENARIO("The command line parser recognizes when the user requests msync's conf
 
 		WHEN("the command line is parsed")
 		{
-			const auto result = parse(2, argv);
+			const auto& result = parse(2, argv);
 
 			THEN("the parse is good.")
 			{
@@ -1178,7 +1178,7 @@ SCENARIO("The command line parser recognizes when the user requests msync's conf
 
 		WHEN("the command line is parsed")
 		{
-			const auto result = parse(3, argv);
+			const auto& result = parse(3, argv);
 
 			THEN("the parse is good.")
 			{
@@ -1202,7 +1202,7 @@ SCENARIO("The command line parser recognizes when the user wants help.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is help")
 			{
