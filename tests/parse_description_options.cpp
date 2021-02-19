@@ -147,6 +147,151 @@ void check_parse(std::vector<const char*>& argv, const std::vector<command_line_
 	}
 }
 
+void fill_options(std::vector<command_line_option>& options, gen_options& expected, const int combination, const int attach, const std::pair<const char*, visibility>& vis)
+{
+	if (vis.first[0] != '\0')
+	{
+		command_line_option opt;
+
+		switch (zero_to_n(2))
+		{
+		case 0:
+			opt.options.push_back("-p");
+			break;
+		case 1:
+			opt.options.push_back("--privacy");
+			break;
+		case 2:
+			opt.options.push_back("--visibility");
+			break;
+		}
+
+		opt.options.push_back(vis.first);
+		expected.post.vis = vis.second;
+		options.push_back(std::move(opt));
+	}
+
+	if (attach != 3)
+	{
+		pick_attachment(attach, expected, options);
+	}
+
+	if (flag_set(combination, 0))
+	{
+		command_line_option opt;
+		if (flip_coin())
+			opt.options.push_back("-o");
+		else
+			opt.options.push_back("--output");
+
+		opt.options.push_back("filename");
+		expected.filename = "filename";
+		options.push_back(std::move(opt));
+	}
+
+	if (flag_set(combination, 1))
+	{
+		command_line_option opt;
+		if (flip_coin())
+			opt.options.push_back("-r");
+		else
+			opt.options.push_back("--reply-to");
+
+		opt.options.push_back("1234567");
+		expected.post.reply_to_id = "1234567";
+		options.push_back(std::move(opt));
+	}
+
+	if (flag_set(combination, 2))
+	{
+		command_line_option opt;
+
+		switch (zero_to_n(2))
+		{
+		case 0:
+			opt.options.push_back("-c");
+			break;
+		case 1:
+			opt.options.push_back("--content-warning");
+			break;
+		case 2:
+			opt.options.push_back("--cw");
+			break;
+		}
+
+		opt.options.push_back("there's content in here!");
+		expected.post.content_warning = "there's content in here!";
+		options.push_back(std::move(opt));
+	}
+
+	if (flag_set(combination, 3))
+	{
+		command_line_option opt;
+		if (flip_coin())
+			opt.options.push_back("-i");
+		else
+			opt.options.push_back("--reply-id");
+
+		opt.options.push_back("76543");
+		expected.post.reply_id = "76543";
+		options.push_back(std::move(opt));
+	}
+
+	if (flag_set(combination, 4))
+	{
+		command_line_option opt;
+		switch (zero_to_n(2))
+		{
+		case 0:
+			opt.options.push_back("-b");
+			break;
+		case 1:
+			opt.options.push_back("--body");
+			break;
+		case 2:
+			opt.options.push_back("--content");
+			break;
+		}
+
+		opt.options.push_back("@someguy@website.com");
+		expected.post.text = "@someguy@website.com";
+		options.push_back(std::move(opt));
+	}
+
+	for (unsigned int i = 0; i < options.size(); i++)
+		options[i].order = i;
+}
+
+void permute_and_check(std::vector<command_line_option>& options, const gen_options& expected)
+{
+
+	// static and doing the pass-by-mutable-ref thing because there's really no sense in 
+	// freeing and reallocating for every test case
+	// check_parse clears it every time, but keeps the capacity
+	static std::vector<const char*> argv;
+
+	// exhaustively trying every permutation takes far too long once you get past 7 or 8
+	// so if there's more than that, randomly shuffle instead
+	if (options.size() <= 7)
+	{
+		do
+		{
+			check_parse(argv, options, expected);
+		} while (std::next_permutation(options.begin(), options.end()));
+	}
+	else
+	{
+		static std::minstd_rand g(std::random_device{}());
+		// shuffle once because shuffling is slow
+		std::shuffle(options.begin(), options.end(), g);
+		for (int i = 0; i < 6000; i++)
+		{
+			check_parse(argv, options, expected);
+			std::next_permutation(options.begin(), options.end());
+		}
+	}
+}
+
 SCENARIO("The command line parser recognizes when the user wants to generate a file with a description.", "[long_run][long_run_parseopts]")
 {
 	GIVEN("A combination of options for the file generator")
@@ -165,151 +310,17 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		static std::vector<command_line_option> options;
 		options.clear();
 
-		if (vis.first[0] != '\0')
-		{
-			command_line_option opt;
-
-			switch (zero_to_n(2))
-			{
-			case 0:
-				opt.options.push_back("-p");
-				break;
-			case 1:
-				opt.options.push_back("--privacy");
-				break;
-			case 2:
-				opt.options.push_back("--visibility");
-				break;
-			}
-
-			opt.options.push_back(vis.first);
-			expected.post.vis = vis.second;
-			options.push_back(std::move(opt));
-		}
-
-		if (attach != 3)
-		{
-			pick_attachment(attach, expected, options);
-		}
-
 		pick_description(description, expected, options);
 
-		if (flag_set(combination, 0))
-		{
-			command_line_option opt;
-			if (flip_coin())
-				opt.options.push_back("-o");
-			else
-				opt.options.push_back("--output");
-
-			opt.options.push_back("filename");
-			expected.filename = "filename";
-			options.push_back(std::move(opt));
-		}
-
-		if (flag_set(combination, 1))
-		{
-			command_line_option opt;
-			if (flip_coin())
-				opt.options.push_back("-r");
-			else
-				opt.options.push_back("--reply-to");
-
-			opt.options.push_back("1234567");
-			expected.post.reply_to_id = "1234567";
-			options.push_back(std::move(opt));
-		}
-
-		if (flag_set(combination, 2))
-		{
-			command_line_option opt;
-
-			switch (zero_to_n(2))
-			{
-			case 0:
-				opt.options.push_back("-c");
-				break;
-			case 1:
-				opt.options.push_back("--content-warning");
-				break;
-			case 2:
-				opt.options.push_back("--cw");
-				break;
-			}
-
-			opt.options.push_back("there's content in here!");
-			expected.post.content_warning = "there's content in here!";
-			options.push_back(std::move(opt));
-		}
-
-		if (flag_set(combination, 3))
-		{
-			command_line_option opt;
-			if (flip_coin())
-				opt.options.push_back("-i");
-			else
-				opt.options.push_back("--reply-id");
-
-			opt.options.push_back("76543");
-			expected.post.reply_id = "76543";
-			options.push_back(std::move(opt));
-		}
-
-		if (flag_set(combination, 4))
-		{
-			command_line_option opt;
-			switch (zero_to_n(2))
-			{
-			case 0:
-				opt.options.push_back("-b");
-				break;
-			case 1:
-				opt.options.push_back("--body");
-				break;
-			case 2:
-				opt.options.push_back("--content");
-				break;
-			}
-
-			opt.options.push_back("@someguy@website.com");
-			expected.post.text = "@someguy@website.com";
-			options.push_back(std::move(opt));
-		}
-
-		for (unsigned int i = 0; i < options.size(); i++)
-			options[i].order = i;
+		fill_options(options, expected, combination, attach, vis);
 
 		WHEN("the command line is parsed")
 		{
-			// static and doing the pass-by-mutable-ref thing because there's really no sense in 
-			// freeing and reallocating for every test case
-			// check_parse clears it every time, but keeps the capacity
-			static std::vector<const char*> argv;
-
-			// exhaustively trying every permutation takes far too long once you get past 7 or 8
-			// so if there's more than that, randomly shuffle instead
-			if (options.size() <= 7)
-			{
-				do
-				{
-					check_parse(argv, options, expected);
-				} while (std::next_permutation(options.begin(), options.end()));
-			}
-			else
-			{
-				static std::minstd_rand g(std::random_device{}());
-				// shuffle once because shuffling is slow
-				std::shuffle(options.begin(), options.end(), g);
-				for (int i = 0; i < 6000; i++)
-				{
-					check_parse(argv, options, expected);
-					std::next_permutation(options.begin(), options.end());
-				}
-			}
-
+			permute_and_check(options, expected);
 		}
 	}
 }
+
 
 SCENARIO("The command line parser recognizes when the user wants to generate a file without any descriptions.", "[long_run][long_run_parseopts]")
 {
@@ -328,146 +339,11 @@ SCENARIO("The command line parser recognizes when the user wants to generate a f
 		static std::vector<command_line_option> options;
 		options.clear();
 
-		if (vis.first[0] != '\0')
-		{
-			command_line_option opt;
-
-			switch (zero_to_n(2))
-			{
-			case 0:
-				opt.options.push_back("-p");
-				break;
-			case 1:
-				opt.options.push_back("--privacy");
-				break;
-			case 2:
-				opt.options.push_back("--visibility");
-				break;
-			}
-
-			opt.options.push_back(vis.first);
-			expected.post.vis = vis.second;
-			options.push_back(std::move(opt));
-		}
-
-		if (attach != 3)
-		{
-			pick_attachment(attach, expected, options);
-		}
-
-		if (flag_set(combination, 0))
-		{
-			command_line_option opt;
-			if (flip_coin())
-				opt.options.push_back("-o");
-			else
-				opt.options.push_back("--output");
-
-			opt.options.push_back("filename");
-			expected.filename = "filename";
-			options.push_back(std::move(opt));
-		}
-
-		if (flag_set(combination, 1))
-		{
-			command_line_option opt;
-			if (flip_coin())
-				opt.options.push_back("-r");
-			else
-				opt.options.push_back("--reply-to");
-
-			opt.options.push_back("1234567");
-			expected.post.reply_to_id = "1234567";
-			options.push_back(std::move(opt));
-		}
-
-		if (flag_set(combination, 2))
-		{
-			command_line_option opt;
-
-			switch (zero_to_n(2))
-			{
-			case 0:
-				opt.options.push_back("-c");
-				break;
-			case 1:
-				opt.options.push_back("--content-warning");
-				break;
-			case 2:
-				opt.options.push_back("--cw");
-				break;
-			}
-
-			opt.options.push_back("there's content in here!");
-			expected.post.content_warning = "there's content in here!";
-			options.push_back(std::move(opt));
-		}
-
-		if (flag_set(combination, 3))
-		{
-			command_line_option opt;
-			if (flip_coin())
-				opt.options.push_back("-i");
-			else
-				opt.options.push_back("--reply-id");
-
-			opt.options.push_back("76543");
-			expected.post.reply_id = "76543";
-			options.push_back(std::move(opt));
-		}
-
-		if (flag_set(combination, 4))
-		{
-			command_line_option opt;
-			switch (zero_to_n(2))
-			{
-			case 0:
-				opt.options.push_back("-b");
-				break;
-			case 1:
-				opt.options.push_back("--body");
-				break;
-			case 2:
-				opt.options.push_back("--content");
-				break;
-			}
-
-			opt.options.push_back("@someguy@website.com");
-			expected.post.text = "@someguy@website.com";
-			options.push_back(std::move(opt));
-		}
-
-		for (unsigned int i = 0; i < options.size(); i++)
-			options[i].order = i;
+		fill_options(options, expected, combination, attach, vis);
 
 		WHEN("the command line is parsed")
 		{
-			// static and doing the pass-by-mutable-ref thing because there's really no sense in 
-			// freeing and reallocating for every test case
-			// check_parse clears it every time, but keeps the capacity
-			static std::vector<const char*> argv;
-
-			// exhaustively trying every permutation takes far too long once you get past 7 or 8
-			// so if there's more than that, randomly shuffle instead
-			if (options.size() <= 7)
-			{
-				do
-				{
-					check_parse(argv, options, expected);
-				} while (std::next_permutation(options.begin(), options.end()));
-			}
-			else
-			{
-				static std::minstd_rand g(std::random_device{}());
-				// shuffle once because shuffling is slow
-				std::shuffle(options.begin(), options.end(), g);
-				for (int i = 0; i < 6000; i++)
-				{
-					check_parse(argv, options, expected);
-					std::next_permutation(options.begin(), options.end());
-				}
-			}
-
+			permute_and_check(options, expected);
 		}
 	}
 }
