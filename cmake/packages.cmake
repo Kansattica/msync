@@ -4,7 +4,7 @@ message(STATUS "Downloading nlohmann json...")
 FetchContent_Declare(
 	njson
 	URL https://github.com/nlohmann/json/releases/download/v3.9.1/include.zip
-	URL_HASH SHA256=87b5884741427220d3a33df1363ae0e8b898099fbc59f1c451113f6732891014
+	URL_HASH SHA256=6bea5877b1541d353bd77bdfbdb2696333ae5ed8f9e8cc22df657192218cad91 
 	)
 
 #FetchContent_MakeAvailable(json) Not available in cmake 13
