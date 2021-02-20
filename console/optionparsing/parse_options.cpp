@@ -20,11 +20,9 @@ New account names must be fully specified, like: GoddessGrace@goodchristian.webs
 For more information, consult the manual: https://raw.githubusercontent.com/Kansattica/msync/princess/MANUAL.md
 )";
 
-parse_result parse(const int argc, const char* argv[], const bool silent)
+clipp::group make_cli(parse_result& ret)
 {
 	using namespace std::string_literals;
-
-	parse_result ret;
 
 	const auto settableoptions = (one_of(
 				command("access_token").set(ret.toset, user_option::access_token).set(ret.selected, mode::showopt),
@@ -107,12 +105,21 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 	const auto universalOptions = ((option("-a", "--account") & value("account", ret.account)).doc("The account name to operate on."),
 			option("-v", "--verbose").set(verbose_logs).doc("Verbose mode. Program will be more chatty."));
 
-	const auto cli = (newaccount | configMode | syncMode | genMode | queueMode | 
+	return (newaccount | configMode | syncMode | genMode | queueMode | 
 		command("yeehaw").set(ret.selected, mode::yeehaw) | 
 		command("location").set(ret.selected, mode::location).doc("Print the location where msync stores user data.") | 
 		command("version", "--version").set(ret.selected, mode::version).doc("Print version and compile flags.") |
 		command("license", "--license").set(ret.selected, mode::license) |
 		(command("help").set(ret.selected, mode::help)), universalOptions);
+}
+
+// make this global and return a reference to it because it makes testing faster and easier
+// otherwise, the command line parser tests waste a bunch of time recreating the clipp cli every time
+parse_result ret;
+const parse_result& parse(const int argc, const char* argv[], const bool silent)
+{
+	ret = {};
+	const static auto cli = make_cli(ret);
 
 	//skip the first result.
 	//we do it this way because C++11 and later don't like it when you turn a string literal into a char*, so we have to use the iterator interface

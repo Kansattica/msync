@@ -201,7 +201,7 @@ std::vector<api_call> to_api_calls(std::vector<std::string>&& add, api_route tar
 	return to_return;
 }
 
-void enqueue(const api_route toenqueue, const fs::path& user_account_dir, std::vector<std::string>&& add)
+void enqueue(const api_route toenqueue, const fs::path& user_account_dir, std::vector<std::string> add)
 {
 	queue_list toaddto = open_queue(user_account_dir);
 
@@ -262,7 +262,7 @@ void dequeue_post(const fs::path& queuedir, const fs::path& filename)
 	}
 }
 
-void dequeue(api_route todequeue, const fs::path& user_account_dir, std::vector<std::string>&& remove)
+void dequeue(api_route todequeue, const fs::path& user_account_dir, std::vector<std::string> remove)
 {
 	queue_list toremovefrom = open_queue(user_account_dir);
 
