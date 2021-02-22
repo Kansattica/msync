@@ -73,7 +73,7 @@ struct mock_network_get : public mock_network
 			std::string_view url_view = url.substr(url.find_last_of('/') + 1);
 			if (url_view == "notifications") { return std::make_tuple(make_notification_json, lowest_notif_id, total_notif_count); }
 			if (url_view == "home") { return std::make_tuple(make_status_json, lowest_post_id, total_post_count); }
-			if (url_view == "bookmarks") { return std::make_tuple(make_status_json, lowest_post_id, total_bookmark_count); }
+			if (url_view == "bookmarks") { return std::make_tuple(make_status_json, lowest_bookmark_id, total_bookmark_count); }
 
 			CAPTURE(url);
 			FAIL("Hey, I don't know what to do with this URL.");
