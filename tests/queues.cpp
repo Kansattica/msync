@@ -681,3 +681,34 @@ SCENARIO("Can enqueue and dequeue files with non-ASCII paths.", "[locale]")
 	}
 
 }
+
+SCENARIO("Queues refuse to enqueue empty posts and posts that aren't files.")
+{
+	const test_dir allaccounts = temporary_directory();
+	const fs::path accountdir = allaccounts.dirname / "funnybone@typical.egg";
+	fs::create_directory(accountdir);
+
+	const fs::path file_queue_dir = accountdir / File_Queue_Directory;
+	const fs::path queue_file = accountdir / Queue_Filename;
+	GIVEN("Some post files that have neither text nor attachments.")
+	{
+		const auto blankfile = temporary_file();
+		const auto defaultfile = temporary_file();
+		const auto dir = temporary_directory();
+		{
+			std::ofstream fout { defaultfile };
+			fout << "visibility=default\n---\n";
+		}
+
+		WHEN("Those files are enqueued.")
+		{
+			enqueue(api_route::post, accountdir, std::vector<std::string> { to_utf8(blankfile.filename()), to_utf8(defaultfile.filename()), to_utf8(defaultfile.filename()) });
+
+			THEN("All those files got skipped.")
+			{
+				REQUIRE(read_lines(queue_file).empty());
+				REQUIRE(count_files_in_directory(file_queue_dir) == 0);
+			}
+		}
+	}
+}

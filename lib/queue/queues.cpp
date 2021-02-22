@@ -6,6 +6,7 @@
 #include "../postfile/outgoing_post.hpp"
 #include "../util/util.hpp"
 #include <algorithm>
+#include <functional>
 #include <array>
 #include <msync_exception.hpp>
 
@@ -126,21 +127,39 @@ api_route undo_route(const api_route queue)
 
 }
 
-std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
+bool post_is_empty(const fs::path& postfile)
 {
-	fs::create_directories(queuedir);
+	const readonly_outgoing_post post{ postfile };
+	const bool empty_body = post.parsed.text.empty() || post.parsed.text.find_first_not_of(" \n\r\t");
+	return empty_body && post.parsed.attachments.empty();
+}
 
+bool should_queue_post(const fs::path& postfile)
+{
 	if (!fs::exists(postfile))
 	{
 		pl() << "Could not find " << to_utf8(postfile) << ". Skipping.\n";
-		return {};
+		return false;
 	}
 
 	if (!fs::is_regular_file(postfile))
 	{
 		pl() << to_utf8(postfile) << " is not a file. Skipping.\n";
-		return {};
+		return false;
 	}
+
+	if (post_is_empty(postfile))
+	{
+		pl() << to_utf8(postfile) << " has no body and no attachments. Skipping.\n";
+		return false;
+	}
+
+	return true;
+}
+
+std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
+{
+	fs::create_directories(queuedir);
 
 	fs::path copyto = queuedir / postfile.filename();
 
@@ -156,6 +175,7 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 		unique_file_name(copyto);
 		plverb() << to_utf8(copyto) << '\n';
 	}
+
 
 	fs::copy(postfile, copyto);
 
@@ -183,19 +203,23 @@ std::vector<api_call> to_api_calls(std::vector<std::string>&& add, api_route tar
 	return to_return;
 }
 
-void enqueue(const api_route toenqueue, const fs::path& user_account_dir, std::vector<std::string>&& add)
+void enqueue(const api_route toenqueue, const fs::path& user_account_dir, std::vector<std::string> add)
 {
 	queue_list toaddto = open_queue(user_account_dir);
 
 	if (toenqueue == api_route::post)
 	{
+		const auto dont_queue = std::remove_if(add.begin(), add.end(), std::not_fn(should_queue_post));
+
 		const fs::path filequeuedir = get_file_queue_directory(user_account_dir);
-		std::transform(add.begin(), add.end(), std::back_inserter(toaddto.parsed), [&filequeuedir, toenqueue](const auto& id)
+		std::transform(add.begin(), dont_queue, std::back_inserter(toaddto.parsed), [&filequeuedir](const auto& id)
 			{
-				return api_call{ toenqueue, queue_post(filequeuedir, id) };
+				return api_call{ api_route::post, queue_post(filequeuedir, id) };
 			});
 
-		plverb() << "Enqueued " << add.size() << pluralize(add.size(), " post", " posts") << " for " << user_account_dir.filename() << ".\n";
+		const auto queued = dont_queue - add.begin();
+		const auto skipped = add.end() - dont_queue;
+		plverb() << "Enqueued " << queued << pluralize(queued, " post", " posts") << " and skipped " << skipped << " for " << user_account_dir.filename() << ".\n";
 	}
 	else
 	{
@@ -240,7 +264,7 @@ void dequeue_post(const fs::path& queuedir, const fs::path& filename)
 	}
 }
 
-void dequeue(api_route todequeue, const fs::path& user_account_dir, std::vector<std::string>&& remove)
+void dequeue(api_route todequeue, const fs::path& user_account_dir, std::vector<std::string> remove)
 {
 	queue_list toremovefrom = open_queue(user_account_dir);
 

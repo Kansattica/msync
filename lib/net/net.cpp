@@ -68,7 +68,6 @@ constexpr auto idempotency_key_header{ "Idempotency-Key" };
 constexpr auto authorization_key_header{ "Authorization" };
 net_response simple_post(const std::string_view url, const std::string_view access_token)
 {
-	// add rate limiting handling later
 	return handle_response(
 		cpr::Post(cpr::Url{ url },
 			cpr::Header{ { idempotency_key_header, std::string{ ensure_small_string(url) } } ,
@@ -79,7 +78,6 @@ net_response simple_post(const std::string_view url, const std::string_view acce
 
 net_response simple_delete(const std::string_view url, const std::string_view access_token)
 {
-	// add rate limiting handling later
 	return handle_response(
 		cpr::Delete(cpr::Url{ url },
 			cpr::Header{ {authorization_key_header, make_bearer(access_token) } })

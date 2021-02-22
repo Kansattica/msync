@@ -3,8 +3,8 @@ include(FetchContent)
 message(STATUS "Downloading nlohmann json...")
 FetchContent_Declare(
 	njson
-	URL https://github.com/nlohmann/json/releases/download/v3.7.3/include.zip
-	URL_HASH SHA256=87b5884741427220d3a33df1363ae0e8b898099fbc59f1c451113f6732891014
+	URL https://github.com/nlohmann/json/releases/download/v3.9.1/include.zip
+	URL_HASH SHA256=6bea5877b1541d353bd77bdfbdb2696333ae5ed8f9e8cc22df657192218cad91 
 	)
 
 #FetchContent_MakeAvailable(json) Not available in cmake 13
@@ -19,12 +19,12 @@ message(STATUS "Downloading clipp...")
 FetchContent_Declare(
 	clipplib
 	GIT_REPOSITORY https://github.com/muellan/clipp.git
-	GIT_TAG		   2c32b2f1f7cc530b1ec1f62c92f698643bb368db
+	GIT_TAG 	2c32b2f1f7cc530b1ec1f62c92f698643bb368db
 	)
 
 FetchContent_GetProperties(clipplib)
-	# suppress that weird INSTALL_DIRS message clipp makes.
-	if(NOT clipplib_POPULATED)
+# suppress that weird INSTALL_DIRS message clipp makes.
+if(NOT clipplib_POPULATED)
 	function(message)
 		if (NOT MESSAGE_QUIET)
 			_message(${ARGN})
@@ -155,7 +155,7 @@ if (MSYNC_BUILD_TESTS)
 	FetchContent_Declare(
 		catch2lib
 		GIT_REPOSITORY	https://github.com/catchorg/Catch2.git
-		GIT_TAG 		v2.11.1
+		GIT_TAG 		v2.13.4
 		GIT_SHALLOW		TRUE
 		)
 

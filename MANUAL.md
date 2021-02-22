@@ -190,11 +190,11 @@ To do other useful stuff with `msync`, you'll have to use queues. The `msync que
 
 To queue up favorites, run `msync queue fav <any number of status IDs>`. You can get these status IDs from downloaded posts and notifications. They're always on a line that starts with `status id:` in `home.list` and `notifications.list`- don't put any other ID numbers into this! Boosts are the same: `msync queue boost <any number of status ids>`
 
-If you accidentally favorited or boosted a toot you'd rather not have, run `msync queue --remove fav <any number of status IDs>`. This works for favorites and boosts that you haven't sent yet (which will be removed immediately) and for ones that have already been sent (which will be removed the next time you `msync sync`).
+If you accidentally favorited or boosted a toot you'd rather not have, run `msync queue remove fav <any number of status IDs>`. This works for favorites and boosts that you haven't sent yet (which will be removed immediately) and for ones that have already been sent (which will be removed the next time you `msync sync`).
 
 You can check the status of your queues and see what will be sent next time you sync up with `msync queue print`.
 
-If you want to just clear that queue, possibly because there's a typo'd ID in there- you can run `msync queue --clear fav` (or `boost` or `post`).
+If you want to just clear that queue, possibly because there's a typo'd ID in there- you can run `msync queue clear fav` (or `boost` or `post` or `context`).
 
 Posts are a little different. You still queue them up to be sent when you next `sync` up, but there's an extra step involved. `msync queue post <any number of file paths>` takes, well, a number of file paths. The contents of these will be interpreted as text files and sent as posts when you `msync sync` up next. A few notes on posts:
 
@@ -239,6 +239,10 @@ vim -p `msync location`/**/*.list
 ```
 
 - If you fetch context for a the same thread at a later date, `msync` will automatically overwite the existing file to ensure you have the most recent version of the thread.
+
+#### `msync` doesn't like my filename!
+
+The command line parser library `msync` uses has a few edge cases. It seems to have issues parsing filenames that begin with the same prefix as a command msync uses. If you're trying to generate a file that starts with `post` or attach a file named `favicon.png`, the parser might get mad at you. I suggest renaming the file or, in the case of `msync gen`, entering a different name on the command line and updating it to the correct one in the generated file.
 
 #### A note on UTF-8, Unicode, and Emoji
 

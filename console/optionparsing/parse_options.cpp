@@ -20,11 +20,9 @@ New account names must be fully specified, like: GoddessGrace@goodchristian.webs
 For more information, consult the manual: https://raw.githubusercontent.com/Kansattica/msync/princess/MANUAL.md
 )";
 
-parse_result parse(const int argc, const char* argv[], const bool silent)
+clipp::group make_cli(parse_result& ret)
 {
 	using namespace std::string_literals;
-
-	parse_result ret;
 
 	const auto settableoptions = (one_of(
 				command("access_token").set(ret.toset, user_option::access_token).set(ret.selected, mode::showopt),
@@ -93,8 +91,8 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 			) % "generate options");
 
 	const auto queueMode = (command("queue", "q").set(ret.selected, mode::queue).doc("Manage queued favs, boosts, requests, and posts") &
-			one_of(option("-r", "--remove").set(ret.queue_opt.to_do, queue_action::remove).doc("Remove the post ids or filenames from the queue instead of adding them. If not in the queue, queue unfaving, unboosting, or deleting the post so it happens on next sync."),
-				option("-c", "--clear").set(ret.queue_opt.to_do, queue_action::clear).doc("Remove everything in the specified queue.")) %
+			one_of(option("remove", "r", "-r", "--remove").set(ret.queue_opt.to_do, queue_action::remove).doc("Remove the post ids or filenames from the queue instead of adding them. If not in the queue, queue unfaving, unboosting, or deleting the post so it happens on next sync."),
+				option("clear", "c", "-c", "--clear").set(ret.queue_opt.to_do, queue_action::clear).doc("Remove everything in the specified queue.")) %
 			"queue options",
 			one_of(
 				command("fav").set(ret.queue_opt.selected, api_route::fav) & opt_values("post ids", ret.queue_opt.queued),
@@ -108,12 +106,21 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 	const auto universalOptions = ((option("-a", "--account") & value("account", ret.account)).doc("The account name to operate on."),
 			option("-v", "--verbose").set(verbose_logs).doc("Verbose mode. Program will be more chatty."));
 
-	const auto cli = (newaccount | configMode | syncMode | genMode | queueMode | 
+	return (newaccount | configMode | syncMode | genMode | queueMode | 
 		command("yeehaw").set(ret.selected, mode::yeehaw) | 
 		command("location").set(ret.selected, mode::location).doc("Print the location where msync stores user data.") | 
 		command("version", "--version").set(ret.selected, mode::version).doc("Print version and compile flags.") |
 		command("license", "--license").set(ret.selected, mode::license) |
 		(command("help").set(ret.selected, mode::help)), universalOptions);
+}
+
+// make this global and return a reference to it because it makes testing faster and easier
+// otherwise, the command line parser tests waste a bunch of time recreating the clipp cli every time
+parse_result ret;
+const parse_result& parse(const int argc, const char* argv[], const bool silent)
+{
+	ret = {};
+	const static auto cli = make_cli(ret);
 
 	//skip the first result.
 	//we do it this way because C++11 and later don't like it when you turn a string literal into a char*, so we have to use the iterator interface
@@ -126,7 +133,7 @@ parse_result parse(const int argc, const char* argv[], const bool silent)
 
 		ret.selected = mode::help; //possible for, say, config to be set but still be a parse fail
 
-		//clipp::debug::print(cout, result);
+		//clipp::debug::print(std::cout, result);
 	}
 
 	ret.okay = static_cast<bool>(result);

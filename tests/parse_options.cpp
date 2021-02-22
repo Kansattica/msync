@@ -18,7 +18,7 @@ SCENARIO("The command line parser recognizes when the user wants to start a new 
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is new user")
 			{
@@ -44,7 +44,7 @@ SCENARIO("The command line parser recognizes when the user wants to start a new 
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is new user")
 			{
@@ -73,7 +73,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is config")
 			{
@@ -109,7 +109,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is config")
 			{
@@ -145,7 +145,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is showopt")
 			{
@@ -181,7 +181,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is showopt")
 			{
@@ -217,7 +217,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is showallopt")
 			{
@@ -248,7 +248,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is showallopt")
 			{
@@ -279,7 +279,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is defaultopt")
 			{
@@ -310,7 +310,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is defaultopt")
 			{
@@ -342,7 +342,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is configlist")
 			{
@@ -378,7 +378,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is configlist")
 			{
@@ -414,7 +414,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is configsync")
 			{
@@ -450,7 +450,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is configsync")
 			{
@@ -486,7 +486,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is configsync")
 			{
@@ -527,7 +527,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is sync")
 			{
@@ -558,7 +558,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is sync")
 			{
@@ -589,7 +589,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is sync")
 			{
@@ -621,7 +621,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is sync")
 			{
@@ -653,7 +653,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is sync")
 			{
@@ -684,7 +684,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is sync")
 			{
@@ -719,9 +719,11 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 		const char* arg = GENERATE(as<const char*>{}, "-g", "--get-only", "--recv-only");
 		std::array<char const*, 3> argv{ "msync", subcommand, arg };
 
+		CAPTURE(argv);
+
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse((int)argv.size(), argv.data());
+			const auto& parsed = parse((int)argv.size(), argv.data());
 
 			THEN("the selected mode is sync")
 			{
@@ -761,7 +763,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse((int)argv.size(), argv.data());
+			const auto& parsed = parse((int)argv.size(), argv.data());
 
 			THEN("the selected mode is sync")
 			{
@@ -803,9 +805,11 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 		const char* max = GENERATE(as<const char*>{}, "-m", "--max-requests");
 		std::array<char const*, 6> argv{ "msync", subcommand,  posts, "60", max, "100" };
 
+		CAPTURE(argv);
+
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse((int)argv.size(), argv.data());
+			const auto& parsed = parse((int)argv.size(), argv.data());
 
 			THEN("the selected mode is sync")
 			{
@@ -851,7 +855,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 			WHEN("the command line is parsed")
 			{
-				const auto parsed = parse((int)argv.size(), argv.data());
+				const auto& parsed = parse((int)argv.size(), argv.data());
 
 				THEN("the selected mode is sync")
 				{
@@ -895,7 +899,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 		WHEN("the command line is parsed")
 		{
-			auto result = parse(argc, argv);
+			const auto& result = parse(argc, argv);
 
 			THEN("the parse is bad.")
 			{
@@ -912,7 +916,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 		WHEN("the command line is parsed")
 		{
-			auto result = parse(argc, argv);
+			const auto& result = parse(argc, argv);
 
 			THEN("the parse is good.")
 			{
@@ -939,13 +943,13 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 	GIVEN("A command line that removes a bunch of things from the boost queue.")
 	{
 		const auto commandtype = GENERATE(std::make_pair("fav", api_route::fav), std::make_pair("boost", api_route::boost), std::make_pair("context", api_route::context));
-		const auto opt = GENERATE(as<const char*>{}, "-r", "--remove");
+		const auto opt = GENERATE(as<const char*>{}, "-r", "--remove", "r", "remove");
 		constexpr int argc = 7;
 		char const* argv[]{ "msync", qcommand, opt, commandtype.first, "12345", "6789", "bwingus" };
 
 		WHEN("the command line is parsed")
 		{
-			auto result = parse(argc, argv);
+			const auto& result = parse(argc, argv);
 
 			THEN("the parse is good.")
 			{
@@ -976,7 +980,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 		WHEN("the command line is parsed")
 		{
-			auto result = parse(argc, argv);
+			const auto& result = parse(argc, argv);
 
 			THEN("the parse is good.")
 			{
@@ -1002,13 +1006,13 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 	GIVEN("A command line that clears the post queue.")
 	{
-		const auto opt = GENERATE(as<const char*>{}, "-c", "--clear");
+		const auto opt = GENERATE(as<const char*>{}, "-c", "--clear", "c", "clear");
 		constexpr int argc = 4;
 		char const* argv[]{ "msync", qcommand, opt, "post" };
 
 		WHEN("the command line is parsed")
 		{
-			auto result = parse(argc, argv);
+			const auto& result = parse(argc, argv);
 
 			THEN("the parse is good.")
 			{
@@ -1034,7 +1038,7 @@ SCENARIO("The command line parser correctly parses when the user wants to intera
 
 		WHEN("the command line is parsed")
 		{
-			auto result = parse(argc, argv);
+			const auto& result = parse(argc, argv);
 
 			THEN("the parse is good.")
 			{
@@ -1058,7 +1062,7 @@ SCENARIO("The command line parser recognizes when the user requests yeehaw.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto result = parse(2, argv);
+			const auto& result = parse(2, argv);
 
 			THEN("the parse is good.")
 			{
@@ -1080,7 +1084,7 @@ SCENARIO("The command line parser recognizes when the user requests yeehaw.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto result = parse(3, argv);
+			const auto& result = parse(3, argv);
 
 			THEN("the parse is good.")
 			{
@@ -1105,7 +1109,7 @@ SCENARIO("The command line parser recognizes when the user requests msync's vers
 
 		WHEN("the command line is parsed")
 		{
-			const auto result = parse(2, argv);
+			const auto& result = parse(2, argv);
 
 			THEN("the parse is good.")
 			{
@@ -1130,7 +1134,7 @@ SCENARIO("The command line parser recognizes when the user requests msync's lice
 
 		WHEN("the command line is parsed")
 		{
-			const auto result = parse(2, argv);
+			const auto& result = parse(2, argv);
 
 			THEN("the parse is good.")
 			{
@@ -1153,7 +1157,7 @@ SCENARIO("The command line parser recognizes when the user requests msync's conf
 
 		WHEN("the command line is parsed")
 		{
-			const auto result = parse(2, argv);
+			const auto& result = parse(2, argv);
 
 			THEN("the parse is good.")
 			{
@@ -1174,7 +1178,7 @@ SCENARIO("The command line parser recognizes when the user requests msync's conf
 
 		WHEN("the command line is parsed")
 		{
-			const auto result = parse(3, argv);
+			const auto& result = parse(3, argv);
 
 			THEN("the parse is good.")
 			{
@@ -1189,493 +1193,6 @@ SCENARIO("The command line parser recognizes when the user requests msync's conf
 	}
 }
 
-bool flag_set(int combo, int position)
-{
-	return combo & (1 << position);
-}
-
-struct command_line_option
-{
-	std::vector<const char*> options;
-	unsigned int attachment_order = 0;
-	unsigned int description_order = 0;
-	unsigned int order = 1000;
-
-	friend bool operator< (const command_line_option& lhs, const command_line_option& rhs)
-	{
-		return lhs.order < rhs.order;
-	}
-};
-
-
-void pick_attachment(int number, gen_options& expected, std::vector<command_line_option>& options)
-{
-	switch (number)
-	{
-	case 0:
-		options.push_back(command_line_option{ {"-f", "someattach"} });
-		expected.post.attachments.push_back("someattach");
-		break;
-	case 1:
-		options.push_back(command_line_option{ {"--attach", u8"attacher🖇"}, 1 });
-		options.push_back(command_line_option{ { "--attachment", "somefile"}, 2 });
-		expected.post.attachments.push_back(u8"attacher🖇");
-		expected.post.attachments.push_back("somefile");
-		break;
-	case 2:
-		options.push_back(command_line_option{ {"--file", "filey"} });
-		expected.post.attachments.push_back("filey");
-		break;
-	case 3:
-		break;
-		//case 1:
-		//	opt.options.push_back("-f");
-		//	opt.options.push_back("someotherattach");
-		//	opt.options.push_back("thirdattach");
-		//	expected.post.attachments.push_back("someotherattach");
-		//	expected.post.attachments.push_back("thirdattach");
-		//	break;
-	}
-}
-
-void pick_description(int number, gen_options& expected, std::vector<command_line_option>& options)
-{
-	switch (number)
-	{
-	case 0:
-		options.push_back(command_line_option{ {"-d", "some🕳descrip"} });
-		expected.post.descriptions.push_back("some🕳descrip");
-		break;
-	case 1:
-		options.push_back(command_line_option{ {"--description", "describer"}, 0, 1 });
-		options.push_back(command_line_option{ {"-d", "some file!"}, 0, 2 });
-		expected.post.descriptions.push_back("describer");
-		expected.post.descriptions.push_back("some file!");
-		break;
-		//case 1:
-		//	opt.options.push_back("-d");
-		//	opt.options.push_back("some other description");
-		//	opt.options.push_back("thirddescrip");
-		//	expected.post.descriptions.push_back("some other description");
-		//	expected.post.descriptions.push_back("thirddescrip");
-		//	break;
-		//case 3:
-		//	opt.options.push_back("--description");
-		//	opt.options.push_back("some jerk doing a thing.");
-		//	expected.post.descriptions.push_back("some jerk doing a thing.");
-		//	break;
-	case 2:
-		break;
-	}
-}
-
-auto pick_visibility()
-{
-	switch (zero_to_n(7))
-	{
-	case 0:
-		return std::make_pair("", visibility::default_vis);
-	case 1:
-		return std::make_pair("default", visibility::default_vis);
-	case 2:
-		return std::make_pair("public", visibility::pub);
-	case 3:
-		return std::make_pair("private", visibility::priv);
-	case 4:
-		return std::make_pair("followersonly", visibility::priv);
-	case 5:
-		return std::make_pair("unlisted", visibility::unlisted);
-	case 6:
-		return std::make_pair("dm", visibility::direct);
-	case 7:
-		return std::make_pair("direct", visibility::direct);
-	}
-
-	FAIL("Hey, the visibility picker screwed up.");
-	return std::make_pair("Well, this shouldn't happen.", visibility::default_vis);
-}
-
-template <typename get_field>
-bool should_reverse(const std::vector<command_line_option>& options, get_field func)
-{
-	const auto found = std::find_if(options.begin(), options.end(), [func](const auto& opt) { return func(opt) != 0; });
-	if (found == options.end() || func(*found) == 1)
-		return false;
-	return true;
-}
-
-template <typename T>
-std::vector<T> reversed(const std::vector<T>& vec)
-{
-	return std::vector<T> { vec.rbegin(), vec.rend() };
-}
-
-void check_parse(std::vector<const char*>& argv, const std::vector<command_line_option>& options, const gen_options& expected)
-{
-	if (flip_coin())
-		argv = { "msync", "gen" };
-	else
-		argv = { "msync", "generate" };
-
-	for (const auto& option : options)
-	{
-		argv.insert(argv.end(), option.options.begin(), option.options.end());
-	}
-
-	const auto parsed = parse((int)argv.size(), argv.data());
-
-	THEN("the options are parsed as expected")
-	{
-		CAPTURE(argv);
-		REQUIRE(parsed.okay);
-		REQUIRE(parsed.selected == mode::gen);
-		REQUIRE(parsed.account.empty());
-
-		REQUIRE(expected.filename == parsed.gen_opt.filename);
-		REQUIRE(expected.post.text == parsed.gen_opt.post.text);
-		REQUIRE(expected.post.vis == parsed.gen_opt.post.vis);
-		REQUIRE(expected.post.content_warning == parsed.gen_opt.post.content_warning);
-		REQUIRE(expected.post.reply_to_id == parsed.gen_opt.post.reply_to_id);
-		REQUIRE(expected.post.reply_id == parsed.gen_opt.post.reply_id);
-
-		// basically, it's possible for these to get permuted so that they're not in the original order.
-		if (should_reverse(options, [](const command_line_option& opt) { return opt.attachment_order; }))
-			REQUIRE(reversed(expected.post.attachments) == parsed.gen_opt.post.attachments);
-		else
-			REQUIRE(expected.post.attachments == parsed.gen_opt.post.attachments);
-
-		if (should_reverse(options, [](const command_line_option& opt) { return opt.description_order; }))
-			REQUIRE(reversed(expected.post.descriptions) == parsed.gen_opt.post.descriptions);
-		else
-			REQUIRE(expected.post.descriptions == parsed.gen_opt.post.descriptions);
-	}
-}
-
-SCENARIO("The command line parser recognizes when the user wants to generate a file with a description.", "[long_run][long_run_parseopts]")
-{
-	GIVEN("A combination of options for the file generator")
-	{
-		// try every combination of bits. note that the ranges are half-open, including the 0 and excluding the maximum.
-		// this test isn't as exhaustive as it could be, because if it was, it'd take forever to run
-		const auto combination = GENERATE(range(0, 0b11111 + 1));
-		const auto attach = GENERATE(0, 1, 2, 3);
-		const auto description = GENERATE(0, 1);
-		const auto vis = pick_visibility();
-
-		gen_options expected;
-
-		// this guy is going to be refilled and emptied a bunch
-		// make 'em static and clear it every time to keep the capacity
-		static std::vector<command_line_option> options;
-		options.clear();
-
-		if (vis.first[0] != '\0')
-		{
-			command_line_option opt;
-
-			switch (zero_to_n(2))
-			{
-			case 0:
-				opt.options.push_back("-p");
-				break;
-			case 1:
-				opt.options.push_back("--privacy");
-				break;
-			case 2:
-				opt.options.push_back("--visibility");
-				break;
-			}
-
-			opt.options.push_back(vis.first);
-			expected.post.vis = vis.second;
-			options.push_back(std::move(opt));
-		}
-
-		if (attach != 3)
-		{
-			pick_attachment(attach, expected, options);
-		}
-
-		pick_description(description, expected, options);
-
-		if (flag_set(combination, 0))
-		{
-			command_line_option opt;
-			if (flip_coin())
-				opt.options.push_back("-o");
-			else
-				opt.options.push_back("--output");
-
-			opt.options.push_back("filename");
-			expected.filename = "filename";
-			options.push_back(std::move(opt));
-		}
-
-		if (flag_set(combination, 1))
-		{
-			command_line_option opt;
-			if (flip_coin())
-				opt.options.push_back("-r");
-			else
-				opt.options.push_back("--reply-to");
-
-			opt.options.push_back("1234567");
-			expected.post.reply_to_id = "1234567";
-			options.push_back(std::move(opt));
-		}
-
-		if (flag_set(combination, 2))
-		{
-			command_line_option opt;
-
-			switch (zero_to_n(2))
-			{
-			case 0:
-				opt.options.push_back("-c");
-				break;
-			case 1:
-				opt.options.push_back("--content-warning");
-				break;
-			case 2:
-				opt.options.push_back("--cw");
-				break;
-			}
-
-			opt.options.push_back("there's content in here!");
-			expected.post.content_warning = "there's content in here!";
-			options.push_back(std::move(opt));
-		}
-
-		if (flag_set(combination, 3))
-		{
-			command_line_option opt;
-			if (flip_coin())
-				opt.options.push_back("-i");
-			else
-				opt.options.push_back("--reply-id");
-
-			opt.options.push_back("76543");
-			expected.post.reply_id = "76543";
-			options.push_back(std::move(opt));
-		}
-
-		if (flag_set(combination, 4))
-		{
-			command_line_option opt;
-			switch (zero_to_n(2))
-			{
-			case 0:
-				opt.options.push_back("-b");
-				break;
-			case 1:
-				opt.options.push_back("--body");
-				break;
-			case 2:
-				opt.options.push_back("--content");
-				break;
-			}
-
-			opt.options.push_back("@someguy@website.com");
-			expected.post.text = "@someguy@website.com";
-			options.push_back(std::move(opt));
-		}
-
-		for (unsigned int i = 0; i < options.size(); i++)
-			options[i].order = i;
-
-		WHEN("the command line is parsed")
-		{
-			// static and doing the pass-by-mutable-ref thing because there's really no sense in 
-			// freeing and reallocating for every test case
-			// check_parse clears it every time, but keeps the capacity
-			static std::vector<const char*> argv;
-
-			// exhaustively trying every permutation takes far too long once you get past 7 or 8
-			// so if there's more than that, randomly shuffle instead
-			if (options.size() <= 7)
-			{
-				do
-				{
-					check_parse(argv, options, expected);
-				} while (std::next_permutation(options.begin(), options.end()));
-			}
-			else
-			{
-				static std::minstd_rand g(std::random_device{}());
-				// shuffle once because shuffling is slow
-				std::shuffle(options.begin(), options.end(), g);
-				for (int i = 0; i < 6000; i++)
-				{
-					check_parse(argv, options, expected);
-					std::next_permutation(options.begin(), options.end());
-				}
-			}
-
-		}
-	}
-}
-
-SCENARIO("The command line parser recognizes when the user wants to generate a file without any descriptions.", "[long_run][long_run_parseopts]")
-{
-	GIVEN("A combination of options for the file generator")
-	{
-		// try every combination of bits. note that the ranges are half-open, including the 0 and excluding the maximum.
-		// this test isn't as exhaustive as it could be, because if it was, it'd take forever to run
-		const auto combination = GENERATE(range(0, 0b11111 + 1));
-		const auto attach = GENERATE(0, 1, 2, 3);
-		const auto vis = pick_visibility();
-
-		gen_options expected;
-
-		// this guy is going to be refilled and emptied a bunch
-		// make 'em static and clear it every time to keep the capacity
-		static std::vector<command_line_option> options;
-		options.clear();
-
-		if (vis.first[0] != '\0')
-		{
-			command_line_option opt;
-
-			switch (zero_to_n(2))
-			{
-			case 0:
-				opt.options.push_back("-p");
-				break;
-			case 1:
-				opt.options.push_back("--privacy");
-				break;
-			case 2:
-				opt.options.push_back("--visibility");
-				break;
-			}
-
-			opt.options.push_back(vis.first);
-			expected.post.vis = vis.second;
-			options.push_back(std::move(opt));
-		}
-
-		if (attach != 3)
-		{
-			pick_attachment(attach, expected, options);
-		}
-
-		if (flag_set(combination, 0))
-		{
-			command_line_option opt;
-			if (flip_coin())
-				opt.options.push_back("-o");
-			else
-				opt.options.push_back("--output");
-
-			opt.options.push_back("filename");
-			expected.filename = "filename";
-			options.push_back(std::move(opt));
-		}
-
-		if (flag_set(combination, 1))
-		{
-			command_line_option opt;
-			if (flip_coin())
-				opt.options.push_back("-r");
-			else
-				opt.options.push_back("--reply-to");
-
-			opt.options.push_back("1234567");
-			expected.post.reply_to_id = "1234567";
-			options.push_back(std::move(opt));
-		}
-
-		if (flag_set(combination, 2))
-		{
-			command_line_option opt;
-
-			switch (zero_to_n(2))
-			{
-			case 0:
-				opt.options.push_back("-c");
-				break;
-			case 1:
-				opt.options.push_back("--content-warning");
-				break;
-			case 2:
-				opt.options.push_back("--cw");
-				break;
-			}
-
-			opt.options.push_back("there's content in here!");
-			expected.post.content_warning = "there's content in here!";
-			options.push_back(std::move(opt));
-		}
-
-		if (flag_set(combination, 3))
-		{
-			command_line_option opt;
-			if (flip_coin())
-				opt.options.push_back("-i");
-			else
-				opt.options.push_back("--reply-id");
-
-			opt.options.push_back("76543");
-			expected.post.reply_id = "76543";
-			options.push_back(std::move(opt));
-		}
-
-		if (flag_set(combination, 4))
-		{
-			command_line_option opt;
-			switch (zero_to_n(2))
-			{
-			case 0:
-				opt.options.push_back("-b");
-				break;
-			case 1:
-				opt.options.push_back("--body");
-				break;
-			case 2:
-				opt.options.push_back("--content");
-				break;
-			}
-
-			opt.options.push_back("@someguy@website.com");
-			expected.post.text = "@someguy@website.com";
-			options.push_back(std::move(opt));
-		}
-
-		for (unsigned int i = 0; i < options.size(); i++)
-			options[i].order = i;
-
-		WHEN("the command line is parsed")
-		{
-			// static and doing the pass-by-mutable-ref thing because there's really no sense in 
-			// freeing and reallocating for every test case
-			// check_parse clears it every time, but keeps the capacity
-			static std::vector<const char*> argv;
-
-			// exhaustively trying every permutation takes far too long once you get past 7 or 8
-			// so if there's more than that, randomly shuffle instead
-			if (options.size() <= 7)
-			{
-				do
-				{
-					check_parse(argv, options, expected);
-				} while (std::next_permutation(options.begin(), options.end()));
-			}
-			else
-			{
-				static std::minstd_rand g(std::random_device{}());
-				// shuffle once because shuffling is slow
-				std::shuffle(options.begin(), options.end(), g);
-				for (int i = 0; i < 6000; i++)
-				{
-					check_parse(argv, options, expected);
-					std::next_permutation(options.begin(), options.end());
-				}
-			}
-
-		}
-	}
-}
-
 SCENARIO("The command line parser recognizes when the user wants help.")
 {
 	GIVEN("A command line that says 'help'.")
@@ -1685,7 +1202,7 @@ SCENARIO("The command line parser recognizes when the user wants help.")
 
 		WHEN("the command line is parsed")
 		{
-			const auto parsed = parse(argc, argv);
+			const auto& parsed = parse(argc, argv);
 
 			THEN("the selected mode is help")
 			{

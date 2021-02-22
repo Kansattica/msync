@@ -71,11 +71,12 @@ void make_new_account(const std::string& accountname, global_options& options)
 	{
 		pl() << "Registering app with " << instanceurl << ".\n";
 		const auto r = cpr::Post(cpr::Url{make_api_url(instanceurl, "/api/v1/apps")},
-						   cpr::Parameters{{"client_name", "msync"}, {"redirect_uris", redirect_uri}, {"scopes", scopes}, {"website", "https://github.com/kansattica/msync"}});
+						   cpr::Payload{{"client_name", "msync"}, {"redirect_uris", redirect_uri}, {"scopes", scopes}, {"website", "https://github.com/kansattica/msync"}});
 
-		if (r.error)
+		if (r.error || r.status_code != 200)
 		{
 			pl() << "Could not register app with server. Responded with error code " << r.status_code << ": " << r.error.message << ".\n"
+			"Response body: " << r.text << "\n"
 			"Please double check your instance URL, ensure you're connected to the internet, and try again.";
 			return;
 		}
@@ -117,8 +118,8 @@ void make_new_account(const std::string& accountname, global_options& options)
 	}
 
 	pl() << "Getting access token from server with authorization code.\n";
-	const auto response = cpr::Post(cpr::Url{make_api_url(instanceurl, "/oauth/token")}, 
-		cpr::Parameters{{"client_id", *client_id}, {"client_secret", *client_secret}, {"grant_type", "authorization_code"}, 
+	const auto response = cpr::Post(cpr::Url{make_api_url(instanceurl, "/oauth/token")},
+		cpr::Payload{{"client_id", *client_id}, {"client_secret", *client_secret}, {"grant_type", "authorization_code"},
 		{"code", *authcode}, {"redirect_uri", redirect_uri}});
 
 	useraccount.set_option(user_option::auth_code, "");
