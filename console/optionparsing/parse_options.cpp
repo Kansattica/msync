@@ -44,6 +44,7 @@ clipp::group make_cli(parse_result& ret)
 				command("default").set(ret.selected, mode::setdefault).doc("Set the specified account as the default."),
 				in_sequence(command("sync").set(ret.selected, mode::configsync),
 					one_of(command("home").set(ret.toset, user_option::pull_home),
+						command("bookmarks").set(ret.toset, user_option::pull_bookmarks),
 //						command("dms").set(ret.toset, user_option::pull_dms),
 						command("notifications").set(ret.toset, user_option::pull_notifications)),
 					one_of(command("newest").set(ret.sync_opts.mode, sync_settings::newest_first),
