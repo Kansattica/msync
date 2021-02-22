@@ -32,15 +32,16 @@ void print_truncated_string(std::string_view toprint, Stream& str)
 	bool truncated = false;
 	if (toprint.size() > max_length)
 	{
-		toprint.remove_suffix(toprint.size() - max_length);
 		truncated = true;
+		toprint.remove_suffix(toprint.size() - max_length);
 	}
 
 	const auto newline_idx = toprint.find('\n');
 	if (newline_idx != std::string::npos)
 	{
+		// only print the dots if something other than whitespace got chopped off
+		truncated = (toprint.find_first_not_of(" \r\n\t", newline_idx) != std::string::npos);
 		toprint.remove_suffix(toprint.size() - newline_idx);
-		truncated = true;
 	}
 
 	str << toprint;
