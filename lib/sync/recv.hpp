@@ -49,12 +49,11 @@ public:
 		pl() << "Downloading notifications for " << account_name << '\n';
 		update_timeline<to_get::notifications, mastodon_notification, true>(account, account.get_user_directory(), clamp_or_default(per_call, 30));
 
-		pl() << "Downloading bookmarks for " << account_name << '\n';
-		update_timeline<to_get::bookmarks, mastodon_status>(account, account.get_user_directory(), clamp_or_default(per_call, 40));
-
 		pl() << "Downloading the home timeline for " << account_name << '\n';
 		update_timeline<to_get::home, mastodon_status>(account, account.get_user_directory(), clamp_or_default(per_call, 40));
 
+		pl() << "Downloading bookmarks for " << account_name << '\n';
+		update_timeline<to_get::bookmarks, mastodon_status>(account, account.get_user_directory(), clamp_or_default(per_call, 40));
 	}
 
 private:
