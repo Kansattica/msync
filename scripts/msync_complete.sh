@@ -30,7 +30,7 @@ function _msync() {
 		'sync')
 			# this is a weird one because it could be a config sync or a normal sync
 			if [[ "$line" == "*config*" ]]; then
-				COMPREPLY=($( compgen -W 'home notifications' -- $word ));
+				COMPREPLY=($( compgen -W 'home notifications bookmarks' -- $word ));
 			else
 				COMPREPLY=($( compgen -W "-r --retries -p --posts -m --max-requests -s --send-only -g --get-only --recv-only $accountverbose" -- $word ));
 			fi
@@ -61,7 +61,7 @@ function _msync() {
 			return 0;
 			;;
 		'-a' | '--account')
-			local accounts=$(ls "$(./msync location)")
+			local accounts=$(ls "$(${cmd} location)")
 			local lowercased=$(echo "$accounts" | awk '{print tolower($0)}')
 			COMPREPLY=($( compgen -W "$accounts $lowercased" -- $word ));
 			return 0;
