@@ -29,7 +29,7 @@ function _msync() {
 			;;
 		'sync')
 			# this is a weird one because it could be a config sync or a normal sync
-			if [[ "$line" == "*config*" ]]; then
+			if [[ "$line" == *"config"* ]]; then
 				COMPREPLY=($( compgen -W 'home notifications bookmarks' -- $word ));
 			else
 				COMPREPLY=($( compgen -W "-r --retries -p --posts -m --max-requests -s --send-only -g --get-only --recv-only $accountverbose" -- $word ));
