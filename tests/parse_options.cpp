@@ -25,7 +25,7 @@ SCENARIO("The command line parser recognizes when the user wants to start a new 
 				REQUIRE(parsed.selected == mode::newuser);
 			}
 
-			THEN("account is not set")
+			THEN("the account is not set")
 			{
 				REQUIRE(parsed.account.empty());
 			}
@@ -51,7 +51,7 @@ SCENARIO("The command line parser recognizes when the user wants to start a new 
 				REQUIRE(parsed.selected == mode::newuser);
 			}
 
-			THEN("account is set")
+			THEN("the account is set")
 			{
 				REQUIRE(parsed.account == "regular@folks.egg");
 			}
@@ -90,7 +90,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 				REQUIRE(parsed.optionval == "sometoken");
 			}
 
-			THEN("account is not set")
+			THEN("the account is not set")
 			{
 				REQUIRE(parsed.account.empty());
 			}
@@ -126,7 +126,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 				REQUIRE(parsed.optionval == "asecret!");
 			}
 
-			THEN("account is set")
+			THEN("the account is set")
 			{
 				REQUIRE(parsed.account == "jerk@fun.website");
 			}
@@ -162,7 +162,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 				REQUIRE(parsed.optionval.empty());
 			}
 
-			THEN("account is not set")
+			THEN("the account is not set")
 			{
 				REQUIRE(parsed.account.empty());
 			}
@@ -198,7 +198,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 				REQUIRE(parsed.toset == user_option::instance_url);
 			}
 
-			THEN("account is set")
+			THEN("the account is set")
 			{
 				REQUIRE(parsed.account == "niceperson@impolite.egg");
 			}
@@ -229,7 +229,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 				REQUIRE(parsed.optionval.empty());
 			}
 
-			THEN("account is not set")
+			THEN("the account is not set")
 			{
 				REQUIRE(parsed.account.empty());
 			}
@@ -260,7 +260,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 				REQUIRE(parsed.optionval.empty());
 			}
 
-			THEN("account is set")
+			THEN("the account is set")
 			{
 				REQUIRE(parsed.account == "regular@folks.egg");
 			}
@@ -291,7 +291,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 				REQUIRE(parsed.optionval.empty());
 			}
 
-			THEN("account is not set")
+			THEN("the account is not set")
 			{
 				REQUIRE(parsed.account.empty());
 			}
@@ -322,7 +322,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 				REQUIRE(parsed.optionval.empty());
 			}
 
-			THEN("account is set")
+			THEN("the account is set")
 			{
 				REQUIRE(parsed.account == "regular@folks.egg");
 			}
@@ -359,7 +359,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 				REQUIRE(parsed.listops == list_operations::add);
 			}
 
-			THEN("account is not set")
+			THEN("the account is not set")
 			{
 				REQUIRE(parsed.account.empty());
 			}
@@ -395,7 +395,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 				REQUIRE(parsed.listops == list_operations::remove);
 			}
 
-			THEN("account is set")
+			THEN("the account is set")
 			{
 				REQUIRE(parsed.account == "coolfriend");
 			}
@@ -431,7 +431,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 				REQUIRE(parsed.sync_opts.mode == sync_settings::oldest_first);
 			}
 
-			THEN("account is set")
+			THEN("the account is set")
 			{
 				REQUIRE(parsed.account == "coolerfriend");
 			}
@@ -467,7 +467,7 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 				REQUIRE(parsed.sync_opts.mode == sync_settings::newest_first);
 			}
 
-			THEN("account is set")
+			THEN("the account is set")
 			{
 				REQUIRE(parsed.account.empty());
 			}
@@ -503,9 +503,45 @@ SCENARIO("The command line parser extracts configuration option lines correctly.
 				REQUIRE(parsed.sync_opts.mode == sync_settings::dont_sync);
 			}
 
-			THEN("account is set")
+			THEN("the account is set")
 			{
 				REQUIRE(parsed.account == "coolestfriend");
+			}
+
+			THEN("the parse is good")
+			{
+				REQUIRE(parsed.okay);
+			}
+		}
+	}
+
+	GIVEN("A command line specifying that bookmarks should be synced newest first.")
+	{
+		constexpr int argc = 5;
+		char const* argv[]{ "msync", "config", "sync", "bookmarks", "newest" };
+
+		WHEN("the command line is parsed")
+		{
+			const auto& parsed = parse(argc, argv);
+
+			THEN("the selected mode is configsync")
+			{
+				REQUIRE(parsed.selected == mode::configsync);
+			}
+
+			THEN("the correct sync location is set")
+			{
+				REQUIRE(parsed.toset == user_option::pull_bookmarks);
+			}
+
+			THEN("the correct sync operation is set")
+			{
+				REQUIRE(parsed.sync_opts.mode == sync_settings::newest_first);
+			}
+
+			THEN("the account is not set")
+			{
+				REQUIRE(parsed.account.empty());
 			}
 
 			THEN("the parse is good")
@@ -534,7 +570,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 				REQUIRE(parsed.selected == mode::sync);
 			}
 
-			THEN("account is not set")
+			THEN("the account is not set")
 			{
 				REQUIRE(parsed.account.empty());
 			}
@@ -565,7 +601,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 				REQUIRE(parsed.selected == mode::sync);
 			}
 
-			THEN("account is not set")
+			THEN("the account is not set")
 			{
 				REQUIRE(parsed.account.empty());
 			}
@@ -596,7 +632,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 				REQUIRE(parsed.selected == mode::sync);
 			}
 
-			THEN("account is not set")
+			THEN("the account is not set")
 			{
 				REQUIRE(parsed.account.empty());
 			}
@@ -628,7 +664,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 				REQUIRE(parsed.selected == mode::sync);
 			}
 
-			THEN("account is not set")
+			THEN("the account is not set")
 			{
 				REQUIRE(parsed.account.empty());
 			}
@@ -660,7 +696,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 				REQUIRE(parsed.selected == mode::sync);
 			}
 
-			THEN("account is set")
+			THEN("the account is set")
 			{
 				REQUIRE(parsed.account == "coolfella");
 			}
@@ -691,7 +727,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 				REQUIRE(parsed.selected == mode::sync);
 			}
 
-			THEN("account is set")
+			THEN("the account is set")
 			{
 				REQUIRE(parsed.account == "coolfella");
 			}
@@ -730,7 +766,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 				REQUIRE(parsed.selected == mode::sync);
 			}
 
-			THEN("account is not set")
+			THEN("the account is not set")
 			{
 				REQUIRE(parsed.account.empty());
 			}
@@ -770,7 +806,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 				REQUIRE(parsed.selected == mode::sync);
 			}
 
-			THEN("account is not set")
+			THEN("the account is not set")
 			{
 				REQUIRE(parsed.account.empty());
 			}
@@ -816,7 +852,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 				REQUIRE(parsed.selected == mode::sync);
 			}
 
-			THEN("account is not set")
+			THEN("the account is not set")
 			{
 				REQUIRE(parsed.account.empty());
 			}
@@ -862,7 +898,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 					REQUIRE(parsed.selected == mode::sync);
 				}
 
-				THEN("account is set")
+				THEN("the account is set")
 				{
 					REQUIRE(parsed.account == "cool@folks.egg");
 				}
@@ -1209,7 +1245,7 @@ SCENARIO("The command line parser recognizes when the user wants help.")
 				REQUIRE(parsed.selected == mode::help);
 			}
 
-			THEN("account is not set")
+			THEN("the account is not set")
 			{
 				REQUIRE(parsed.account.empty());
 			}
