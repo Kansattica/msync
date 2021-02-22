@@ -40,7 +40,8 @@ void print_truncated_string(std::string_view toprint, Stream& str)
 	if (newline_idx != std::string::npos)
 	{
 		// only print the dots if something other than whitespace got chopped off
-		truncated = (toprint.find_first_not_of(" \r\n\t", newline_idx) != std::string::npos);
+		// or if it's already been truncated due to length
+		truncated = truncated || (toprint.find_first_not_of(" \r\n\t", newline_idx) != std::string::npos);
 		toprint.remove_suffix(toprint.size() - newline_idx);
 	}
 
