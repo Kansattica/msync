@@ -148,6 +148,7 @@ int main(int argc, const char* argv[])
 			pl() << "[default]";
 		else
 			pl() << parsed.account;
+		return 1;
 	}
 
 	if (should_print_newline)
