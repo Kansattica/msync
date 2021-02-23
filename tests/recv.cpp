@@ -405,6 +405,4 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 			}
 		}
 	}
-
-	std::cout << "Rate limiting is " << mock_get.should_rate_limit << '\n';
 }
