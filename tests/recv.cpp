@@ -68,7 +68,7 @@ struct mock_network_get : public mock_network
 		}
 
 		
-		// if the url ends in "notifications" do notifications. if it ends in "home", do statuses
+		// if the url ends in "notifications" do notifications. if it ends in "home", do statuses and so on
 		const auto [json_func, lowest_id, total_count] = [url, this]() {
 			std::string_view url_view = url.substr(url.find_last_of('/') + 1);
 			if (url_view == "notifications") { return std::make_tuple(make_notification_json, lowest_notif_id, total_notif_count); }
@@ -263,6 +263,24 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 					// cut it a second of slack because of clock jitter and stuff
 					const auto target_time = start_time + (2 * mock_get.rate_limit_wait) - std::chrono::seconds(1);
 					REQUIRE(std::chrono::system_clock::now() >= target_time);
+				}
+
+				THEN("Two calls were made to each endpoint.")
+				{
+					const auto& args = mock_get.arguments;
+					REQUIRE(args.size() == 6);
+					REQUIRE(args[0].url == expected_notification_endpoint);
+					REQUIRE(args[0].limit == 30);
+					REQUIRE(args[1].url == expected_notification_endpoint);
+					REQUIRE(args[1].limit == 30);
+					REQUIRE(args[2].url == expected_home_endpoint);
+					REQUIRE(args[2].limit == 40);
+					REQUIRE(args[3].url == expected_home_endpoint);
+					REQUIRE(args[3].limit == 40);
+					REQUIRE(args[4].url == expected_bookmark_endpoint);
+					REQUIRE(args[4].limit == 40);
+					REQUIRE(args[5].url == expected_bookmark_endpoint);
+					REQUIRE(args[5].limit == 40);
 				}
 			}
 
