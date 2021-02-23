@@ -258,14 +258,18 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 				const auto start_time = std::chrono::system_clock::now();
 				post_getter.get(account.second);
 
-				THEN("The appropriate amount of time was waited after a rate-limited call.")
+				// this is a little weird
+				// because Catch runs everything leading up to the test case for each THEN block,
+				// having everything in separate blocks means the test gets run that many times. 
+				// Normally, this is good, expected, and desirable, but for the rate limiting, it means you wait a long time for no reason.
+				// so, all the test cases get combined into one instead of waiting for nothing.
+				THEN("The appropriate amount of time was waited after a rate-limited call and everything is as it should be.")
 				{
 					// cut it a second of slack because of clock jitter and stuff
 					const auto target_time = start_time + (2 * mock_get.rate_limit_wait) - std::chrono::seconds(1);
 					REQUIRE(std::chrono::system_clock::now() >= target_time);
-				}
 
-				THEN("Two calls were made to each endpoint.")
+				//THEN("Two calls were made to each endpoint.")
 				{
 					const auto& args = mock_get.arguments;
 					REQUIRE(args.size() == 6);
@@ -281,6 +285,22 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 					REQUIRE(args[4].limit == 40);
 					REQUIRE(args[5].url == expected_bookmark_endpoint);
 					REQUIRE(args[5].limit == 40);
+				}
+
+				//THEN("All three files have the expected number of posts, and the IDs are strictly increasing.")
+				{
+					// the -1 is because adding 10 to the post count only adds 9 new statuses because you already got the 0th status last time
+					// this feels weird because of the weird mix of half-open ranges and fully closed ranges, but I believe it's correct
+					constexpr int expected_home_statuses = 40 * 5 + 10 - 1;
+					constexpr int expected_notifications = 30 * 5 + 15 - 1;
+					constexpr int expected_bookmark_statuses = 40 * 5 + 5 - 1;
+
+					verify_file(home_timeline_file, expected_home_statuses, "status id: ");
+					verify_file(notifications_file, expected_notifications, "notification id: ");
+					verify_file(bookmarks_file, expected_bookmark_statuses, "status id: ");
+				}
+
+
 				}
 			}
 
