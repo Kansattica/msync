@@ -45,6 +45,9 @@ void print_truncated_string(std::string_view toprint, Stream& str)
 		toprint.remove_suffix(toprint.size() - newline_idx);
 	}
 
+	while (!toprint.empty() && toprint.back() == ' ')
+		toprint.remove_suffix(1);
+
 	str << toprint;
 	if (truncated)
 		str << "...";

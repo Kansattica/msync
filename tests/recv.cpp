@@ -299,8 +299,6 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 					verify_file(notifications_file, expected_notifications, "notification id: ");
 					verify_file(bookmarks_file, expected_bookmark_statuses, "status id: ");
 				}
-
-
 				}
 			}
 
