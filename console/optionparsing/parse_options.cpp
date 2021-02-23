@@ -44,6 +44,7 @@ clipp::group make_cli(parse_result& ret)
 				command("default").set(ret.selected, mode::setdefault).doc("Set the specified account as the default."),
 				in_sequence(command("sync").set(ret.selected, mode::configsync),
 					one_of(command("home").set(ret.toset, user_option::pull_home),
+						command("bookmarks").set(ret.toset, user_option::pull_bookmarks),
 //						command("dms").set(ret.toset, user_option::pull_dms),
 						command("notifications").set(ret.toset, user_option::pull_notifications)),
 					one_of(command("newest").set(ret.sync_opts.mode, sync_settings::newest_first),
@@ -97,6 +98,7 @@ clipp::group make_cli(parse_result& ret)
 			one_of(
 				command("fav").set(ret.queue_opt.selected, api_route::fav) & opt_values("post ids", ret.queue_opt.queued),
 				command("boost").set(ret.queue_opt.selected, api_route::boost) & opt_values("post ids", ret.queue_opt.queued),
+				command("bookmark").set(ret.queue_opt.selected, api_route::bookmark) & opt_values("post ids", ret.queue_opt.queued),
 				command("context").set(ret.queue_opt.selected, api_route::context) & opt_values("post ids", ret.queue_opt.queued),
 				command("post").set(ret.queue_opt.selected, api_route::post) & opt_values("filenames", ret.queue_opt.queued),
 				command("print").set(ret.queue_opt.to_do, queue_action::print))

@@ -51,6 +51,9 @@ public:
 
 		pl() << "Downloading the home timeline for " << account_name << '\n';
 		update_timeline<to_get::home, mastodon_status>(account, account.get_user_directory(), clamp_or_default(per_call, 40));
+
+		pl() << "Downloading bookmarks for " << account_name << '\n';
+		update_timeline<to_get::bookmarks, mastodon_status>(account, account.get_user_directory(), clamp_or_default(per_call, 40));
 	}
 
 private:
@@ -65,7 +68,10 @@ private:
 		const sync_settings sync_method = account.get_sync_option(params.sync_setting);
 
 		if (sync_method == sync_settings::dont_sync)
+		{
+			pl() << "Set to don't sync. Skipping.\n";
 			return;
+		}
 
 		const std::string& access_token = account.get_option(user_option::access_token);
 
@@ -92,7 +98,7 @@ private:
 		{
 			highest_id = newest_first<mastodon_entity, use_excludes>(writer, url, access_token, last_recorded_id, limit);
 		}
-		else if (sync_method == sync_settings::oldest_first) //else if because dont_sync is an option
+		else if (sync_method == sync_settings::oldest_first) //else if because dont_sync is an option (not that a dont_sync should get here) and to save a comparison
 		{
 			highest_id = oldest_first<mastodon_entity, use_excludes>(writer, url, access_token, last_recorded_id, limit);
 		}

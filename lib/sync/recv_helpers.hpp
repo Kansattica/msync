@@ -10,12 +10,13 @@
 
 #include "read_response.hpp"
 
-enum class to_get { notifications, home, dms, lists };
+enum class to_get { notifications, home, dms, lists, bookmarks };
 
 struct recv_parameters { user_option last_id_setting; user_option sync_setting; std::string_view route; const CONSTANT_PATH_TYPE& filename; };
 
 constexpr std::string_view home_route{ "/api/v1/timelines/home" };
 constexpr std::string_view notifications_route{ "/api/v1/notifications" };
+constexpr std::string_view bookmarks_route{ "/api/v1/bookmarks" };
 
 template <to_get timeline>
 CONSTEXPR_IF_NOT_BOOST recv_parameters get_parameters()
@@ -28,6 +29,11 @@ CONSTEXPR_IF_NOT_BOOST recv_parameters get_parameters()
 	if CONSTEXPR_IF_NOT_BOOST (timeline == to_get::home)
 	{
 		return { user_option::last_home_id, user_option::pull_home, home_route, Home_Timeline_Filename };
+	}
+
+	if CONSTEXPR_IF_NOT_BOOST (timeline == to_get::bookmarks)
+	{
+		return { user_option::last_bookmark_id, user_option::pull_bookmarks, bookmarks_route, Bookmarks_Filename };
 	}
 }
 

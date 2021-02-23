@@ -50,6 +50,8 @@ private:
 		case api_route::unfav:
 		case api_route::boost:
 		case api_route::unboost:
+		case api_route::bookmark:
+		case api_route::unbookmark:
 			return simple_call(post, "POST", retries, paramaterize_url(urls.status_url(), to_make.argument, ROUTE_LOOKUP[static_cast<uint8_t>(to_make.queued_call)]), access_token).success;
 		case api_route::post:
 			// posts are a little trickier

@@ -41,6 +41,7 @@ enum class user_option
 	client_id,
 	last_home_id,
 	last_dm_id,
+	last_bookmark_id,
 	last_notification_id,
 	is_default,
 	exclude_follows,
@@ -50,6 +51,7 @@ enum class user_option
 	exclude_polls,
 	pull_home,
 	pull_dms,
+	pull_bookmarks,
 	pull_notifications,
 };
 
@@ -57,8 +59,8 @@ constexpr auto USER_OPTION_NAMES =
 	std::array<std::string_view,
 			   static_cast<int>(user_option::pull_notifications) + 1>(
 		{"file_version", "account_name", "instance_url", "auth_code", "access_token", "client_secret", "client_id",
-				   "last_home_id", "last_dm_id", "last_notification_id", 
+				   "last_home_id", "last_dm_id", "last_bookmark_id", "last_notification_id", 
 				   "is_default",
 				   "exclude_follows", "exclude_favs", "exclude_boosts", "exclude_mentions", "exclude_polls",
-		 "pull_home", "pull_dms", "pull_notifications"});
+		 "pull_home", "pull_dms", "pull_bookmarks", "pull_notifications"});
 #endif

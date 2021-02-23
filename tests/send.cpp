@@ -245,6 +245,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 				REQUIRE(mockdel.arguments.empty());
 				REQUIRE(mocknew.arguments.empty());
 				REQUIRE(mockupload.arguments.empty());
+				REQUIRE(mockget.arguments.empty());
 			}
 		}
 	}
@@ -295,6 +296,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 				REQUIRE(mockdel.arguments.empty());
 				REQUIRE(mocknew.arguments.empty());
 				REQUIRE(mockupload.arguments.empty());
+				REQUIRE(mockget.arguments.empty());
 			}
 		}
 	}
@@ -360,6 +362,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 				REQUIRE(mockdel.arguments.empty());
 				REQUIRE(mocknew.arguments.empty());
 				REQUIRE(mockupload.arguments.empty());
+				REQUIRE(mockget.arguments.empty());
 			}
 		}
 	}
@@ -426,6 +429,7 @@ SCENARIO("Send correctly sends from and modifies the queue with favs and boosts.
 				REQUIRE(mockdel.arguments.empty());
 				REQUIRE(mocknew.arguments.empty());
 				REQUIRE(mockupload.arguments.empty());
+				REQUIRE(mockget.arguments.empty());
 			}
 		}
 	}
@@ -648,6 +652,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[locale]"
 			{
 				REQUIRE(mockpost.arguments.empty());
 				REQUIRE(mockdel.arguments.empty());
+				REQUIRE(mockget.arguments.empty());
 			}
 
 			THEN("the access token was passed in.")
@@ -742,6 +747,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[locale]"
 			{
 				REQUIRE(mockpost.arguments.empty());
 				REQUIRE(mockdel.arguments.empty());
+				REQUIRE(mockget.arguments.empty());
 			}
 
 			THEN("the access token was passed in.")
@@ -819,6 +825,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[locale]"
 			THEN("the other APIs weren't called.")
 			{
 				REQUIRE(mockpost.arguments.empty());
+				REQUIRE(mockget.arguments.empty());
 				REQUIRE(mockdel.arguments.empty());
 			}
 

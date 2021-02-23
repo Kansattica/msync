@@ -29,8 +29,8 @@ function _msync() {
 			;;
 		'sync')
 			# this is a weird one because it could be a config sync or a normal sync
-			if [[ "$line" == "*config*" ]]; then
-				COMPREPLY=($( compgen -W 'home notifications' -- $word ));
+			if [[ "$line" == *"config"* ]]; then
+				COMPREPLY=($( compgen -W 'home notifications bookmarks' -- $word ));
 			else
 				COMPREPLY=($( compgen -W "-r --retries -p --posts -m --max-requests -s --send-only -g --get-only --recv-only $accountverbose" -- $word ));
 			fi
@@ -49,11 +49,11 @@ function _msync() {
 			return 0;
 			;;
 		'queue' | 'q')
-			COMPREPLY=($( compgen -W 'remove -r --remove clear -c --clear fav boost post print context' -- $word ));
+			COMPREPLY=($( compgen -W 'remove -r --remove clear -c --clear fav boost bookmark post print context' -- $word ));
 			return 0;
 			;;
 		'-r' | '--remove' | '-c' | '--clear' | 'remove' | 'r' | 'c' | 'clear')
-			COMPREPLY=($( compgen -W 'fav boost post context' -- $word ));
+			COMPREPLY=($( compgen -W 'fav boost bookmark post context' -- $word ));
 			return 0;
 			;;
 		'post' | '-f' | '--file' | '--attach' | '--attachment')
@@ -61,7 +61,7 @@ function _msync() {
 			return 0;
 			;;
 		'-a' | '--account')
-			local accounts=$(ls "$(./msync location)")
+			local accounts=$(ls "$(${cmd} location)")
 			local lowercased=$(echo "$accounts" | awk '{print tolower($0)}')
 			COMPREPLY=($( compgen -W "$accounts $lowercased" -- $word ));
 			return 0;

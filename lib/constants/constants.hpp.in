@@ -31,6 +31,7 @@ inline CONSTANT_PATH_DECLARATION Thread_Directory{ "fetched" };
 
 inline CONSTANT_PATH_DECLARATION Home_Timeline_Filename{ "home.list" };
 inline CONSTANT_PATH_DECLARATION Notifications_Filename{ "notifications.list" };
+inline CONSTANT_PATH_DECLARATION Bookmarks_Filename{ "bookmarks.list" };
 inline CONSTANT_PATH_DECLARATION Direct_Messages_Filename{ "dm.list" };
 
 #cmakedefine MSYNC_FILE_LOG

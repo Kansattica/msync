@@ -24,15 +24,17 @@ using namespace std::string_view_literals;
 
 constexpr unsigned int lowest_post_id = 1000000;
 constexpr unsigned int lowest_notif_id = 10000;
+constexpr unsigned int lowest_bookmark_id = 2000000;
 
 struct mock_network_get : public mock_network
 {
 	std::vector<get_mock_args> arguments;
 
 	unsigned int total_post_count = 310;
+	unsigned int total_bookmark_count = 220;
 	unsigned int total_notif_count = 240;
 
-	bool should_rate_limt = false;
+	bool should_rate_limit = false;
 	std::chrono::seconds rate_limit_wait = std::chrono::seconds(20);
 	
 	net_response operator()(std::string_view url, std::string_view access_token, const timeline_params& params, unsigned int limit)
@@ -47,7 +49,7 @@ struct mock_network_get : public mock_network
 		toreturn.status_code = status_code;
 		if (!toreturn.okay)
 		{
-			if (toreturn.retryable_error && should_rate_limt)
+			if (toreturn.retryable_error && should_rate_limit)
 			{
 				toreturn.status_code = 429;
 
@@ -66,11 +68,12 @@ struct mock_network_get : public mock_network
 		}
 
 		
-		// if the url ends in "notifications" do notifications. if it ends in "home", do statuses
+		// if the url ends in "notifications" do notifications. if it ends in "home", do statuses and so on
 		const auto [json_func, lowest_id, total_count] = [url, this]() {
 			std::string_view url_view = url.substr(url.find_last_of('/') + 1);
 			if (url_view == "notifications") { return std::make_tuple(make_notification_json, lowest_notif_id, total_notif_count); }
 			if (url_view == "home") { return std::make_tuple(make_status_json, lowest_post_id, total_post_count); }
+			if (url_view == "bookmarks") { return std::make_tuple(make_status_json, lowest_bookmark_id, total_bookmark_count); }
 
 			CAPTURE(url);
 			FAIL("Hey, I don't know what to do with this URL.");
@@ -135,6 +138,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 
 	static constexpr std::string_view account_name = "user@crime.egg";
 	static constexpr std::string_view expected_notification_endpoint = "https://crime.egg/api/v1/notifications";
+	static constexpr std::string_view expected_bookmark_endpoint = "https://crime.egg/api/v1/bookmarks";
 	static constexpr std::string_view expected_home_endpoint = "https://crime.egg/api/v1/timelines/home";
 	static constexpr std::string_view expected_access_token = "token!";
 
@@ -147,6 +151,7 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 	const auto user_dir = account_dir.dirname / account.first;
 	const auto home_timeline_file = user_dir / Home_Timeline_Filename;
 	const auto notifications_file = user_dir / Notifications_Filename;
+	const auto bookmarks_file = user_dir / Bookmarks_Filename;
 
 	REQUIRE(account.first == account_name);
 
@@ -166,23 +171,25 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 
 			post_getter.get(account.second);
 
-			THEN("Five calls each were made to the home and notification API endpoints with the correct URLs, default limits, and access tokens.")
+			THEN("Five calls each were made to the home, notification, and bookmark API endpoints with the correct URLs, default limits, and access tokens.")
 			{
 				const auto& args = mock_get.arguments;
-				CAPTURE(args);
-				REQUIRE(args.size() == 10);
+				REQUIRE(args.size() == 15);
 				REQUIRE(std::all_of(args.begin(), args.begin() + 5, [&](const get_mock_args& arg) { return arg.url == expected_notification_endpoint && arg.limit == 30; }));
-				REQUIRE(std::all_of(args.begin() + 5, args.end(), [&](const get_mock_args& arg) { return arg.url == expected_home_endpoint && arg.limit == 40; }));
+				REQUIRE(std::all_of(args.begin() + 5, args.begin() + 10, [&](const get_mock_args& arg) { return arg.url == expected_home_endpoint && arg.limit == 40; }));
+				REQUIRE(std::all_of(args.begin() + 10, args.end(), [&](const get_mock_args& arg) { return arg.url == expected_bookmark_endpoint && arg.limit == 40; }));
 				REQUIRE(std::all_of(args.begin(), args.end(), [&](const get_mock_args& arg) { return arg.access_token == expected_access_token && arg.exclude_notifs.empty(); }));
 			}
 
-			THEN("Both files have the expected number of posts, and the IDs are strictly increasing.")
+			THEN("All three files have the expected number of posts, and the IDs are strictly increasing.")
 			{
 				constexpr int expected_home_statuses = 40 * 5;
 				constexpr int expected_notifications = 30 * 5;
+				constexpr int expected_bookmark_statuses = 40 * 5;
 
 				verify_file(home_timeline_file, expected_home_statuses, "status id: ");
 				verify_file(notifications_file, expected_notifications, "notification id: ");
+				verify_file(bookmarks_file, expected_bookmark_statuses, "status id: ");
 			}
 
 			THEN("The correct last IDs are saved back to the account.")
@@ -191,24 +198,28 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 
 				REQUIRE(account.second.get_option(user_option::last_home_id) == sv_to_chars(lowest_post_id + mock_get.total_post_count, id_char_buf));
 				REQUIRE(account.second.get_option(user_option::last_notification_id) == sv_to_chars(lowest_notif_id + mock_get.total_notif_count, id_char_buf));
+				REQUIRE(account.second.get_option(user_option::last_bookmark_id) == sv_to_chars(lowest_bookmark_id + mock_get.total_bookmark_count, id_char_buf));
 			}
 
-			AND_WHEN("More posts and notifications are added and get is called again.")
+			AND_WHEN("More posts, notifications, and bookmarks are added and get is called again.")
 			{
 				mock_get.arguments.clear();
 				mock_get.total_post_count += 10;
 				mock_get.total_notif_count += 15;
+				mock_get.total_bookmark_count += 5;
 
 				post_getter.get(account.second);
 
 				THEN("Only one call was made to each endpoint.")
 				{
 					const auto& args = mock_get.arguments;
-					REQUIRE(args.size() == 2);
+					REQUIRE(args.size() == 3);
 					REQUIRE(args[0].url == expected_notification_endpoint);
 					REQUIRE(args[0].limit == 30);
 					REQUIRE(args[1].url == expected_home_endpoint);
 					REQUIRE(args[1].limit == 40);
+					REQUIRE(args[2].url == expected_bookmark_endpoint);
+					REQUIRE(args[2].limit == 40);
 				}
 
 				THEN("The correct last IDs are saved back to the account.")
@@ -217,43 +228,51 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 
 					REQUIRE(account.second.get_option(user_option::last_home_id) == sv_to_chars(lowest_post_id + mock_get.total_post_count, id_char_buf));
 					REQUIRE(account.second.get_option(user_option::last_notification_id) == sv_to_chars(lowest_notif_id + mock_get.total_notif_count, id_char_buf));
+					REQUIRE(account.second.get_option(user_option::last_bookmark_id) == sv_to_chars(lowest_bookmark_id + mock_get.total_bookmark_count, id_char_buf));
 				}
 
-				THEN("Both files have the expected number of posts, and the IDs are strictly increasing.")
+				THEN("All three files have the expected number of posts, and the IDs are strictly increasing.")
 				{
 					// the -1 is because adding 10 to the post count only adds 9 new statuses because you already got the 0th status last time
 					// this feels weird because of the weird mix of half-open ranges and fully closed ranges, but I believe it's correct
 					constexpr int expected_home_statuses = 40 * 5 + 10 - 1;
 					constexpr int expected_notifications = 30 * 5 + 15 - 1;
+					constexpr int expected_bookmark_statuses = 40 * 5 + 5 - 1;
 
 					verify_file(home_timeline_file, expected_home_statuses, "status id: ");
 					verify_file(notifications_file, expected_notifications, "notification id: ");
+					verify_file(bookmarks_file, expected_bookmark_statuses, "status id: ");
 				}
 			}
 
-			AND_WHEN("More posts and notifications are added and get is called again, but we're rate limited.")
+			AND_WHEN("More posts, notifications, and bookmarks are added and get is called again, but we're rate limited.")
 			{
 				mock_get.arguments.clear();
 				mock_get.total_post_count += 10;
 				mock_get.total_notif_count += 15;
+				mock_get.total_bookmark_count += 5;
 
-				mock_get.should_rate_limt = true;
+				mock_get.should_rate_limit = true;
 				mock_get.set_succeed_after(2);
 
 				const auto start_time = std::chrono::system_clock::now();
 				post_getter.get(account.second);
 
-				THEN("The appropriate amount of time was waited after a rate-limited call.")
+				// this is a little weird
+				// because Catch runs everything leading up to the test case for each THEN block,
+				// having everything in separate blocks means the test gets run that many times. 
+				// Normally, this is good, expected, and desirable, but for the rate limiting, it means you wait a long time for no reason.
+				// so, all the test cases get combined into one instead of waiting for nothing.
+				THEN("The appropriate amount of time was waited after a rate-limited call and everything is as it should be.")
 				{
 					// cut it a second of slack because of clock jitter and stuff
 					const auto target_time = start_time + (2 * mock_get.rate_limit_wait) - std::chrono::seconds(1);
 					REQUIRE(std::chrono::system_clock::now() >= target_time);
-				}
 
-				THEN("Two calls were made to each endpoint.")
+				//THEN("Two calls were made to each endpoint.")
 				{
 					const auto& args = mock_get.arguments;
-					REQUIRE(args.size() == 4);
+					REQUIRE(args.size() == 6);
 					REQUIRE(args[0].url == expected_notification_endpoint);
 					REQUIRE(args[0].limit == 30);
 					REQUIRE(args[1].url == expected_notification_endpoint);
@@ -262,6 +281,56 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 					REQUIRE(args[2].limit == 40);
 					REQUIRE(args[3].url == expected_home_endpoint);
 					REQUIRE(args[3].limit == 40);
+					REQUIRE(args[4].url == expected_bookmark_endpoint);
+					REQUIRE(args[4].limit == 40);
+					REQUIRE(args[5].url == expected_bookmark_endpoint);
+					REQUIRE(args[5].limit == 40);
+				}
+
+				//THEN("All three files have the expected number of posts, and the IDs are strictly increasing.")
+				{
+					// the -1 is because adding 10 to the post count only adds 9 new statuses because you already got the 0th status last time
+					// this feels weird because of the weird mix of half-open ranges and fully closed ranges, but I believe it's correct
+					constexpr int expected_home_statuses = 40 * 5 + 10 - 1;
+					constexpr int expected_notifications = 30 * 5 + 15 - 1;
+					constexpr int expected_bookmark_statuses = 40 * 5 + 5 - 1;
+
+					verify_file(home_timeline_file, expected_home_statuses, "status id: ");
+					verify_file(notifications_file, expected_notifications, "notification id: ");
+					verify_file(bookmarks_file, expected_bookmark_statuses, "status id: ");
+				}
+
+
+				}
+			}
+
+			AND_WHEN("More posts, notifications, and bookmarks are added and get is called again, but on a flaky connection.")
+			{
+				mock_get.arguments.clear();
+				mock_get.total_post_count += 10;
+				mock_get.total_notif_count += 15;
+				mock_get.total_bookmark_count += 5;
+
+				mock_get.set_succeed_after(2);
+
+				post_getter.get(account.second);
+
+				THEN("Two calls were made to each endpoint.")
+				{
+					const auto& args = mock_get.arguments;
+					REQUIRE(args.size() == 6);
+					REQUIRE(args[0].url == expected_notification_endpoint);
+					REQUIRE(args[0].limit == 30);
+					REQUIRE(args[1].url == expected_notification_endpoint);
+					REQUIRE(args[1].limit == 30);
+					REQUIRE(args[2].url == expected_home_endpoint);
+					REQUIRE(args[2].limit == 40);
+					REQUIRE(args[3].url == expected_home_endpoint);
+					REQUIRE(args[3].limit == 40);
+					REQUIRE(args[4].url == expected_bookmark_endpoint);
+					REQUIRE(args[4].limit == 40);
+					REQUIRE(args[5].url == expected_bookmark_endpoint);
+					REQUIRE(args[5].limit == 40);
 				}
 
 				THEN("The correct last IDs are saved back to the account.")
@@ -270,17 +339,20 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 
 					REQUIRE(account.second.get_option(user_option::last_home_id) == sv_to_chars(lowest_post_id + mock_get.total_post_count, id_char_buf));
 					REQUIRE(account.second.get_option(user_option::last_notification_id) == sv_to_chars(lowest_notif_id + mock_get.total_notif_count, id_char_buf));
+					REQUIRE(account.second.get_option(user_option::last_bookmark_id) == sv_to_chars(lowest_bookmark_id + mock_get.total_bookmark_count, id_char_buf));
 				}
 
-				THEN("Both files have the expected number of posts, and the IDs are strictly increasing.")
+				THEN("All three files have the expected number of posts, and the IDs are strictly increasing.")
 				{
 					// the -1 is because adding 10 to the post count only adds 9 new statuses because you already got the 0th status last time
 					// this feels weird because of the weird mix of half-open ranges and fully closed ranges, but I believe it's correct
 					constexpr int expected_home_statuses = 40 * 5 + 10 - 1;
 					constexpr int expected_notifications = 30 * 5 + 15 - 1;
+					constexpr int expected_bookmark_statuses = 40 * 5 + 5 - 1;
 
 					verify_file(home_timeline_file, expected_home_statuses, "status id: ");
 					verify_file(notifications_file, expected_notifications, "notification id: ");
+					verify_file(bookmarks_file, expected_bookmark_statuses, "status id: ");
 				}
 			}
 		}
@@ -307,23 +379,26 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 				}
 			}
 
-			THEN("Five calls each were made to the home and notification API endpoints with the correct URLs, default limits, and access tokens.")
+			THEN("Five calls each were made to the home, notification, and bookmark API endpoints with the correct URLs, default limits, and access tokens.")
 			{
 				const auto& args = mock_get.arguments;
 				CAPTURE(args);
-				REQUIRE(args.size() == 10);
+				REQUIRE(args.size() == 15);
 				REQUIRE(std::all_of(args.begin(), args.begin() + 5, [&](const get_mock_args& arg) { return arg.url == expected_notification_endpoint && arg.limit == 30; }));
-				REQUIRE(std::all_of(args.begin() + 5, args.end(), [&](const get_mock_args& arg) { return arg.url == expected_home_endpoint && arg.limit == 40 && arg.exclude_notifs.empty(); }));
+				REQUIRE(std::all_of(args.begin() + 5, args.begin() + 10, [&](const get_mock_args& arg) { return arg.url == expected_home_endpoint && arg.limit == 40 && arg.exclude_notifs.empty(); }));
+				REQUIRE(std::all_of(args.begin() + 10, args.end(), [&](const get_mock_args& arg) { return arg.url == expected_bookmark_endpoint && arg.limit == 40 && arg.exclude_notifs.empty(); }));
 				REQUIRE(std::all_of(args.begin(), args.end(), [&](const get_mock_args& arg) { return arg.access_token == expected_access_token; }));
 			}
 
-			THEN("Both files have the expected number of posts, and the IDs are strictly increasing.")
+			THEN("All three files have the expected number of posts, and the IDs are strictly increasing.")
 			{
 				constexpr int expected_home_statuses = 40 * 5;
 				constexpr int expected_notifications = 30 * 5;
+				constexpr int expected_bookmark_statuses = 40 * 5;
 
 				verify_file(home_timeline_file, expected_home_statuses, "status id: ");
 				verify_file(notifications_file, expected_notifications, "notification id: ");
+				verify_file(bookmarks_file, expected_bookmark_statuses, "status id: ");
 			}
 
 			THEN("The correct last IDs are saved back to the account.")
@@ -332,24 +407,28 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 
 				REQUIRE(account.second.get_option(user_option::last_home_id) == sv_to_chars(lowest_post_id + mock_get.total_post_count, id_char_buf));
 				REQUIRE(account.second.get_option(user_option::last_notification_id) == sv_to_chars(lowest_notif_id + mock_get.total_notif_count, id_char_buf));
+				REQUIRE(account.second.get_option(user_option::last_bookmark_id) == sv_to_chars(lowest_bookmark_id + mock_get.total_bookmark_count, id_char_buf));
 			}
 
-			AND_WHEN("More posts and notifications are added and get is called again.")
+			AND_WHEN("More posts, notifications, and bookmarks are added and get is called again.")
 			{
 				mock_get.arguments.clear();
 				mock_get.total_post_count += 10;
 				mock_get.total_notif_count += 15;
+				mock_get.total_bookmark_count += 5;
 
 				post_getter.get(account.second);
 
 				THEN("Only one call was made to each endpoint.")
 				{
 					const auto& args = mock_get.arguments;
-					REQUIRE(args.size() == 2);
+					REQUIRE(args.size() == 3);
 					REQUIRE(args[0].url == expected_notification_endpoint);
 					REQUIRE(args[0].limit == 30);
 					REQUIRE(args[1].url == expected_home_endpoint);
 					REQUIRE(args[1].limit == 40);
+					REQUIRE(args[2].url == expected_bookmark_endpoint);
+					REQUIRE(args[2].limit == 40);
 				}
 
 				THEN("The correct last IDs are saved back to the account.")
@@ -358,17 +437,20 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 
 					REQUIRE(account.second.get_option(user_option::last_home_id) == sv_to_chars(lowest_post_id + mock_get.total_post_count, id_char_buf));
 					REQUIRE(account.second.get_option(user_option::last_notification_id) == sv_to_chars(lowest_notif_id + mock_get.total_notif_count, id_char_buf));
+					REQUIRE(account.second.get_option(user_option::last_bookmark_id) == sv_to_chars(lowest_bookmark_id + mock_get.total_bookmark_count, id_char_buf));
 				}
 
-				THEN("Both files have the expected number of posts, and the IDs are strictly increasing.")
+				THEN("All three files have the expected number of posts, and the IDs are strictly increasing.")
 				{
 					// the -1 is because adding 10 to the post count only adds 9 new statuses because you already got the 0th status last time
 					// this feels weird because of the weird mix of half-open ranges and fully closed ranges, but I believe it's correct
 					constexpr int expected_home_statuses = 40 * 5 + 10 - 1;
 					constexpr int expected_notifications = 30 * 5 + 15 - 1;
+					constexpr int expected_bookmark_statuses = 40 * 5 + 5 - 1;
 
 					verify_file(home_timeline_file, expected_home_statuses, "status id: ");
 					verify_file(notifications_file, expected_notifications, "notification id: ");
+					verify_file(bookmarks_file, expected_bookmark_statuses, "status id: ");
 				}
 			}
 		}

@@ -104,9 +104,9 @@ After your account is set up, running `msync sync --verbose` will connect to you
 - If you don't care about a specific type of notification, you can stop `msync` from retrieving them when you sync with `msync config exclude_boosts true`, and same for `favs`, `follows`, `mentions`, and `polls`. `msync` treats anything starting with a `t`, `T`, `y`, or `Y` as truthy, and everything else as falsy. So `exclude_favs true`, `exclude_favs YES`, and `exclude_favs Yeehaw` are equivalent.
 - I'll write more about configuration later, but for now, you can see all your settings and registered accounts with `msync config showall`.
 
-#### Reading the home timeline and notifications
+#### Reading the home timeline, notifications, and bookmarks
 
-Your home timeline and notifications are saved into files named `home.list` and `notifications.list` in your `msync_accounts` folder under the appropriate user account. You can find where these files are located by running `msync location` or `msync sync --verbose`. `msync` doesn't provide a built-in way to look at these files. It's designed so that you can use whatever tool you prefer for reading text files. Here's a few ways that work for me to get you started.
+Your home timeline, notifications, and bookmarks are saved into files named `home.list`, `notifications.list`, and `bookmarks.list` in your `msync_accounts` folder under the appropriate user account. You can find where these files are located by running `msync location` or `msync sync --verbose`. `msync` doesn't provide a built-in way to look at these files. It's designed so that you can use whatever tool you prefer for reading text files. Here's a few ways that work for me to get you started.
 
 ##### vim
 
@@ -186,7 +186,7 @@ All of these skip downloading files you've already downloaded, so feel free to a
 
 #### Queueing
 
-To do other useful stuff with `msync`, you'll have to use queues. The `msync queue` command allows you to queue up favorites, boosts, and posts to be sent when you're back online. 
+To do other useful stuff with `msync`, you'll have to use queues. The `msync queue` command allows you to queue up favorites, boosts, bookmarks, and posts to be sent when you're back online. 
 
 To queue up favorites, run `msync queue fav <any number of status IDs>`. You can get these status IDs from downloaded posts and notifications. They're always on a line that starts with `status id:` in `home.list` and `notifications.list`- don't put any other ID numbers into this! Boosts are the same: `msync queue boost <any number of status ids>`
 
@@ -216,7 +216,7 @@ Posts are a little different. You still queue them up to be sent when you next `
 - If you're replying to someone else's post, make sure you:
     - use the same (or whatever necessary) visibility setting- `msync` will default to whatever your account's default visibility setting is. 
     - include their @ handle in the body
-    - include a CW, if needed
+    - include a content warning, if needed
     - all in all, my `msync` command line when generating a reply usually looks like this:
 
     ```
@@ -232,7 +232,7 @@ Posts are a little different. You still queue them up to be sent when you next `
     - If a post has an invalid `reply_to`, the remote server won't accept it. You can edit the queued version of the post in `msync_accounts/<username@instance.url>/queuedposts` and sync again.
 
 
-- If you see a post on your timeline and want to see the rest of the thread, you can queue up a request for context next time you sync. Use `msync queue context <id>` to have `msync` fetch all the posts before and after that one in the thread. Next time you `msync sync`, it'll fetch the post in question, as well as all the posts above and below it in the thread. This doesn't get everything- it won't fetch replies to other posts in the thread, for example- but it's useful for seeing what a reply is to or digging up the rest of a thread. Threads fetched like this are storied in  `msync_accounts/<username@instance.url>/threads` as `<status id>.list`, so they get picked up if you use a wildcard to open your timelines like this:
+- If you see a post on your timeline and want to see the rest of the thread, you can queue up a request for context next time you sync. Use `msync queue context <id>` to have `msync` fetch all the posts before and after that one in the thread. Next time you `msync sync`, it'll fetch the post in question, as well as all the posts above and below it in the thread. This doesn't get everything- it won't fetch replies to other posts in the thread, for example- but it's useful for seeing what a reply is to or digging up the rest of a thread. Threads fetched like this are stored in `msync_accounts/<username@instance.url>/threads` as `<status id>.list`, so they get picked up if you use a wildcard to open your timelines like this:
 
 ```
 vim -p `msync location`/**/*.list

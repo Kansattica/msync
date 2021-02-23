@@ -116,6 +116,8 @@ api_route undo_route(const api_route queue)
 		return api_route::unfav;
 	case api_route::post:
 		return api_route::unpost;
+	case api_route::bookmark:
+		return api_route::unbookmark;
 	// can't really undo context
 	case api_route::context:
 		return api_route::context;
