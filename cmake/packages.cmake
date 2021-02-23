@@ -134,7 +134,9 @@ if (NOT USE_SYSTEM_CURL AND UNIX)
 endif()
 # add_definitions(-DCURL_STATICLIB)
 if (MSVC)
-	set (CMAKE_USE_WINSSL ON CACHE BOOL "Use winssl" FORCE)
+	# it's called CMAKE_USE_SCHANNEL now
+	#set (CMAKE_USE_WINSSL ON CACHE BOOL "Use winssl" FORCE)
+	set (CMAKE_USE_SCHANNEL ON CACHE BOOL "enable Windows native SSL/TLS" FORCE)
 	set (CMAKE_USE_OPENSSL OFF CACHE BOOL "Don't use openssl" FORCE)
 endif()
 
