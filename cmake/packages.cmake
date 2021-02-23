@@ -59,7 +59,7 @@ message(STATUS "Downloading CPR...")
 FetchContent_Declare(
 	libcpr
 	GIT_REPOSITORY 	https://github.com/kansattica/cpr.git
-	GIT_TAG			3c8ae80119b09318ec193078bdf872ce311a359d
+	GIT_TAG			20d438db91d5be7acb3c2ba0b3183f8872287b58
 )
 option(USE_SYSTEM_CURL "Try to use the system's libcurl instead of downloading and statically linking." ON)
 option(MSYNC_DOWNLOAD_ZLIB "If downloading and building curl on Windows, try to download zlib as well." ON)
@@ -134,7 +134,9 @@ if (NOT USE_SYSTEM_CURL AND UNIX)
 endif()
 # add_definitions(-DCURL_STATICLIB)
 if (MSVC)
-	set (CMAKE_USE_WINSSL ON CACHE BOOL "Use winssl" FORCE)
+	# it's called CMAKE_USE_SCHANNEL now
+	#set (CMAKE_USE_WINSSL ON CACHE BOOL "Use winssl" FORCE)
+	set (CMAKE_USE_SCHANNEL ON CACHE BOOL "enable Windows native SSL/TLS" FORCE)
 	set (CMAKE_USE_OPENSSL OFF CACHE BOOL "Don't use openssl" FORCE)
 endif()
 
