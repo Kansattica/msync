@@ -264,6 +264,18 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 					const auto target_time = start_time + (2 * mock_get.rate_limit_wait) - std::chrono::seconds(1);
 					REQUIRE(std::chrono::system_clock::now() >= target_time);
 				}
+			}
+
+			AND_WHEN("More posts, notifications, and bookmarks are added and get is called again, but on a flaky connection.")
+			{
+				mock_get.arguments.clear();
+				mock_get.total_post_count += 10;
+				mock_get.total_notif_count += 15;
+				mock_get.total_bookmark_count += 5;
+
+				mock_get.set_succeed_after(2);
+
+				post_getter.get(account.second);
 
 				THEN("Two calls were made to each endpoint.")
 				{
@@ -304,8 +316,6 @@ SCENARIO("Recv downloads and writes the correct number of posts.")
 					verify_file(notifications_file, expected_notifications, "notification id: ");
 					verify_file(bookmarks_file, expected_bookmark_statuses, "status id: ");
 				}
-
-				mock_get.should_rate_limit = false;
 			}
 		}
 	}
