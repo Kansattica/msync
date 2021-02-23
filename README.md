@@ -114,6 +114,7 @@ Once you have `msync` compiled, check out [MANUAL.md](MANUAL.md#msync-manual) fo
 - [X] Allow choosing a default account.
 - [ ] Support for adding and removing filters.
 - [X] Respecting rate limits.
+- [X] Bookmark support.
 
 ### Roadmap (things for later)
 
