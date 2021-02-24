@@ -29,12 +29,9 @@ steps:
 
   - name: wait to publish
     image: ubuntu:20.04
-    commands: |
-      RELEASE_URL="https://api.github.com/repos/kansattica/msync/releases/tags/${DRONE_TAG}"
-      while [[ "$(curl "$RELEASE_URL")" == *"Not Found"* ]]; do
-      echo "Waiting for the release.";
-      sleep 30s;
-      done
+    commands:
+    - export RELEASE_URL="https://api.github.com/repos/kansattica/msync/releases/tags/${DRONE_TAG}"
+    - while [[ "$(curl "$RELEASE_URL")" == *"Not Found"* ]]; do echo "Waiting for the release."; sleep 30s; done
     when:
       event: tag
 
@@ -79,12 +76,9 @@ steps:
 
   - name: wait to publish
     image: ubuntu:20.04
-    commands: |
-      RELEASE_URL="https://api.github.com/repos/kansattica/msync/releases/tags/${DRONE_TAG}"
-      while [[ "$(curl "$RELEASE_URL")" == *"Not Found"* ]]; do
-      echo "Waiting for the release.";
-      sleep 30s;
-      done
+    commands:
+    - export RELEASE_URL="https://api.github.com/repos/kansattica/msync/releases/tags/${DRONE_TAG}"
+    - while [[ "$(curl "$RELEASE_URL")" == *"Not Found"* ]]; do echo "Waiting for the release."; sleep 30s; done
     when:
       event: tag
 
