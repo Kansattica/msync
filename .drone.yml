@@ -35,7 +35,6 @@ steps:
         echo "Waiting for the release.";
         sleep 30s;
       done
-
     when:
       event: tag
 
@@ -86,6 +85,8 @@ steps:
         echo "Waiting for the release.";
         sleep 30s;
       done
+    when:
+      event: tag
 
   - name: publish
     image: plugins/github-release
