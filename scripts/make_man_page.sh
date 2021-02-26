@@ -1,6 +1,7 @@
 #/usr/bin/bash
 
 # adapted from https://www.howtogeek.com/682871/how-to-create-a-man-page-on-linux/
+# assumes msync is in your path. if it isn't, provide its path as the first argument to this script.
 
 msync_location="${1:-msync}"
 filename='msync.1.md'
