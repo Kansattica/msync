@@ -179,7 +179,7 @@ jobs:
       id: make-man-page
       working-directory: ${{runner.workspace}}/build
       if: matrix.make_deb
-      run: sudo apt-fast install -y pandoc && $GITHUB_WORKSPACE/scripts/make_man_page.sh "./msync" && cp msync.1.gz ~/compiled_artifacts/
+      run: sudo apt-fast install -y pandoc && $GITHUB_WORKSPACE/scripts/make_man_page.sh "./msync" && cp msync.1.gz ~/compiled_artifacts/ && ls
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2.2.2
