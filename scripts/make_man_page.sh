@@ -12,7 +12,6 @@ echo "% $(date "+%B %Y")" >> $filename
 echo "" >> $filename
 $msync_location help | sed 's/^\([A-Z]\+$\)/# \1/' >> $filename
 pandoc $filename -s -t man -o msync.1
-cat msync.1
 gzip -f msync.1
 rm $filename
 
