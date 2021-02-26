@@ -3,14 +3,16 @@
 # adapted from https://www.howtogeek.com/682871/how-to-create-a-man-page-on-linux/
 # afterwards, you want to do something like:
 
+msync_location="${1:-msync}"
 filename='msync.1.md'
-version=$(msync version | head -n1 | cut -d' ' -f3)
+version="$msync_location version" | head -n1 | cut -d' ' -f3
 echo "% msync(1) msync $version" > $filename
 echo "% Grace Lovelace" >> $filename
 echo "% $(date "+%B %Y")" >> $filename
 echo "" >> $filename
-msync help | sed 's/^\([A-Z]\+$\)/# \1/' >> $filename
+$msync_location help | sed 's/^\([A-Z]\+$\)/# \1/' >> $filename
 pandoc $filename -s -t man -o msync.1
+cat msync.1
 gzip -f msync.1
 rm $filename
 
