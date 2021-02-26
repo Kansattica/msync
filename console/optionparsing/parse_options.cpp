@@ -7,8 +7,7 @@
 
 using namespace clipp;
 
-constexpr auto helpmessage = R"(msync is a command line utility for synchronizing with a Mastodon API-compatible server.
-Account names for accounts that you have logged into msync with can be shortened as long as it's unambiguous.
+constexpr auto helpmessage = R"(Account names for accounts that you have logged into msync with can be shortened as long as it's unambiguous.
 (for example, if you have GoddessGrace@goodchristian.website and GoodGraces@crime.egg, you can select them with -a God or -a Goo, respectively)
 The account name can be left out of most commands entirely if you only have one account registered with msync.
 If this is your first time, try running:
@@ -130,7 +129,9 @@ const parse_result& parse(const int argc, const char* argv[], const bool silent)
 	if (!result || ret.selected == mode::help)
 	{
 		if (!silent)
-			std::cout << make_man_page(cli, "msync").append_section("NOTES", helpmessage);
+			std::cout << make_man_page(cli, "msync")
+			.prepend_section("DESCRIPTION", "\tA store and forward Mastodon API client.")
+			.append_section("NOTES", helpmessage);
 
 		ret.selected = mode::help; //possible for, say, config to be set but still be a parse fail
 

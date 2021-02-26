@@ -175,6 +175,12 @@ jobs:
       if: matrix.make_deb
       run: cpack && cp *.deb ~/compiled_artifacts/
 
+    - name: Make Man Page
+      id: make-man-page
+      working-directory: ${{runner.workspace}}/scripts
+      if: matrix.make_deb
+      run: PATH="$PATH:../build" ./make_man_page && cp msync.1.gz ~/compiled_artifacts/
+
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2.2.2
       with:
