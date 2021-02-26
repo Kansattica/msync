@@ -179,7 +179,7 @@ jobs:
       id: make-man-page
       working-directory: ${{runner.workspace}}/build
       if: matrix.make_deb
-      run: $GITHUB_WORKSPACE/scripts/make_man_page "./msync" && cp msync.1.gz ~/compiled_artifacts/
+      run: echo $GITHUB_WORKSPACE && ls $GITHUB_WORKSPACE #$GITHUB_WORKSPACE/scripts/make_man_page "./msync" && cp msync.1.gz ~/compiled_artifacts/
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2.2.2
