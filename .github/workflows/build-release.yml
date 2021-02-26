@@ -173,7 +173,7 @@ jobs:
       id: make-debian-package
       working-directory: ${{runner.workspace}}/build
       if: matrix.make_deb
-      run: cpack && cp *.deb ~/compiled_artifacts/
+      run: cpack && cp *.deb ~/compiled_artifacts/ && printf "::set-output name=deb_name::%s" $(*.deb)
 
     - name: Make Man Page
       id: make-man-page
@@ -181,13 +181,35 @@ jobs:
       if: matrix.make_deb
       run: sudo apt-fast install -y pandoc && $GITHUB_WORKSPACE/scripts/make_man_page.sh "./msync" && cp msync.1.gz ~/compiled_artifacts/ && ls
 
-    - name: Upload Artifacts
+    - name: Upload Executable
       uses: actions/upload-artifact@v2.2.2
       with:
         # Artifact name
         name: ${{ steps.find-exe.outputs.binary_name }} # optional, default is artifact
         # A file, directory or wildcard pattern that describes what to upload
-        path: ~/compiled_artifacts/*
+        path: ~/compiled_artifacts/${{ steps.find-exe.outputs.binary_name }}
+        # The desired behavior if no files are found using the provided path.
+        if-no-files-found: error
+
+    - name: Upload Debian Package
+      uses: actions/upload-artifact@v2.2.2
+      if: matrix.make_deb
+      with:
+        # Artifact name
+        name: ${{ steps.find-exe.outputs.binary_name }} # optional, default is artifact
+        # A file, directory or wildcard pattern that describes what to upload
+        path: ~/compiled_artifacts/*.deb
+        # The desired behavior if no files are found using the provided path.
+        if-no-files-found: error
+
+    - name: Upload Man Page
+      uses: actions/upload-artifact@v2.2.2
+      if: matrix.make_deb
+      with:
+        # Artifact name
+        name: msync.1.gz # optional, default is artifact
+        # A file, directory or wildcard pattern that describes what to upload
+        path: ~/compiled_artifacts/msync.1.gz
         # The desired behavior if no files are found using the provided path.
         if-no-files-found: error
   
