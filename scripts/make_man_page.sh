@@ -1,7 +1,6 @@
 #/usr/bin/bash
 
 # adapted from https://www.howtogeek.com/682871/how-to-create-a-man-page-on-linux/
-# afterwards, you want to do something like:
 
 msync_location="${1:-msync}"
 filename='msync.1.md'
@@ -15,4 +14,4 @@ pandoc $filename -s -t man -o msync.1
 gzip -f msync.1
 rm $filename
 
-printf "To install this, you probably want to do something like:\nsudo mkdir /usr/local/man/man1\nsudo cp msync.1.gz /usr/local/man/man1\n"
+printf "To install this, you probably want to do something like:\nsudo mkdir /usr/local/man/man1\nsudo mv msync.1.gz /usr/local/man/man1\n"
