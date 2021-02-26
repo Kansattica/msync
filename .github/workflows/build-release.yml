@@ -196,7 +196,7 @@ jobs:
       if: matrix.make_deb
       with:
         # Artifact name
-        name: ${{ steps.find-exe.outputs.binary_name }} # optional, default is artifact
+        name: ${{ steps.make-debian-package.outputs.deb_name }} # optional, default is artifact
         # A file, directory or wildcard pattern that describes what to upload
         path: ~/compiled_artifacts/*.deb
         # The desired behavior if no files are found using the provided path.
