@@ -1,10 +1,9 @@
-#!/usr/bin/sh
+#source this in your .bashrc or .zshrc
 
 qpost()
 {
 	postfile=$(mktemp /tmp/msync_post.XXXXXXXX)
-	quoted_args="$(printf "%q " "${@}")"
-	msync generate --body "${quoted_args}" -o "$postfile"
+	msync generate "${@}" -o "$postfile"
 	$EDITOR "$postfile"
 	if [ -s "$postfile" ]
 	then
@@ -20,3 +19,7 @@ qpost()
 	fi
 	rm "$postfile"
 }
+
+if [ -n "$ZSH_VERSION" ]; then autoload -U +X bashcompinit && bashcompinit; fi
+
+complete -W '-d --description -f --file --attach --attachment -r --reply-to -i --reply-id -c --content-warning --cw -b --body --content -p --privacy --visibility' qpost
