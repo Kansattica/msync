@@ -237,19 +237,12 @@ jobs:
           echo ${{ steps.download-artifacts.outputs.download-path }}
           ls -R ${{ steps.download-artifacts.outputs.download-path }}
 
-      - name: Gather Artifacts
-        run: |
-          mkdir justthefacts
-          find artifacts -type f -print -exec mv {} justthefacts \;
-          ls justthefacts
-      
       - name: Prepare Release Notes
         id: release-notes
         run: |
           cd code
           git fetch --tags --depth=1 origin +refs/tags/*:refs/tags/*
           git tag -n99 --format='%(contents)' --contains > msync_release_notes.md
-          cat msync_release_notes.md
           echo "::set-output name=release_notes_path::$(realpath msync_release_notes.md)"
 
       - name: Create Release
@@ -267,8 +260,8 @@ jobs:
           prerelease: false
 
       - name: Upload Release Assets
-        uses: alexellis/upload-assets@0.2.3
+        uses: alexellis/upload-assets@0.3.0
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          asset_paths: '["justthefacts/*"]'
+          asset_paths: '["artifacts/**/*"]'
