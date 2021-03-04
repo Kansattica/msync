@@ -13,7 +13,8 @@ steps:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
-    - apt update && apt install -y build-essential cmake libcurl4-gnutls-dev git
+    - /bin/bash -c "$(curl -sL https://git.io/vokNn)" # install https://github.com/ilikenwf/apt-fast
+    - apt-fast install -y build-essential cmake libcurl4-gnutls-dev git
     - cmake -E make_directory build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
@@ -60,7 +61,8 @@ steps:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
-    - apt update && apt install -y build-essential cmake libcurl4-gnutls-dev git
+    - /bin/bash -c "$(curl -sL https://git.io/vokNn)" # install https://github.com/ilikenwf/apt-fast
+    - apt-fast install -y build-essential cmake libcurl4-gnutls-dev git
     - cmake -E make_directory build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release 
