@@ -13,8 +13,10 @@ steps:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
-    - /bin/bash -c "$(curl -sL https://git.io/vokNn)" # install https://github.com/ilikenwf/apt-fast
-    - apt-fast install -y build-essential cmake libcurl4-openssl-dev git
+    - sudo add-apt-repository ppa:apt-fast/stable
+    - sudo apt-get update
+    - sudo apt-get -y install apt-fast
+    - sudo apt-fast install -y build-essential cmake libcurl4-openssl-dev git
     - cmake -E make_directory build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
@@ -61,8 +63,10 @@ steps:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
-    - /bin/bash -c "$(curl -sL https://git.io/vokNn)" # install https://github.com/ilikenwf/apt-fast
-    - apt-fast install -y build-essential cmake libcurl4-openssl-dev git
+    - sudo add-apt-repository ppa:apt-fast/stable
+    - sudo apt-get update
+    - sudo apt-get -y install apt-fast
+    - sudo apt-fast install -y build-essential cmake libcurl4-openssl-dev git
     - cmake -E make_directory build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release 
