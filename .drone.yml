@@ -8,13 +8,13 @@ platform:
 
 steps:
   - name: build
-    image: ubuntu:20.04
+    image: ubuntu:20.10
     environment:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
     - /bin/bash -c "$(curl -sL https://git.io/vokNn)" # install https://github.com/ilikenwf/apt-fast
-    - apt-fast install -y build-essential cmake libcurl4-gnutls-dev git
+    - apt-fast install -y build-essential cmake libcurl4-openssl-dev git
     - cmake -E make_directory build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
@@ -56,13 +56,13 @@ platform:
 
 steps:
   - name: build
-    image: ubuntu:20.04
+    image: ubuntu:20.10
     environment:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
     - /bin/bash -c "$(curl -sL https://git.io/vokNn)" # install https://github.com/ilikenwf/apt-fast
-    - apt-fast install -y build-essential cmake libcurl4-gnutls-dev git
+    - apt-fast install -y build-essential cmake libcurl4-openssl-dev git
     - cmake -E make_directory build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release 
