@@ -535,8 +535,8 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[locale]"
 			{
 				REQUIRE(print(account).empty());
 
-				// it'll leave the .bak files behind
-				REQUIRE(count_files_in_directory(queue_directory) == 4);
+				// ensure the .bak files are deleted, too
+				REQUIRE(count_files_in_directory(queue_directory) == 0);
 			}
 
 			THEN("the input files and attachments are untouched")
@@ -629,8 +629,8 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[locale]"
 			{
 				REQUIRE(print(account) == std::vector<std::string>{ "POST second.post", "POST another kind of post" });
 
-				// 4 bak files, 2 regular
-				REQUIRE(count_files_in_directory(queue_directory) == 6);
+				// 2 regular, 2 bak files
+				REQUIRE(count_files_in_directory(queue_directory) == 4);
 			}
 
 			THEN("the input files and attachments are untouched")
@@ -728,7 +728,7 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[locale]"
 			{
 				REQUIRE(print(account) == make_expected_ids(expected_files, "POST "));
 
-				// queueing the posts makes a .bak file for them
+				// Each post and its bak file should still be there
 				REQUIRE(count_files_in_directory(queue_directory) == 8);
 			}
 
@@ -807,8 +807,8 @@ SCENARIO("Send correctly sends new posts and deletes existing ones.", "[locale]"
 			{
 				REQUIRE(print(account).empty());
 
-				// queueing the posts makes a .bak file for them
-				REQUIRE(count_files_in_directory(queue_directory) == 4);
+				// make sure .bak files are gone
+				REQUIRE(count_files_in_directory(queue_directory) == 0);
 			}
 
 			THEN("the input files and attachments are untouched")
