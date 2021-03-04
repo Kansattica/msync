@@ -151,6 +151,11 @@ private:
 			if (succeeded)
 			{
 				fs::remove(file_to_send);
+
+				// make a copy with ".bak" at the end to remove the .bak file
+				// it would be fine to mutate file_to_send, but it's const and 
+				// i think being const correct here is probably worth more than avoiding a copy
+				fs::remove(fs::path(file_to_send).concat(".bak"));
 				auto parsed_status = read_status(response);
 				pl() << "Created post at " << parsed_status.url;
 				parsed_status_id = std::move(parsed_status.id);
