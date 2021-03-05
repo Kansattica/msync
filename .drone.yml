@@ -13,9 +13,7 @@ steps:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
-    - add-apt-repository ppa:apt-fast/stable
-    - apt-get update
-    - apt-get -y install apt-fast
+    - wget https://raw.githubusercontent.com/ilikenwf/apt-fast/master/quick-install.sh && bash quick-install.sh
     - apt-fast install -y build-essential cmake libcurl4-openssl-dev git
     - cmake -E make_directory build
     - cd build
@@ -63,9 +61,7 @@ steps:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
-    - add-apt-repository ppa:apt-fast/stable
-    - apt-get update
-    - apt-get -y install apt-fast
+    - wget https://raw.githubusercontent.com/ilikenwf/apt-fast/master/quick-install.sh && bash quick-install.sh
     - apt-fast install -y build-essential cmake libcurl4-openssl-dev git
     - cmake -E make_directory build
     - cd build
