@@ -13,7 +13,7 @@ steps:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
-    - apt update && apt-get install -y --no-install-recommends curl
+    - apt update && apt-get install -y --no-install-recommends curl ca-certificates
     - curl https://raw.githubusercontent.com/ilikenwf/apt-fast/master/apt-fast > /usr/local/sbin/apt-fast
     - chmod +x /usr/local/sbin/apt-fast
     - curl https://raw.githubusercontent.com/ilikenwf/apt-fast/master/apt-fast.conf > /etc/apt-fast.conf
@@ -64,7 +64,7 @@ steps:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
-    - apt update && apt-get install -y --no-install-recommends curl
+    - apt update && apt-get install -y --no-install-recommends curl ca-certificates
     - curl https://raw.githubusercontent.com/ilikenwf/apt-fast/master/apt-fast > /usr/local/sbin/apt-fast
     - chmod +x /usr/local/sbin/apt-fast
     - curl https://raw.githubusercontent.com/ilikenwf/apt-fast/master/apt-fast.conf > /etc/apt-fast.conf
