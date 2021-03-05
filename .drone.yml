@@ -8,12 +8,16 @@ platform:
 
 steps:
   - name: build
-    image: ubuntu:20.04
+    image: ubuntu:20.10
     environment:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
-    - apt update && apt install -y build-essential cmake libcurl4-gnutls-dev git
+    - apt update && apt-get install -y --no-install-recommends curl ca-certificates aria2
+    - curl https://raw.githubusercontent.com/ilikenwf/apt-fast/master/apt-fast > /usr/local/sbin/apt-fast
+    - chmod +x /usr/local/sbin/apt-fast
+    - curl https://raw.githubusercontent.com/ilikenwf/apt-fast/master/apt-fast.conf > /etc/apt-fast.conf
+    - apt-fast install -y --no-install-recommends build-essential cmake libcurl4-openssl-dev git
     - cmake -E make_directory build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
@@ -55,12 +59,16 @@ platform:
 
 steps:
   - name: build
-    image: ubuntu:20.04
+    image: ubuntu:20.10
     environment:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
-    - apt update && apt install -y build-essential cmake libcurl4-gnutls-dev git
+    - apt update && apt-get install -y --no-install-recommends curl ca-certificates aria2
+    - curl https://raw.githubusercontent.com/ilikenwf/apt-fast/master/apt-fast > /usr/local/sbin/apt-fast
+    - chmod +x /usr/local/sbin/apt-fast
+    - curl https://raw.githubusercontent.com/ilikenwf/apt-fast/master/apt-fast.conf > /etc/apt-fast.conf
+    - apt-fast install -y --no-install-recommends build-essential cmake libcurl4-openssl-dev git
     - cmake -E make_directory build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release 
