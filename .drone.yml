@@ -21,7 +21,7 @@ steps:
     - cmake -E make_directory build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
-    - cmake --build . --config Release --parallel
+    - cmake --build . --config Release --parallel 8
     - strip --strip-unneeded msync
     - ./msync
     - ./msync version
@@ -72,7 +72,7 @@ steps:
     - cmake -E make_directory build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release 
-    - cmake --build . --config Release --parallel
+    - cmake --build . --config Release --parallel 8
     - strip --strip-unneeded msync
     - ./msync
     - ./msync version
