@@ -14,7 +14,7 @@ steps:
       TZ: America/Los_Angeles
     commands:
     - wget https://raw.githubusercontent.com/ilikenwf/apt-fast/master/quick-install.sh && bash quick-install.sh
-    - apt-fast install -y build-essential cmake libcurl4-openssl-dev git
+    - apt-fast install -y --no-install-recommends build-essential cmake libcurl4-openssl-dev git
     - cmake -E make_directory build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
@@ -62,7 +62,7 @@ steps:
       TZ: America/Los_Angeles
     commands:
     - wget https://raw.githubusercontent.com/ilikenwf/apt-fast/master/quick-install.sh && bash quick-install.sh
-    - apt-fast install -y build-essential cmake libcurl4-openssl-dev git
+    - apt-fast install -y --no-install-recommends build-essential cmake libcurl4-openssl-dev git
     - cmake -E make_directory build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release 
