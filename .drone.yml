@@ -13,7 +13,7 @@ steps:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
-    - wget https://raw.githubusercontent.com/ilikenwf/apt-fast/master/quick-install.sh && bash quick-install.sh
+    - apt update && apt install -y --no-install-recommends curl && /bin/bash -c "$(curl -sL https://git.io/vokNn)"
     - apt-fast install -y --no-install-recommends build-essential cmake libcurl4-openssl-dev git
     - cmake -E make_directory build
     - cd build
@@ -61,7 +61,7 @@ steps:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
-    - wget https://raw.githubusercontent.com/ilikenwf/apt-fast/master/quick-install.sh && bash quick-install.sh
+    - apt update && apt install -y --no-install-recommends curl && /bin/bash -c "$(curl -sL https://git.io/vokNn)"
     - apt-fast install -y --no-install-recommends build-essential cmake libcurl4-openssl-dev git
     - cmake -E make_directory build
     - cd build
