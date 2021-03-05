@@ -185,9 +185,11 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 				dequeue(api_route::post, accountdir, std::move(toq));
 
 				CAPTURE(justfilename);
-				THEN("msync's copy of the post is deleted")
+				THEN("msync's copy and backup of the post are deleted")
 				{
-					REQUIRE_FALSE(fs::exists(file_queue_dir / justfilename));
+					auto filepath = file_queue_dir / justfilename;
+					REQUIRE_FALSE(fs::exists(filepath));
+					REQUIRE_FALSE(fs::exists(filepath.concat(".bak")));
 				}
 
 				THEN("the original copy of the post is fine")
@@ -326,9 +328,11 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 				dequeue(api_route::post, accountdir, std::vector<std::string> { thisfile });
 
-				THEN("msync's copy of the dequeued file is deleted.")
+				THEN("msync's copy and backup of the dequeued file are deleted.")
 				{
-					REQUIRE_FALSE(fs::exists(file_queue_dir / thisfile));
+					auto filepath = file_queue_dir / thisfile;
+					REQUIRE_FALSE(fs::exists(filepath));
+					REQUIRE_FALSE(fs::exists(filepath.concat(".bak")));
 				}
 
 				THEN("msync's copy of the other file is still there.")
@@ -426,9 +430,11 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 
 				dequeue(api_route::post, accountdir, std::vector<std::string> { thisfile });
 
-				THEN("msync's copy of the dequeued file is deleted.")
-				{
-					REQUIRE_FALSE(fs::exists(file_queue_dir / thisfile));
+				THEN("msync's copy of the dequeued file and its backup are deleted.")
+				{ 
+					auto filepath = file_queue_dir / thisfile;
+					REQUIRE_FALSE(fs::exists(filepath));
+					REQUIRE_FALSE(fs::exists(filepath.concat(".bak")));
 				}
 
 				THEN("msync's copy of the other file is still there.")

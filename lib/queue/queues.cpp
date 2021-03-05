@@ -258,7 +258,14 @@ void enqueue(const api_route toenqueue, const fs::path& user_account_dir, std::v
 
 void dequeue_post(const fs::path& queuedir, const fs::path& filename)
 {
-	if (!fs::remove(queuedir / filename))
+	auto todelete = queuedir / filename;
+	if (!fs::remove(todelete))
+	{
+		pl() << "Could not delete " << filename << ", could not find it in " << to_utf8(queuedir) << '\n';
+	}
+
+	todelete.concat(".bak");
+	if (!fs::remove(todelete))
 	{
 		pl() << "Could not delete " << filename << ", could not find it in " << to_utf8(queuedir) << '\n';
 	}
