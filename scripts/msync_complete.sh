@@ -2,6 +2,8 @@
 # source this somewhere if you want it to stick
 # i think the traditional place is 
 # ~/.local/share/bash-completion/completions/ for bash
+# or /etc/bash_completion.d/ fpr system-wide bash
+# or /usr/share/zsh/functions/Completion/Debian/ for zsh
 # or you can just put it in your .bashrc or .zshrc
 # long story short, it works after doing:
 # source msync_completion.sh
