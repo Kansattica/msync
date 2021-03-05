@@ -13,7 +13,8 @@ steps:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
-    - apt update && apt install -y --no-install-recommends curl && /bin/bash -c "$(curl -sL https://git.io/vokNn)" && rehash
+    - echo "deb http://ppa.launchpad.net/apt-fast/stable/ubuntu bionic main" > /etc/apt/sources.list.d/apt-fast.list
+    - apt update && apt intall -y apt-fast
     - apt-fast install -y --no-install-recommends build-essential cmake libcurl4-openssl-dev git
     - cmake -E make_directory build
     - cd build
@@ -61,7 +62,9 @@ steps:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
-    - apt update && apt install -y --no-install-recommends curl && /bin/bash -c "$(curl -sL https://git.io/vokNn)" && rehash
+    - echo "deb http://ppa.launchpad.net/apt-fast/stable/ubuntu bionic main" > /etc/apt/sources.list.d/apt-fast.list
+    - apt update && apt intall -y apt-fast
+    - apt install -y --no-install-recommends curl && /bin/bash -c "$(curl -sL https://git.io/vokNn)" && rehash
     - apt-fast install -y --no-install-recommends build-essential cmake libcurl4-openssl-dev git
     - cmake -E make_directory build
     - cd build
