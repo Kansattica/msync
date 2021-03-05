@@ -13,10 +13,10 @@ steps:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
-    - echo "deb http://ppa.launchpad.net/apt-fast/stable/ubuntu bionic main" > /etc/apt/sources.list.d/apt-fast.list
-    - apt-get install -y --no-install-recommends gnupg2
-    - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A2166B8DE8BDC3367D1901C11EE2FF37CA8DA16B
-    - apt update && apt intall -y apt-fast
+    - apt update && apt-get install -y --no-install-recommends curl
+    - curl https://raw.githubusercontent.com/ilikenwf/apt-fast/master/apt-fast > /usr/local/sbin/apt-fast
+    - chmod +x /usr/local/sbin/apt-fast
+    - curl https://raw.githubusercontent.com/ilikenwf/apt-fast/master/apt-fast.conf > /etc/apt-fast.conf
     - apt-fast install -y --no-install-recommends build-essential cmake libcurl4-openssl-dev git
     - cmake -E make_directory build
     - cd build
@@ -64,11 +64,10 @@ steps:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
-    - echo "deb http://ppa.launchpad.net/apt-fast/stable/ubuntu bionic main" > /etc/apt/sources.list.d/apt-fast.list
-    - apt-get install -y --no-install-recommends gnupg2
-    - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A2166B8DE8BDC3367D1901C11EE2FF37CA8DA16B
-    - apt update && apt intall -y apt-fast
-    - apt install -y --no-install-recommends curl && /bin/bash -c "$(curl -sL https://git.io/vokNn)" && rehash
+    - apt update && apt-get install -y --no-install-recommends curl
+    - curl https://raw.githubusercontent.com/ilikenwf/apt-fast/master/apt-fast > /usr/local/sbin/apt-fast
+    - chmod +x /usr/local/sbin/apt-fast
+    - curl https://raw.githubusercontent.com/ilikenwf/apt-fast/master/apt-fast.conf > /etc/apt-fast.conf
     - apt-fast install -y --no-install-recommends build-essential cmake libcurl4-openssl-dev git
     - cmake -E make_directory build
     - cd build
