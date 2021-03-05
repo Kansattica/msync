@@ -13,7 +13,7 @@ steps:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
-    - apt update && apt install -y --no-install-recommends build-essential cmake libcurl4-openssl-dev git
+    - apt update && apt install -y --no-install-recommends build-essential cmake libcurl4-openssl-dev git ca-certificates
     - cmake -E make_directory build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
@@ -65,7 +65,7 @@ steps:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
-    - apt update && apt install -y --no-install-recommends build-essential cmake libcurl4-openssl-dev git
+    - apt update && apt install -y --no-install-recommends build-essential cmake libcurl4-openssl-dev git ca-certificates
     - cmake -E make_directory build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release 
