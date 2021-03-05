@@ -13,7 +13,7 @@ steps:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
-    - apt update && apt install -y --no-install-recommends curl && /bin/bash -c "$(curl -sL https://git.io/vokNn)"
+    - apt update && apt install -y --no-install-recommends curl && /bin/bash -c "$(curl -sL https://git.io/vokNn)" && rehash
     - apt-fast install -y --no-install-recommends build-essential cmake libcurl4-openssl-dev git
     - cmake -E make_directory build
     - cd build
@@ -61,7 +61,7 @@ steps:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
     commands:
-    - apt update && apt install -y --no-install-recommends curl && /bin/bash -c "$(curl -sL https://git.io/vokNn)"
+    - apt update && apt install -y --no-install-recommends curl && /bin/bash -c "$(curl -sL https://git.io/vokNn)" && rehash
     - apt-fast install -y --no-install-recommends build-essential cmake libcurl4-openssl-dev git
     - cmake -E make_directory build
     - cd build
