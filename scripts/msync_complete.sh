@@ -1,9 +1,11 @@
+#compdef msync qpost
 # should work for bash or zsh
 # source this somewhere if you want it to stick
 # i think the traditional place is 
-# ~/.local/share/bash-completion/completions/ for bash
-# or /etc/bash_completion.d/ fpr system-wide bash
-# or /usr/share/zsh/functions/Completion/Debian/ for zsh
+# ~/.local/share/bash-completion/completions/ or a file named ~/.bash_completion for bash
+# or /etc/bash_completion.d/ for system-wide bash
+# or /usr/share/zsh/site-functions for zsh- anywhere in your $FPATH.
+# Convention is to name the file _msync for zsh and msync for bash
 # or you can just put it in your .bashrc or .zshrc
 # long story short, it works after doing:
 # source msync_completion.sh
