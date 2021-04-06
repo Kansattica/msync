@@ -31,7 +31,7 @@ function _msync() {
 			COMPREPLY=($( compgen -W 'showall default sync access_token auth_code account_name instance_url client_id client_secret exclude_boosts exclude_favs exclude_follows exclude_mentions exclude_polls' -- $word ))
 			return 0;
 			;;
-		'sync')
+		'sync' | 's')
 			# this is a weird one because it could be a config sync or a normal sync
 			if [[ "$line" == *"config"* ]]; then
 				COMPREPLY=($( compgen -W 'home notifications bookmarks' -- $word ));
