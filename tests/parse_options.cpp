@@ -796,7 +796,7 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 	{
 		const char* arg = GENERATE(as<const char*>{}, "-g", "--get", "--recv", "--get-only", "--recv-only");
 		const char* posts = GENERATE(as<const char*>{}, "-p", "--posts");
-		std::array<char const*, 5> argv{ "msync", subcommand, get, posts, "50" };
+		std::array<char const*, 5> argv{ "msync", subcommand, arg, posts, "50" };
 
 		WHEN("the command line is parsed")
 		{
@@ -883,12 +883,12 @@ SCENARIO("The command line parser recognizes when the user wants to sync.")
 
 		GIVEN("A command line that says 'sync' and specifies receive only and all the options.")
 		{
-		const char* arg = GENERATE(as<const char*>{}, "-g", "--get", "--recv", "--get-only", "--recv-only");
+			const char* arg = GENERATE(as<const char*>{}, "-g", "--get", "--recv", "--get-only", "--recv-only");
 			const char* posts = GENERATE(as<const char*>{}, "-p", "--posts");
 			const char* max = GENERATE(as<const char*>{}, "-m", "--max-requests");
 			const char* retry = GENERATE(as<const char*>{}, "-r", "--retries");
 			const char* account = GENERATE(as<const char*>{}, "-a", "--account");
-			std::array<char const*, 11> argv{ "msync", subcommand, get, retry, "200", max, "62", posts, "1000", account, "cool@folks.egg" };
+			std::array<char const*, 11> argv{ "msync", subcommand, arg, retry, "200", max, "62", posts, "1000", account, "cool@folks.egg" };
 
 			WHEN("the command line is parsed")
 			{
