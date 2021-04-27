@@ -36,7 +36,7 @@ function _msync() {
 			if [[ "$line" == *"config"* ]]; then
 				COMPREPLY=($( compgen -W 'home notifications bookmarks' -- $word ));
 			else
-				COMPREPLY=($( compgen -W "-r --retries -p --posts -m --max-requests -s --send-only -g --get-only --recv-only $accountverbose" -- $word ));
+				COMPREPLY=($( compgen -W "-r --retries -p --posts -m --max-requests -s --send --send-only -g --get --recv --get-only --recv-only $accountverbose" -- $word ));
 			fi
 			return 0;
 			;;
@@ -81,7 +81,7 @@ function _msync() {
 			return 0;
 			;;
 		'sync')
-			COMPREPLY=($( compgen -W "-r --retries -p --posts -m --max-requests -s --send-only -g --get-only --recv-only $accountverbose" -- $word ));
+			COMPREPLY=($( compgen -W "-r --retries -p --posts -m --max-requests -s --send --send-only -g --get --get-only --recv --recv-only $accountverbose" -- $word ));
 			return 0;
 			;;
 	esac

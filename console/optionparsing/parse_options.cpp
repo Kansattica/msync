@@ -64,8 +64,8 @@ clipp::group make_cli(parse_result& ret)
 			(option("-p", "--posts") & value("count", ret.sync_opts.per_call)) % "When receiving, get this many posts or notifications per call. Decrease this if you have a flaky connection. (default: 40 for statuses, 30 for notifications)",
 			(option("-m", "--max-requests") & value("count", ret.sync_opts.max_requests)) % "When receiving, get at most this many pages of posts or notifications. (default: 5 on first run, unlimited afterwards)",
 			one_of(
-				option("-s", "--send-only").set(ret.sync_opts.get, false).doc("Only send queued messages, don't download anything."),
-				option("-g", "--get-only", "--recv-only").set(ret.sync_opts.send, false).doc("Only download posts, don't send anything from queues.")
+				option("-s", "--send", "--send-only").set(ret.sync_opts.get, false).doc("Only send queued messages, don't download anything."),
+				option("-g", "--get",  "--get-only", "--recv", "--recv-only").set(ret.sync_opts.send, false).doc("Only download posts, don't send anything from queues.")
 				)) % "sync options" );
 
 	const auto visibilities = one_of(
