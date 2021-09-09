@@ -21,8 +21,8 @@ jobs:
             arch: x64
             apt: libcurl4-openssl-dev
           - os: ubuntu-latest
-            compiler: clang-8
-            cxx_compiler: clang++-8
+            compiler: clang-10
+            cxx_compiler: clang++-10
             arch: x64
             apt: libcurl4-openssl-dev
           - os: ubuntu-latest
