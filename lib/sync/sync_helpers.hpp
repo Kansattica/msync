@@ -115,7 +115,7 @@ request_response request_with_retries(make_request req, unsigned int retries, St
 						os << (print_minutes ? ", " : "") << seconds_part << pluralize(seconds_part, " second.", " seconds.");
 					os << "                \r"; // make sure line is cleared and carriage return for live updates.
 					os.flush(); // tell the user what they're waiting for
-					std::this_thread::sleep_for(std::min(estimated_wait, std::chrono::seconds{10}));
+					std::this_thread::sleep_for(std::min(estimated_wait, std::chrono::seconds{5}));
 				} while (std::chrono::system_clock::now() < resets_at);
 				os << "                                 \rRate limit reset.";
 				rate_limit_waited = true;
