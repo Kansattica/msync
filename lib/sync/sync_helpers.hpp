@@ -117,7 +117,7 @@ request_response request_with_retries(make_request req, unsigned int retries, St
 					os.flush(); // tell the user what they're waiting for
 					std::this_thread::sleep_for(std::min(estimated_wait, std::chrono::seconds{5}));
 				} while (std::chrono::system_clock::now() < resets_at);
-				os << "                                 \rRate limit reset.";
+				os << "                                 \rRate limit reset. Retrying.";
 				rate_limit_waited = true;
 			}
 			// should retry
