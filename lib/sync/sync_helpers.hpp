@@ -96,10 +96,10 @@ request_response request_with_retries(make_request req, unsigned int retries, St
 				os << '\n';
 				do
 				{
-					const auto estimated_wait = std::chrono::duration_cast<std::chrono::seconds>(resets_at - std::chrono::system_clock::now());
+					// always wait a minimum of ten seconds
+					const auto estimated_wait = std::max(std::chrono::duration_cast<std::chrono::seconds>(resets_at - std::chrono::system_clock::now()), std::chrono::seconds{10});
 					os << "429: Rate limited.";
-					if (estimated_wait < std::chrono::seconds{1})
-						break;
+
 					os << " Waiting ";
 					const bool print_minutes = estimated_wait >= std::chrono::minutes(1);
 					if (print_minutes)
