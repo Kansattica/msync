@@ -211,6 +211,7 @@ Posts are a little different. You still queue them up to be sent when you next `
 
 - The scripts folder has a file called `quickpost.sh` that helps automate this process for simple posts. Run `source quickpost.sh` to enable it. After it's been sourced, typing `qpost` at the shell will create a temporary file, open it in your `$EDITOR` and automatically enqueue it.
 - `qpost` takes the same command line arguments as `msync gen`. `qpost -b "hello there"` will open a post prefilled with `hello there` in the body. `qpost --cw food` will open a post already content-warned with `food`.
+- If the first argument to `qpost` is `-e` or `--empty`, it will open a blank text file in your editor and queue that instead. This can be handy if you want to type right away without having to move to the end of the file first.
 - You need not use `msync gen` to generate post files. `msync` will happily queue and send any text file you pass to `msync queue post`.
 - `msync queue post` will copy the files you specify into your `msync_accounts` folder, so don't feel obligated to keep them around after you queue them.
 - `msync` does *not* copy attachments when you queue them. Attachment paths are converted to absolute file paths and uploaded in place when you `msync sync` up next.

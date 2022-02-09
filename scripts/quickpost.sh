@@ -3,7 +3,12 @@
 qpost()
 {
 	postfile=$(mktemp /tmp/msync_post.XXXXXXXX)
-	msync generate "${@}" -o "$postfile"
+
+	if [ "$1" != "-e" ] && [ "$1" != "--empty" ]
+		then
+			msync generate "${@}" -o "$postfile"
+	fi
+
 	$EDITOR "$postfile"
 	if [ -s "$postfile" ]
 	then
@@ -22,4 +27,4 @@ qpost()
 
 if [ -n "$ZSH_VERSION" ]; then autoload -U +X bashcompinit && bashcompinit; fi
 
-complete -W '-d --description -f --file --attach --attachment -r --reply-to -i --reply-id -c --content-warning --cw -b --body --content -p --privacy --visibility' qpost
+complete -W '-d --description -f --file --attach --attachment -r --reply-to -i --reply-id -c --content-warning --cw -b --body --content -p --privacy --visibility -e --empty' qpost
