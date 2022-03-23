@@ -5,6 +5,7 @@
 #include <optional>
 #include <chrono>
 #include <thread>
+#include <algorithm>
 
 #include <filesystem.hpp>
 
@@ -79,6 +80,7 @@ request_response request_with_retries(make_request req, unsigned int retries, St
 	// I want people to see the URL for the request that's happening, while it's happening.
 	os.flush();
 	const auto start_time = std::chrono::steady_clock::now();
+	bool rate_limit_waited = false;
 	for (unsigned int i = 0; i < retries; i++)
 	{
 		net_response response = req();
@@ -91,16 +93,32 @@ request_response request_with_retries(make_request req, unsigned int retries, St
 			{
 				const auto resets_at = parse_ISO8601_timestamp(response.message);
 
-				const auto estimated_wait = std::chrono::duration_cast<std::chrono::seconds>(resets_at - std::chrono::system_clock::now());
-				os << "\n429: Rate limited. Waiting ";
-				if (estimated_wait >= std::chrono::minutes(1))
+				os << '\n';
+				do
 				{
-					const auto mins = std::chrono::duration_cast<std::chrono::minutes>(estimated_wait).count();
-					os << mins << pluralize(mins, " minute, ", " minutes, ");
-				}
-				os << estimated_wait.count() % 60 << pluralize(estimated_wait.count(), " second.", " seconds.");
-				os.flush(); // tell the user what they're waiting for
-				std::this_thread::sleep_until(resets_at);
+					// always wait a minimum of ten seconds
+					const auto estimated_wait = std::max(std::chrono::duration_cast<std::chrono::seconds>(resets_at - std::chrono::system_clock::now()), std::chrono::seconds{10});
+					os << "429: Rate limited.";
+
+					os << " Waiting ";
+					const bool print_minutes = estimated_wait >= std::chrono::minutes(1);
+					if (print_minutes)
+					{
+						const auto mins = std::chrono::duration_cast<std::chrono::minutes>(estimated_wait).count();
+						os << mins << pluralize(mins, " minute", " minutes");
+					}
+					const auto seconds_part = estimated_wait.count() % 60;
+
+					if (seconds_part == 0)
+						os << ".           ";
+					else
+						os << (print_minutes ? ", " : "") << seconds_part << pluralize(seconds_part, " second.", " seconds.");
+					os << "                \r"; // make sure line is cleared and carriage return for live updates.
+					os.flush(); // tell the user what they're waiting for
+					std::this_thread::sleep_for(std::min(estimated_wait, std::chrono::seconds{5}));
+				} while (std::chrono::system_clock::now() < resets_at);
+				os << "                                 \rFinished waiting for rate limit to reset. Retrying.";
+				rate_limit_waited = true;
 			}
 			// should retry
 			continue;
@@ -109,7 +127,7 @@ request_response request_with_retries(make_request req, unsigned int retries, St
 		// some other error, assume unrecoverable
 		if (!response.okay)
 		{
-			os << '\n' << response.status_code << ": " << get_error_message(response.status_code, false);
+			os << '\n' << response.status_code << ": " << get_error_message(response.status_code, rate_limit_waited);
 
 			auto parsed_error = read_error(response.message);
 			if (!parsed_error.empty())
