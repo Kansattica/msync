@@ -3,8 +3,8 @@ include(FetchContent)
 message(STATUS "Downloading nlohmann json...")
 FetchContent_Declare(
 	njson
-	URL https://github.com/nlohmann/json/releases/download/v3.9.1/include.zip
-	URL_HASH SHA256=6bea5877b1541d353bd77bdfbdb2696333ae5ed8f9e8cc22df657192218cad91 
+	URL https://github.com/nlohmann/json/releases/download/v3.10.5/include.zip
+	URL_HASH SHA256=b94997df68856753b72f0d7a3703b7d484d4745c567f3584ef97c96c25a5798e
 	)
 
 #FetchContent_MakeAvailable(json) Not available in cmake 13
@@ -157,7 +157,7 @@ if (MSYNC_BUILD_TESTS)
 	FetchContent_Declare(
 		catch2lib
 		GIT_REPOSITORY	https://github.com/catchorg/Catch2.git
-		GIT_TAG 		v2.13.4
+		GIT_TAG 		v2.13.8
 		GIT_SHALLOW		TRUE
 		)
 
