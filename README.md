@@ -3,7 +3,7 @@
 
 `msync` is a command line client for Mastodon (and anything else that implements the same API, including Pleroma) that works a little different. `msync` doesn't stay connected to the internet all the time and constantly pull new posts. Instead, it only connects when you use the `msync sync` command. Every other change is stored on your computer until then. You can queue up posts to send, boost, bookmark, and favorite when you're online, download posts, notifications, and bookmarks to look at offline, and do the same for as many accounts as you want.
 
-`msync` currently supports queueing and sending posts, boosts, and favorites for any number of accounts, as well as downloading the home timeline and notifications.
+`msync` currently supports queueing and sending posts, boosts, favorites, and bookmarks for any number of accounts, as well as downloading the home timeline, notifications, bookmarks, and arbitrary threads.
 
 `msync` is for everyone, but it's really designed for:
 
