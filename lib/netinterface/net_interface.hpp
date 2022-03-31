@@ -56,6 +56,8 @@ inline constexpr const char* get_error_message(const int status_code, const bool
 		return "Not found, the post may have been deleted or the ID was incorrect.\n";
 	case 408:
 		return "Request timed out, but may have still gone through.\n";
+	case 422:
+		return "Unprocessable entity. The server didn't like your post.\n";
 	case 429:
 		return "Rate limited. Try again later.\n";
 
