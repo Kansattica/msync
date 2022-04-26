@@ -34,7 +34,9 @@ struct print_logger
 			std::cout << towrite;
 		}
 
+#ifdef MSYNC_FILE_LOG
 		logfile << towrite;
+#endif
 		return *this;
 	}
 

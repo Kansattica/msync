@@ -160,6 +160,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM(notif_type, {
 		{ notif_type::boost, "reblog" },
 		{ notif_type::poll, "poll" },
 		{ notif_type::favorite, "favourite" },
+		{ notif_type::update, "update" },
 	})
 
 void from_json(const json& j, mastodon_notification& notif)

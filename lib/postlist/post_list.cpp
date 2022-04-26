@@ -98,6 +98,8 @@ const char* notification_verb(notif_type t)
 		return " followed you.";
 	case notif_type::poll:
 		return "'s poll ended:";
+	case notif_type::update:
+		return " updated their post:";
 	default:
 		return " ??? ";
 	}

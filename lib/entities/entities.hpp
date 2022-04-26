@@ -74,7 +74,7 @@ struct mastodon_context
 
 enum class notif_type
 {
-	unknown, follow, mention, boost, favorite, poll
+	unknown, follow, mention, boost, favorite, poll, update
 };
 
 struct mastodon_notification
