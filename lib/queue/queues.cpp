@@ -105,6 +105,15 @@ void queue_attachments(outgoing_post& post)
 	}
 }
 
+void assign_reply_id_if_blank(outgoing_post& post, const fs::path& copyto)
+{
+	if (post.parsed.reply_id.empty())
+	{
+		post.parsed.reply_id = to_utf8(copyto.filename());
+		pl() << "Automatically assigned reply id: " << post.parsed.reply_id << '\n';
+	}
+}
+
 api_route undo_route(const api_route queue)
 {
 	switch (queue)
@@ -181,6 +190,8 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 	outgoing_post post{ copyto };
 
 	queue_attachments(post);
+
+	assign_reply_id_if_blank(post, copyto);
 
 	return to_utf8(copyto.filename());
 }

@@ -533,7 +533,7 @@ SCENARIO("Queues can handle a mix of different queued calls.")
 					"UNBOOST whoopsie",
 					"POST one post"});
 
-			REQUIRE(read_lines(file_queue_dir / "one post") == std::vector<std::string> { "visibility=default", "--- post body below this line ---", "hey, I'm number 1" });
+			REQUIRE(read_lines(file_queue_dir / "one post") == std::vector<std::string> { "reply_id=one post", "visibility=default", "--- post body below this line ---", "hey, I'm number 1" });
 
 			dequeue(api_route::fav, accountdir, { "friend!", "whoopsie", "sorry about that" });
 
