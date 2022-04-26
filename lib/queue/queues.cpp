@@ -79,9 +79,8 @@ bool validate_file(const fs::path& attachpath)
 	return true;
 }
 
-void queue_attachments(const fs::path& postfile)
+void queue_attachments(outgoing_post& post)
 {
-	outgoing_post post{ postfile };
 #if MSYNC_USE_BOOST
 	boost::system::error_code err;
 #else
@@ -179,7 +178,9 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 
 	fs::copy(postfile, copyto);
 
-	queue_attachments(copyto);
+	outgoing_post post{ copyto };
+
+	queue_attachments(post);
 
 	return to_utf8(copyto.filename());
 }
