@@ -233,6 +233,7 @@ Posts are a little different. You still queue them up to be sent when you next `
         - The `reply_id` of a post queued in front of this one. 
     - Basically, when you run `msync sync`, your queued posts are sent as normal. If a post has a `reply_id`, after it's published, any posts with a `reply_to` equal to that `reply_id` will have their `reply_to` set to the actual published ID of that post. This will persist even if the subsequent post fails to send for some reason. 
     - If a post has an invalid `reply_to`, the remote server won't accept it. You can edit the queued version of the post in `msync_accounts/<username@instance.url>/queuedposts` and sync again.
+	- Starting with msync v0.9.9.9, posts queued without a reply ID will be automatically assigned one based on the filename.
 
 
 - If you see a post on your timeline and want to see the rest of the thread, you can queue up a request for context next time you sync. Use `msync queue context <id>` to have `msync` fetch all the posts before and after that one in the thread. Next time you `msync sync`, it'll fetch the post in question, as well as all the posts above and below it in the thread. This doesn't get everything- it won't fetch replies to other posts in the thread, for example- but it's useful for seeing what a reply is to or digging up the rest of a thread. Threads fetched like this are stored in `msync_accounts/<username@instance.url>/threads` as `<status id>.list`, so they get picked up if you use a wildcard to open your timelines like this:
