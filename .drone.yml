@@ -8,7 +8,7 @@ platform:
 
 steps:
   - name: build
-    image: ubuntu:latest
+    image: ubuntu:focal
     environment:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
@@ -28,7 +28,7 @@ steps:
     - ls ../dist
 
   - name: wait to publish
-    image: ubuntu:20.04
+    image: ubuntu:focal
     commands:
     - apt install -y curl
     - >
@@ -60,7 +60,7 @@ platform:
 
 steps:
   - name: build
-    image: ubuntu:latest
+    image: ubuntu:focal
     environment:
       DEBIAN_FRONTEND: noninteractive
       TZ: America/Los_Angeles
@@ -80,7 +80,7 @@ steps:
     - ls ../dist
 
   - name: wait to publish
-    image: ubuntu:20.04
+    image: ubuntu:focal
     commands:
     - apt install -y curl
     - >
