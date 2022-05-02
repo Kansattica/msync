@@ -79,9 +79,8 @@ bool validate_file(const fs::path& attachpath)
 	return true;
 }
 
-void queue_attachments(const fs::path& postfile)
+void queue_attachments(outgoing_post& post)
 {
-	outgoing_post post{ postfile };
 #if MSYNC_USE_BOOST
 	boost::system::error_code err;
 #else
@@ -103,6 +102,15 @@ void queue_attachments(const fs::path& postfile)
 		attach = to_utf8(attachpath);
 
 		err.clear();
+	}
+}
+
+void assign_reply_id_if_blank(outgoing_post& post, const fs::path& copyto)
+{
+	if (post.parsed.reply_id.empty())
+	{
+		post.parsed.reply_id = to_utf8(copyto.filename());
+		pl() << "Automatically assigned reply id: " << post.parsed.reply_id << '\n';
 	}
 }
 
@@ -179,7 +187,11 @@ std::string queue_post(const fs::path& queuedir, const fs::path& postfile)
 
 	fs::copy(postfile, copyto);
 
-	queue_attachments(copyto);
+	outgoing_post post{ copyto };
+
+	queue_attachments(post);
+
+	assign_reply_id_if_blank(post, copyto);
 
 	return to_utf8(copyto.filename());
 }

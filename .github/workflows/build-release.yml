@@ -110,7 +110,7 @@ jobs:
 
     - name: Install Linux Dependencies
       if: matrix.os == 'ubuntu-latest'
-      run: sudo apt-fast install -y ${{ matrix.apt }}
+      run: sudo apt update && sudo apt-fast install -y ${{ matrix.apt }}
       
     - name: Create Build Environment
       # Some projects don't allow in-source building, so create a separate build directory
