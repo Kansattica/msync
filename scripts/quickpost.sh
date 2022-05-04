@@ -2,7 +2,7 @@
 
 qpost()
 {
-	postfile=$(mktemp /tmp/msync_post.XXXXXXXX)
+	postfile=$(mktemp /tmp/qpost.XXXXXXXX)
 	msync generate "${@}" -o "$postfile"
 	$EDITOR "$postfile"
 	if [ -s "$postfile" ]
