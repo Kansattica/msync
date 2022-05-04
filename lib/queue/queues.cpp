@@ -138,7 +138,7 @@ api_route undo_route(const api_route queue)
 bool post_is_empty(const fs::path& postfile)
 {
 	const readonly_outgoing_post post{ postfile };
-	const bool empty_body = post.parsed.text.empty() || post.parsed.text.find_first_not_of(" \n\r\t");
+	const bool empty_body = post.parsed.text.empty() || (post.parsed.text.find_first_not_of(" \n\r\t") == std::string::npos);
 	return empty_body && post.parsed.attachments.empty();
 }
 
