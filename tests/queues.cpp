@@ -229,6 +229,85 @@ SCENARIO("Queues correctly enqueue and dequeue posts.")
 		}
 	}
 
+	GIVEN("Some posts to enqueue with leading whitespace")
+	{
+		const test_file postfiles[]{ "postboy", "guy.extension", "../up.here", "yeeeeeeehaw" };
+		const char leading = GENERATE(' ', '\n', '\t', '\r');
+		for (auto& file : postfiles)
+		{
+			std::ofstream of{ file };
+			of << leading << "My name is " << file.filename().filename() << "\n";
+		}
+
+		WHEN("a post is enqueued")
+		{
+			const auto idx = GENERATE(0, 1, 2, 3);
+			std::vector<std::string> toq{ postfiles[idx].filename().string() };
+			std::string justfilename = postfiles[idx].filename().filename().string();
+
+			enqueue(api_route::post, accountdir, std::vector<std::string>{toq});
+
+			THEN("the post is copied to the user's account folder")
+			{
+				files_match(accountdir, postfiles[idx].filename(), justfilename);
+			}
+
+			THEN("the queue post file is filled correctly")
+			{
+				const auto lines = print(accountdir);
+				REQUIRE(lines.size() == 1);
+				REQUIRE(prefix_match(lines[0], "POST ", justfilename));
+			}
+
+			AND_WHEN("that post is dequeued")
+			{
+				dequeue(api_route::post, accountdir, std::move(toq));
+
+				CAPTURE(justfilename, leading);
+				THEN("msync's copy and backup of the post are deleted")
+				{
+					auto filepath = file_queue_dir / justfilename;
+					REQUIRE_FALSE(fs::exists(filepath));
+					REQUIRE_FALSE(fs::exists(filepath.concat(".bak")));
+				}
+
+				THEN("the original copy of the post is fine")
+				{
+					REQUIRE(fs::exists(postfiles[idx].filename()));
+					const auto readfile = read_file(postfiles[idx].filename());
+
+					std::string compareto{ "My name is \"" };
+					compareto.insert(0, 1, leading);
+					compareto.append(justfilename);
+					compareto.append("\"\n");
+					REQUIRE(readfile == compareto);
+				}
+
+				THEN("the queue post file is emptied.")
+				{
+					const auto lines = read_lines(post_queue_file);
+					REQUIRE(lines.size() == 0);
+				}
+			}
+
+			AND_WHEN("the list is cleared")
+			{
+				clear(api_route::post, accountdir);
+
+				THEN("the queue file is empty.")
+				{
+					const auto lines = read_lines(post_queue_file);
+					REQUIRE(lines.size() == 0);
+				}
+
+				THEN("the queue directory has been erased.")
+				{
+					REQUIRE_FALSE(fs::exists(file_queue_dir));
+				}
+			}
+		}
+	}
+
 	GIVEN("A post with attachments to enqueue")
 	{
 		const test_file files[]{ "somepost", "attachment.mp3", "filey.png" };
