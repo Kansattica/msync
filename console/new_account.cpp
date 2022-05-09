@@ -34,6 +34,13 @@ void make_new_account(const std::string& accountname, global_options& options)
 	// if no user was found, make a new one
 	if (useraccountpair == nullptr)
 	{
+		if (accountname.empty())
+		{
+			pl() << "Please specify the account you'd like to add to msync. For example:\n"
+				"msync new --account username@instance.egg";
+			return;
+		}
+
 		pl() << "Creating new account for " << accountname << ".\n";
 		const auto parsed = parse_account_name(accountname);
 		if (!parsed.has_value())
