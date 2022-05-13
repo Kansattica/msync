@@ -96,6 +96,10 @@ const char* notification_verb(notif_type t)
 		return " mentioned you:";
 	case notif_type::follow:
 		return " followed you.";
+	case notif_type::follow_request:
+		return " asked to follow you.";
+	case notif_type::status:
+		return " posted:";
 	case notif_type::poll:
 		return "'s poll ended:";
 	default:
