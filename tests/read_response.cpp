@@ -60,6 +60,7 @@ SCENARIO("read_status correctly reads and cleans the relevant fields from a JSON
 				REQUIRE(status.created_at == "2019-11-15T21:20:09.004Z");
 				REQUIRE(status.reply_to_post_id.empty());
 				REQUIRE(status.original_post_url.empty());
+				REQUIRE(status.original_post_id.empty());
 				REQUIRE(status.boosted_by.empty());
 				REQUIRE(status.favorites == 1);
 				REQUIRE(status.boosts == 3);
@@ -98,6 +99,7 @@ SCENARIO("read_status correctly reads and cleans the relevant fields from a JSON
 				REQUIRE(status.created_at == "2019-11-15T02:05:36.000Z");
 				REQUIRE(status.reply_to_post_id.empty());
 				REQUIRE(status.original_post_url ==	"https://botsin.space/users/tmnt/statuses/103139477824897157");
+				REQUIRE(status.original_post_id == "103139477977906929");
 				REQUIRE(status.boosted_by == "BestGirlGrace");
 				REQUIRE(status.boosted_by_bot == false);
 				REQUIRE(status.boosted_by_display_name == "Secret Government Grace :qvp:");
@@ -140,6 +142,7 @@ SCENARIO("read_status correctly reads and cleans the relevant fields from a JSON
 				REQUIRE(status.created_at == "2020-01-28T23:13:32.102Z");
 				REQUIRE(status.reply_to_post_id.empty());
 				REQUIRE(status.original_post_url.empty());
+				REQUIRE(status.original_post_id.empty());
 				REQUIRE(status.boosted_by.empty());
 				REQUIRE(status.favorites == 2);
 				REQUIRE(status.boosts == 3);
@@ -185,6 +188,7 @@ SCENARIO("read_status correctly reads and cleans the relevant fields from a JSON
 				REQUIRE(status.created_at == "2020-01-28T23:13:32.102Z");
 				REQUIRE(status.reply_to_post_id.empty());
 				REQUIRE(status.original_post_url.empty());
+				REQUIRE(status.original_post_id.empty());
 				REQUIRE(status.boosted_by.empty());
 				REQUIRE(status.favorites == 2);
 				REQUIRE(status.boosts == 3);
@@ -230,6 +234,7 @@ SCENARIO("read_status correctly reads and cleans the relevant fields from a JSON
 				REQUIRE(status.created_at == "2020-01-28T23:13:32.102Z");
 				REQUIRE(status.reply_to_post_id.empty());
 				REQUIRE(status.original_post_url.empty());
+				REQUIRE(status.original_post_id.empty());
 				REQUIRE(status.boosted_by.empty());
 				REQUIRE(status.favorites == 2);
 				REQUIRE(status.boosts == 3);
@@ -274,6 +279,7 @@ SCENARIO("read_status correctly reads and cleans the relevant fields from a JSON
 				REQUIRE(status.created_at == "2020-02-11T22:29:36.278Z");
 				REQUIRE(status.reply_to_post_id.empty());
 				REQUIRE(status.original_post_url.empty());
+				REQUIRE(status.original_post_id.empty());
 				REQUIRE(status.boosted_by.empty());
 				REQUIRE(status.favorites == 0);
 				REQUIRE(status.boosts == 0);
@@ -317,6 +323,7 @@ SCENARIO("read_statuses correctly reads and cleans the relevant fields from an a
 				REQUIRE(statuses[0].created_at == "2019-11-15T21:20:09.004Z");
 				REQUIRE(statuses[0].reply_to_post_id.empty());
 				REQUIRE(statuses[0].original_post_url.empty());
+				REQUIRE(statuses[0].original_post_id.empty());
 				REQUIRE(statuses[0].boosted_by.empty());
 				REQUIRE(statuses[0].favorites == 1);
 				REQUIRE(statuses[0].boosts == 3);
@@ -342,6 +349,7 @@ SCENARIO("read_statuses correctly reads and cleans the relevant fields from an a
 				REQUIRE(statuses[1].created_at == "2019-11-15T02:05:36.000Z");
 				REQUIRE(statuses[1].reply_to_post_id.empty());
 				REQUIRE(statuses[1].original_post_url ==	"https://botsin.space/users/tmnt/statuses/103139477824897157");
+				REQUIRE(statuses[1].original_post_id == "103139477977906929");
 				REQUIRE(statuses[1].boosted_by == "BestGirlGrace");
 				REQUIRE(statuses[1].boosted_by_display_name == "Secret Government Grace :qvp:");
 				REQUIRE(statuses[1].boosted_by_bot == false);
@@ -400,6 +408,7 @@ SCENARIO("read_context correctly deserializes a context object.")
 				REQUIRE(result.ancestors[0].created_at == "2021-01-11T21:38:29.058Z");
 				REQUIRE(result.ancestors[0].reply_to_post_id.empty());
 				REQUIRE(result.ancestors[0].original_post_url.empty());
+				REQUIRE(result.ancestors[0].original_post_id.empty());
 				REQUIRE(result.ancestors[0].boosted_by.empty());
 				REQUIRE(result.ancestors[0].boosted_by_display_name.empty());
 				REQUIRE_FALSE(result.ancestors[0].boosted_by_bot);
@@ -420,6 +429,7 @@ SCENARIO("read_context correctly deserializes a context object.")
 				REQUIRE(result.descendants[0].created_at == "2021-01-11T21:38:45.694Z");
 				REQUIRE(result.descendants[0].reply_to_post_id == "105539247642691774");
 				REQUIRE(result.descendants[0].original_post_url.empty());
+				REQUIRE(result.descendants[0].original_post_id.empty();
 				REQUIRE(result.descendants[0].boosted_by.empty());
 				REQUIRE(result.descendants[0].boosted_by_display_name.empty());
 				REQUIRE_FALSE(result.descendants[0].boosted_by_bot);
@@ -439,6 +449,7 @@ SCENARIO("read_context correctly deserializes a context object.")
 				REQUIRE(result.descendants[1].created_at == "2021-01-11T21:39:07.572Z");
 				REQUIRE(result.descendants[1].reply_to_post_id == "105539248172091186");
 				REQUIRE(result.descendants[1].original_post_url.empty());
+				REQUIRE(result.descendants[1].original_post_id.empty());
 				REQUIRE(result.descendants[1].boosted_by.empty());
 				REQUIRE(result.descendants[1].boosted_by_display_name.empty());
 				REQUIRE_FALSE(result.descendants[1].boosted_by_bot);

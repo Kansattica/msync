@@ -127,6 +127,7 @@ void from_json(const json& j, mastodon_status& status)
 		j["account"]["bot"].get_to(status.boosted_by_bot);
 		j["account"]["display_name"].get_to(status.boosted_by_display_name);
 		post->at("uri").get_to(status.original_post_url);
+		post->at("id").get_to(status.original_post_id);
 	}
 
 	bulk_replace_mentions(status.content, get_mentions(*post));
