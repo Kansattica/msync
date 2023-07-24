@@ -61,6 +61,7 @@ author: Cyberfriend: The Friendening (@cyberfriend) [bot]
 boosted by: Meat Boosterson (@meatbooster@different.website.egg)
 reply to: 123456
 boost of: https://different.website.egg/goodpost
+original id: 123
 cw: Wow! A post!
 body: Imagine: a post for you. :blobcat:
 attached: https://fake.website.egg/system/media_attachments/files/000/663/294/original/4536210b61b27ad2.png?1573544488
@@ -202,6 +203,7 @@ mastodon_status make_everything()
 	everything.created_at = "10:57AM 11-14-2019";
 	everything.reply_to_post_id = "123456";
 	everything.original_post_url = "https://different.website.egg/goodpost";
+	everything.original_post_id = "123";
 	everything.boosted_by = "meatbooster@different.website.egg";
 	everything.boosted_by_display_name = "Meat Boosterson";
 	everything.boosted_by_bot = false;

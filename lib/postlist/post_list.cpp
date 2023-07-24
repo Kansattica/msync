@@ -60,6 +60,7 @@ std::ostream& operator<<(std::ostream& out, const mastodon_status& status)
 	print_author(out, "boosted by: ", status.boosted_by_display_name, status.boosted_by, status.boosted_by_bot);
 	print(out, "reply to: ", status.reply_to_post_id);
 	print(out, "boost of: ", status.original_post_url);
+	print(out, "original id: ", status.original_post_id);
 	print(out, "cw: ", status.content_warning);
 	print(out, "body: ", status.content);
 
