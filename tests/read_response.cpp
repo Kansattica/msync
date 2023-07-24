@@ -429,7 +429,7 @@ SCENARIO("read_context correctly deserializes a context object.")
 				REQUIRE(result.descendants[0].created_at == "2021-01-11T21:38:45.694Z");
 				REQUIRE(result.descendants[0].reply_to_post_id == "105539247642691774");
 				REQUIRE(result.descendants[0].original_post_url.empty());
-				REQUIRE(result.descendants[0].original_post_id.empty();
+				REQUIRE(result.descendants[0].original_post_id.empty());
 				REQUIRE(result.descendants[0].boosted_by.empty());
 				REQUIRE(result.descendants[0].boosted_by_display_name.empty());
 				REQUIRE_FALSE(result.descendants[0].boosted_by_bot);
