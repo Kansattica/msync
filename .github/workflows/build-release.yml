@@ -184,7 +184,7 @@ jobs:
       run: sudo apt-fast install -y pandoc && $GITHUB_WORKSPACE/scripts/make_man_page.sh "./msync" && cp msync.1.gz ~/compiled_artifacts/
 
     - name: Upload Executable
-      uses: actions/upload-artifact@v2.2.2
+      uses: actions/upload-artifact@v3
       with:
         # Artifact name
         name: ${{ steps.find-exe.outputs.binary_name }} # optional, default is artifact
