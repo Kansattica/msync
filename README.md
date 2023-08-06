@@ -23,7 +23,7 @@ If you're feeling adventurous, you can order a [floppy disk release](https://pri
 
 I recommend downloading the `.deb` file if you're on a x64 Debian-like system that can install it. Otherwise, I recommend downloading the release for your system with `install` in the filename. This version will store user data in the appropriate place for your system. The versions without `install` store user data in the same directory as the executable. See [the manual](MANUAL.md#a-note-about-msync_accounts) for more information.
 
-If you're on OSX, the builds for 10.15 use std::filesystem APIs that are only available on OSX 10.15.
+If you're on OSX, the builds for 10.15 use std::filesystem APIs that are only available on OSX 10.15. Not that you can download these any more- GitHub Actions removed support for pre-11 versions of macOS, so you'll have to build yourself if you're on an older macOS.
 
 If you would like to build `msync` yourself, read on. If you have a fairly recent version of CMake (3.12 or later), you can simply clone the repo, make a `build` directory, run CMake inside, and CMake will download and build `msync` and its dependencies automatically. 
 
