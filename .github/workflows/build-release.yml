@@ -153,8 +153,8 @@ jobs:
         if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then FINISHED_BINARY_NAME+="linux-${{ matrix.arch }}-${{ steps.compiler_name.outputs.replaced }}"; fi
         if [ "${{ matrix.os }}" = "windows-latest" ]; then FINISHED_BINARY_NAME+="windows-${{ matrix.arch }}.exe"; fi
         if [ "${{ matrix.os }}" = "macos-10.15" ]; then FINISHED_BINARY_NAME+="osx-${{ matrix.deployment_target}}-x64"; fi
-        if [ "${{ matrix.os }}" = "macos-11" ]; then FINISHED_BINARY_NAME+="macos11-${{ matrix.deployment_target}}-x64"; fi
-        if [ "${{ matrix.os }}" = "macos-12" ]; then FINISHED_BINARY_NAME+="macos12-${{ matrix.deployment_target}}-x64"; fi
+        if [ "${{ matrix.os }}" = "macos-11" ]; then FINISHED_BINARY_NAME+="macos-${{ matrix.deployment_target}}-x64"; fi
+        if [ "${{ matrix.os }}" = "macos-12" ]; then FINISHED_BINARY_NAME+="macos-${{ matrix.deployment_target}}-x64"; fi
         mkdir ~/compiled_artifacts
         cp $EXELOCATION ~/compiled_artifacts/$FINISHED_BINARY_NAME
         echo "binary_name=$FINISHED_BINARY_NAME" >> $GITHUB_OUTPUT
