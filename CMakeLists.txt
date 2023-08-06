@@ -4,7 +4,7 @@ project (msync VERSION 0.9.9.8
 	DESCRIPTION "Store and forward messages with a Mastodon API-compatible server."
 	HOMEPAGE_URL "https://github.com/Kansattica/msync"
 	LANGUAGES CXX C)
-set (CPACK_PACKAGE_CONTACT "grace@princess.software")
+set (CPACK_PACKAGE_CONTACT "msync@princess.software")
 
 option(MSYNC_BUILD_TESTS "Download catch2 and build tests with it." ON)
 option(MSYNC_FILE_LOG "Log debug messages to msync.log" ON)
