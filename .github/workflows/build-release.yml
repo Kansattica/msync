@@ -175,7 +175,7 @@ jobs:
       id: make-debian-package
       working-directory: ${{runner.workspace}}/build
       if: matrix.make_deb
-      run: cpack && cp *.deb ~/compiled_artifacts/ && printf "::set-output name=deb_name::%s" $(ls *.deb)
+      run: cpack && cp *.deb ~/compiled_artifacts/ && printf "deb_name=%s" $(ls *.deb) >> $GITHUB_OUTPUT
 
     - name: Make Man Page
       id: make-man-page
