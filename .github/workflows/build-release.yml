@@ -69,15 +69,15 @@ jobs:
             deployment_target: 12
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
      
     - name: Get Version
       id: get_version
-      uses: battila7/get-version-action@v2.0.0
+      uses: battila7/get-version-action@v2
     
     - name: Format Version
       id: format_version
-      uses: frabert/replace-string-action@v1.2
+      uses: frabert/replace-string-action@v2
       with:
         # Regular expression pattern
         pattern: '(/)'
@@ -91,7 +91,7 @@ jobs:
     - name: Clean Up Compiler Name
       id: compiler_name
       if: matrix.os == 'ubuntu-latest'
-      uses: frabert/replace-string-action@v1.2
+      uses: frabert/replace-string-action@v2
       with:
         # Regular expression pattern
         pattern: '([a-z]+)-[0-9]+'
@@ -194,7 +194,7 @@ jobs:
         if-no-files-found: error
 
     - name: Upload Debian Package
-      uses: actions/upload-artifact@v2.2.2
+      uses: actions/upload-artifact@v3
       if: matrix.make_deb
       with:
         # Artifact name
