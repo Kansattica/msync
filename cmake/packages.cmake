@@ -191,7 +191,7 @@ if (MSYNC_BUILD_TESTS)
 			add_subdirectory(${catch2lib_SOURCE_DIR} ${catch2lib_BINARY_DIR} EXCLUDE_FROM_ALL)
 		endif()
 	else()
-		message(STATUS "Looking for catch2 in ${MSYNC_CATCH2_DIR}.");
+		message(STATUS "Looking for catch2 in ${MSYNC_CATCH2_DIR}.")
 		add_subdirectory(${MSYNC_CATCH2_DIR} EXCLUDE_FROM_ALL)
 	endif()
 endif()
