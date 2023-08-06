@@ -57,16 +57,16 @@ jobs:
           - os: windows-latest
             arch: win32
             configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF -A Win32
-          - os: macos-10.15
-            deployment_target: 10.15
-          - os: macos-10.15
-            deployment_target: 10.15
+          - os: macos-11
+            deployment_target: 11
+          - os: macos-11
+            deployment_target: 11
             configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
-          - os: macos-10.15
-            deployment_target: 10.14
-          - os: macos-10.15
+          - os: macos-12
+            deployment_target: 12
+          - os: macos-12
             configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
-            deployment_target: 10.14
+            deployment_target: 12
 
     steps:
     - uses: actions/checkout@v2
