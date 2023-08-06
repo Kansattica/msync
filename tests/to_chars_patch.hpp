@@ -19,8 +19,8 @@ std::string_view sv_to_chars(Number n, std::array<char, 10>& char_buf)
 	// this is to avoid allocations and also not return pointers into memory that will be freed when the function returns.
 
 #if __APPLE__ && !defined(__cpp_lib_to_chars)
-	const int written = sprintf(char_buf.data(), "%u", n);
-	if (written > 10) { FAIL("You messed up with sprintf, ya dingus."); }
+	const int written = snprintf(char_buf.data(), 10, "%u", n);
+	if (written > 10) { FAIL("You messed up with snprintf, ya dingus."); }
 	return std::string_view(char_buf.data(), written);
 #else
 	const auto [end, err] = std::to_chars(char_buf.data(), char_buf.data() + char_buf.size(), n);
