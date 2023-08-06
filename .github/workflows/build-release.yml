@@ -73,7 +73,7 @@ jobs:
      
     - name: Get Version
       id: get_version
-      uses: battila7/get-version-action@v2
+      uses: Simply007/get-version-action@v2
     
     - name: Format Version
       id: format_version
