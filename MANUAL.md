@@ -192,7 +192,7 @@ To do other useful stuff with `msync`, you'll have to use queues. The `msync que
 
 To queue up favorites, run `msync queue fav <any number of status IDs>`. You can get these status IDs from downloaded posts and notifications. They're always on a line that starts with `status id:` in `home.list` and `notifications.list`- don't put any other ID numbers into this! Boosts are the same: `msync queue boost <any number of status ids>`
 
-Note that for boosted posts, you typically want to interact with the `original id` instead of the `status id`. Boosted posts get a new ID number in the database, but the Mastodon API generally wants to work with the original ID. If your msync doesn't have an `original id` column, you'll want to update to the newest release.
+Note that for boosted posts, you typically want to interact with the `original id` instead of the `status id`. Boosted posts get a new ID number in the database, but the Mastodon API generally wants to work with the original ID. If your msync doesn't have an `original id` field, you'll want to update to the newest release.
 
 If you accidentally favorited or boosted a toot you'd rather not have, run `msync queue remove fav <any number of status IDs>`. This works for favorites and boosts that you haven't sent yet (which will be removed immediately) and for ones that have already been sent (which will be removed the next time you `msync sync`).
 
