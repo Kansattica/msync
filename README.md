@@ -56,7 +56,9 @@ Older Linux releases might require you to `apt install libstdc++-8-dev` or their
 
 #### Building on macOS
 
-The instructions for building on Linux should mostly work, though note that Apple only officially supports std::filesystem on Xcode 11.1 and Catalina/10.15 and up. `msync` does support pre-10.15 versions with Boost::filesystem, which you can install through Homebrew. I don't have a Mac to test on, but I do ensure that it builds and all unit tests pass. I test on OSX 10.15, producing builds for both 10.14 with Boost::filesystem 1.72.0 and 10.15 with Apple's std::filesystem implementation.
+The instructions for building on Linux should mostly work, though note that Apple only officially supports std::filesystem on Xcode 11.1 and Catalina/10.15 and up. `msync` does support pre-10.15 versions with Boost::filesystem, which you can install through Homebrew. I don't have a Mac to test on, but I do ensure that it builds and all unit tests pass. 
+
+I used to test on OSX 10.15, producing builds for both 10.14 with Boost::filesystem 1.72.0 and 10.15 with Apple's std::filesystem implementation. GitHub Actions stopped supporting earlier macOS versions, so I now build and test on macOS 11 and 12. I have no reason to believe that earlier versions won't still work, but I have no way to test that right now.
 
 #### Building on Windows
 
@@ -70,11 +72,13 @@ If you want something lighter weight, I suspect you can install the [build tools
 
 - gcc and clang on 64-bit (x64) Ubuntu
 - gcc on 32-bit (i386) Ubuntu
-- gcc on arm64 Ubuntu
-- OSX 10.15 with Xcode 12 
-- MSVC 2017 on 32 and 64-bit Windows 
+- gcc on arm64 Ubuntu (broken?)
+- MSVC 2022 on 32 and 64-bit Windows 
+- MacOS 11 with AppleClang 13
+- MacOS 12 with AppleClang 14
 
-OSX 10.14 with Boost::filesystem should still work, but I've since changed CI providers and can't test on 10.14 any more.
+- OSX 10.15 with Xcode 12 should still work, but GitHub Actions removed support and so I can't test it any more.
+- OSX 10.14 with Boost::filesystem should still work, but I've since changed CI providers and can't test on 10.14 any more.
 
 #### Relevant CMake flags
 
