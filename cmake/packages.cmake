@@ -143,7 +143,7 @@ if (MSVC)
 	set (CMAKE_USE_OPENSSL OFF CACHE BOOL "Don't use openssl" FORCE)
 endif()
 
-set(CPR_USE_SYSTEM_CURL "${USE_SYSTEM_CURL}" ON CACHE STRING "Ensure CPR's use system curl setting matches ours.")
+set(CPR_USE_SYSTEM_CURL "${USE_SYSTEM_CURL}" CACHE STRING "Ensure CPR's use system curl setting matches ours.")
 FetchContent_GetProperties(libcpr)
 if(NOT libcpr_POPULATED)
 	message(STATUS "Configuring CPR...")
