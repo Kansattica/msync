@@ -46,7 +46,7 @@ if (NOT MSYNC_USER_CONFIG)
 	FetchContent_Declare(
 		whereamilib
 		GIT_REPOSITORY https://github.com/gpakosz/whereami.git
-		GIT_TAG	       6a8536a8b2d8c1903f22333c1a130a142f6d31de
+		GIT_TAG	       ba364cd54fd431c76c045393b6522b4bff547f50
 		)
 
 	FetchContent_GetProperties(whereamilib)
@@ -164,7 +164,7 @@ if (MSYNC_BUILD_TESTS)
 	FetchContent_Declare(
 		catch2lib
 		GIT_REPOSITORY	https://github.com/catchorg/Catch2.git
-		GIT_TAG 		v2.13.8
+		GIT_TAG 		v2.13.10
 		GIT_SHALLOW		TRUE
 		)
 
