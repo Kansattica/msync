@@ -205,7 +205,7 @@ jobs:
         if-no-files-found: error
 
     - name: Upload Man Page
-      uses: actions/upload-artifact@v2.2.2
+      uses: actions/upload-artifact@v3
       if: matrix.make_deb
       with:
         # Artifact name
