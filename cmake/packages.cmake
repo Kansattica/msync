@@ -5,6 +5,7 @@ FetchContent_Declare(
 	njson
 	URL https://github.com/nlohmann/json/releases/download/v3.10.5/include.zip
 	URL_HASH SHA256=b94997df68856753b72f0d7a3703b7d484d4745c567f3584ef97c96c25a5798e
+	DOWNLOAD_EXTRACT_TIMESTAMP true
 	)
 
 #FetchContent_MakeAvailable(json) Not available in cmake 13
@@ -142,6 +143,7 @@ if (MSVC)
 	set (CMAKE_USE_OPENSSL OFF CACHE BOOL "Don't use openssl" FORCE)
 endif()
 
+set(CPR_USE_SYSTEM_CURL "${USE_SYSTEM_CURL}" ON CACHE STRING "Ensure CPR's use system curl setting matches ours.")
 FetchContent_GetProperties(libcpr)
 if(NOT libcpr_POPULATED)
 	message(STATUS "Configuring CPR...")
