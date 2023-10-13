@@ -25,7 +25,9 @@ I recommend downloading the `.deb` file if you're on a x64 Debian-like system th
 
 If you're on OSX, the builds for 10.15 use std::filesystem APIs that are only available on OSX 10.15. Not that you can download these any more- GitHub Actions removed support for pre-11 versions of macOS, so you'll have to build yourself if you're on an older macOS.
 
-If you would like to build `msync` yourself, read on. If you have a fairly recent version of CMake (3.12 or later), you can simply clone the repo, make a `build` directory, run CMake inside, and CMake will download and build `msync` and its dependencies automatically. 
+If you would like to build `msync` yourself, read on. If you have a fairly recent version of CMake (3.15 or later), you can simply clone the repo, make a `build` directory, run CMake inside, and CMake will download and build `msync` and its dependencies automatically. 
+
+If you're on a version of CMake before 3.15, you may have to use [my old, unsupported branch of CPR](https://github.com/Kansattica/cpr) because pre-3.15 CMake versions don't support its newer FetchContent calls.
 
 Arch Linux users can use the AUR packages [msync](https://aur.archlinux.org/packages/msync/) and [msync-git](https://aur.archlinux.org/packages/msync-git/). These are maintained by someone else and I cannot test them, but I have no reason to believe they won't work.
 

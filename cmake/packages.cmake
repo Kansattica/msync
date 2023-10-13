@@ -56,11 +56,13 @@ else()
 endif()
 
 message(STATUS "Downloading CPR...")
+include(FetchContent)
 FetchContent_Declare(
-	libcpr
-	GIT_REPOSITORY 	https://github.com/kansattica/cpr.git
-	GIT_TAG			20d438db91d5be7acb3c2ba0b3183f8872287b58
+	libcpr 
+	GIT_REPOSITORY https://github.com/libcpr/cpr.git
+	GIT_TAG 2553fc41450301cd09a9271c8d2c3e0cf3546b73
 )
+
 option(USE_SYSTEM_CURL "Try to use the system's libcurl instead of downloading and statically linking." ON)
 option(MSYNC_DOWNLOAD_ZLIB "If downloading and building curl on Windows, try to download zlib as well." ON)
 option(BUILD_CPR_TESTS "" OFF)

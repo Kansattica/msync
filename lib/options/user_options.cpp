@@ -46,7 +46,7 @@ std::array<sync_settings, 4> sync_setting_defaults = {
 sync_settings user_options::get_sync_option(user_option toget) const
 {
 	//only these guys have sync options
-	assert(toget == user_option::pull_home || toget == user_option::pull_dms || toget == user_option::pull_notifications);
+	assert(toget == user_option::pull_home || toget == user_option::pull_dms || toget == user_option::pull_notifications || toget == user_option::pull_bookmarks);
 	const auto option = static_cast<size_t>(toget);
 	const auto val = backing.parsed.find(USER_OPTION_NAMES[option]);
 	if (val == backing.parsed.end())
