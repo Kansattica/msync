@@ -33,7 +33,7 @@ Arch Linux users can use the AUR packages [msync](https://aur.archlinux.org/pack
 
 ##### Notes on libcurl 
 
-- If you're compiling `msync` from source, you'll need something like `libcurl4-gnutls-dev` or `libcurl4-openssl-dev` installed.
+- If you're compiling `msync` from source, you'll need something like `libcurl4-gnutls-dev` or `libcurl4-openssl-dev` and `libssl-dev` (new CPR likes to see the SSL library headers) installed.
 - If you'd rather have msync compile curl into itself, add `-DUSE_SYSTEM_CURL=OFF` after `-DCMAKE_BUILD_TYPE=Release`. This will automatically download and configure curl as part of the build process. If you go this route, I suggest having zlib (e.g. `zlib1g-dev`, optional but highly recommended) and an ssl library (e.g. `libssl-dev`, required) installed where curl can find them.
 
 #### Building on Linux
