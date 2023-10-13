@@ -86,11 +86,16 @@ Pass these during the first call to CMake (next to `-DCMAKE_BUILD_TYPE=Release`)
 
 | Command             |   Type    | Default | Description |
 |:-------------------:|:---------:|:-------:|--------------
-| `MSYNC_BUILD_TESTS` | boolean   |  `ON`   | If `ON`, download Catch2 and build two test executables, `tests` and `net_tests`, will also be built. |
-| `MSYNC_FILE_LOG`    | boolean   |  `ON`   | If `ON`, `msync` will create an `msync.log` file in the current directory whenever it runs with a record of what it did. | 
-| `MSYNC_USER_CONFIG` | boolean   |  `OFF`  | If `ON`, `msync` will store account information in the default location for your system. On Windows, this is something like `C:\Users\username\AppData\Local`. On Linux and OSX, this is the `XDG_CONFIG_HOME` environment variable, if set, and `~/.config` otherwise. If this is `OFF`, `msync` will store information in the same directory as the executable.  |
-|`MSYNC_DOWNLOAD_ZLIB`| boolean   |  `ON`   | If `ON` AND you're on Windows, CMake will download a built copy of zlib and statically link it to curl for compression. No effect on other platforms. |
-| `USE_SYSTEM_CURL`   | boolean   |  `ON`   | If `ON` AND CMake can find `libcurl` on your system, `msync` will use that to perform network requests. If this is `OFF` OR CMake couldn't find `libcurl`, it will download, build, and statically link `libcurl` for you. |
+|     `MSYNC_BUILD_TESTS`     | boolean   |  `ON`   | If `ON`, download Catch2 and build two test executables, `tests` and `net_tests`, will also be built. |
+|       `MSYNC_FILE_LOG`      | boolean   |  `ON`   | If `ON`, `msync` will create an `msync.log` file in the current directory whenever it runs with a record of what it did. | 
+|     `MSYNC_USER_CONFIG`     | boolean   |  `OFF`  | If `ON`, `msync` will store account information in the default location for your system. On Windows, this is something like `C:\Users\username\AppData\Local`. On Linux and OSX, this is the `XDG_CONFIG_HOME` environment variable, if set, and `~/.config` otherwise. If this is `OFF`, `msync` will store information in the same directory as the executable.  |
+|    `MSYNC_DOWNLOAD_ZLIB`    | boolean   |  `ON`   | If `ON` AND you're on Windows, CMake will download a built copy of zlib and statically link it to curl for compression. No effect on other platforms. |
+|     `USE_SYSTEM_CURL`       | boolean   |  `ON`   | If `ON` AND CMake can find `libcurl` on your system, `msync` will use that to perform network requests. If this is `OFF` OR CMake couldn't find `libcurl`, it will download, build, and statically link `libcurl` for you. |
+| `MSYNC_NLOHMANN_JSON_DIR`   |  string   |   `""`    | Look in this directory for Nlohmann JSON. If empty (the default), `msync` will download it automatically. |
+|      `MSYNC_CLIPP_DIR`      |  string   |   `""`    | Look in this directory for Clipp. If empty (the default), `msync` will download it automatically. |
+|     `MSYNC_WHEREAMI_DIR`    |  string   |   `""`    | Look in this directory for Whereami. If empty (the default), `msync` will download it automatically. |
+|       `MSYNC_CPR_DIR`       |  string   |   `""`    | Look in this directory for CPR. If empty (the default), `msync` will download it automatically. |
+|      `MSYNC_CATCH2_DIR`     |  string   |   `""`    | Look in this directory for Catch2. If empty (the default) and `MSYNC_BUILD_TESTS` is `ON`, `msync` will download it automatically. |
 
 #### Testing your build
 
