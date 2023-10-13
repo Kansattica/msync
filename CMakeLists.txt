@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12..3.15)
+cmake_minimum_required(VERSION 3.15)
 
 project (msync VERSION 0.9.9.8
 	DESCRIPTION "Store and forward messages with a Mastodon API-compatible server."
@@ -11,6 +11,7 @@ option(MSYNC_FILE_LOG "Log debug messages to msync.log" ON)
 option(MSYNC_USER_CONFIG "Store configuration in the OS user configuration folder. Otherwise, store configuration in msync_accounts in the executable's directory." OFF)
 
 set(CMAKE_POLICY_DEFAULT_CMP0069 NEW) #enable interprocedural optimization for all projects
+cmake_policy(SET CMP0069 NEW) #enable interprocedural optimization for all projects
 
 include(cmake/linktimeoptimization.cmake)
 

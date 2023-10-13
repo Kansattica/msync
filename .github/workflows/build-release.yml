@@ -21,8 +21,8 @@ jobs:
             arch: x64
             apt: libcurl4-openssl-dev
           - os: ubuntu-latest
-            compiler: clang-12
-            cxx_compiler: clang++-12
+            compiler: clang-13
+            cxx_compiler: clang++-13
             arch: x64
             apt: libcurl4-openssl-dev
           - os: ubuntu-latest
@@ -30,14 +30,14 @@ jobs:
             cxx_compiler: g++-9
             arch: i386
             cflags: -m32
-            apt: gcc-9-multilib g++-9-multilib libcurl4-openssl-dev:i386 linux-libc-dev:i386
+            apt: gcc-9-multilib g++-9-multilib libcurl4-openssl-dev:i386 linux-libc-dev:i386 libssl-dev:i386
           - os: ubuntu-latest
             compiler: gcc-9
             cxx_compiler: g++-9
             arch: i386
             cflags: -m32
             configure_args: -DMSYNC_USER_CONFIG=ON -DMSYNC_FILE_LOG=OFF
-            apt: gcc-9-multilib g++-9-multilib libcurl4-openssl-dev:i386 linux-libc-dev:i386
+            apt: gcc-9-multilib g++-9-multilib libcurl4-openssl-dev:i386 linux-libc-dev:i386 libssl-dev:i386
           - os: ubuntu-latest
             compiler: gcc-9
             cxx_compiler: g++-9
@@ -102,7 +102,7 @@ jobs:
         
     - name: Enable Cross-Compilation If Needed
       if: matrix.os == 'ubuntu-latest' && matrix.arch == 'i386'
-      run: sudo dpkg --add-architecture i386 && sudo apt update
+      run: sudo dpkg --add-architecture i386 && sudo apt update && sudo apt purge --autoremove libssl-dev libcurl4-openssl-dev linux-libc-dev
 
     - name: Install Boost For Earlier OSX Versions
       if: matrix.os == 'macos-10.15' && matrix.deployment_target < 10.15
@@ -205,7 +205,7 @@ jobs:
         if-no-files-found: error
 
     - name: Upload Man Page
-      uses: actions/upload-artifact@v2.2.2
+      uses: actions/upload-artifact@v3
       if: matrix.make_deb
       with:
         # Artifact name

@@ -6,6 +6,8 @@
 
 #include <filesystem.hpp>
 
+using namespace std::string_view_literals;
+
 std::string_view ensure_small_string(const std::string_view sv)
 {
 	// I want to ensure that, when a string is constructed from this, it's cheap to make
@@ -96,32 +98,32 @@ net_response upload_media(std::string_view url, std::string_view access_token, c
 	));
 }
 
-void add_if_value(cpr::Payload& params, const char* key, const std::string& value)
+void add_if_value(cpr::Payload& params, const std::string_view key, const std::string& value)
 {
 	if (!value.empty())
-		params.AddPair(cpr::Pair(key, value));
+		params.Add(cpr::Pair(std::string(key), value));
 }
 
-void add_array(cpr::Payload& params, const char* key, const std::vector<std::string>& values)
+void add_array(cpr::Payload& params, const std::string_view key, const std::vector<std::string>& values)
 {
 	for (const auto& value : values)
 	{
-		params.AddPair(cpr::Pair(key, value));
+		params.Add(cpr::Pair(std::string(key), value));
 	}
 }
 
 net_response new_status(std::string_view url, std::string_view access_token, const status_params& params)
 {
 	cpr::Payload post_params{};
-	add_if_value(post_params, "status", params.body);
-	add_if_value(post_params, "spoiler_text", params.content_warning);
-	add_if_value(post_params, "visibility", params.visibility);
-	add_if_value(post_params, "in_reply_to_id", params.reply_to);
+	add_if_value(post_params, "status"sv, params.body);
+	add_if_value(post_params, "spoiler_text"sv, params.content_warning);
+	add_if_value(post_params, "visibility"sv, params.visibility);
+	add_if_value(post_params, "in_reply_to_id"sv, params.reply_to);
 
 	// the mastodon api page doesn't mention this, but apparently this is a feature of rails
 	// (that the other mastodon api libs use)
 	// that lets you specify arrays with empty brackets like this
-	add_array(post_params, "media_ids[]", params.attachment_ids);
+	add_array(post_params, "media_ids[]"sv, params.attachment_ids);
 
 
 	return handle_response(
@@ -131,17 +133,17 @@ net_response new_status(std::string_view url, std::string_view access_token, con
 			std::move(post_params)));
 }
 
-void add_if_value(cpr::Parameters& params, const char* key, const std::string_view value)
+void add_if_value(cpr::Parameters& params, const std::string_view key, const std::string_view value)
 {
 	if (!value.empty())
-		params.AddParameter(cpr::Parameter{ key, value });
+		params.Add(cpr::Parameter{ std::string(key), std::string(value) });
 }
 
-void add_array(cpr::Parameters& params, const char* key, const std::vector<std::string_view>& values)
+void add_array(cpr::Parameters& params, const std::string_view key, const std::vector<std::string_view>& values)
 {
 	for (const auto& value : values)
 	{
-		params.AddParameter(cpr::Parameter{ key, value });
+		params.Add(cpr::Parameter{ std::string(key), std::string(value) });
 	}
 }
 
@@ -149,11 +151,11 @@ net_response get_timeline_and_notifs(std::string_view url, std::string_view acce
 {
 	cpr::Parameters query_params{ { "limit", std::to_string(limit) } };
 
-	add_if_value(query_params, "min_id", params.min_id);
-	add_if_value(query_params, "max_id", params.max_id);
-	add_if_value(query_params, "since_id", params.since_id);
+	add_if_value(query_params, "min_id"sv, params.min_id);
+	add_if_value(query_params, "max_id"sv, params.max_id);
+	add_if_value(query_params, "since_id"sv, params.since_id);
 
-	if (params.exclude_notifs != nullptr) { add_array(query_params, "exclude_types[]", *params.exclude_notifs); }
+	if (params.exclude_notifs != nullptr) { add_array(query_params, "exclude_types[]"sv, *params.exclude_notifs); }
 
 	return handle_response(
 		cpr::Get(cpr::Url{ url },

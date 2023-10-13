@@ -1,10 +1,14 @@
+if(POLICY CMP0135)
+	cmake_policy(SET CMP0135 NEW) #fix warning about zip file timestamps
+endif()
+
 include(FetchContent)
 
 message(STATUS "Downloading nlohmann json...")
 FetchContent_Declare(
 	njson
-	URL https://github.com/nlohmann/json/releases/download/v3.10.5/include.zip
-	URL_HASH SHA256=b94997df68856753b72f0d7a3703b7d484d4745c567f3584ef97c96c25a5798e
+	URL https://github.com/nlohmann/json/releases/download/v3.11.2/include.zip
+	URL_HASH SHA256=e5c7a9f49a16814be27e4ed0ee900ecd0092bfb7dbfca65b5a421b774dccaaed
 	)
 
 #FetchContent_MakeAvailable(json) Not available in cmake 13
@@ -42,7 +46,7 @@ if (NOT MSYNC_USER_CONFIG)
 	FetchContent_Declare(
 		whereamilib
 		GIT_REPOSITORY https://github.com/gpakosz/whereami.git
-		GIT_TAG	       6a8536a8b2d8c1903f22333c1a130a142f6d31de
+		GIT_TAG	       ba364cd54fd431c76c045393b6522b4bff547f50
 		)
 
 	FetchContent_GetProperties(whereamilib)
@@ -56,11 +60,13 @@ else()
 endif()
 
 message(STATUS "Downloading CPR...")
+include(FetchContent)
 FetchContent_Declare(
-	libcpr
-	GIT_REPOSITORY 	https://github.com/kansattica/cpr.git
-	GIT_TAG			20d438db91d5be7acb3c2ba0b3183f8872287b58
+	libcpr 
+	GIT_REPOSITORY https://github.com/libcpr/cpr.git
+	GIT_TAG 2553fc41450301cd09a9271c8d2c3e0cf3546b73
 )
+
 option(USE_SYSTEM_CURL "Try to use the system's libcurl instead of downloading and statically linking." ON)
 option(MSYNC_DOWNLOAD_ZLIB "If downloading and building curl on Windows, try to download zlib as well." ON)
 option(BUILD_CPR_TESTS "" OFF)
@@ -140,6 +146,7 @@ if (MSVC)
 	set (CMAKE_USE_OPENSSL OFF CACHE BOOL "Don't use openssl" FORCE)
 endif()
 
+set(CPR_USE_SYSTEM_CURL "${USE_SYSTEM_CURL}" CACHE STRING "Ensure CPR's use system curl setting matches ours.")
 FetchContent_GetProperties(libcpr)
 if(NOT libcpr_POPULATED)
 	message(STATUS "Configuring CPR...")
@@ -157,7 +164,7 @@ if (MSYNC_BUILD_TESTS)
 	FetchContent_Declare(
 		catch2lib
 		GIT_REPOSITORY	https://github.com/catchorg/Catch2.git
-		GIT_TAG 		v2.13.8
+		GIT_TAG 		v2.13.10
 		GIT_SHALLOW		TRUE
 		)
 
