@@ -102,7 +102,7 @@ jobs:
         
     - name: Enable Cross-Compilation If Needed
       if: matrix.os == 'ubuntu-latest' && matrix.arch == 'i386'
-      run: sudo dpkg --add-architecture i386 && sudo apt update
+      run: sudo dpkg --add-architecture i386 && sudo apt update && sudo apt purge --autoremove libssl-dev libcurl4-openssl-dev linux-libc-dev
 
     - name: Install Boost For Earlier OSX Versions
       if: matrix.os == 'macos-10.15' && matrix.deployment_target < 10.15
