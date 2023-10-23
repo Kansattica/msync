@@ -97,6 +97,8 @@ Pass these during the first call to CMake (next to `-DCMAKE_BUILD_TYPE=Release`)
 |       `MSYNC_CPR_DIR`       |  string   |   `""`    | Look in this directory for CPR. If empty (the default), `msync` will download it automatically. |
 |      `MSYNC_CATCH2_DIR`     |  string   |   `""`    | Look in this directory for Catch2. If empty (the default) and `MSYNC_BUILD_TESTS` is `ON`, `msync` will download it automatically. |
 
+If the `MSYNC_*_DIR` options don't work, please let me know with a GitHub issue- these are provided as conveniences for packaging and I don't have a good way to test them on their own.
+
 #### Testing your build
 
 To ensure that `msync` found and compiled its network dependencies correctly, run the CMake commands above without `-DMSYNC_BUILD_TESTS=OFF` (or, equivalently, `-DMSYNC_BUILD_TESTS=ON`). Then, run `./tests/net_tests`. This will determine whether `msync` can correctly make authenticated HTTPS requests and will print warnings if it cannot request and recieve compressed responses.
