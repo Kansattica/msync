@@ -4,11 +4,17 @@ project (msync VERSION 0.9.9.8
 	DESCRIPTION "Store and forward messages with a Mastodon API-compatible server."
 	HOMEPAGE_URL "https://github.com/Kansattica/msync"
 	LANGUAGES CXX C)
-set (CPACK_PACKAGE_CONTACT "grace@princess.software")
+set (CPACK_PACKAGE_CONTACT "msync@princess.software")
 
 option(MSYNC_BUILD_TESTS "Download catch2 and build tests with it." ON)
 option(MSYNC_FILE_LOG "Log debug messages to msync.log" ON)
 option(MSYNC_USER_CONFIG "Store configuration in the OS user configuration folder. Otherwise, store configuration in msync_accounts in the executable's directory." OFF)
+
+set(MSYNC_NLOHMANN_JSON_DIR "" CACHE PATH "Path to a directory to search for Nlohmann JSON. If empty, CMake will download it.")
+set(MSYNC_CLIPP_DIR "" CACHE PATH "Path to a directory to search for clipp. If empty, CMake will download it.")
+set(MSYNC_WHEREAMI_DIR "" CACHE PATH "Path to a directory to search for whereami. If empty, CMake will download it.")
+set(MSYNC_CPR_DIR "" CACHE PATH "Path to a directory to search for cpr. If empty, CMake will download it.")
+set(MSYNC_CATCH2_DIR "" CACHE PATH "Path to a directory to search for catch2. If empty, CMake will download it.")
 
 set(CMAKE_POLICY_DEFAULT_CMP0069 NEW) #enable interprocedural optimization for all projects
 
